@@ -4,7 +4,7 @@ COPY installer.sh /
 
 ENV DEBIAN_FRONTEND non-interactive
 
-RUN apt-get -qq update && \
+RUN apt-get update && \
 	apt-get -qq install \
 		wget \
 		git \
