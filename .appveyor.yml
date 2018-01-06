@@ -28,11 +28,6 @@ before_build:
 build_script:
   - mingw32-make
 
-after_build:
-  - mingw32-make test
-  - mingw32-make package
-  - dir
-
 cache:
 - SDL2-devel-%SDL2_VERSION%-mingw.tar.gz
 - SDL2_mixer-devel-2.0.2-mingw.tar.gz
