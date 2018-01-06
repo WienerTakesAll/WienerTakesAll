@@ -44,6 +44,7 @@ cd $DIR
 
 #SDL2_mixer
 wget https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-2.0.2.tar.gz
+tar xzf SDL2_mixer-2.0.2.tar.gz
 cd SDL2_mixer-2.0.2
 
 ./configure
