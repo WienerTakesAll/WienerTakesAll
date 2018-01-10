@@ -18,8 +18,10 @@ else
 	docker run --rm -t \
 		-v $DIR:/WienerTakesAll/ \
 		$IMAGE_NAME ./build.sh "$1"
+	exit_status=$? 
 	docker run --rm \
 		-v $DIR:/WienerTakesAll/ \
 		$IMAGE_NAME chown -R 1000:1000 .
+	exit $exit_status
 fi
 
