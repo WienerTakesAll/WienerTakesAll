@@ -7,6 +7,7 @@
 //For how to handle events, please view EventSystem.h
 struct Event
 {
+	Event(std::string&& name);
 	//Construct an event from a variable number of arguments
 	template <typename... T>
 	Event(std::string&& name, T... args);
@@ -28,7 +29,6 @@ struct Event
 	std::unordered_map<std::string, EventValue> eventValues;
 	//Due to strings having non-trivial destructors, I can't put them in the union! Oops!
 	std::unordered_map<std::string, std::string> stringValues;
-
 
 	void add_value(std::string name, int arg);
 	void add_value(std::string name, float arg);
