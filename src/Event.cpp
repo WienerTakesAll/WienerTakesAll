@@ -1,3 +1,5 @@
+#include <typeinfo>
+
 #include "Event.h"
 
 Event::Event(std::string&& name)
