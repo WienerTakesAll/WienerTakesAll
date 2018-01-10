@@ -34,7 +34,7 @@ private:
 	std::vector<Event> eventQueue;
 	std::unordered_map<std::string, std::function<void(Event)>> functionHandlers;
 };
-#include "EventSystem.impl"
+#include "EventSystem_impl.h"
 
 /*
 
