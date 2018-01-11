@@ -8,31 +8,30 @@
 #include "Event.h"
 
 template<class T>
-class EventSystem
-{
+class EventSystem {
 public:
-	EventSystem() = default;
-	~EventSystem() = default;
+    EventSystem() = default;
+    ~EventSystem() = default;
 
-	//Add a function to handle an event of name eventName. Also requires "this" pointer of object.
-	//Example Usage: addEventHandler("someEvent", &ExampleClass::ExampleFunction, this)
-	void addEventHandler(std::string&& eventName, std::function<void(T*,Event)> handleFunction, T* this_pointer);
+    //Add a function to handle an event of name eventName. Also requires "this" pointer of object.
+    //Example Usage: addEventHandler("someEvent", &ExampleClass::ExampleFunction, this)
+    void addEventHandler(std::string&& eventName, std::function<void(T*, Event)> handleFunction, T* this_pointer);
 
-	//Takes a list of events and runs the specified function handlers
-	void handleEvents(const std::vector<Event>& events);
+    //Takes a list of events and runs the specified function handlers
+    void handleEvents(const std::vector<Event>& events);
 
-	//Construct and queue an event.
-	//Example Usage: queueEvent("someEvent", "int_value", 10, "float_value", 5.5f, "string_value", "text")
-	void queueEvent(Event&& queuedEvent);
+    //Construct and queue an event.
+    //Example Usage: queueEvent("someEvent", "int_value", 10, "float_value", 5.5f, "string_value", "text")
+    void queueEvent(Event&& queuedEvent);
 
-	//Send the accumulated events to a list.
-	//This should be used to congregate the events of all the systems before handling
-	void sendEvents(std::vector<Event>& reciever);
+    //Send the accumulated events to a list.
+    //This should be used to congregate the events of all the systems before handling
+    void sendEvents(std::vector<Event>& reciever);
 
 private:
 
-	std::vector<Event> eventQueue;
-	std::unordered_map<std::string, std::function<void(Event)>> functionHandlers;
+    std::vector<Event> eventQueue;
+    std::unordered_map<std::string, std::function<void(Event)>> functionHandlers;
 };
 #include "EventSystem_impl.h"
 

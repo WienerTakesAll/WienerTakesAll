@@ -1,26 +1,27 @@
 #include <iostream>
 
 #include "EventSystem.h"
+
 #include "Renderer.h"
 
 
+
 int main(int argc, char* args[]) {
+    Renderer renderer;
 
-	Renderer renderer;
+    std::vector<Event> events;
+    events.emplace_back("load");
 
-	std::vector<Event> events;
-	events.emplace_back("load");
+    for (;;) {
+        renderer.handleEvents(events);
+        events.clear();
 
-	for (;;) {
-		renderer.handleEvents(events);
-		events.clear();
+        renderer.update();
 
-		renderer.update();
+        renderer.render();
 
-		renderer.render();
+        renderer.sendEvents(events);
+    }
 
-		renderer.sendEvents(events);
-	}
-
-	return 0;
+    return 0;
 }
