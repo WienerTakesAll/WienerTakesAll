@@ -22,7 +22,7 @@ function src {
 }
 
 function format {
-	(cd "$DIR/src" && astyle "*.h" "*.cpp" -r --options=astylerc)
+	(cd "$DIR/src" && astyle "*.h" "*.cpp" -r --options=../astylerc)
 	find "$DIR" -name "*.orig" -delete
 }
 
