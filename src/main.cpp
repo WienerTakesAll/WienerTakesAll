@@ -14,17 +14,17 @@ int main(int argc, char* args[]) {
 	Renderer renderer;
 
 	std::vector<Event> events;
-	events.emplace_back("load");
+	events.emplace_back(EventType::LOAD_EVENT);
 
 	for (;;) {
-		renderer.handleEvents(events);
+		renderer.handle_events(events);
 		events.clear();
 
 		renderer.update();
 
 		renderer.render();
 
-		renderer.sendEvents(events);
+		renderer.send_events(events);
 	}
 
     return 0;

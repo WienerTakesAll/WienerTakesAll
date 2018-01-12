@@ -5,7 +5,7 @@
 Renderer::Renderer()
 	: time(0.0f)
 {
-	EventSystem::addEventHandler("load", &Renderer::load, this);
+	EventSystem::add_event_handler(EventType::LOAD_EVENT, &Renderer::load, this);
 }
 
 void Renderer::update()

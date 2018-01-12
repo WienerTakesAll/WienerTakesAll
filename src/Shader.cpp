@@ -21,7 +21,6 @@ bool Shader::loadShader(const std::string& vertexPath, const std::string& fragme
 	}
 	else {
 		std::cout << "Failed to open " << vertexPath << std::endl;
-		getchar();
 		return false;
 	}
 
