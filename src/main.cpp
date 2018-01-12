@@ -1,10 +1,15 @@
 #include <iostream>
 
+
 #include "EventSystem.h"
 #include "Renderer.h"
 
 
+#include "ExampleClass.h"
+
+
 int main(int argc, char* args[]) {
+
 
 	Renderer renderer;
 
@@ -22,5 +27,5 @@ int main(int argc, char* args[]) {
 		renderer.sendEvents(events);
 	}
 
-	return 0;
+    return 0;
 }
