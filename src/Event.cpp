@@ -2,8 +2,8 @@
 
 #include "Event.h"
 
-Event::Event(std::string&& name)
-    : eventName(name) {
+Event::Event(EventType eType)
+    : eventType(eType) {
 }
 
 void Event::add_value(std::string name, int arg) {
@@ -26,18 +26,18 @@ void Event::add_value(std::string name, std::string&& arg) {
 }
 
 template<>
-int Event::getValue(const std::string& name, int otherwise) {
+int Event::getValue(const std::string& name, int otherwise) const {
     const auto val = eventValues.find(name);
 
     if (val == eventValues.end()) {
-        std::cout << "Value " << name << " not found in event " << eventName << "!" << std::endl;
+        std::cout << "Value " << name << " not found in event " << static_cast<int>(eventType) << "!" << std::endl;
         return otherwise;
     }
 
     if (val->second.typeName != typeid(int).name()) {
         std::cout
                 << "Wrong type int instead of " << val->second.typeName
-                << " in value " << name << " of event " << eventName << "!" << std::endl;
+                << " in value " << name << " of event " << static_cast<int>(eventType) << "!" << std::endl;
         return otherwise;
     }
 
@@ -45,18 +45,18 @@ int Event::getValue(const std::string& name, int otherwise) {
 }
 
 template<>
-float Event::getValue(const std::string& name, float otherwise) {
+float Event::getValue(const std::string& name, float otherwise) const {
     const auto val = eventValues.find(name);
 
     if (val == eventValues.end()) {
-        std::cout << "Value " << name << " not found in event " << eventName << "!" << std::endl;
+        std::cout << "Value " << name << " not found in event " << static_cast<int>(eventType) << "!" << std::endl;
         return otherwise;
     }
 
     if (val->second.typeName != typeid(float).name()) {
         std::cout
                 << "Wrong type float instead of " << val->second.typeName
-                << " in value " << name << " of event " << eventName << "!" << std::endl;
+                << " in value " << name << " of event " << static_cast<int>(eventType) << "!" << std::endl;
         return otherwise;
     }
 
@@ -64,11 +64,11 @@ float Event::getValue(const std::string& name, float otherwise) {
 }
 
 template<>
-std::string Event::getValue(const std::string& name, std::string otherwise) {
+std::string Event::getValue(const std::string& name, std::string otherwise) const {
     const auto val = stringValues.find(name);
 
     if (val == stringValues.end()) {
-        std::cout << "String Value " << name << " not found in event " << eventName << "!" << std::endl;
+        std::cout << "String Value " << name << " not found in event " << static_cast<int>(eventType) << "!" << std::endl;
         return otherwise;
     }
 

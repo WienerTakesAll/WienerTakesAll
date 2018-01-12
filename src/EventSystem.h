@@ -3,7 +3,7 @@
 #include <string>
 #include <functional>
 #include <vector>
-#include <unordered_map>
+#include <array>
 
 #include "Event.h"
 
@@ -15,7 +15,7 @@ public:
 
     //Add a function to handle an event of name eventName. Also requires "this" pointer of object.
     //Example Usage: addEventHandler("someEvent", &ExampleClass::ExampleFunction, this)
-    void addEventHandler(std::string&& eventName, std::function<void(T*, Event)> handleFunction, T* this_pointer);
+    void addEventHandler(EventType eventType, std::function<void(T*, Event)> handleFunction, T* this_pointer);
 
     //Takes a list of events and runs the specified function handlers
     void handleEvents(const std::vector<Event>& events);
@@ -31,7 +31,7 @@ public:
 private:
 
     std::vector<Event> eventQueue;
-    std::unordered_map<std::string, std::function<void(Event)>> functionHandlers;
+    std::array<std::function<void(const Event&)>, static_cast<int>(EventType::EVENT_COUNT)> functionHandlers;
 };
 #include "EventSystem_impl.h"
 
@@ -72,7 +72,7 @@ public:
 
 		//Now let's say we want to send an event...
 		EventSystem::queueEvent(
-			Event("someKindofEvent",
+			Event(EventType::someEvent,
 				"I am a string type", "I am a value of a string type",
 				"I am an int type", 5,
 				"I am a float type", 5.0f,
@@ -85,7 +85,7 @@ public:
 };
 
 //So how might we handle a specific event?
-void ExampleClass::handleExampleEvent(Event some_event)
+void ExampleClass::handleExampleEvent(const Event& some_event)
 {
 	//Lets grab what values we might need
 

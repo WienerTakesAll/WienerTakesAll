@@ -5,7 +5,7 @@
 class ExampleClass : public EventSystem<ExampleClass> {
 public:
     //Pretend this does something
-    void handleExampleEvent(Event some_event);
+    void handleExampleEvent(const Event& some_event);
 
     //Here's what a constructor should look like
     ExampleClass() {
@@ -14,7 +14,7 @@ public:
         //"&ExampleClass::handleExampleEvent" is a function that will be called on the event.
         //--> Note that the handler MUST have type void(Event) <--
         //"this" is the pointer of this class. A little redundant, but it's the best I could do.
-        EventSystem::addEventHandler("someKindofEvent", &ExampleClass::handleExampleEvent, this);
+        EventSystem::addEventHandler(EventType::load, &ExampleClass::handleExampleEvent, this);
     }
 
 
@@ -26,7 +26,7 @@ public:
 
         //Now let's say we want to send an event...
         EventSystem::queueEvent(
-            Event("someKindofEvent",
+            Event(EventType::load,
                   "I am a string type", "I am a value of a string type",
                   "I am an int type", 5,
                   "I am a float type", 5.0f,
@@ -38,7 +38,7 @@ public:
 
 };
 
-void ExampleClass::handleExampleEvent(Event some_event) {
+void ExampleClass::handleExampleEvent(const Event& some_event) {
     //Lets grab what values we might need
 
     //neededString will be the string, or "error" if there is no such string
