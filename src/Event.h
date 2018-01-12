@@ -4,18 +4,18 @@
 #include <unordered_map>
 #include <string>
 
-enum class EventType {load, EVENT_COUNT};
+enum class EventType {LOAD_EVENT, DUMMY_EVENT, EVENT_COUNT};
 
 //For how to handle events, please view EventSystem.h
 struct Event {
-    Event(EventType eType);
+    Event(EventType e_type);
     //Construct an event from a variable number of arguments
     template <typename... T>
     Event(EventType eType, T... args);
 
-    EventType eventType;
+    EventType event_type;
     struct EventValue {
-        std::string typeName;
+        std::string type_name;
         union ValueType {
             int         int_type;
             float       float_type;
@@ -29,13 +29,13 @@ struct Event {
     void add_value(std::string name, std::string&& arg);
 
     template<typename T>
-    T getValue(const std::string& name, T otherwise) const;
+    T get_value(const std::string& name, T otherwise) const;
 
 private:
 
-	std::unordered_map<std::string, EventValue> eventValues;
-	//Due to strings having non-trivial destructors, I can't put them in the union! Oops!
-	std::unordered_map<std::string, std::string> stringValues;
+    std::unordered_map<std::string, EventValue> event_values;
+    //Due to strings having non-trivial destructors, I can't put them in the union! Oops!
+    std::unordered_map<std::string, std::string> string_values;
 
     template <typename U, typename... T>
     void event_impl(std::string&& name, U&& arg, T... rest);
