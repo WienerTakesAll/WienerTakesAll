@@ -173,36 +173,38 @@ void InputManager::process_input(SDL_Event* event) const {
 
             switch (event->caxis.axis) {
                 case SDL_CONTROLLER_AXIS_LEFTX:
-                    std::cout << "Left axis horizontal" << std::endl;
+                    std::cout << "Left axis horizontal";
                     break;
 
                 case SDL_CONTROLLER_AXIS_LEFTY:
-                    std::cout << "Left axis vertical" << std::endl;
+                    std::cout << "Left axis vertical";
                     break;
 
                 case SDL_CONTROLLER_AXIS_RIGHTX:
-                    std::cout << "Right axis horizontal" << std::endl;
+                    std::cout << "Right axis horizontal";
                     break;
 
                 case SDL_CONTROLLER_AXIS_RIGHTY:
-                    std::cout << "Right axis vertical" << std::endl;
+                    std::cout << "Right axis vertical";
                     break;
 
                 case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
-                    std::cout << "Left trigger" << std::endl;
+                    std::cout << "Left trigger";
                     break;
 
                 case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-                    std::cout << "Right trigger" << std::endl;
+                    std::cout << "Right trigger";
                     break;
 
                 case SDL_CONTROLLER_AXIS_INVALID:
-                    std::cout << "Invalid axis" << std::endl;
+                    std::cout << "Invalid axis";
                     break;
 
                 default:
                     break;
             }
+
+            std::cout << " value: " << value << std::endl;
 
             break;
 
