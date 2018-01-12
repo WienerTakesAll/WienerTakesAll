@@ -28,7 +28,6 @@ InputManager::InputManager() {
                 fprintf(stderr, "Could not open gamecontroller %i: %s\n", player_id, SDL_GetError());
             }
 
-            break;
         }
     }
 
@@ -42,8 +41,12 @@ InputManager::InputManager() {
 }
 
 void InputManager::process_input(SDL_Event* event) const {
+    int player_id = -1;
+
     switch (event->type) {
+        // Keyboard (Player 1)
         case SDL_KEYDOWN:
+            player_id = 0;
 
             /* Check the SDLKey values and move change the coords */
             switch ( event->key.keysym.sym ) {
@@ -55,7 +58,12 @@ void InputManager::process_input(SDL_Event* event) const {
                     break;
             }
 
+            break;
+
         case SDL_CONTROLLERBUTTONDOWN:
+
+            player_id = event->cbutton.which; // Joystick ID of event sender
+            std::cout << "[Player " << player_id << "] ";
 
             switch (event->cbutton.button) {
 
@@ -152,13 +160,16 @@ void InputManager::process_input(SDL_Event* event) const {
 
             break;
 
-
         case SDL_CONTROLLERAXISMOTION:
-            const int deadzone = 3200; // Range of displacement for joystick before reading event
+            const int DEADZONE = 3200; // Minimum range of displacement for joystick before reading event
+            int value = event->caxis.value; // Current displacement of joystick
 
-            if ((event->caxis.value > -deadzone) && (event->caxis.value < deadzone)) {
+            if ((value > -DEADZONE) && (value < DEADZONE)) {
                 break;
             }
+
+            player_id = event->caxis.which; // Joystick ID of event sender
+            std::cout << "[Player " << player_id << "] ";
 
             switch (event->caxis.axis) {
                 case SDL_CONTROLLER_AXIS_LEFTX:
@@ -192,6 +203,8 @@ void InputManager::process_input(SDL_Event* event) const {
                 default:
                     break;
             }
+
+            break;
 
     }
 }
