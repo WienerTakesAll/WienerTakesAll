@@ -3,6 +3,7 @@
 #include "SDL.h"
 
 #include "EventSystem.h"
+#include "InputManager.h"
 
 SDL_Window* window = NULL;
 
@@ -94,16 +95,20 @@ int main(int argc, char* args[]) {
 
     std::cout << "Driver: " <<  SDL_GetCurrentVideoDriver() << std::endl;
 
+    InputManager input_manager;
+
     for (;;) {
         SDL_Event event;
 
+        // Early out on quit
+        if (event.type == SDL_QUIT) {
+            std::cout << "SDL_QUIT was called" << std::endl;
+            SDL_Quit();
+            break;
+        }
+
         while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-                case SDL_QUIT:
-                    std::cout << "SDL_QUIT was called" << std::endl;
-                    SDL_Quit();
-                    break;
-            }
+            input_manager.ProcessInput(&event);
         }
     }
 
