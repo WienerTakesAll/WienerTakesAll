@@ -14,7 +14,7 @@ public:
     InputManager();
 
     int pId;
-    void ProcessInput(SDL_Event* event) const;
+    void process_input(SDL_Event* event) const;
 };
 
 #endif

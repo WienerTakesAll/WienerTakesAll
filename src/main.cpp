@@ -108,7 +108,7 @@ int main(int argc, char* args[]) {
         }
 
         while (SDL_PollEvent(&event)) {
-            input_manager.ProcessInput(&event);
+            input_manager.process_input(&event);
         }
     }
 
