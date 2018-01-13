@@ -1,5 +1,4 @@
-#ifndef INPUT_H
-#define INPUT_H
+#pragma once
 
 #include <vector>
 
@@ -8,13 +7,12 @@
 
 class InputManager {
 
+    const int DEADZONE = 8000; // Minimum range of displacement for joystick before reading event
     std::vector<SDL_GameController*> controllers;
 
 public:
     InputManager();
 
-    int pId;
     void process_input(SDL_Event* event) const;
+    void quit();
 };
-
-#endif

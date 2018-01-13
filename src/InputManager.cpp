@@ -9,15 +9,10 @@ InputManager::InputManager() {
     int num_controllers_player = SDL_NumJoysticks();
 
     // Link player controllers
-    SDL_JoystickEventState(SDL_ENABLE);
     SDL_GameControllerEventState(SDL_ENABLE);
-
-    SDL_Joystick* joystick = nullptr;
     SDL_GameController* controller = nullptr;
 
     for (int player_id = 0; player_id < num_controllers_player; ++player_id) {
-        joystick = SDL_JoystickOpen(player_id);
-
         if (SDL_IsGameController(player_id)) {
             controller = SDL_GameControllerOpen(player_id);
 
@@ -35,7 +30,7 @@ InputManager::InputManager() {
     if (num_controllers_player < MAX_PLAYERS) {
         for (int player_id = num_controllers_player; player_id < MAX_PLAYERS; ++player_id) {
             // Create AI controller
-            std::cout << "AI Controller for player " << player_id << " created" << std::endl;
+            std::cout << "Create AI Controller for player " << player_id << " here" << std::endl;
         }
     }
 }
@@ -161,7 +156,6 @@ void InputManager::process_input(SDL_Event* event) const {
             break;
 
         case SDL_CONTROLLERAXISMOTION:
-            const int DEADZONE = 3200; // Minimum range of displacement for joystick before reading event
             int value = event->caxis.value; // Current displacement of joystick
 
             if ((value > -DEADZONE) && (value < DEADZONE)) {
@@ -211,3 +205,11 @@ void InputManager::process_input(SDL_Event* event) const {
     }
 }
 
+void InputManager::quit() {
+    for (SDL_GameController* game_controller : controllers) {
+        SDL_GameControllerClose(game_controller);
+    }
+
+    controllers.clear();
+    std::cout << "All controllers closed" << std::endl;
+}

@@ -41,21 +41,37 @@ int main(int argc, char* args[]) {
 
     InputManager input_manager;
 
+    // Create World
+
     bool game_is_running = true;
 
     while (game_is_running) {
         SDL_Event event;
 
+        // Input
         while (SDL_PollEvent(&event)) {
             // Early out on quit
             if (event.type == SDL_QUIT) {
                 std::cout << "SDL_QUIT was called" << std::endl;
-                SDL_Quit();
                 game_is_running = false;
+                input_manager.quit();
+                SDL_Quit();
+                continue;
             }
 
             input_manager.process_input(&event);
         }
+
+        // Events
+
+        // Gameplay
+
+        // Physics
+
+        // Rendering
+
+        // UI
+
     }
 
     return 0;
