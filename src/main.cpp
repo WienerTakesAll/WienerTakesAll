@@ -10,10 +10,10 @@ SDL_Window* window = NULL;
 int main(int argc, char* args[]) {
 
     ExampleClass example;
-    example.doSomething();
+    example.do_something();
     std::vector<Event> allEvents;
-    example.sendEvents(allEvents);
-    example.handleEvents(allEvents);
+    example.send_events(allEvents);
+    example.handle_events(allEvents);
 
 
 
