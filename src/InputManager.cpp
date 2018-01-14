@@ -18,7 +18,7 @@ InputManager::InputManager() {
                 controllers.push_back(controller);
                 std::cout << "Controller for player " << player_id << " linked" << std::endl;
             } else {
-                std::fprintf(stderr, "Could not open gamecontroller %i: %s\n", player_id, SDL_GetError());
+                std::cerr << "Could not open GameController " << player_id << ": " << SDL_GetError() << std::endl;
             }
 
         }
