@@ -3,8 +3,6 @@
 #include "InputManager.h"
 #include "SDL.h"
 
-const int MAX_PLAYERS = 4;
-
 InputManager::InputManager() {
     int num_controllers_player = SDL_NumJoysticks();
 
@@ -42,11 +40,28 @@ void InputManager::process_input(SDL_Event* event) const {
         // Keyboard (Player 1)
         case SDL_KEYDOWN:
             player_id = 0;
+            std::cout << "[Player " << player_id << "] ";
 
             /* Check the SDLKey values and move change the coords */
             switch ( event->key.keysym.sym ) {
-                case SDLK_LEFT:
-                    std::cout << "Left was pressed" << std::endl;
+                case SDLK_w:
+                    std::cout << "W was pressed" << std::endl;
+                    break;
+
+                case SDLK_s:
+                    std::cout << "S was pressed" << std::endl;
+                    break;
+
+                case SDLK_a:
+                    std::cout << "A was pressed" << std::endl;
+                    break;
+
+                case SDLK_d:
+                    std::cout << "D was pressed" << std::endl;
+                    break;
+
+                case SDLK_SPACE:
+                    std::cout << "SPACE was pressed" << std::endl;
                     break;
 
                 default:
@@ -166,6 +181,11 @@ void InputManager::process_input(SDL_Event* event) const {
             std::cout << "[Player " << player_id << "] ";
 
             switch (event->caxis.axis) {
+
+                /**
+                 * LEFT STICK
+                 */
+
                 case SDL_CONTROLLER_AXIS_LEFTX:
                     std::cout << "Left axis horizontal";
                     break;
@@ -173,6 +193,10 @@ void InputManager::process_input(SDL_Event* event) const {
                 case SDL_CONTROLLER_AXIS_LEFTY:
                     std::cout << "Left axis vertical";
                     break;
+
+                /**
+                 * RIGHT STICK
+                 */
 
                 case SDL_CONTROLLER_AXIS_RIGHTX:
                     std::cout << "Right axis horizontal";
@@ -182,6 +206,10 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "Right axis vertical";
                     break;
 
+                /**
+                 * TRIGGERS
+                 */
+
                 case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
                     std::cout << "Left trigger";
                     break;
@@ -189,6 +217,10 @@ void InputManager::process_input(SDL_Event* event) const {
                 case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
                     std::cout << "Right trigger";
                     break;
+
+                /**
+                 * MISC
+                 */
 
                 case SDL_CONTROLLER_AXIS_INVALID:
                     std::cout << "Invalid axis";
