@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vector>
 #include <array>
 
@@ -5,12 +7,13 @@
 #include "SDL_opengl.h"
 #include "glm\glm.hpp"
 
-class RenderObject
-{
+class RenderingComponent {
 public:
     //Takes a list of camera matrices and renders up to 4 views
     //Does not set the shader
-    void render_views(std::array<glm::mat4x4,4>& cameras, size_t count, GLuint program_id);
+    void render_views(std::array<glm::mat4x4, 4>& cameras, size_t count, GLuint program_id);
+
+
     void load_from_file(const std::string& file_path);
 
 private:

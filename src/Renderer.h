@@ -1,7 +1,7 @@
 #pragma once
 
 #include "EventSystem.h"
-#include "RenderObject.h"
+#include "RenderingComponent.h"
 #include "Shader.h"
 
 #include "SDL_opengl.h"
@@ -10,24 +10,24 @@
 class Renderer : public EventSystem<Renderer>
 {
 public:
-	Renderer();
-	
-	void update();
-	void render();
+    Renderer();
+    
+    void update();
+    void render();
 private:
-	void load(Event e);
+    void load(Event e);
 
-	void start_render();
-	void setup_cameras();
-	void endRender();
+    void start_render();
+    void setup_cameras();
+    void endRender();
 
-	bool init_window();
-	SDL_Window* window;
+    bool init_window();
+    SDL_Window* window;
 
-	GLuint vertex_array_id;
-	Shader example_shader;
-	RenderObject example_object;
-	float time;
-	std::array<glm::mat4x4, 4> cameras;
+    GLuint vertex_array_id;
+    Shader example_shader;
+    RenderingComponent example_object;
+    float time;
+    std::array<glm::mat4x4, 4> cameras;
 };
 
