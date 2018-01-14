@@ -8,13 +8,13 @@
 
 #include <glm\gtc\type_ptr.hpp>
 
-void RenderObject::renderViews
-(std::array<glm::mat4x4, 4>& cameras, size_t count, GLuint programID)
+void RenderObject::render_views
+(std::array<glm::mat4x4, 4>& cameras, size_t count, GLuint program_id)
 {
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
-	glBindBuffer(GL_ARRAY_BUFFER, glVertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffer);
 	glVertexAttribPointer
 		( 0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData)
 		, reinterpret_cast<void*>(offsetof(VertexData, position)) );
@@ -22,12 +22,11 @@ void RenderObject::renderViews
 		( 1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData)
 		, reinterpret_cast<void*>(offsetof(VertexData, normal)));
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glIndexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffer);
 
-	GLuint uniformMVP = glGetUniformLocation(programID, "MVP");
+	GLuint uniformMVP = glGetUniformLocation(program_id, "MVP");
 
-
-	for (int i = 0; i < count; i++)
+	for (unsigned int i = 0; i < count; i++)
 	{
 		glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, glm::value_ptr(cameras[i]));
 		glViewport(320 * (i % 2), 240 * ((i % 4) / 2), 320, 240);
@@ -38,12 +37,12 @@ void RenderObject::renderViews
 
 }
 
-void RenderObject::loadFromFile(const std::string& filePath)
+void RenderObject::load_from_file(const std::string& file_path)
 {
 	Assimp::Importer importer;
 
 	const aiScene* scene = importer.ReadFile
-		( filePath,
+		(	file_path,
 		aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
 
 	if (!scene)
@@ -54,7 +53,7 @@ void RenderObject::loadFromFile(const std::string& filePath)
 
 	if (!scene->HasMeshes())
 	{
-		std::cout << "No mesh found in model " << filePath << std::endl;
+		std::cout << "No mesh found in model " << file_path << std::endl;
 	}
 
 	auto& mesh = scene->mMeshes[0];
@@ -107,12 +106,12 @@ void RenderObject::loadFromFile(const std::string& filePath)
 
 void RenderObject::setupBuffer()
 {
-	glGenBuffers(1, &glVertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, glVertexBuffer);
+	glGenBuffers(1, &gl_vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexData)*vertices.size(), &vertices.front(), GL_STATIC_DRAW);
 
-	glGenBuffers(1, &glIndexBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glIndexBuffer);
+	glGenBuffers(1, &gl_index_buffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices.front(), GL_STATIC_DRAW);
 
 }

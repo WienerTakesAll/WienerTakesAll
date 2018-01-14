@@ -17,16 +17,16 @@ public:
 private:
 	void load(Event e);
 
-	void startRender();
-	void setupCameras();
+	void start_render();
+	void setup_cameras();
 	void endRender();
 
-	bool initWindow();
+	bool init_window();
 	SDL_Window* window;
 
-	GLuint VertexArrayID;
-	Shader exampleShader;
-	RenderObject exampleObject;
+	GLuint vertex_array_id;
+	Shader example_shader;
+	RenderObject example_object;
 	float time;
 	std::array<glm::mat4x4, 4> cameras;
 };

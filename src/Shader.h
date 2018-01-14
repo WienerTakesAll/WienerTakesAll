@@ -8,9 +8,9 @@
 class Shader
 {
 public:
-	bool loadShader(const std::string& vertexPath, const std::string& fragmentPath);
+	bool load_shader(const std::string& vertex_path, const std::string& fragment_path);
 
-	GLuint programID;
+	GLuint program_id;
 private:
-	void checkError(GLuint id);
+	void check_error(GLuint id);
 };

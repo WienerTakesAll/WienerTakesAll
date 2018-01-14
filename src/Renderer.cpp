@@ -5,7 +5,7 @@
 Renderer::Renderer()
 	: time(0.0f)
 {
-	EventSystem::addEventHandler("load", &Renderer::load, this);
+	EventSystem::add_event_handler(EventType::LOAD_EVENT, &Renderer::load, this);
 }
 
 void Renderer::update()
@@ -27,20 +27,20 @@ void Renderer::update()
 
 void Renderer::load(Event e)
 {
-	initWindow();
+	init_window();
 
-	exampleShader.loadShader("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader");
-	exampleObject.loadFromFile("Ship.obj");
+	example_shader.load_shader("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader");
+	example_object.load_from_file("Ship.obj");
 }
 
 void Renderer::render()
 {
-	startRender();
-	exampleObject.renderViews(cameras, 4, exampleShader.programID);
+	start_render();
+	example_object.render_views(cameras, 4, example_shader.program_id);
 	endRender();
 }
 
-bool Renderer::initWindow()
+bool Renderer::init_window()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
 
@@ -79,29 +79,29 @@ bool Renderer::initWindow()
 	}
 
 
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
+	glGenVertexArrays(1, &vertex_array_id);
+	glBindVertexArray(vertex_array_id);
 
 	return true;
 }
 
-void Renderer::startRender()
+void Renderer::start_render()
 {
 	//Setup the various camera matrices...
-	setupCameras();
+	setup_cameras();
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
-	glUseProgram(exampleShader.programID);
+	glUseProgram(example_shader.program_id);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
 }
 
-void Renderer::setupCameras()
+void Renderer::setup_cameras()
 {
 	auto P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 100.0f);
 

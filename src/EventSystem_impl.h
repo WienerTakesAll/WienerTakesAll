@@ -1,30 +1,30 @@
 #pragma once
 template<typename T>
-void EventSystem<T>::addEventHandler(std::string&& eventName, std::function<void(T*, Event)> handleFunction, T* this_pointer) {
-    functionHandlers.emplace(eventName, std::bind(handleFunction, this_pointer, std::placeholders::_1));
+void EventSystem<T>::add_event_handler(EventType eventType, std::function<void(T*, Event)> handle_function, T* this_pointer) {
+    function_handlers[static_cast<int>(eventType)] = std::bind(handle_function, this_pointer, std::placeholders::_1);
 }
 
 template<typename T>
-void EventSystem<T>::handleEvents(const std::vector<Event>& events) {
+void EventSystem<T>::handle_events(const std::vector<Event>& events) {
     for (const auto& some_event : events) {
-        const auto handler = functionHandlers.find(some_event.eventName);
+        const auto& handler = function_handlers[static_cast<int>(some_event.event_type)];
 
         //If there is a registered function to handle the event then we do.
-        if (handler != functionHandlers.end()) {
-            handler->second(some_event);
+        if (handler != nullptr) {
+            handler(some_event);
         }
     }
 }
 
 template<class T>
-void EventSystem<T>::queueEvent(Event&& queuedEvent) {
-    eventQueue.emplace_back(queuedEvent);
+void EventSystem<T>::queue_event(Event&& queuedEvent) {
+    event_queue.emplace_back(queuedEvent);
 }
 
 template<class T>
-void EventSystem<T>::sendEvents(std::vector<Event>& reciever) {
+void EventSystem<T>::send_events(std::vector<Event>& reciever) {
     reciever.insert(reciever.end(),
-                    std::make_move_iterator(eventQueue.begin()),
-                    std::make_move_iterator(eventQueue.end()));
-    eventQueue.clear();
+                    std::make_move_iterator(event_queue.begin()),
+                    std::make_move_iterator(event_queue.end()));
+    event_queue.clear();
 }
