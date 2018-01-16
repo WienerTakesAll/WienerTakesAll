@@ -3,6 +3,11 @@
 #include "InputManager.h"
 #include "SDL.h"
 
+namespace {
+    const int MAX_PLAYERS = 4; // Maximum number of players in a game
+    const int DEADZONE = 8000; // Minimum range of displacement for joystick before reading event
+}
+
 InputManager::InputManager() {
     int num_controllers_player = SDL_NumJoysticks();
 
@@ -65,6 +70,7 @@ void InputManager::process_input(SDL_Event* event) const {
                     break;
 
                 default:
+                    std::cout << "UNMAPPED was pressed" << std::endl;
                     break;
             }
 
@@ -77,9 +83,8 @@ void InputManager::process_input(SDL_Event* event) const {
 
             switch (event->cbutton.button) {
 
-                /**
-                 * LETTER BUTTONS
-                 */
+                // LETTER BUTTONS
+
                 case SDL_CONTROLLER_BUTTON_A:
                     std::cout << "A button was pressed" << std::endl;
                     break;
@@ -96,9 +101,7 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "Y button was pressed" << std::endl;
                     break;
 
-                /**
-                 * SHOULDER BUTTONS
-                 */
+                // SHOULDER BUTTONS
 
                 case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
                     std::cout << "Left bumper was pressed" << std::endl;
@@ -108,9 +111,7 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "Right bumper was pressed" << std::endl;
                     break;
 
-                /**
-                 * SPECIAL BUTTONS
-                 */
+                // SPECIAL BUTTONS
 
                 case SDL_CONTROLLER_BUTTON_START:
                     std::cout << "Start button was pressed" << std::endl;
@@ -124,9 +125,7 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "Guide button was pressed" << std::endl;
                     break;
 
-                /**
-                 * DIRECTIONAL BUTTONS
-                 */
+                // DIRECTIONAL BUTTONS
 
                 case SDL_CONTROLLER_BUTTON_DPAD_UP:
                     std::cout << "D-UP button was pressed" << std::endl;
@@ -144,9 +143,7 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "D-RIGHT button was pressed" << std::endl;
                     break;
 
-                /**
-                 * STICK BUTTONS
-                 */
+                // STICK BUTTONS
 
                 case SDL_CONTROLLER_BUTTON_LEFTSTICK:
                     std::cout << "Left stick button was pressed" << std::endl;
@@ -156,9 +153,7 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "Right stick button was pressed" << std::endl;
                     break;
 
-                /**
-                 * MISC
-                 */
+                // MISC
 
                 case SDL_CONTROLLER_BUTTON_INVALID:
                     std::cout << "Invalid button was pressed" << std::endl;
@@ -182,9 +177,7 @@ void InputManager::process_input(SDL_Event* event) const {
 
             switch (event->caxis.axis) {
 
-                /**
-                 * LEFT STICK
-                 */
+                // LEFT STICK
 
                 case SDL_CONTROLLER_AXIS_LEFTX:
                     std::cout << "Left axis horizontal";
@@ -194,9 +187,7 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "Left axis vertical";
                     break;
 
-                /**
-                 * RIGHT STICK
-                 */
+                // RIGHT STICK
 
                 case SDL_CONTROLLER_AXIS_RIGHTX:
                     std::cout << "Right axis horizontal";
@@ -206,9 +197,7 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "Right axis vertical";
                     break;
 
-                /**
-                 * TRIGGERS
-                 */
+                // TRIGGERS
 
                 case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
                     std::cout << "Left trigger";
@@ -218,9 +207,7 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "Right trigger";
                     break;
 
-                /**
-                 * MISC
-                 */
+                // MISC
 
                 case SDL_CONTROLLER_AXIS_INVALID:
                     std::cout << "Invalid axis";
