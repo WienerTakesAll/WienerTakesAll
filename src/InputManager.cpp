@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include "AudioSystem.h"
 #include "InputManager.h"
 #include "SDL.h"
 
@@ -47,6 +48,22 @@ void InputManager::process_input(SDL_Event* event) const {
             switch ( event->key.keysym.sym ) {
                 case SDLK_LEFT:
                     std::cout << "Left was pressed" << std::endl;
+                    audio_system.PlaySound("beat", 0);
+                    break;
+
+                case SDLK_UP:
+                    std::cout << "Up was pressed" << std::endl;
+                    audio_system.ResumeMusic();
+                    break;
+
+                case SDLK_DOWN:
+                    std::cout << "Down was pressed" << std::endl;
+                    audio_system.PauseMusic();
+                    break;
+
+                case SDLK_RIGHT:
+                    std::cout << "Right was pressed" << std::endl;
+                    audio_system.PlayMusic("beat");
                     break;
 
                 default:
@@ -212,4 +229,6 @@ void InputManager::quit() {
 
     controllers.clear();
     std::cout << "All controllers closed" << std::endl;
+
+    audio_system.quit();
 }
