@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "AssetManager.h"
 #include "EventSystem.h"
 #include "InputManager.h"
 #include "Renderer.h"
@@ -8,7 +9,8 @@
 
 int main(int argc, char* args[]) {
 
-    Renderer renderer;
+    AssetManager asset_manager;
+    Renderer renderer(asset_manager);
     InputManager input_manager;
 
     std::vector<Event> events;

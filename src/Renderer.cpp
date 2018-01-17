@@ -1,17 +1,20 @@
 #include "Renderer.h"
 
+#include "AssetManager.h"
+
 #include <glm\gtc\matrix_transform.hpp>
 
-Renderer::Renderer()
-    : time(0.0f)
-{
+Renderer::Renderer(AssetManager& n_asset_manager)
+    : time(0.0f),
+      asset_manager(n_asset_manager) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &Renderer::load, this);
 }
 
-void Renderer::update()
-{
+void Renderer::update() {
+    example_objects[1].apply_transform(glm::rotate(glm::mat4x4(), 0.01f, glm::vec3(1, 1, 1)));
+
     time += 0.01f;
-    
+
     //This should be moved to a different system
     SDL_Event event;
 
@@ -25,23 +28,33 @@ void Renderer::update()
     }
 }
 
-void Renderer::load(Event e)
-{
+void Renderer::load(const Event& e) {
     init_window();
 
     example_shader.load_shader("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader");
-    example_object.load_from_file("Ship.obj");
+    
+    auto mesh = asset_manager.get_mesh_asset("Ship.obj");
+
+    example_objects.emplace_back();
+    example_objects[0].set_mesh(mesh);
+    example_objects[0].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(0, -2, 0)));
+
+    example_objects.emplace_back();
+    example_objects[1].set_mesh(mesh);
+    example_objects[1].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(1, 2, 1)));
 }
 
-void Renderer::render()
-{
+void Renderer::render() {
     start_render();
-    example_object.render_views(cameras, 4, example_shader.program_id);
+
+    for (auto& object : example_objects) {
+        object.render_views(cameras, 4, example_shader.program_id);
+    }
+
     endRender();
 }
 
-bool Renderer::init_window()
-{
+bool Renderer::init_window() {
     SDL_Init(SDL_INIT_EVERYTHING);
 
     int sdl_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;

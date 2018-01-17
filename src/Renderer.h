@@ -7,15 +7,17 @@
 #include "SDL_opengl.h"
 #include "SDL.h"
 
+class AssetManager;
+
 class Renderer : public EventSystem<Renderer>
 {
 public:
-    Renderer();
+    Renderer(AssetManager&);
     
     void update();
     void render();
 private:
-    void load(Event e);
+    void load(const Event& e);
 
     void start_render();
     void setup_cameras();
@@ -26,8 +28,9 @@ private:
 
     GLuint vertex_array_id;
     Shader example_shader;
-    RenderingComponent example_object;
+    std::vector<RenderingComponent> example_objects;
     float time;
     std::array<glm::mat4x4, 4> cameras;
+    AssetManager& asset_manager;
 };
 
