@@ -1,45 +1,21 @@
 #include <iostream>
 
-#include "SDL.h"
-
-#include "ExampleClass.h"
+#include "AssetManager.h"
+#include "EventSystem.h"
 #include "InputManager.h"
+#include "Renderer.h"
 
-SDL_Window* window = NULL;
 
 
 int main(int argc, char* args[]) {
 
-    ExampleClass example;
-    example.do_something();
-    std::vector<Event> allEvents;
-    example.send_events(allEvents);
-    example.handle_events(allEvents);
-
-
-
-    SDL_Init(SDL_INIT_EVERYTHING);
-
-    int sdl_flags = SDL_WINDOW_SHOWN;
-
-    int screen_width = 640;
-    int screen_height = 480;
-
-    window = SDL_CreateWindow("WienerTakesAll",
-                              SDL_WINDOWPOS_UNDEFINED,
-                              SDL_WINDOWPOS_UNDEFINED,
-                              screen_width,
-                              screen_height,
-                              sdl_flags);
-
-    if (window == NULL) {
-        std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
-        return false;
-    }
-
-    std::cout << "Driver: " <<  SDL_GetCurrentVideoDriver() << std::endl;
-
+    AssetManager asset_manager;
+    Renderer renderer(asset_manager);
     InputManager input_manager;
+
+    std::vector<Event> events;
+    events.emplace_back(EventType::LOAD_EVENT);
+
 
     // Create World
 
@@ -63,12 +39,19 @@ int main(int argc, char* args[]) {
         }
 
         // Events
+        renderer.send_events(events);
+        renderer.handle_events(events);
+        events.clear();
+
 
         // Gameplay
 
         // Physics
 
         // Rendering
+
+        renderer.update();
+        renderer.render();
 
         // UI
 
