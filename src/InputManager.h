@@ -8,7 +8,6 @@
 
 class InputManager : public EventSystem<InputManager> {
 
-    const int DEADZONE = 8000; // Minimum range of displacement for joystick before reading event
     std::vector<SDL_GameController*> controllers;
 
 public:
