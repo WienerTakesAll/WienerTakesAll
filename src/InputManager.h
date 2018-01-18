@@ -8,7 +8,7 @@
 
 class InputManager : public EventSystem<InputManager> {
 
-    std::vector<SDL_GameController*> controllers;
+    std::vector<SDL_GameController*> controllers_;
 
 public:
     InputManager();
