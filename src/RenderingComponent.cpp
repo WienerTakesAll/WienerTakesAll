@@ -20,6 +20,9 @@ void RenderingComponent::render_views
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffer);
 
     GLuint uniformMVP = glGetUniformLocation(program_id, "MVP");
+    GLuint transform = glGetUniformLocation(program_id, "transform");
+
+    glUniformMatrix4fv(transform, 1, GL_FALSE, glm::value_ptr(transform_matrix));
 
     for (unsigned int i = 0; i < count; i++) {
         glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, glm::value_ptr(cameras[i] * transform_matrix));

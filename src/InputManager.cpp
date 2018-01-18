@@ -1,10 +1,13 @@
 #include <iostream>
 #include <vector>
-#include "AudioSystem.h"
+#include "EventSystem.h"
 #include "InputManager.h"
 #include "SDL.h"
 
-const int MAX_PLAYERS = 4;
+namespace {
+    const int MAX_PLAYERS = 4; // Maximum number of players in a game
+    const int DEADZONE = 8000; // Minimum range of displacement for joystick before reading event
+}
 
 InputManager::InputManager() {
     int num_controllers_player = SDL_NumJoysticks();
@@ -21,7 +24,7 @@ InputManager::InputManager() {
                 controllers.push_back(controller);
                 std::cout << "Controller for player " << player_id << " linked" << std::endl;
             } else {
-                fprintf(stderr, "Could not open gamecontroller %i: %s\n", player_id, SDL_GetError());
+                std::cerr << "Could not open GameController " << player_id << ": " << SDL_GetError() << std::endl;
             }
 
         }
@@ -36,52 +39,75 @@ InputManager::InputManager() {
     }
 }
 
-void InputManager::process_input(SDL_Event* event) const {
+void InputManager::process_input(SDL_Event* event) {
+    int key = -1;
+    int value = -1;
     int player_id = -1;
+    bool should_queue_event = true;
 
     switch (event->type) {
         // Keyboard (Player 1)
-        case SDL_KEYDOWN:
+        case SDL_KEYDOWN: {
+            key = event->key.keysym.sym;
             player_id = 0;
+            std::cout << "[Player " << player_id << "] ";
 
             /* Check the SDLKey values and move change the coords */
             switch ( event->key.keysym.sym ) {
+                case SDLK_w:
+                    std::cout << "W was pressed" << std::endl;
+                    break;
+
+                case SDLK_s:
+                    std::cout << "S was pressed" << std::endl;
+                    break;
+
+                case SDLK_a:
+                    std::cout << "A was pressed" << std::endl;
+                    break;
+
+                case SDLK_d:
+                    std::cout << "D was pressed" << std::endl;
+                    break;
+
+                case SDLK_SPACE:
+                    std::cout << "SPACE was pressed" << std::endl;
+                    break;
+
                 case SDLK_LEFT:
                     std::cout << "Left was pressed" << std::endl;
-                    audio_system.PlaySound("beat", 0);
                     break;
 
                 case SDLK_UP:
                     std::cout << "Up was pressed" << std::endl;
-                    audio_system.ResumeMusic();
                     break;
 
                 case SDLK_DOWN:
                     std::cout << "Down was pressed" << std::endl;
-                    audio_system.PauseMusic();
                     break;
 
                 case SDLK_RIGHT:
                     std::cout << "Right was pressed" << std::endl;
-                    audio_system.PlayMusic("beat");
                     break;
 
                 default:
+                    should_queue_event = false;
+                    std::cout << "UNMAPPED was pressed" << std::endl;
                     break;
             }
 
             break;
+        }
 
-        case SDL_CONTROLLERBUTTONDOWN:
-
+        case SDL_CONTROLLERBUTTONDOWN: {
+            key = event->cbutton.button;
             player_id = event->cbutton.which; // Joystick ID of event sender
             std::cout << "[Player " << player_id << "] ";
 
             switch (event->cbutton.button) {
 
-                /**
-                 * LETTER BUTTONS
-                 */
+                // LETTER BUTTONS
+
                 case SDL_CONTROLLER_BUTTON_A:
                     std::cout << "A button was pressed" << std::endl;
                     break;
@@ -98,9 +124,7 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "Y button was pressed" << std::endl;
                     break;
 
-                /**
-                 * SHOULDER BUTTONS
-                 */
+                // SHOULDER BUTTONS
 
                 case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
                     std::cout << "Left bumper was pressed" << std::endl;
@@ -110,9 +134,7 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "Right bumper was pressed" << std::endl;
                     break;
 
-                /**
-                 * SPECIAL BUTTONS
-                 */
+                // SPECIAL BUTTONS
 
                 case SDL_CONTROLLER_BUTTON_START:
                     std::cout << "Start button was pressed" << std::endl;
@@ -126,9 +148,7 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "Guide button was pressed" << std::endl;
                     break;
 
-                /**
-                 * DIRECTIONAL BUTTONS
-                 */
+                // DIRECTIONAL BUTTONS
 
                 case SDL_CONTROLLER_BUTTON_DPAD_UP:
                     std::cout << "D-UP button was pressed" << std::endl;
@@ -146,9 +166,7 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "D-RIGHT button was pressed" << std::endl;
                     break;
 
-                /**
-                 * STICK BUTTONS
-                 */
+                // STICK BUTTONS
 
                 case SDL_CONTROLLER_BUTTON_LEFTSTICK:
                     std::cout << "Left stick button was pressed" << std::endl;
@@ -158,21 +176,22 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "Right stick button was pressed" << std::endl;
                     break;
 
-                /**
-                 * MISC
-                 */
+                // MISC
 
                 case SDL_CONTROLLER_BUTTON_INVALID:
                     std::cout << "Invalid button was pressed" << std::endl;
                     break;
 
                 default:
+                    should_queue_event = false;
                     break;
             }
 
             break;
+        }
 
-        case SDL_CONTROLLERAXISMOTION:
+        case SDL_CONTROLLERAXISMOTION: {
+            int key = event->caxis.axis;
             int value = event->caxis.value; // Current displacement of joystick
 
             if ((value > -DEADZONE) && (value < DEADZONE)) {
@@ -183,6 +202,9 @@ void InputManager::process_input(SDL_Event* event) const {
             std::cout << "[Player " << player_id << "] ";
 
             switch (event->caxis.axis) {
+
+                // LEFT STICK
+
                 case SDL_CONTROLLER_AXIS_LEFTX:
                     std::cout << "Left axis horizontal";
                     break;
@@ -190,6 +212,8 @@ void InputManager::process_input(SDL_Event* event) const {
                 case SDL_CONTROLLER_AXIS_LEFTY:
                     std::cout << "Left axis vertical";
                     break;
+
+                // RIGHT STICK
 
                 case SDL_CONTROLLER_AXIS_RIGHTX:
                     std::cout << "Right axis horizontal";
@@ -199,6 +223,8 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "Right axis vertical";
                     break;
 
+                // TRIGGERS
+
                 case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
                     std::cout << "Left trigger";
                     break;
@@ -207,18 +233,36 @@ void InputManager::process_input(SDL_Event* event) const {
                     std::cout << "Right trigger";
                     break;
 
+                // MISC
+
                 case SDL_CONTROLLER_AXIS_INVALID:
                     std::cout << "Invalid axis";
                     break;
 
                 default:
+                    should_queue_event = false;
                     break;
             }
 
             std::cout << " value: " << value << std::endl;
+            break;
+        }
 
+        default:
+            should_queue_event = false;
             break;
 
+    }
+
+    if (should_queue_event) {
+        EventSystem::queue_event(
+            Event(
+                EventType::KEYPRESS_EVENT,
+                "player_id", player_id,
+                "key", key,
+                "value", value
+            )
+        );
     }
 }
 
@@ -229,6 +273,4 @@ void InputManager::quit() {
 
     controllers.clear();
     std::cout << "All controllers closed" << std::endl;
-
-    audio_system.quit();
 }

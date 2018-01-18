@@ -21,10 +21,12 @@ AudioSystem::AudioSystem() {
     }
 
     // Load all audio files
-    LoadAudioAssets();
+    load_audio_assets();
+
+    add_event_handler(EventType::KEYPRESS_EVENT, &AudioSystem::handle_keypress_event, this);
 }
 
-void AudioSystem::LoadAudioAssets() {
+void AudioSystem::load_audio_assets() {
     // Load all sound assets
     sound_assets["beat"] = Mix_LoadWAV("assets/audio/beat.wav");
 
@@ -40,7 +42,34 @@ void AudioSystem::LoadAudioAssets() {
     }
 }
 
-void AudioSystem::PlaySound(const char* sound, const int loops /*= 0*/) const {
+void AudioSystem::handle_keypress_event(const Event& e) {
+    int player_id = e.get_value<int>("player_id", -1);
+    int key = e.get_value<int>("key", -1);
+    int value = e.get_value<int>("value", 0);
+
+    switch (key) {
+        case SDLK_LEFT:
+            play_sound("beat");
+            break;
+
+        case SDLK_RIGHT:
+            play_music("beat");
+            break;
+
+        case SDLK_UP:
+            resume_music();
+            break;
+
+        case SDLK_DOWN:
+            pause_music();
+            break;
+
+        default:
+            break;
+    }
+}
+
+void AudioSystem::play_sound(const char* sound, const int loops /*= 0*/) const {
     if (!init_successful) {
         return;
     }
@@ -56,7 +85,7 @@ void AudioSystem::PlaySound(const char* sound, const int loops /*= 0*/) const {
     std::cout << "Audio played: " << sound << " loops: " << loops << std::endl;
 }
 
-void AudioSystem::PlayMusic(const char* music, const bool force /* = false*/) const {
+void AudioSystem::play_music(const char* music, const bool force /* = false*/) const {
     if (!init_successful) {
         return;
     }
@@ -73,7 +102,7 @@ void AudioSystem::PlayMusic(const char* music, const bool force /* = false*/) co
     }
 }
 
-void AudioSystem::PauseMusic() const {
+void AudioSystem::pause_music() const {
     if (!init_successful) {
         return;
     }
@@ -83,7 +112,7 @@ void AudioSystem::PauseMusic() const {
     }
 }
 
-void AudioSystem::ResumeMusic() const {
+void AudioSystem::resume_music() const {
     if (!init_successful) {
         return;
     }
@@ -113,6 +142,7 @@ void AudioSystem::quit() {
     // Clear asset sets
     sound_assets.clear();
     music_assets.clear();
+    std::cout << "All sound assets cleared" << std::endl;
 
     Mix_Quit();
 }

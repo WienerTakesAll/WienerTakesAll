@@ -8,12 +8,13 @@ Renderer::Renderer(AssetManager& n_asset_manager)
     : time(0.0f),
       asset_manager(n_asset_manager) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &Renderer::load, this);
+    EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &Renderer::handle_key_press, this);
 }
 
 void Renderer::update() {
     example_objects[1].apply_transform(glm::rotate(glm::mat4x4(), 0.01f, glm::vec3(1, 1, 1)));
 
-    time += 0.01f;
+    //time += 0.01f;
 
     //This should be moved to a different system
     SDL_Event event;
@@ -42,6 +43,42 @@ void Renderer::load(const Event& e) {
     example_objects.emplace_back();
     example_objects[1].set_mesh(mesh);
     example_objects[1].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(1, 2, 1)));
+
+    setup_cameras();
+}
+
+void Renderer::handle_key_press(const Event& e) {
+    int player_id = e.get_value<int>("player_id", -1);
+    int key = e.get_value<int>("key", -1);
+    int value = e.get_value<int>("value", 0);
+
+    glm::mat4 transform;
+
+    switch (key) {
+    case SDLK_LEFT:
+        transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(0, 1, 0));
+        break;
+
+    case SDLK_RIGHT:
+        transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(0, 1, 0));
+        break;
+
+    case SDLK_UP:
+        transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(1, 0, 0));
+        break;
+
+    case SDLK_DOWN:
+        transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(1, 0, 0));
+        break;
+
+    default:
+        break;
+    }
+
+    for (auto& cam : cameras) {
+        cam *= transform;
+    }
+
 }
 
 void Renderer::render() {
@@ -100,9 +137,7 @@ bool Renderer::init_window() {
 
 void Renderer::start_render()
 {
-    //Setup the various camera matrices...
-    setup_cameras();
-
+    //Clear the buffers and setup the opengl requirements
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -127,7 +162,7 @@ void Renderer::setup_cameras()
     cameras[2] = glm::translate(glm::mat4(), glm::vec3(5.f*std::cos(std::sqrt(time)), 5.f*std::cos(time), 5.f*std::sin(time)));
     cameras[2] = P * glm::lookAt(glm::vec3(cameras[2][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
-    cameras[3] = glm::translate(glm::mat4(), glm::vec3(5.f*std::sin(time), 5.f*std::cos(time), 5.f*std::sin(time)));
+    cameras[3] = glm::translate(glm::mat4(), glm::vec3(15.f*std::sin(time), 15.f*std::sin(time), 15.f*std::cos(time)));
     cameras[3] = P * glm::lookAt(glm::vec3(cameras[3][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 }
 

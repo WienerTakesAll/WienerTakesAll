@@ -18,6 +18,7 @@ public:
     void render();
 private:
     void load(const Event& e);
+    void handle_key_press(const Event& e);
 
     void start_render();
     void setup_cameras();
