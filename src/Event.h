@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <string>
 
-enum class EventType {LOAD_EVENT, DUMMY_EVENT, EVENT_COUNT};
+enum class EventType {LOAD_EVENT, DUMMY_EVENT, KEYPRESS_EVENT, EVENT_COUNT};
 
 //For how to handle events, please view EventSystem.h
 struct Event {

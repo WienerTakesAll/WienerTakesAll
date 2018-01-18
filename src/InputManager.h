@@ -2,19 +2,18 @@
 
 #include <vector>
 
-#include "AudioSystem.h"
+#include "EventSystem.h"
 #include "SDL.h"
 
 
-class InputManager {
+class InputManager : public EventSystem<InputManager> {
 
     const int DEADZONE = 8000; // Minimum range of displacement for joystick before reading event
     std::vector<SDL_GameController*> controllers;
-    AudioSystem audio_system;
 
 public:
     InputManager();
 
-    void process_input(SDL_Event* event) const;
+    void process_input(SDL_Event* event);
     void quit();
 };
