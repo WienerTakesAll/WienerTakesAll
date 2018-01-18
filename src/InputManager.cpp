@@ -74,6 +74,10 @@ void InputManager::process_input(SDL_Event* event) {
                     std::cout << "SPACE was pressed" << std::endl;
                     break;
 
+                case SDLK_LEFT:
+                    std::cout << "Left was pressed" << std::endl;
+                    break;
+
                 case SDLK_UP:
                     std::cout << "Up was pressed" << std::endl;
                     break;
