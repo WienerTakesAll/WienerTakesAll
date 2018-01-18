@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "glm\gtc\type_ptr.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 void RenderingComponent::render_views
 (std::array<glm::mat4x4, 4>& cameras, size_t count, GLuint program_id) {

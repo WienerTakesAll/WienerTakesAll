@@ -2,7 +2,7 @@
 
 #include "AssetManager.h"
 
-#include <glm\gtc\matrix_transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 Renderer::Renderer(AssetManager& n_asset_manager)
     : time(0.0f),

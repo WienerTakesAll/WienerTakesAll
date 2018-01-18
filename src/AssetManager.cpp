@@ -1,10 +1,10 @@
 #include "AssetManager.h"
 
-#include "assimp\Importer.hpp"
-#include "assimp\scene.h"
-#include "assimp\postprocess.h"
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
 
-#include "glm\gtc\type_ptr.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 #include <iostream>
 
