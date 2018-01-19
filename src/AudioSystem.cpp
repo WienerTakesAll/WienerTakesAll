@@ -1,4 +1,6 @@
 #include <iostream>
+#include <utility>
+#include <vector>
 
 #include "AudioSystem.h"
 
@@ -6,9 +8,20 @@
 #include "SDL_mixer.h"
 
 namespace {
-    const int MIX_FREQ_HZ = 44100; // Sound sampling frequency in Hz. Change to "22050" if too slow.
-    const int MIX_NUM_CHANNELS = 2; // Number of sound channels for output
-    const int MIX_CHUNK_SIZE = 4096; // Bytes used per output sample
+    // Sound sampling frequency in Hz. Change to "22050" if too slow.
+    const int MIX_FREQ_HZ = 44100;
+    // Number of sound channels for output
+    const int MIX_NUM_CHANNELS = 2;
+    // Bytes used per output sample
+    const int MIX_CHUNK_SIZE = 4096;
+    // Information for loading sound assets. First value is the key, second is the path.
+    const std::vector<std::pair<const char*, const char*>> sound_assets_info = {
+        {"beat", "assets/audio/beat.wav"}
+    };
+    // Information for loading music assets. First value is the key, second is the path.
+    const std::vector<std::pair<const char*, const char*>> music_assets_info = {
+        {"beat", "assets/audio/beat.wav"}
+    };
 }
 
 AudioSystem::AudioSystem() {
@@ -28,17 +41,29 @@ AudioSystem::AudioSystem() {
 
 void AudioSystem::load_audio_assets() {
     // Load all sound assets
-    sound_assets_["beat"] = Mix_LoadWAV("assets/audio/beat.wav");
+    for (auto& sound_asset_info : sound_assets_info) {
+        const char* key = sound_asset_info.first;
+        const char* path = sound_asset_info.second;
+        sound_assets_[key] = Mix_LoadWAV(path);
 
-    if (sound_assets_.at("beat") == nullptr) {
-        std::cerr << "Failed to load sound: beat.wav" << std::endl;
+        if (sound_assets_.at(key) == nullptr) {
+            std::cerr << "Failed to load sound: " << key << std::endl;
+            init_successful_ = false;
+            return;
+        }
     }
 
     // Load all music assets
-    music_assets_["beat"] = Mix_LoadMUS("assets/audio/beat.wav");
+    for (auto& music_asset_info : music_assets_info) {
+        const char* key = music_asset_info.first;
+        const char* path = music_asset_info.second;
+        music_assets_[key] = Mix_LoadMUS(path);
 
-    if (music_assets_.at("beat") == nullptr) {
-        std::cerr << "Failed to load music: beat.wav" << std::endl;
+        if (music_assets_.at(key) == nullptr) {
+            std::cerr << "Failed to load music: " << key << std::endl;
+            init_successful_ = false;
+            return;
+        }
     }
 }
 
