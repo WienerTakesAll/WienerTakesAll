@@ -12,7 +12,7 @@ class AudioSystem : public EventSystem<AudioSystem> {
     std::unordered_map<std::string, Mix_Chunk*> sound_assets_;
     std::unordered_map<std::string, Mix_Music*> music_assets_;
 
-    void load_audio_assets();
+    bool load_audio_assets();
     void handle_keypress_event(const Event& e);
 
 public:

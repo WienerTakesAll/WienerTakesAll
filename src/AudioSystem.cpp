@@ -10,7 +10,7 @@
 namespace {
     // Sound sampling frequency in Hz. Change to "22050" if too slow.
     const int MIX_FREQ_HZ = 44100;
-    // Number of sound channels for output
+    // Number of sound channels for output. 1 = Mono, 2 = Stereo. Indepent from mixing channels.
     const int MIX_NUM_CHANNELS = 2;
     // Bytes used per output sample
     const int MIX_CHUNK_SIZE = 4096;
@@ -34,12 +34,17 @@ AudioSystem::AudioSystem() {
     }
 
     // Load all audio files
-    load_audio_assets();
+    init_successful_ = load_audio_assets();
+
+    if ( !init_successful_) {
+        std::cerr << "AudioSystem initialization failed" << std::endl;
+        return;
+    }
 
     add_event_handler(EventType::KEYPRESS_EVENT, &AudioSystem::handle_keypress_event, this);
 }
 
-void AudioSystem::load_audio_assets() {
+bool AudioSystem::load_audio_assets() {
     // Load all sound assets
     for (auto& sound_asset_info : SOUND_ASSETS_INFO) {
         const char* key = sound_asset_info.first;
@@ -48,8 +53,7 @@ void AudioSystem::load_audio_assets() {
 
         if (sound_assets_.at(key) == nullptr) {
             std::cerr << "Failed to load sound: " << key << std::endl;
-            init_successful_ = false;
-            return;
+            return false;
         }
     }
 
@@ -61,10 +65,11 @@ void AudioSystem::load_audio_assets() {
 
         if (music_assets_.at(key) == nullptr) {
             std::cerr << "Failed to load music: " << key << std::endl;
-            init_successful_ = false;
-            return;
+            return false;
         }
     }
+
+    return true;
 }
 
 void AudioSystem::handle_keypress_event(const Event& e) {
