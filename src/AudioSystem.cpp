@@ -15,11 +15,11 @@ namespace {
     // Bytes used per output sample
     const int MIX_CHUNK_SIZE = 4096;
     // Information for loading sound assets. First value is the key, second is the path.
-    const std::vector<std::pair<const char*, const char*>> sound_assets_info = {
+    const std::vector<std::pair<const char*, const char*>> SOUND_ASSETS_INFO = {
         {"beat", "assets/audio/beat.wav"}
     };
     // Information for loading music assets. First value is the key, second is the path.
-    const std::vector<std::pair<const char*, const char*>> music_assets_info = {
+    const std::vector<std::pair<const char*, const char*>> MUSIC_ASSETS_INFO = {
         {"beat", "assets/audio/beat.wav"}
     };
 }
@@ -41,7 +41,7 @@ AudioSystem::AudioSystem() {
 
 void AudioSystem::load_audio_assets() {
     // Load all sound assets
-    for (auto& sound_asset_info : sound_assets_info) {
+    for (auto& sound_asset_info : SOUND_ASSETS_INFO) {
         const char* key = sound_asset_info.first;
         const char* path = sound_asset_info.second;
         sound_assets_[key] = Mix_LoadWAV(path);
@@ -54,7 +54,7 @@ void AudioSystem::load_audio_assets() {
     }
 
     // Load all music assets
-    for (auto& music_asset_info : music_assets_info) {
+    for (auto& music_asset_info : MUSIC_ASSETS_INFO) {
         const char* key = music_asset_info.first;
         const char* path = music_asset_info.second;
         music_assets_[key] = Mix_LoadMUS(path);
