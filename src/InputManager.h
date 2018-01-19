@@ -2,16 +2,17 @@
 
 #include <vector>
 
+#include "EventSystem.h"
 #include "SDL.h"
 
 
-class InputManager {
+class InputManager : public EventSystem<InputManager> {
 
-    std::vector<SDL_GameController*> controllers;
+    std::vector<SDL_GameController*> controllers_;
 
 public:
     InputManager();
 
-    void process_input(SDL_Event* event) const;
+    void process_input(SDL_Event* event);
     void quit();
 };
