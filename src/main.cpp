@@ -10,7 +10,7 @@
 #include "ExampleClass.h"
 
 #include "InputManager.h"
-#include "Renderer.h"
+#include "RenderingSystem.h"
 
 
 
@@ -20,7 +20,7 @@ int main(int argc, char* args[]) {
     events.emplace_back(EventType::LOAD_EVENT);
 
     AssetManager asset_manager;
-    Renderer renderer(asset_manager);
+    RenderingSystem rendering_system(asset_manager);
     InputManager input_manager;
     AudioSystem audio_system;
 
@@ -47,9 +47,9 @@ int main(int argc, char* args[]) {
         }
 
         // Events
-        renderer.send_events(events);
+        rendering_system.send_events(events);
         input_manager.send_events(events);
-        renderer.handle_events(events);
+        rendering_system.handle_events(events);
         audio_system.handle_events(events);
         events.clear();
 
@@ -60,8 +60,8 @@ int main(int argc, char* args[]) {
 
         // Rendering
 
-        renderer.update();
-        renderer.render();
+        rendering_system.update();
+        rendering_system.render();
 
         // UI
 

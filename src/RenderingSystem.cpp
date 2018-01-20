@@ -1,35 +1,23 @@
-#include "Renderer.h"
+#include "RenderingSystem.h"
 
 #include "AssetManager.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Renderer::Renderer(AssetManager& n_asset_manager)
+RenderingSystem::RenderingSystem(AssetManager& n_asset_manager)
     : time(0.0f),
       asset_manager(n_asset_manager) {
-    EventSystem::add_event_handler(EventType::LOAD_EVENT, &Renderer::load, this);
-    EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &Renderer::handle_key_press, this);
+    EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
+    EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
 }
 
-void Renderer::update() {
+void RenderingSystem::update() {
     example_objects[1].apply_transform(glm::rotate(glm::mat4x4(), 0.01f, glm::vec3(1, 1, 1)));
 
     //time += 0.01f;
-
-    //This should be moved to a different system
-    SDL_Event event;
-
-    while (SDL_PollEvent(&event)) {
-        switch (event.type) {
-            case SDL_QUIT:
-                std::cout << "SDL_QUIT was called" << std::endl;
-                SDL_Quit();
-                break;
-        }
-    }
 }
 
-void Renderer::load(const Event& e) {
+void RenderingSystem::load(const Event& e) {
     init_window();
 
     example_shader.load_shader("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader");
@@ -47,7 +35,7 @@ void Renderer::load(const Event& e) {
     setup_cameras();
 }
 
-void Renderer::handle_key_press(const Event& e) {
+void RenderingSystem::handle_key_press(const Event& e) {
     int player_id = e.get_value<int>("player_id", -1);
     int key = e.get_value<int>("key", -1);
     int value = e.get_value<int>("value", 0);
@@ -55,19 +43,19 @@ void Renderer::handle_key_press(const Event& e) {
     glm::mat4 transform;
 
     switch (key) {
-        case SDLK_LEFT:
+        case SDLK_a:
             transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(0, 1, 0));
             break;
 
-        case SDLK_RIGHT:
+        case SDLK_d:
             transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(0, 1, 0));
             break;
 
-        case SDLK_UP:
+        case SDLK_w:
             transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(1, 0, 0));
             break;
 
-        case SDLK_DOWN:
+        case SDLK_s:
             transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(1, 0, 0));
             break;
 
@@ -81,7 +69,7 @@ void Renderer::handle_key_press(const Event& e) {
 
 }
 
-void Renderer::render() {
+void RenderingSystem::render() {
     start_render();
 
     for (auto& object : example_objects) {
@@ -91,13 +79,13 @@ void Renderer::render() {
     endRender();
 }
 
-bool Renderer::init_window() {
+bool RenderingSystem::init_window() {
     SDL_Init(SDL_INIT_EVERYTHING);
 
-    int sdl_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
+    const int sdl_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
-    int screen_width = 640;
-    int screen_height = 480;
+    const int screen_width = 640;
+    const int screen_height = 480;
 
     window = SDL_CreateWindow("WienerTakesAll",
                               SDL_WINDOWPOS_UNDEFINED,
@@ -135,7 +123,7 @@ bool Renderer::init_window() {
     return true;
 }
 
-void Renderer::start_render() {
+void RenderingSystem::start_render() {
     //Clear the buffers and setup the opengl requirements
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -148,7 +136,7 @@ void Renderer::start_render() {
     glEnable(GL_MULTISAMPLE);
 }
 
-void Renderer::setup_cameras() {
+void RenderingSystem::setup_cameras() {
     auto P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 100.0f);
 
     cameras[0] = glm::translate(glm::mat4(), glm::vec3(5.f * std::sin(time), 5.f * std::sin(time), 5.f * std::cos(time)));
@@ -164,6 +152,6 @@ void Renderer::setup_cameras() {
     cameras[3] = P * glm::lookAt(glm::vec3(cameras[3][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 }
 
-void Renderer::endRender() {
+void RenderingSystem::endRender() {
     SDL_GL_SwapWindow(window);
 }
