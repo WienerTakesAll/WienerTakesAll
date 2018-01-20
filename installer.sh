@@ -8,9 +8,9 @@ case "${unameOut}" in
     MINGW*)     MACHINE=MinGw;;
     *)          MACHINE="UNKNOWN:${unameOut}"
 esac
-echo Machine identified as $MACHINE
+echo Machine identified as "$MACHINE"
 
-if [ $MACHINE = Linux ]; then
+if [[ "$MACHINE" = "Linux" ]]; then
     USER=`whoami`
     if [ $USER = "root" ]
         then
@@ -51,3 +51,10 @@ cd SDL2_mixer-2.0.2
 make -j4
 make install -j4
 cd $DIR
+
+#GLM, ASSIMP, GLEW
+if [[ "$MACHINE" = "Linux" ]]; then
+    apt-get install -y libglm-dev libglew-dev libassimp-dev
+elif [[ "$MACHINE" = "Mac" ]]; then
+    brew install glm glew assimp cmake astyle
+fi

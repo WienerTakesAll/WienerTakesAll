@@ -1,47 +1,28 @@
 #include <iostream>
 
+
+#include "AssetManager.h"
+#include "EventSystem.h"
+
 #include "SDL.h"
 
 #include "AudioSystem.h"
 #include "ExampleClass.h"
-#include "InputManager.h"
 
-SDL_Window* window = NULL;
+#include "InputManager.h"
+#include "RenderingSystem.h"
+
 
 
 int main(int argc, char* args[]) {
 
-    ExampleClass example;
-    example.do_something();
-    std::vector<Event> allEvents;
-    example.send_events(allEvents);
-    example.handle_events(allEvents);
+    std::vector<Event> events;
+    events.emplace_back(EventType::LOAD_EVENT);
 
-
-
-    SDL_Init(SDL_INIT_EVERYTHING);
-
-    int sdl_flags = SDL_WINDOW_SHOWN;
-
-    int screen_width = 640;
-    int screen_height = 480;
-
-    window = SDL_CreateWindow("WienerTakesAll",
-                              SDL_WINDOWPOS_UNDEFINED,
-                              SDL_WINDOWPOS_UNDEFINED,
-                              screen_width,
-                              screen_height,
-                              sdl_flags);
-
-    if (window == NULL) {
-        std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
-        return false;
-    }
-
-    std::cout << "Driver: " <<  SDL_GetCurrentVideoDriver() << std::endl;
-
-    AudioSystem audio_system;
+    AssetManager asset_manager;
+    RenderingSystem rendering_system(asset_manager);
     InputManager input_manager;
+    AudioSystem audio_system;
 
     // Create World
 
@@ -66,15 +47,21 @@ int main(int argc, char* args[]) {
         }
 
         // Events
-        input_manager.send_events(allEvents);
-        audio_system.handle_events(allEvents);
-        allEvents.clear();
+        rendering_system.send_events(events);
+        input_manager.send_events(events);
+        rendering_system.handle_events(events);
+        audio_system.handle_events(events);
+        events.clear();
+
 
         // Gameplay
 
         // Physics
 
         // Rendering
+
+        rendering_system.update();
+        rendering_system.render();
 
         // UI
 
