@@ -19,7 +19,7 @@ void RenderingSystem::load(const Event& e) {
 
     example_shader_.load_shader("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader");
 
-    auto mesh = asset_manager_.get_mesh_asset("Ship.obj");
+    MeshAsset* mesh = asset_manager_.get_mesh_asset("Ship.obj");
 
     example_objects_.emplace_back();
     example_objects_[0].set_mesh(mesh);
@@ -120,7 +120,7 @@ bool RenderingSystem::init_window() {
     return true;
 }
 
-void RenderingSystem::start_render() {
+void RenderingSystem::start_render() const {
     //Clear the buffers and setup the opengl requirements
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -134,7 +134,7 @@ void RenderingSystem::start_render() {
 }
 
 void RenderingSystem::setup_cameras() {
-    auto P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 100.0f);
+    glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 100.0f);
 
     cameras_[0] = glm::translate(glm::mat4(), glm::vec3(5.f * std::sin(0), 5.f * std::sin(0), 5.f * std::cos(0)));
     cameras_[0] = P * glm::lookAt(glm::vec3(cameras_[0][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
@@ -149,6 +149,6 @@ void RenderingSystem::setup_cameras() {
     cameras_[3] = P * glm::lookAt(glm::vec3(cameras_[3][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 }
 
-void RenderingSystem::end_render() {
+void RenderingSystem::end_render() const {
     SDL_GL_SwapWindow(window);
 }

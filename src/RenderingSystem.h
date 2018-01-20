@@ -19,9 +19,9 @@ private:
     void load(const Event& e);
     void handle_key_press(const Event& e);
 
-    void start_render();
+    void start_render() const;
     void setup_cameras();
-    void end_render();
+    void end_render() const;
 
     bool init_window();
     SDL_Window* window;
