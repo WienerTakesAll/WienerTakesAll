@@ -42,8 +42,6 @@ private:
     void event_impl(std::string&& name, U&& arg, T... rest);
     template <typename U>
     void event_impl(std::string&& name, U&& arg);
-
-
 };
 
 #include "Event_impl.h"
