@@ -18,12 +18,13 @@ public:
     void apply_transform(glm::mat4x4 transform);
     void set_transform(glm::mat4x4 transform);
 
-    void set_mesh(MeshAsset* n_mesh);
+    void set_mesh(MeshAsset* mesh);
 
 private:
     void setupBuffer();
 
-    GLuint gl_vertex_buffer, gl_index_buffer_;
+    GLuint gl_vertex_buffer_;
+    GLuint gl_index_buffer_;
     glm::mat4 transform_matrix_;
     MeshAsset* mesh_;
 };
