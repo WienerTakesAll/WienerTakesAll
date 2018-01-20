@@ -4,10 +4,10 @@
 #include <string>
 
 #include "EventSystem.h"
-#include "SDL_mixer.h"
+#include "MusicType.h"
+#include "SoundType.h"
 
-enum class SoundType {BEAT};
-enum class MusicType {BEAT};
+#include "SDL_mixer.h"
 
 class AudioSystem : public EventSystem<AudioSystem> {
 
@@ -20,7 +20,7 @@ public:
     void quit();
 
 private:
-    bool init_successful_ = false;
+    bool init_successful_;
     std::unordered_map<int, Mix_Chunk*> sound_assets_;
     std::unordered_map<int, Mix_Music*> music_assets_;
 

@@ -3,6 +3,8 @@
 #include <vector>
 
 #include "AudioSystem.h"
+#include "MusicType.h"
+#include "SoundType.h"
 
 #include "SDL.h"
 #include "SDL_mixer.h"
