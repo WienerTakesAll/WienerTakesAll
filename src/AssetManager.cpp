@@ -17,11 +17,11 @@ AssetManager::~AssetManager() {
 
 
 MeshAsset* AssetManager::get_mesh_asset(const std::string& filepath) {
-    auto asset = mesh_assets.find(filepath);
+    auto asset = mesh_assets_.find(filepath);
 
-    if (asset == mesh_assets.end()) {
+    if (asset == mesh_assets_.end()) {
         load_mesh_from_file(filepath);
-        asset = mesh_assets.find(filepath);
+        asset = mesh_assets_.find(filepath);
     }
 
     return &asset->second;
@@ -30,7 +30,7 @@ MeshAsset* AssetManager::get_mesh_asset(const std::string& filepath) {
 void AssetManager::load_mesh_from_file(const std::string& file_path) {
     Assimp::Importer importer;
 
-    auto mesh_map = mesh_assets.emplace(file_path, MeshAsset());
+    auto mesh_map = mesh_assets_.emplace(file_path, MeshAsset());
 
     if (!mesh_map.second) {
         std::cout << "AssetManager emplacement failed!" << std::endl;
@@ -57,7 +57,7 @@ void AssetManager::load_mesh_from_file(const std::string& file_path) {
         auto& faces = mesh->mFaces[f_i];
 
         for (unsigned int i = 0; i < faces.mNumIndices; i++) {
-            mesh_data.indices.emplace_back(faces.mIndices[i]);
+            mesh_data.indices_.emplace_back(faces.mIndices[i]);
         }
 
     }
@@ -66,30 +66,30 @@ void AssetManager::load_mesh_from_file(const std::string& file_path) {
         MeshAsset::VertexData vertex;
 
         //Load vertex positions
-        vertex.position[0] = mesh->mVertices[i].x;
-        vertex.position[1] = mesh->mVertices[i].y;
-        vertex.position[2] = mesh->mVertices[i].z;
+        vertex.position_[0] = mesh->mVertices[i].x;
+        vertex.position_[1] = mesh->mVertices[i].y;
+        vertex.position_[2] = mesh->mVertices[i].z;
 
         //Load normals
         if (mesh->HasNormals()) {
-            vertex.normal[0] = mesh->mNormals[i].x;
-            vertex.normal[1] = mesh->mNormals[i].y;
-            vertex.normal[2] = mesh->mNormals[i].z;
+            vertex.normal_[0] = mesh->mNormals[i].x;
+            vertex.normal_[1] = mesh->mNormals[i].y;
+            vertex.normal_[2] = mesh->mNormals[i].z;
         }
 
         //Load colors
         if (mesh->GetNumColorChannels()) {
-            vertex.colors[0] = mesh->mColors[i][0].r;
-            vertex.colors[1] = mesh->mColors[i][0].g;
-            vertex.colors[2] = mesh->mColors[i][0].b;
+            vertex.colors_[0] = mesh->mColors[i][0].r;
+            vertex.colors_[1] = mesh->mColors[i][0].g;
+            vertex.colors_[2] = mesh->mColors[i][0].b;
         }
 
         //Load uvs
         if (mesh->HasTextureCoords(0)) {
-            vertex.uv[0] = mesh->mTextureCoords[i][0].x;
-            vertex.uv[1] = mesh->mTextureCoords[i][0].y;
+            vertex.uv_[0] = mesh->mTextureCoords[i][0].x;
+            vertex.uv_[1] = mesh->mTextureCoords[i][0].y;
         }
 
-        mesh_data.vertices.push_back(vertex);
+        mesh_data.vertices_.push_back(vertex);
     }
 }
