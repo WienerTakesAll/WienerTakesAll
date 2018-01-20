@@ -73,7 +73,7 @@ void RenderingSystem::render() {
     start_render();
 
     for (auto& object : example_objects_) {
-        object.render_views(cameras_, 4, example_shader_.program_id);
+        object.render_views(cameras_, 4, example_shader_.program_id_);
     }
 
     endRender();
@@ -130,7 +130,7 @@ void RenderingSystem::start_render() {
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
-    glUseProgram(example_shader_.program_id);
+    glUseProgram(example_shader_.program_id_);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
