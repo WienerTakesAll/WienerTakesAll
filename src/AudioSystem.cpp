@@ -13,9 +13,9 @@ namespace {
 
 AudioSystem::AudioSystem() {
     // Initialize SDL Mixer
-    init_successful = Mix_OpenAudio(MIX_FREQ_HZ, MIX_DEFAULT_FORMAT, MIX_NUM_CHANNELS, MIX_CHUNK_SIZE) != 1;
+    init_successful_ = Mix_OpenAudio(MIX_FREQ_HZ, MIX_DEFAULT_FORMAT, MIX_NUM_CHANNELS, MIX_CHUNK_SIZE) != 1;
 
-    if (!init_successful) {
+    if (!init_successful_) {
         std::cerr << "AudioSystem initialization failed" << std::endl;
         return;
     }
@@ -28,16 +28,16 @@ AudioSystem::AudioSystem() {
 
 void AudioSystem::load_audio_assets() {
     // Load all sound assets
-    sound_assets["beat"] = Mix_LoadWAV("assets/audio/beat.wav");
+    sound_assets_["beat"] = Mix_LoadWAV("assets/audio/beat.wav");
 
-    if (sound_assets.at("beat") == nullptr) {
+    if (sound_assets_.at("beat") == nullptr) {
         std::cerr << "Failed to load sound: beat.wav" << std::endl;
     }
 
     // Load all music assets
-    music_assets["beat"] = Mix_LoadMUS("assets/audio/beat.wav");
+    music_assets_["beat"] = Mix_LoadMUS("assets/audio/beat.wav");
 
-    if (music_assets.at("beat") == nullptr) {
+    if (music_assets_.at("beat") == nullptr) {
         std::cerr << "Failed to load music: beat.wav" << std::endl;
     }
 }
@@ -70,11 +70,11 @@ void AudioSystem::handle_keypress_event(const Event& e) {
 }
 
 void AudioSystem::play_sound(const char* sound, const int loops /*= 0*/) const {
-    if (!init_successful) {
+    if (!init_successful_) {
         return;
     }
 
-    Mix_Chunk* asset = sound_assets.at(sound);
+    Mix_Chunk* asset = sound_assets_.at(sound);
 
     if (!asset) {
         std::cerr << "Unable to play sound: " << sound << std::endl;
@@ -86,11 +86,11 @@ void AudioSystem::play_sound(const char* sound, const int loops /*= 0*/) const {
 }
 
 void AudioSystem::play_music(const char* music, const bool force /* = false*/) const {
-    if (!init_successful) {
+    if (!init_successful_) {
         return;
     }
 
-    Mix_Music* asset = music_assets.at(music);
+    Mix_Music* asset = music_assets_.at(music);
 
     if (Mix_PlayingMusic() == 1) {
         if (force) {
@@ -103,7 +103,7 @@ void AudioSystem::play_music(const char* music, const bool force /* = false*/) c
 }
 
 void AudioSystem::pause_music() const {
-    if (!init_successful) {
+    if (!init_successful_) {
         return;
     }
 
@@ -113,7 +113,7 @@ void AudioSystem::pause_music() const {
 }
 
 void AudioSystem::resume_music() const {
-    if (!init_successful) {
+    if (!init_successful_) {
         return;
     }
 
@@ -123,25 +123,25 @@ void AudioSystem::resume_music() const {
 }
 
 void AudioSystem::quit() {
-    if (!init_successful) {
+    if (!init_successful_) {
         return;
     }
 
     // Free sound assets
-    for (auto it = sound_assets.begin(); it != sound_assets.end(); ++it) {
+    for (auto it = sound_assets_.begin(); it != sound_assets_.end(); ++it) {
         Mix_FreeChunk(it->second);
         it->second = nullptr;
     }
 
     // Free music assets
-    for (auto it = music_assets.begin(); it != music_assets.end(); ++it) {
+    for (auto it = music_assets_.begin(); it != music_assets_.end(); ++it) {
         Mix_FreeMusic(it->second);
         it->second = nullptr;
     }
 
     // Clear asset sets
-    sound_assets.clear();
-    music_assets.clear();
+    sound_assets_.clear();
+    music_assets_.clear();
     std::cout << "All sound assets cleared" << std::endl;
 
     Mix_Quit();

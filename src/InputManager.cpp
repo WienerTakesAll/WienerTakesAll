@@ -12,7 +12,7 @@ namespace {
 InputManager::InputManager() {
     int num_controllers_player = SDL_NumJoysticks();
 
-    // Link player controllers
+    // Link player controllers_
     SDL_GameControllerEventState(SDL_ENABLE);
     SDL_GameController* controller = nullptr;
 
@@ -21,7 +21,7 @@ InputManager::InputManager() {
             controller = SDL_GameControllerOpen(player_id);
 
             if (controller) {
-                controllers.push_back(controller);
+                controllers_.push_back(controller);
                 std::cout << "Controller for player " << player_id << " linked" << std::endl;
             } else {
                 std::cerr << "Could not open GameController " << player_id << ": " << SDL_GetError() << std::endl;
@@ -30,7 +30,7 @@ InputManager::InputManager() {
         }
     }
 
-    // Create AI controllers
+    // Create AI controllers_
     if (num_controllers_player < MAX_PLAYERS) {
         for (int player_id = num_controllers_player; player_id < MAX_PLAYERS; ++player_id) {
             // Create AI controller
@@ -267,10 +267,10 @@ void InputManager::process_input(SDL_Event* event) {
 }
 
 void InputManager::quit() {
-    for (SDL_GameController* game_controller : controllers) {
+    for (SDL_GameController* game_controller : controllers_) {
         SDL_GameControllerClose(game_controller);
     }
 
-    controllers.clear();
-    std::cout << "All controllers closed" << std::endl;
+    controllers_.clear();
+    std::cout << "All controllers_ closed" << std::endl;
 }

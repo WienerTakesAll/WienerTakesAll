@@ -8,9 +8,9 @@
 
 class AudioSystem : public EventSystem<AudioSystem> {
 
-    bool init_successful = false;
-    std::unordered_map<std::string, Mix_Chunk*> sound_assets;
-    std::unordered_map<std::string, Mix_Music*> music_assets;
+    bool init_successful_ = false;
+    std::unordered_map<std::string, Mix_Chunk*> sound_assets_;
+    std::unordered_map<std::string, Mix_Music*> music_assets_;
 
     void load_audio_assets();
     void handle_keypress_event(const Event& e);
