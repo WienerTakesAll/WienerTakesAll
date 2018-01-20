@@ -54,7 +54,7 @@ cd $DIR
 
 #GLM, ASSIMP, GLEW
 if [[ "$MACHINE" = "Linux" ]]; then
-    apt-get install -y libglm-dev libglm-dev libassimp-dev
+    apt-get install -y libglm-dev libglew-dev libassimp-dev
 elif [[ "$MACHINE" = "Mac" ]]; then
     brew install glm glew assimp cmake astyle
 fi
