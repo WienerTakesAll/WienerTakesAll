@@ -11,7 +11,8 @@ namespace {
     const int MIX_CHUNK_SIZE = 4096; // Bytes used per output sample
 }
 
-AudioSystem::AudioSystem() {
+AudioSystem::AudioSystem()
+: init_successful_(false) {
     // Initialize SDL Mixer
     init_successful_ = Mix_OpenAudio(MIX_FREQ_HZ, MIX_DEFAULT_FORMAT, MIX_NUM_CHANNELS, MIX_CHUNK_SIZE) != 1;
 

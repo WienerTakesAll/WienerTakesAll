@@ -4,8 +4,8 @@
 #include "RenderingComponent.h"
 
 class GameObject {
-    int id;
-    PhysicsComponent physics_component;
-    RenderingComponent rendering_component;
-    // Other params
+public:
+    int id_;
+    PhysicsComponent physics_component_;
+    RenderingComponent rendering_component_;
 };

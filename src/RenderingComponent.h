@@ -23,10 +23,7 @@ public:
 private:
     void setupBuffer();
 
-
-
-
-    GLuint gl_vertex_buffer, gl_index_buffer;
-    glm::mat4 transform_matrix;
-    MeshAsset* mesh;
+    GLuint gl_vertex_buffer, gl_index_buffer_;
+    glm::mat4 transform_matrix_;
+    MeshAsset* mesh_;
 };

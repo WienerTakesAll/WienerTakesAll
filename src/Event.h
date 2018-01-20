@@ -7,7 +7,8 @@
 enum class EventType {LOAD_EVENT, DUMMY_EVENT, KEYPRESS_EVENT, EVENT_COUNT};
 
 //For how to handle events, please view EventSystem.h
-struct Event {
+class Event {
+public:
     Event(EventType e_type);
     //Construct an event from a variable number of arguments
     template <typename... T>
@@ -33,9 +34,9 @@ struct Event {
 
 private:
 
-    std::unordered_map<std::string, EventValue> event_values;
+    std::unordered_map<std::string, EventValue> event_values_;
     //Due to strings having non-trivial destructors, I can't put them in the union! Oops!
-    std::unordered_map<std::string, std::string> string_values;
+    std::unordered_map<std::string, std::string> string_values_;
 
     template <typename U, typename... T>
     void event_impl(std::string&& name, U&& arg, T... rest);
