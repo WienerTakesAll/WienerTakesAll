@@ -15,12 +15,12 @@ namespace {
     // Bytes used per output sample
     const int MIX_CHUNK_SIZE = 4096;
     // Information for loading sound assets. First value is the key, second is the path.
-    const std::vector<std::pair<const char*, const char*>> SOUND_ASSETS_INFO = {
-        {"beat", "assets/audio/beat.wav"}
+    const std::vector<std::pair<const SoundType, const char*>> SOUND_ASSETS_INFO = {
+        {SoundType::BEAT, "assets/audio/beat.wav"}
     };
     // Information for loading music assets. First value is the key, second is the path.
-    const std::vector<std::pair<const char*, const char*>> MUSIC_ASSETS_INFO = {
-        {"beat", "assets/audio/beat.wav"}
+    const std::vector<std::pair<const MusicType, const char*>> MUSIC_ASSETS_INFO = {
+        {MusicType::BEAT, "assets/audio/beat.wav"}
     };
 }
 
@@ -47,7 +47,7 @@ AudioSystem::AudioSystem() {
 bool AudioSystem::load_audio_assets() {
     // Load all sound assets
     for (auto& sound_asset_info : SOUND_ASSETS_INFO) {
-        const char* key = sound_asset_info.first;
+        const int key = (int) sound_asset_info.first;
         const char* path = sound_asset_info.second;
         sound_assets_[key] = Mix_LoadWAV(path);
 
@@ -59,7 +59,7 @@ bool AudioSystem::load_audio_assets() {
 
     // Load all music assets
     for (auto& music_asset_info : MUSIC_ASSETS_INFO) {
-        const char* key = music_asset_info.first;
+        const int key = (int) music_asset_info.first;
         const char* path = music_asset_info.second;
         music_assets_[key] = Mix_LoadMUS(path);
 
@@ -79,11 +79,11 @@ void AudioSystem::handle_keypress_event(const Event& e) {
 
     switch (key) {
         case SDLK_LEFT:
-            play_sound("beat");
+            play_sound(SoundType::BEAT);
             break;
 
         case SDLK_RIGHT:
-            play_music("beat");
+            play_music(MusicType::BEAT);
             break;
 
         case SDLK_UP:
@@ -99,10 +99,12 @@ void AudioSystem::handle_keypress_event(const Event& e) {
     }
 }
 
-void AudioSystem::play_sound(const char* sound, const int loops /*= 0*/) const {
+void AudioSystem::play_sound(const SoundType sound_type, const int loops /*= 0*/) const {
     if (!init_successful_) {
         return;
     }
+
+    const int sound = (int) sound_type;
 
     Mix_Chunk* asset = sound_assets_.at(sound);
 
@@ -115,10 +117,12 @@ void AudioSystem::play_sound(const char* sound, const int loops /*= 0*/) const {
     std::cout << "Audio played: " << sound << " loops: " << loops << std::endl;
 }
 
-void AudioSystem::play_music(const char* music, const bool force /* = false*/) const {
+void AudioSystem::play_music(const MusicType music_type, const bool force /* = false*/) const {
     if (!init_successful_) {
         return;
     }
+
+    const int music = (int) music_type;
 
     Mix_Music* asset = music_assets_.at(music);
 
@@ -130,6 +134,8 @@ void AudioSystem::play_music(const char* music, const bool force /* = false*/) c
     } else {
         Mix_PlayMusic(asset, -1);
     }
+
+    std::cout << "Music played: " << music << ", forced: " << force << std::endl;
 }
 
 void AudioSystem::pause_music() const {
