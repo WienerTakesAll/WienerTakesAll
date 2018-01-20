@@ -84,6 +84,9 @@ bool RenderingSystem::init_window() {
     const int screen_width = 640;
     const int screen_height = 480;
 
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     window = SDL_CreateWindow("WienerTakesAll",
                               SDL_WINDOWPOS_UNDEFINED,
                               SDL_WINDOWPOS_UNDEFINED,
@@ -97,19 +100,16 @@ bool RenderingSystem::init_window() {
     }
 
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GLContext glContext = SDL_GL_CreateContext(window);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-    SDL_GLContext glContext = SDL_GL_CreateContext(window);
 
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
 
     if (err != GLEW_OK) {
-        std::cout << glewGetErrorString(err) << std::endl;
+        std::cout << "Error intitializing glew:" << glewGetErrorString(err) << std::endl;
         return false;
     }
 
