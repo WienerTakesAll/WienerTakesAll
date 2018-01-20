@@ -12,7 +12,7 @@ namespace {
 }
 
 AudioSystem::AudioSystem()
-: init_successful_(false) {
+    : init_successful_(false) {
     // Initialize SDL Mixer
     init_successful_ = Mix_OpenAudio(MIX_FREQ_HZ, MIX_DEFAULT_FORMAT, MIX_NUM_CHANNELS, MIX_CHUNK_SIZE) != 1;
 
