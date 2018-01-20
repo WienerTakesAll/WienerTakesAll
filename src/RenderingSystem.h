@@ -25,8 +25,8 @@ private:
     void endRender();
 
     bool init_window();
-    SDL_Window* window;
 
+    SDL_Window* window_;
     GLuint vertex_array_id_;
     Shader example_shader_;
     std::vector<RenderingComponent> example_objects_;
