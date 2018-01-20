@@ -4,33 +4,30 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-RenderingSystem::RenderingSystem(AssetManager& n_asset_manager)
-    : time(0.0f),
-      asset_manager(n_asset_manager) {
+RenderingSystem::RenderingSystem(AssetManager& asset_manager)
+    : asset_manager_(asset_manager) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
 }
 
 void RenderingSystem::update() {
-    example_objects[1].apply_transform(glm::rotate(glm::mat4x4(), 0.01f, glm::vec3(1, 1, 1)));
-
-    //time += 0.01f;
+    example_objects_[1].apply_transform(glm::rotate(glm::mat4x4(), 0.01f, glm::vec3(1, 1, 1)));
 }
 
 void RenderingSystem::load(const Event& e) {
     init_window();
 
-    example_shader.load_shader("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader");
+    example_shader_.load_shader("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader");
 
-    auto mesh = asset_manager.get_mesh_asset("Ship.obj");
+    auto mesh = asset_manager_.get_mesh_asset("Ship.obj");
 
-    example_objects.emplace_back();
-    example_objects[0].set_mesh(mesh);
-    example_objects[0].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(0, -2, 0)));
+    example_objects_.emplace_back();
+    example_objects_[0].set_mesh(mesh);
+    example_objects_[0].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(0, -2, 0)));
 
-    example_objects.emplace_back();
-    example_objects[1].set_mesh(mesh);
-    example_objects[1].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(1, 2, 1)));
+    example_objects_.emplace_back();
+    example_objects_[1].set_mesh(mesh);
+    example_objects_[1].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(1, 2, 1)));
 
     setup_cameras();
 }
@@ -38,7 +35,7 @@ void RenderingSystem::load(const Event& e) {
 void RenderingSystem::handle_key_press(const Event& e) {
     int player_id = e.get_value<int>("player_id", -1);
     int key = e.get_value<int>("key", -1);
-    int value = e.get_value<int>("value", 0);
+    // int value = e.get_value<int>("value", 0);
 
     glm::mat4 transform;
 
@@ -63,7 +60,7 @@ void RenderingSystem::handle_key_press(const Event& e) {
             break;
     }
 
-    for (auto& cam : cameras) {
+    for (auto& cam : cameras_) {
         cam *= transform;
     }
 
@@ -72,11 +69,11 @@ void RenderingSystem::handle_key_press(const Event& e) {
 void RenderingSystem::render() {
     start_render();
 
-    for (auto& object : example_objects) {
-        object.render_views(cameras, 4, example_shader.program_id);
+    for (auto& object : example_objects_) {
+        object.render_views(cameras_, 4, example_shader_.program_id);
     }
 
-    endRender();
+    end_render();
 }
 
 bool RenderingSystem::init_window() {
@@ -117,8 +114,8 @@ bool RenderingSystem::init_window() {
     }
 
 
-    glGenVertexArrays(1, &vertex_array_id);
-    glBindVertexArray(vertex_array_id);
+    glGenVertexArrays(1, &vertex_array_id_);
+    glBindVertexArray(vertex_array_id_);
 
     return true;
 }
@@ -130,7 +127,7 @@ void RenderingSystem::start_render() {
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
-    glUseProgram(example_shader.program_id);
+    glUseProgram(example_shader_.program_id);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
@@ -139,19 +136,19 @@ void RenderingSystem::start_render() {
 void RenderingSystem::setup_cameras() {
     auto P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 100.0f);
 
-    cameras[0] = glm::translate(glm::mat4(), glm::vec3(5.f * std::sin(time), 5.f * std::sin(time), 5.f * std::cos(time)));
-    cameras[0] = P * glm::lookAt(glm::vec3(cameras[0][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    cameras_[0] = glm::translate(glm::mat4(), glm::vec3(5.f * std::sin(0), 5.f * std::sin(0), 5.f * std::cos(0)));
+    cameras_[0] = P * glm::lookAt(glm::vec3(cameras_[0][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
-    cameras[1] = glm::translate(glm::mat4(), glm::vec3(5.f * std::cos(time), 5.f * std::cos(time), 5.f * std::sin(time)));
-    cameras[1] = P * glm::lookAt(glm::vec3(cameras[1][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    cameras_[1] = glm::translate(glm::mat4(), glm::vec3(5.f * std::cos(0), 5.f * std::cos(0), 5.f * std::sin(0)));
+    cameras_[1] = P * glm::lookAt(glm::vec3(cameras_[1][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
-    cameras[2] = glm::translate(glm::mat4(), glm::vec3(5.f * std::cos(std::sqrt(time)), 5.f * std::cos(time), 5.f * std::sin(time)));
-    cameras[2] = P * glm::lookAt(glm::vec3(cameras[2][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    cameras_[2] = glm::translate(glm::mat4(), glm::vec3(5.f * std::cos(std::sqrt(0)), 5.f * std::cos(0), 5.f * std::sin(0)));
+    cameras_[2] = P * glm::lookAt(glm::vec3(cameras_[2][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
-    cameras[3] = glm::translate(glm::mat4(), glm::vec3(15.f * std::sin(time), 15.f * std::sin(time), 15.f * std::cos(time)));
-    cameras[3] = P * glm::lookAt(glm::vec3(cameras[3][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    cameras_[3] = glm::translate(glm::mat4(), glm::vec3(15.f * std::sin(0), 15.f * std::sin(0), 15.f * std::cos(0)));
+    cameras_[3] = P * glm::lookAt(glm::vec3(cameras_[3][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 }
 
-void RenderingSystem::endRender() {
+void RenderingSystem::end_render() {
     SDL_GL_SwapWindow(window);
 }
