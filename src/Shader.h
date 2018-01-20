@@ -5,8 +5,7 @@
 #include "GL/glew.h"
 #include "SDL_opengl.h"
 
-class Shader
-{
+class Shader {
 public:
     bool load_shader(const std::string& vertex_path, const std::string& fragment_path);
 

@@ -9,14 +9,13 @@
 
 #include "MeshAsset.h"
 
-class AssetManager
-{
+class AssetManager {
 public:
     AssetManager();
     ~AssetManager();
 
     MeshAsset* get_mesh_asset(const std::string& filepath);
-private:  
+private:
     void load_mesh_from_file(const std::string& filepath);
 
     std::unordered_map<std::string, MeshAsset> mesh_assets;

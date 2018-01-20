@@ -18,11 +18,12 @@ AssetManager::~AssetManager() {
 
 MeshAsset* AssetManager::get_mesh_asset(const std::string& filepath) {
     auto asset = mesh_assets.find(filepath);
-    if (asset == mesh_assets.end())
-    {
+
+    if (asset == mesh_assets.end()) {
         load_mesh_from_file(filepath);
         asset = mesh_assets.find(filepath);
     }
+
     return &asset->second;
 }
 
@@ -38,8 +39,8 @@ void AssetManager::load_mesh_from_file(const std::string& file_path) {
     MeshAsset& mesh_data = mesh_map.first->second;
 
     const aiScene* scene = importer.ReadFile
-        ( file_path,
-        aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+                           ( file_path,
+                             aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
 
     if (!scene) {
         std::cout << importer.GetErrorString();
@@ -51,11 +52,13 @@ void AssetManager::load_mesh_from_file(const std::string& file_path) {
     }
 
     auto& mesh = scene->mMeshes[0];
+
     for (unsigned int f_i = 0; f_i < mesh->mNumFaces; f_i++) {
         auto& faces = mesh->mFaces[f_i];
 
-        for (unsigned int i = 0; i < faces.mNumIndices; i++)
+        for (unsigned int i = 0; i < faces.mNumIndices; i++) {
             mesh_data.indices.emplace_back(faces.mIndices[i]);
+        }
 
     }
 

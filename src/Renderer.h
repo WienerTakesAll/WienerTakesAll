@@ -9,11 +9,10 @@
 
 class AssetManager;
 
-class Renderer : public EventSystem<Renderer>
-{
+class Renderer : public EventSystem<Renderer> {
 public:
     Renderer(AssetManager&);
-    
+
     void update();
     void render();
 private:

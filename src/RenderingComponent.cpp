@@ -12,10 +12,10 @@ void RenderingComponent::render_views
     glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffer);
     glVertexAttribPointer
     (0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::VertexData)
-        , reinterpret_cast<void*>(offsetof(MeshAsset::VertexData, position)));
+     , reinterpret_cast<void*>(offsetof(MeshAsset::VertexData, position)));
     glVertexAttribPointer
     (1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::VertexData)
-        , reinterpret_cast<void*>(offsetof(MeshAsset::VertexData, normal)));
+     , reinterpret_cast<void*>(offsetof(MeshAsset::VertexData, normal)));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffer);
 

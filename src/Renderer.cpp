@@ -21,10 +21,10 @@ void Renderer::update() {
 
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
-        case SDL_QUIT:
-            std::cout << "SDL_QUIT was called" << std::endl;
-            SDL_Quit();
-            break;
+            case SDL_QUIT:
+                std::cout << "SDL_QUIT was called" << std::endl;
+                SDL_Quit();
+                break;
         }
     }
 }
@@ -33,7 +33,7 @@ void Renderer::load(const Event& e) {
     init_window();
 
     example_shader.load_shader("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader");
-    
+
     auto mesh = asset_manager.get_mesh_asset("Ship.obj");
 
     example_objects.emplace_back();
@@ -55,24 +55,24 @@ void Renderer::handle_key_press(const Event& e) {
     glm::mat4 transform;
 
     switch (key) {
-    case SDLK_LEFT:
-        transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(0, 1, 0));
-        break;
+        case SDLK_LEFT:
+            transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(0, 1, 0));
+            break;
 
-    case SDLK_RIGHT:
-        transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(0, 1, 0));
-        break;
+        case SDLK_RIGHT:
+            transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(0, 1, 0));
+            break;
 
-    case SDLK_UP:
-        transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(1, 0, 0));
-        break;
+        case SDLK_UP:
+            transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(1, 0, 0));
+            break;
 
-    case SDLK_DOWN:
-        transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(1, 0, 0));
-        break;
+        case SDLK_DOWN:
+            transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(1, 0, 0));
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
 
     for (auto& cam : cameras) {
@@ -100,11 +100,11 @@ bool Renderer::init_window() {
     int screen_height = 480;
 
     window = SDL_CreateWindow("WienerTakesAll",
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
-        screen_width,
-        screen_height,
-        sdl_flags);
+                              SDL_WINDOWPOS_UNDEFINED,
+                              SDL_WINDOWPOS_UNDEFINED,
+                              screen_width,
+                              screen_height,
+                              sdl_flags);
 
     if (window == NULL) {
         std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
@@ -122,8 +122,8 @@ bool Renderer::init_window() {
 
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
-    if (err != GLEW_OK)
-    {
+
+    if (err != GLEW_OK) {
         std::cout << glewGetErrorString(err) << std::endl;
         return false;
     }
@@ -135,8 +135,7 @@ bool Renderer::init_window() {
     return true;
 }
 
-void Renderer::start_render()
-{
+void Renderer::start_render() {
     //Clear the buffers and setup the opengl requirements
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -149,24 +148,22 @@ void Renderer::start_render()
     glEnable(GL_MULTISAMPLE);
 }
 
-void Renderer::setup_cameras()
-{
+void Renderer::setup_cameras() {
     auto P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 100.0f);
 
-    cameras[0] = glm::translate(glm::mat4(), glm::vec3(5.f*std::sin(time), 5.f*std::sin(time), 5.f*std::cos(time)));
+    cameras[0] = glm::translate(glm::mat4(), glm::vec3(5.f * std::sin(time), 5.f * std::sin(time), 5.f * std::cos(time)));
     cameras[0] = P * glm::lookAt(glm::vec3(cameras[0][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
-    cameras[1] = glm::translate(glm::mat4(), glm::vec3(5.f*std::cos(time), 5.f*std::cos(time), 5.f*std::sin(time)));
+    cameras[1] = glm::translate(glm::mat4(), glm::vec3(5.f * std::cos(time), 5.f * std::cos(time), 5.f * std::sin(time)));
     cameras[1] = P * glm::lookAt(glm::vec3(cameras[1][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
-    cameras[2] = glm::translate(glm::mat4(), glm::vec3(5.f*std::cos(std::sqrt(time)), 5.f*std::cos(time), 5.f*std::sin(time)));
+    cameras[2] = glm::translate(glm::mat4(), glm::vec3(5.f * std::cos(std::sqrt(time)), 5.f * std::cos(time), 5.f * std::sin(time)));
     cameras[2] = P * glm::lookAt(glm::vec3(cameras[2][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
-    cameras[3] = glm::translate(glm::mat4(), glm::vec3(15.f*std::sin(time), 15.f*std::sin(time), 15.f*std::cos(time)));
+    cameras[3] = glm::translate(glm::mat4(), glm::vec3(15.f * std::sin(time), 15.f * std::sin(time), 15.f * std::cos(time)));
     cameras[3] = P * glm::lookAt(glm::vec3(cameras[3][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 }
 
-void Renderer::endRender()
-{
+void Renderer::endRender() {
     SDL_GL_SwapWindow(window);
 }

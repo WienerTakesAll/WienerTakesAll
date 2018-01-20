@@ -4,8 +4,7 @@
 #include <iostream>
 #include <vector>
 
-bool Shader::load_shader(const std::string& vertex_path, const std::string& fragment_path)
-{
+bool Shader::load_shader(const std::string& vertex_path, const std::string& fragment_path) {
     // Create the shaders
     GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
     GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
@@ -13,36 +12,43 @@ bool Shader::load_shader(const std::string& vertex_path, const std::string& frag
     std::string VertexShaderCode;
 
     std::ifstream VertexShaderStream(vertex_path, std::ios::in);
+
     if (VertexShaderStream.is_open()) {
         std::string Line = "";
-        while (getline(VertexShaderStream, Line))
+
+        while (getline(VertexShaderStream, Line)) {
             VertexShaderCode += "\n" + Line;
+        }
+
         VertexShaderStream.close();
-    }
-    else {
+    } else {
         std::cout << "Failed to open " << vertex_path << std::endl;
         return false;
     }
-    
+
     // Read the Fragment Shader code from the file
     std::string FragmentShaderCode;
     std::ifstream FragmentShaderStream(fragment_path, std::ios::in);
+
     if (FragmentShaderStream.is_open()) {
         std::string Line = "";
-        while (getline(FragmentShaderStream, Line))
+
+        while (getline(FragmentShaderStream, Line)) {
             FragmentShaderCode += "\n" + Line;
+        }
+
         FragmentShaderStream.close();
     }
 
 
 
-    char const * VertexSourcePointer = VertexShaderCode.c_str();
+    char const* VertexSourcePointer = VertexShaderCode.c_str();
     glShaderSource(vertex_shader_id, 1, &VertexSourcePointer, NULL);
     glCompileShader(vertex_shader_id);
 
     check_error(vertex_shader_id);
 
-    char const * FragmentSourcePointer = FragmentShaderCode.c_str();
+    char const* FragmentSourcePointer = FragmentShaderCode.c_str();
     glShaderSource(fragment_shader_id, 1, &FragmentSourcePointer, NULL);
     glCompileShader(fragment_shader_id);
 
@@ -68,12 +74,12 @@ bool Shader::load_shader(const std::string& vertex_path, const std::string& frag
     return true;
 }
 
-void Shader::check_error(GLuint id)
-{
+void Shader::check_error(GLuint id) {
     GLint result = GL_FALSE;
     int length;
     glGetShaderiv(id, GL_COMPILE_STATUS, &result);
     glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+
     if (length > 0) {
         std::vector<char> errorMessage(length + 1);
         glGetShaderInfoLog(id, length, NULL, &errorMessage[0]);
