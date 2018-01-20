@@ -12,10 +12,10 @@ void RenderingComponent::render_views
     glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffer_);
     glVertexAttribPointer
     (0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::VertexData)
-     , reinterpret_cast<void*>(offsetof(MeshAsset::VertexData, position)));
+     , reinterpret_cast<void*>(offsetof(MeshAsset::VertexData, position_)));
     glVertexAttribPointer
     (1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::VertexData)
-     , reinterpret_cast<void*>(offsetof(MeshAsset::VertexData, normal)));
+     , reinterpret_cast<void*>(offsetof(MeshAsset::VertexData, normal_)));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffer_);
 
@@ -27,7 +27,7 @@ void RenderingComponent::render_views
     for (unsigned int i = 0; i < count; i++) {
         glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, glm::value_ptr(cameras[i] * transform_matrix_));
         glViewport(320 * (i % 2), 240 * ((i % 4) / 2), 320, 240);
-        glDrawElements(GL_TRIANGLES, mesh_->indices.size(), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, mesh_->indices_.size(), GL_UNSIGNED_INT, 0);
     }
 }
 
@@ -51,10 +51,10 @@ void RenderingComponent::set_mesh(MeshAsset* mesh) {
 void RenderingComponent::setupBuffer() {
     glGenBuffers(1, &gl_vertex_buffer_);
     glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffer_);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(MeshAsset::VertexData)*mesh_->vertices.size(), &mesh_->vertices.front(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(MeshAsset::VertexData)*mesh_->vertices_.size(), &mesh_->vertices_.front(), GL_STATIC_DRAW);
 
     glGenBuffers(1, &gl_index_buffer_);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffer_);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh_->indices.size() * sizeof(GLuint), &mesh_->indices.front(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh_->indices_.size() * sizeof(GLuint), &mesh_->indices_.front(), GL_STATIC_DRAW);
 
 }
