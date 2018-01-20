@@ -29,6 +29,7 @@ function finish {
     rm $DIR/SDL2_mixer-2.0.2.tar.gz || true
     rm -rf $DIR/SDL2-2.0.7 || true
     rm -rf $DIR/SDL2_mixer-2.0.2 || true
+    rm -rf $DIR/yaml-cpp || true
 }
 
 trap finish EXIT
@@ -58,3 +59,13 @@ if [[ "$MACHINE" = "Linux" ]]; then
 elif [[ "$MACHINE" = "Mac" ]]; then
     brew install glm glew assimp cmake astyle
 fi
+
+# yaml-cpp
+git clone https://github.com/jbeder/yaml-cpp.git
+cd yaml-cpp
+mkdir build
+cd build
+cmake ..
+make -j4
+make install -j4
+cd $DIR
