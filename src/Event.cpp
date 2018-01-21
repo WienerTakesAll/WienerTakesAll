@@ -10,26 +10,26 @@ void Event::add_value(std::string name, int arg) {
     EventValue v;
     v.type_name = typeid(int).name();
     v.value.int_type = arg;
-    event_values.emplace(name, v);
+    event_values_.emplace(name, v);
 }
 
 void Event::add_value(std::string name, float arg) {
     EventValue v;
     v.type_name = typeid(float).name();
     v.value.float_type = arg;
-    event_values.emplace(name, v);
+    event_values_.emplace(name, v);
 }
 
 void Event::add_value(std::string name, std::string&& arg) {
     EventValue v;
-    string_values.emplace(name, arg);
+    string_values_.emplace(name, arg);
 }
 
 template<>
 int Event::get_value(const std::string& name, int otherwise) const {
-    const auto val = event_values.find(name);
+    const auto val = event_values_.find(name);
 
-    if (val == event_values.end()) {
+    if (val == event_values_.end()) {
         std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
         return otherwise;
     }
@@ -46,9 +46,9 @@ int Event::get_value(const std::string& name, int otherwise) const {
 
 template<>
 float Event::get_value(const std::string& name, float otherwise) const {
-    const auto val = event_values.find(name);
+    const auto val = event_values_.find(name);
 
-    if (val == event_values.end()) {
+    if (val == event_values_.end()) {
         std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
         return otherwise;
     }
@@ -65,9 +65,9 @@ float Event::get_value(const std::string& name, float otherwise) const {
 
 template<>
 std::string Event::get_value(const std::string& name, std::string otherwise) const {
-    const auto val = string_values.find(name);
+    const auto val = string_values_.find(name);
 
-    if (val == string_values.end()) {
+    if (val == string_values_.end()) {
         std::cout << "String Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
         return otherwise;
     }

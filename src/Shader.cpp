@@ -56,16 +56,16 @@ bool Shader::load_shader(const std::string& vertex_path, const std::string& frag
     check_error(fragment_shader_id);
 
     // Link the program
-    program_id = glCreateProgram();
-    glAttachShader(program_id, vertex_shader_id);
-    glAttachShader(program_id, fragment_shader_id);
-    glLinkProgram(program_id);
+    program_id_ = glCreateProgram();
+    glAttachShader(program_id_, vertex_shader_id);
+    glAttachShader(program_id_, fragment_shader_id);
+    glLinkProgram(program_id_);
 
 
-    check_error(program_id);
+    check_error(program_id_);
 
-    glDetachShader(program_id, vertex_shader_id);
-    glDetachShader(program_id, fragment_shader_id);
+    glDetachShader(program_id_, vertex_shader_id);
+    glDetachShader(program_id_, fragment_shader_id);
 
     glDeleteShader(vertex_shader_id);
     glDeleteShader(fragment_shader_id);

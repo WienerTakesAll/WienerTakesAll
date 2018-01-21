@@ -7,12 +7,12 @@
 
 
 class InputManager : public EventSystem<InputManager> {
-
-    std::vector<SDL_GameController*> controllers_;
-
 public:
     InputManager();
 
     void process_input(SDL_Event* event);
     void quit();
+
+private:
+    std::vector<SDL_GameController*> controllers_;
 };
