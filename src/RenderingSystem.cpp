@@ -36,9 +36,14 @@ void RenderingSystem::load(const Event& e) {
 }
 
 void RenderingSystem::handle_key_press(const Event& e) {
-    int player_id = e.get_value<int>("player_id", -1);
-    int key = e.get_value<int>("key", -1);
-    int value = e.get_value<int>("value", 0);
+
+    int player_id = -1, key = -1, value = -1;
+    bool has_id = e.get_value<int>("player_id", &player_id, true);
+    bool has_key = e.get_value<int>("key", &key, true);
+    bool has_value = e.get_value<int>("value", &value, true);
+
+    std::cout << "player_id: " << player_id << std::endl;
+    std::cout << "key: " << key << std::endl;
 
     glm::mat4 transform;
 

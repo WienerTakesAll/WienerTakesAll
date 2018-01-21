@@ -41,14 +41,17 @@ public:
 void ExampleClass::handle_example_event(const Event& some_event) {
     //Lets grab what values we might need
 
-    //neededString will be the string, or "error" if there is no such string
-    std::string needed_string = some_event.get_value<std::string>("I am a string type", "error");
+    //neededString will be the string
+    std::string needed_string;
+    bool has_string = some_event.get_value<std::string>("I am a string type", &needed_string, false); // name of the type, address to store at, crash_on_fail bool
 
-    //neededInt will be the int, or -1 if the value is either not there or not an int
-    int needed_int = some_event.get_value<int>("I am an int type", -1);
+    //neededInt will be the int
+    int needed_int;
+    bool has_int = some_event.get_value<int>("I am an int type", &needed_int, false); // name of the type, address to store at, crash_on_fail bool
 
     //Same idea
-    float needed_float = some_event.get_value<float>("I am a float type", -1.0f);
+    float needed_float;
+    bool has_float = some_event.get_value<float>("I am a float type", &needed_float, false);
 
     //...
     //Now we could do something based on these values.

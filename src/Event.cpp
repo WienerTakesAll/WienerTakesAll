@@ -25,52 +25,80 @@ void Event::add_value(std::string name, std::string&& arg) {
     string_values.emplace(name, arg);
 }
 
+//get_value
+//Params: name of event, address to store result at, bool for error checking. if true and an error occurs then exit program
 template<>
-int Event::get_value(const std::string& name, int otherwise) const {
-    const auto val = event_values.find(name);
+bool Event::get_value(const std::string& name, std::string* value, bool crash_on_fail) const {
+    const auto val = string_values.find(name); //val - pointer to the event "name"
+
+    if (val == string_values.end()) {
+        std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
+    
+        if ( crash_on_fail == true) {   //if there is an error and crash is set to true crash program
+            exit (-1);
+        } else {
+            return false;
+        }
+    }
+
+    *value = val->second;       //update the value requested
+    return true;
+}
+template<>
+bool Event::get_value(const std::string& name, int* value, bool crash_on_fail) const {
+    const std::unordered_map<std::string, EventValue>::const_iterator val = event_values.find(name);
 
     if (val == event_values.end()) {
         std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
-        return otherwise;
+
+        if ( crash_on_fail == true) {
+            exit (0);
+        } else {
+            return false;
+        }
     }
 
     if (val->second.type_name != typeid(int).name()) {
         std::cout
                 << "Wrong type int instead of " << val->second.type_name
                 << " in value " << name << " of event " << static_cast<int>(event_type) << "!" << std::endl;
-        return otherwise;
+
+        if ( crash_on_fail == true) {
+            exit (0);
+        } else {
+            return false;
+        }
     }
 
-    return val->second.value.int_type;
+    *value = val->second.value.int_type;
+    return true;
 }
-
 template<>
-float Event::get_value(const std::string& name, float otherwise) const {
+bool Event::get_value(const std::string& name, float* value, bool crash_on_fail) const {
     const auto val = event_values.find(name);
 
     if (val == event_values.end()) {
         std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
-        return otherwise;
+
+        if ( crash_on_fail == true) {
+            exit (0);
+        } else {
+            return false;
+        }
     }
 
-    if (val->second.type_name != typeid(float).name()) {
+    if (val->second.type_name != typeid(int).name()) {
         std::cout
-                << "Wrong type float instead of " << val->second.type_name
+                << "Wrong type int instead of " << val->second.type_name
                 << " in value " << name << " of event " << static_cast<int>(event_type) << "!" << std::endl;
-        return otherwise;
+
+        if ( crash_on_fail == true) {
+            exit (0);
+        } else {
+            return false;
+        }
     }
 
-    return val->second.value.float_type;
-}
-
-template<>
-std::string Event::get_value(const std::string& name, std::string otherwise) const {
-    const auto val = string_values.find(name);
-
-    if (val == string_values.end()) {
-        std::cout << "String Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
-        return otherwise;
-    }
-
-    return val->second;
+    *value = val->second.value.float_type;
+    return true;
 }
