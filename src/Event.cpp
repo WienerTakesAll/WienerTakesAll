@@ -34,8 +34,9 @@ bool Event::get_value(const std::string& name, std::string* value, bool crash_on
     if (val == string_values.end()) {
         std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
     
-        if ( crash_on_fail == true) {   //if there is an error and crash is set to true crash program
-            exit (-1);
+        if (crash_on_fail == true) {   //if there is an error and crash is set to true crash program
+           std::cerr <<"Error: Value not found and program will crash on fail."
+            return EXIT_FAILURE;
         } else {
             return false;
         }
