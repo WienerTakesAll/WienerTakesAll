@@ -38,7 +38,7 @@ void RenderingSystem::handle_key_press(const Event& e) {
     int player_id = -1;
     int key = -1;
     int value = -1;
-    
+
     bool has_id = e.get_value<int>("player_id", &player_id, true);
     bool has_key = e.get_value<int>("key", &key, true);
     bool has_value = e.get_value<int>("value", &value, true);

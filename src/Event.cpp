@@ -29,13 +29,13 @@ void Event::add_value(std::string name, std::string&& arg) {
 //Params: name of event, address to store result at, bool for error checking. if true and an error occurs then exit program
 template<>
 bool Event::get_value(const std::string& name, std::string* value, bool crash_on_fail) const {
-    const auto val = string_values.find(name); //val - pointer to the event "name"
+    const auto val = string_values_.find(name); //val - pointer to the event "name"
 
-    if (val == string_values.end()) {
+    if (val == string_values_.end()) {
         std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
-    
+
         if (crash_on_fail == true) {   //if there is an error and crash is set to true crash program
-           std::cerr <<"Error: Value not found and program will crash on fail."
+            std::cerr << "Error: Value not found and program will crash on fail.";
             return EXIT_FAILURE;
         } else {
             return false;
@@ -47,15 +47,13 @@ bool Event::get_value(const std::string& name, std::string* value, bool crash_on
 }
 template<>
 bool Event::get_value(const std::string& name, int* value, bool crash_on_fail) const {
-    const std::unordered_map<std::string, EventValue>::const_iterator val = event_values.find(name);
-
     const auto val = event_values_.find(name);
 
     if (val == event_values_.end()) {
         std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
 
         if (crash_on_fail == true) {
-            std::cerr <<"Error: Value not found and program will crash on fail."
+            std::cerr << "Error: Value not found and program will crash on fail.";
             return EXIT_FAILURE;
         } else {
             return false;
@@ -68,7 +66,7 @@ bool Event::get_value(const std::string& name, int* value, bool crash_on_fail) c
                 << " in value " << name << " of event " << static_cast<int>(event_type) << "!" << std::endl;
 
         if (crash_on_fail == true) {
-            std::cerr <<"Error: Wrong type int and program will crash on fail."
+            std::cerr << "Error: Wrong type int and program will crash on fail.";
             return EXIT_FAILURE;
         } else {
             return false;
@@ -80,13 +78,13 @@ bool Event::get_value(const std::string& name, int* value, bool crash_on_fail) c
 }
 template<>
 bool Event::get_value(const std::string& name, float* value, bool crash_on_fail) const {
-    const auto val = event_values.find(name);
+    const auto val = event_values_.find(name);
 
     if (val == event_values_.end()) {
         std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
 
         if (crash_on_fail == true) {
-            std::cerr <<"Error: Value not found and program will crash on fail."
+            std::cerr << "Error: Value not found and program will crash on fail.";
             return EXIT_FAILURE;
         } else {
             return false;
@@ -99,7 +97,7 @@ bool Event::get_value(const std::string& name, float* value, bool crash_on_fail)
                 << " in value " << name << " of event " << static_cast<int>(event_type) << "!" << std::endl;
 
         if (crash_on_fail == true) {
-            std::cerr <<"Error: Wrong type and program will crash on fail."
+            std::cerr << "Error: Wrong type and program will crash on fail.";
             return EXIT_FAILURE;
         } else {
             return false;
