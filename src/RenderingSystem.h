@@ -15,6 +15,7 @@ public:
 
     void update();
     void render();
+
 private:
     void load(const Event& e);
     void handle_key_press(const Event& e);
@@ -24,8 +25,8 @@ private:
     void end_render() const;
 
     bool init_window();
-    SDL_Window* window;
 
+    SDL_Window* window_;
     GLuint vertex_array_id_;
     Shader example_shader_;
     std::vector<RenderingComponent> example_objects_;
