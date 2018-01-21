@@ -75,7 +75,10 @@ bool AudioSystem::load_audio_assets() {
 
 void AudioSystem::handle_keypress_event(const Event& e) {
 
-    int player_id = 0, key = 0, value = 0;
+    int player_id = 1;
+    int key = 0;
+    int value = 0;
+    
     bool has_id = e.get_value<int>("player_id", &player_id, true);
     bool has_key = e.get_value<int>("key", &key, true);
     bool has_value = e.get_value<int>("value", &value, true);
