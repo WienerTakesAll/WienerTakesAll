@@ -26,24 +26,26 @@ namespace {
     };
 }
 
-AudioSystem::AudioSystem() {
-    // Initialize SDL Mixer
-    init_successful_ = Mix_OpenAudio(MIX_FREQ_HZ, MIX_DEFAULT_FORMAT, MIX_NUM_CHANNELS, MIX_CHUNK_SIZE) != 1;
+AudioSystem::AudioSystem()
+    : init_successful_(false) {
+}
 
-    if (!init_successful_) {
-        std::cerr << "AudioSystem initialization failed" << std::endl;
-        return;
+bool AudioSystem::init() {
+    if (Mix_OpenAudio(MIX_FREQ_HZ, MIX_DEFAULT_FORMAT, MIX_NUM_CHANNELS, MIX_CHUNK_SIZE) != 0) {
+        std::cerr << "Could not initialize SDL Mixer" << std::endl;
+        init_successful_ = false;
+        return false;
     }
 
     // Load all audio files
-    init_successful_ = load_audio_assets();
-
-    if ( !init_successful_) {
-        std::cerr << "AudioSystem initialization failed" << std::endl;
-        return;
+    if (!load_audio_assets()) {
+        init_successful_ = false;
+        return false;
     }
 
     add_event_handler(EventType::KEYPRESS_EVENT, &AudioSystem::handle_keypress_event, this);
+    init_successful_ = true;
+    return init_successful_;
 }
 
 bool AudioSystem::load_audio_assets() {
