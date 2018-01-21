@@ -29,11 +29,8 @@ public:
     void add_value(std::string name, float arg);
     void add_value(std::string name, std::string&& arg);
 
-
     template<typename T>
     bool get_value(const std::string& name, T* value, bool crash_on_fail) const;
-
-
 
 private:
 
