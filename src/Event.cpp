@@ -36,7 +36,7 @@ bool Event::get_value(const std::string& name, std::string* value, bool crash_on
 
         if (crash_on_fail == true) {   //if there is an error and crash is set to true crash program
             std::cerr << "Error: Value not found and program will crash on fail.";
-            return EXIT_FAILURE;
+            exit(EXIT_FAILURE);
         } else {
             return false;
         }
@@ -54,7 +54,7 @@ bool Event::get_value(const std::string& name, int* value, bool crash_on_fail) c
 
         if (crash_on_fail == true) {
             std::cerr << "Error: Value not found and program will crash on fail.";
-            return EXIT_FAILURE;
+            exit(EXIT_FAILURE);
         } else {
             return false;
         }
@@ -67,7 +67,7 @@ bool Event::get_value(const std::string& name, int* value, bool crash_on_fail) c
 
         if (crash_on_fail == true) {
             std::cerr << "Error: Wrong type int and program will crash on fail.";
-            return EXIT_FAILURE;
+            exit(EXIT_FAILURE);
         } else {
             return false;
         }
@@ -85,7 +85,7 @@ bool Event::get_value(const std::string& name, float* value, bool crash_on_fail)
 
         if (crash_on_fail == true) {
             std::cerr << "Error: Value not found and program will crash on fail.";
-            return EXIT_FAILURE;
+            exit(EXIT_FAILURE);
         } else {
             return false;
         }
@@ -98,7 +98,7 @@ bool Event::get_value(const std::string& name, float* value, bool crash_on_fail)
 
         if (crash_on_fail == true) {
             std::cerr << "Error: Wrong type and program will crash on fail.";
-            return EXIT_FAILURE;
+            exit(EXIT_FAILURE);
         } else {
             return false;
         }
