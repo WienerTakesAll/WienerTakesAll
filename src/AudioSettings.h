@@ -1,6 +1,6 @@
 #pragma once
 
-struct AudioSettings {
+namespace AudioSettings {
     // Sound sampling frequency in Hz. Change to "22050" if too slow.
     int MIX_FREQ_HZ = 44100;
     // Number of sound channels for output. 1 = Mono, 2 = Stereo. Indepent from mixing channels.

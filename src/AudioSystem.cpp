@@ -3,32 +3,16 @@
 #include <vector>
 
 #include "AudioSystem.h"
+#include "AudioSettings.h"
 
 #include "SDL.h"
-
-namespace {
-    // Sound sampling frequency in Hz. Change to "22050" if too slow.
-    const int MIX_FREQ_HZ = 44100;
-    // Number of sound channels for output. 1 = Mono, 2 = Stereo. Indepent from mixing channels.
-    const int MIX_NUM_CHANNELS = 2;
-    // Bytes used per output sample
-    const int MIX_CHUNK_SIZE = 4096;
-    // Information for loading sound assets. First value is the key, second is the path.
-    const std::vector<std::pair<const SoundAsset, const char*>> SOUND_ASSETS_INFO = {
-        {SoundAsset::BEAT, "assets/audio/beat.wav"}
-    };
-    // Information for loading music assets. First value is the key, second is the path.
-    const std::vector<std::pair<const MusicAsset, const char*>> MUSIC_ASSETS_INFO = {
-        {MusicAsset::BEAT, "assets/audio/beat.wav"}
-    };
-}
 
 AudioSystem::AudioSystem()
     : init_successful_(false) {
 }
 
 bool AudioSystem::init() {
-    if (Mix_OpenAudio(MIX_FREQ_HZ, MIX_DEFAULT_FORMAT, MIX_NUM_CHANNELS, MIX_CHUNK_SIZE) != 0) {
+    if (Mix_OpenAudio(AudioSettings::MIX_FREQ_HZ, MIX_DEFAULT_FORMAT, AudioSettings::MIX_NUM_CHANNELS, AudioSettings::MIX_CHUNK_SIZE) != 0) {
         std::cerr << "Could not initialize SDL Mixer" << std::endl;
         init_successful_ = false;
         return false;
@@ -47,7 +31,7 @@ bool AudioSystem::init() {
 
 bool AudioSystem::load_audio_assets() {
     // Load all sound assets
-    for (auto& sound_asset_info : SOUND_ASSETS_INFO) {
+    for (auto& sound_asset_info : AudioSettings::SOUND_ASSETS_INFO) {
         const int key = (int) sound_asset_info.first;
         const char* path = sound_asset_info.second;
         sound_assets_[key] = Mix_LoadWAV(path);
@@ -59,7 +43,7 @@ bool AudioSystem::load_audio_assets() {
     }
 
     // Load all music assets
-    for (auto& music_asset_info : MUSIC_ASSETS_INFO) {
+    for (auto& music_asset_info : AudioSettings::MUSIC_ASSETS_INFO) {
         const int key = (int) music_asset_info.first;
         const char* path = music_asset_info.second;
         music_assets_[key] = Mix_LoadMUS(path);

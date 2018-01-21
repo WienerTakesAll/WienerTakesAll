@@ -2,12 +2,8 @@
 #include <vector>
 #include "EventSystem.h"
 #include "InputManager.h"
+#include "InputSettings.h"
 #include "SDL.h"
-
-namespace {
-    const int MAX_PLAYERS = 4; // Maximum number of players in a game
-    const int DEADZONE = 8000; // Minimum range of displacement for joystick before reading event
-}
 
 InputManager::InputManager() {
     int num_controllers_player = SDL_NumJoysticks();
@@ -31,8 +27,8 @@ InputManager::InputManager() {
     }
 
     // Create AI controllers_
-    if (num_controllers_player < MAX_PLAYERS) {
-        for (int player_id = num_controllers_player; player_id < MAX_PLAYERS; ++player_id) {
+    if (num_controllers_player < InputSettings::MAX_PLAYERS) {
+        for (int player_id = num_controllers_player; player_id < InputSettings::MAX_PLAYERS; ++player_id) {
             // Create AI controller
             std::cout << "Create AI Controller for player " << player_id << " here" << std::endl;
         }
@@ -194,7 +190,7 @@ void InputManager::process_input(SDL_Event* event) {
             int key = event->caxis.axis;
             int value = event->caxis.value; // Current displacement of joystick
 
-            if ((value > -DEADZONE) && (value < DEADZONE)) {
+            if ((value > -InputSettings::DEADZONE) && (value < InputSettings::DEADZONE)) {
                 break;
             }
 
