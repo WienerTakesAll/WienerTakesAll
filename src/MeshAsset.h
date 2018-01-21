@@ -6,11 +6,11 @@
 
 struct MeshAsset {
     struct VertexData {
-        float position[3];
-        float normal[3];
-        float colors[3];
-        float uv[2];
+        float position_[3];
+        float normal_[3];
+        float colors_[3];
+        float uv_[2];
     };
-    std::vector<VertexData> vertices;
-    std::vector<GLuint> indices;
+    std::vector<VertexData> vertices_;
+    std::vector<GLuint> indices_;
 };
