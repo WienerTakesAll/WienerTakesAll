@@ -17,9 +17,11 @@ void RenderingSystem::update() {
 void RenderingSystem::load(const Event& e) {
     init_window();
 
-    example_shader_.load_shader("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader");
+    example_shader_.load_shader(
+        "assets/shaders/SimpleVertexShader.vertexshader",
+        "assets/shaders/SimpleFragmentShader.fragmentshader");
 
-    MeshAsset* mesh = asset_manager_.get_mesh_asset("Ship.obj");
+    MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/Ship.obj");
 
     example_objects_.emplace_back();
     example_objects_[0].set_mesh(mesh);
