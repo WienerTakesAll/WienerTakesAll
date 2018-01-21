@@ -3,11 +3,8 @@
 #include <vector>
 
 #include "AudioSystem.h"
-#include "MusicType.h"
-#include "SoundType.h"
 
 #include "SDL.h"
-#include "SDL_mixer.h"
 
 namespace {
     // Sound sampling frequency in Hz. Change to "22050" if too slow.
@@ -17,33 +14,35 @@ namespace {
     // Bytes used per output sample
     const int MIX_CHUNK_SIZE = 4096;
     // Information for loading sound assets. First value is the key, second is the path.
-    const std::vector<std::pair<const SoundType, const char*>> SOUND_ASSETS_INFO = {
-        {SoundType::BEAT, "assets/audio/beat.wav"}
+    const std::vector<std::pair<const SoundAsset, const char*>> SOUND_ASSETS_INFO = {
+        {SoundAsset::BEAT, "assets/audio/beat.wav"}
     };
     // Information for loading music assets. First value is the key, second is the path.
-    const std::vector<std::pair<const MusicType, const char*>> MUSIC_ASSETS_INFO = {
-        {MusicType::BEAT, "assets/audio/beat.wav"}
+    const std::vector<std::pair<const MusicAsset, const char*>> MUSIC_ASSETS_INFO = {
+        {MusicAsset::BEAT, "assets/audio/beat.wav"}
     };
 }
 
-AudioSystem::AudioSystem() {
-    // Initialize SDL Mixer
-    init_successful_ = Mix_OpenAudio(MIX_FREQ_HZ, MIX_DEFAULT_FORMAT, MIX_NUM_CHANNELS, MIX_CHUNK_SIZE) != 1;
+AudioSystem::AudioSystem()
+    : init_successful_(false) {
+}
 
-    if (!init_successful_) {
-        std::cerr << "AudioSystem initialization failed" << std::endl;
-        return;
+bool AudioSystem::init() {
+    if (Mix_OpenAudio(MIX_FREQ_HZ, MIX_DEFAULT_FORMAT, MIX_NUM_CHANNELS, MIX_CHUNK_SIZE) != 0) {
+        std::cerr << "Could not initialize SDL Mixer" << std::endl;
+        init_successful_ = false;
+        return false;
     }
 
     // Load all audio files
-    init_successful_ = load_audio_assets();
-
-    if ( !init_successful_) {
-        std::cerr << "AudioSystem initialization failed" << std::endl;
-        return;
+    if (!load_audio_assets()) {
+        init_successful_ = false;
+        return false;
     }
 
     add_event_handler(EventType::KEYPRESS_EVENT, &AudioSystem::handle_keypress_event, this);
+    init_successful_ = true;
+    return init_successful_;
 }
 
 bool AudioSystem::load_audio_assets() {
@@ -81,11 +80,11 @@ void AudioSystem::handle_keypress_event(const Event& e) {
 
     switch (key) {
         case SDLK_LEFT:
-            play_sound(SoundType::BEAT);
+            play_sound(SoundAsset::BEAT);
             break;
 
         case SDLK_RIGHT:
-            play_music(MusicType::BEAT);
+            play_music(MusicAsset::BEAT);
             break;
 
         case SDLK_UP:
@@ -101,7 +100,7 @@ void AudioSystem::handle_keypress_event(const Event& e) {
     }
 }
 
-void AudioSystem::play_sound(const SoundType sound_type, const int loops /*= 0*/) const {
+void AudioSystem::play_sound(const SoundAsset sound_type, const int loops /*= 0*/) const {
     if (!init_successful_) {
         return;
     }
@@ -119,7 +118,7 @@ void AudioSystem::play_sound(const SoundType sound_type, const int loops /*= 0*/
     std::cout << "Audio played: " << sound << " loops: " << loops << std::endl;
 }
 
-void AudioSystem::play_music(const MusicType music_type, const bool force /* = false*/) const {
+void AudioSystem::play_music(const MusicAsset music_type, const bool force /* = false*/) const {
     if (!init_successful_) {
         return;
     }

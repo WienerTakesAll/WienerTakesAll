@@ -24,6 +24,10 @@ int main(int argc, char* args[]) {
     InputManager input_manager;
     AudioSystem audio_system;
 
+    if (!audio_system.init()) {
+        std::cerr << "Audio system failed to initialize, continuing without audio " << std::endl;
+    }
+
     // Create World
 
     bool game_is_running = true;
