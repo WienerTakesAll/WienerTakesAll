@@ -53,8 +53,9 @@ bool Event::get_value(const std::string& name, int* value, bool crash_on_fail) c
     if (val == event_values_.end()) {
         std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
 
-        if ( crash_on_fail == true) {
-            exit (0);
+        if (crash_on_fail == true) {
+            std::cerr <<"Error: Value not found and program will crash on fail."
+            return EXIT_FAILURE;
         } else {
             return false;
         }
@@ -65,8 +66,9 @@ bool Event::get_value(const std::string& name, int* value, bool crash_on_fail) c
                 << "Wrong type int instead of " << val->second.type_name
                 << " in value " << name << " of event " << static_cast<int>(event_type) << "!" << std::endl;
 
-        if ( crash_on_fail == true) {
-            exit (0);
+        if (crash_on_fail == true) {
+            std::cerr <<"Error: Wrong type int and program will crash on fail."
+            return EXIT_FAILURE;
         } else {
             return false;
         }
@@ -82,20 +84,22 @@ bool Event::get_value(const std::string& name, float* value, bool crash_on_fail)
     if (val == event_values_.end()) {
         std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
 
-        if ( crash_on_fail == true) {
-            exit (0);
+        if (crash_on_fail == true) {
+            std::cerr <<"Error: Value not found and program will crash on fail."
+            return EXIT_FAILURE;
         } else {
             return false;
         }
     }
 
-    if (val->second.type_name != typeid(int).name()) {
+    if (val->second.type_name != typeid(float).name()) {
         std::cout
                 << "Wrong type int instead of " << val->second.type_name
                 << " in value " << name << " of event " << static_cast<int>(event_type) << "!" << std::endl;
 
-        if ( crash_on_fail == true) {
-            exit (0);
+        if (crash_on_fail == true) {
+            std::cerr <<"Error: Wrong type and program will crash on fail."
+            return EXIT_FAILURE;
         } else {
             return false;
         }
