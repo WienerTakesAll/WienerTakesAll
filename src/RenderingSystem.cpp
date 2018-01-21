@@ -72,7 +72,7 @@ void RenderingSystem::render() {
     start_render();
 
     for (auto& object : example_objects_) {
-        object.render_views(cameras_, 4, example_shader_.program_id);
+        object.render_views(cameras_, 4, example_shader_.program_id_);
     }
 
     end_render();
@@ -86,14 +86,14 @@ bool RenderingSystem::init_window() {
     const int screen_width = 640;
     const int screen_height = 480;
 
-    window = SDL_CreateWindow("WienerTakesAll",
-                              SDL_WINDOWPOS_UNDEFINED,
-                              SDL_WINDOWPOS_UNDEFINED,
-                              screen_width,
-                              screen_height,
-                              sdl_flags);
+    window_ = SDL_CreateWindow("WienerTakesAll",
+                               SDL_WINDOWPOS_UNDEFINED,
+                               SDL_WINDOWPOS_UNDEFINED,
+                               screen_width,
+                               screen_height,
+                               sdl_flags);
 
-    if (window == NULL) {
+    if (window_ == NULL) {
         std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
         return false;
     }
@@ -105,7 +105,7 @@ bool RenderingSystem::init_window() {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-    SDL_GLContext glContext = SDL_GL_CreateContext(window);
+    SDL_GLContext glContext = SDL_GL_CreateContext(window_);
 
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
@@ -129,7 +129,7 @@ void RenderingSystem::start_render() const {
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
-    glUseProgram(example_shader_.program_id);
+    glUseProgram(example_shader_.program_id_);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
@@ -152,5 +152,5 @@ void RenderingSystem::setup_cameras() {
 }
 
 void RenderingSystem::end_render() const {
-    SDL_GL_SwapWindow(window);
+    SDL_GL_SwapWindow(window_);
 }

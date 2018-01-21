@@ -29,8 +29,8 @@ public:
     void send_events(std::vector<Event>& reciever);
 
 private:
-
-    std::vector<Event> event_queue;
-    std::array<std::function<void(const Event&)>, static_cast<int>(EventType::EVENT_COUNT)> function_handlers;
+    std::vector<Event> event_queue_;
+    std::array<std::function<void(const Event&)>, static_cast<int>(EventType::EVENT_COUNT)> function_handlers_;
 };
+
 #include "EventSystem_impl.h"

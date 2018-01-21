@@ -22,6 +22,7 @@ public:
 
 private:
     bool init_successful_;
+
     std::unordered_map<int, Mix_Chunk*> sound_assets_;
     std::unordered_map<int, Mix_Music*> music_assets_;
 

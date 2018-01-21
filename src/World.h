@@ -6,5 +6,6 @@
 #include "SDL.h"
 
 class World {
-    std::unordered_map<int, GameObject> game_objects;
+public:
+    std::unordered_map<int, GameObject> game_objects_;
 };
