@@ -13,6 +13,6 @@ public:
     void process_input(SDL_Event* event);
     void quit();
 
-public:
+private:
     std::vector<SDL_GameController*> controllers_;
 };
