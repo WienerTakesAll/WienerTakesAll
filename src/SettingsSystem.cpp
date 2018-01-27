@@ -61,7 +61,9 @@ void SettingsSystem::handle_keypress_event(const Event& e) {
 
     switch (key) {
         case SDLK_F5:
-            reload_settings();
+            if (reload_settings()) {
+                EventSystem::queue_event( Event( EventType::SETTINGS_EVENT ) );
+            }
             break;
 
         default:
