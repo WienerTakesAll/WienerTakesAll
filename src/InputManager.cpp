@@ -86,6 +86,10 @@ void InputManager::process_input(SDL_Event* event) {
                     std::cout << "Right was pressed" << std::endl;
                     break;
 
+                case SDLK_F5:
+                    std::cout << "F5 was pressed" << std::endl;
+                    break;
+
                 default:
                     should_queue_event = false;
                     std::cout << "UNMAPPED was pressed" << std::endl;
