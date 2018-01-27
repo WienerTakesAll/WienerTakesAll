@@ -12,7 +12,9 @@
 #include "InputManager.h"
 #include "RenderingSystem.h"
 
+#include "SettingsSystem.h"
 
+const char* SETTINGS_FILE = "config/config.yaml";
 
 int main(int argc, char* args[]) {
 
@@ -20,6 +22,7 @@ int main(int argc, char* args[]) {
     events.emplace_back(EventType::LOAD_EVENT);
 
     AssetManager asset_manager;
+    SettingsSystem settings_system(SETTINGS_FILE);
     RenderingSystem rendering_system(asset_manager);
     InputManager input_manager;
     AudioSystem audio_system;
@@ -53,6 +56,7 @@ int main(int argc, char* args[]) {
         // Events
         rendering_system.send_events(events);
         input_manager.send_events(events);
+        settings_system.handle_events(events);
         rendering_system.handle_events(events);
         audio_system.handle_events(events);
         events.clear();
