@@ -84,9 +84,11 @@ bool SettingsSystem::update_setting(const std::string top_key, const std::map<st
             switch (type) {
                 case SettingType::INT:
                     load_key( keys, *static_cast<int* const>( target ) );
+                    break;
 
                 default:
                     std::cerr << "Unknown setting type detected" << std::endl;
+                    break;
                     // return false;
             }
         }
