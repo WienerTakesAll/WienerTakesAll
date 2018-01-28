@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 
 
 #include "AssetManager.h"
@@ -31,8 +32,10 @@ int main(int argc, char* args[]) {
     // Create World
 
     bool game_is_running = true;
+    using FrameDuration = std::chrono::duration<long int, std::ratio<1, 60>>;
 
     while (game_is_running) {
+        auto start_time = std::chrono::steady_clock::now();
         SDL_Event event;
 
         // Input
@@ -69,6 +72,10 @@ int main(int argc, char* args[]) {
 
         // UI
 
+        // Maintain a maximum frame rate of 60fps
+        while ( std::chrono::duration_cast<FrameDuration>(std::chrono::steady_clock::now() - start_time).count() < 1 ) {
+            // do nothing
+        }
     }
 
     return 0;
