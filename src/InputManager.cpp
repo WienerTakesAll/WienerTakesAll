@@ -178,10 +178,6 @@ void InputManager::process_input(SDL_Event* event) {
 
                 // MISC
 
-                case SDL_CONTROLLER_BUTTON_INVALID:
-                    std::cout << "Invalid button was pressed" << std::endl;
-                    break;
-
                 default:
                     should_queue_event = false;
                     break;
@@ -234,10 +230,6 @@ void InputManager::process_input(SDL_Event* event) {
                     break;
 
                 // MISC
-
-                case SDL_CONTROLLER_AXIS_INVALID:
-                    std::cout << "Invalid axis";
-                    break;
 
                 default:
                     should_queue_event = false;

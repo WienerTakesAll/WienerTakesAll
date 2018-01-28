@@ -11,8 +11,6 @@ void Event::event_impl(std::string&& name, U&& arg, T... rest) {
     event_impl(rest...);
 }
 
-
-
 template <typename... T>
 Event::Event(EventType e_type, T... args)
     : event_type(e_type) {
