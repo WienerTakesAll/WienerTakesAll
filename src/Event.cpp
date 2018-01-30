@@ -25,6 +25,13 @@ void Event::add_value(std::string name, std::string&& arg) {
     string_values_.emplace(name, arg);
 }
 
+void Event::add_value(std::string name, void* arg) {
+    EventValue v;
+    v.type_name = typeid(void*).name();
+    v.value.pointer_type = arg;
+    event_values_.emplace(name, v);
+}
+
 template<>
 int Event::get_value(const std::string& name, int otherwise) const {
     const auto val = event_values_.find(name);
@@ -73,4 +80,23 @@ std::string Event::get_value(const std::string& name, std::string otherwise) con
     }
 
     return val->second;
+}
+
+template<>
+void* Event::get_value(const std::string& name, void* otherwise) const {
+    const auto val = event_values_.find(name);
+
+    if (val == event_values_.end()) {
+        std::cerr << "Value " << name << " not found in event" << static_cast<int>(event_type) << "!" << std::endl;
+        return otherwise;
+    }
+
+    if (val->second.type_name != typeid(void*).name()) {
+        std::cerr
+                << "Wrong type void* instead of " << val->second.type_name
+                << " in value " << name << " of event " << static_cast<int>(event_type) << "!" << std::endl;
+        return otherwise;
+    }
+
+    return val->second.value.pointer_type;
 }
