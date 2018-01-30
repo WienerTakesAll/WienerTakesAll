@@ -14,7 +14,9 @@
 
 
 
-int main(int argc, char* args[]) {
+int main(int argc, char* argv[]) {
+
+	SDL_Init(SDL_INIT_EVERYTHING);
 
     std::vector<Event> events;
     events.emplace_back(EventType::LOAD_EVENT);

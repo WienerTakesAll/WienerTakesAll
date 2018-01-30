@@ -8,6 +8,8 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
+
+	window_ = asset_manager.get_window();
 }
 
 void RenderingSystem::update() {
@@ -17,19 +19,23 @@ void RenderingSystem::update() {
 void RenderingSystem::load(const Event& e) {
     init_window();
 
-    example_shader_.load_shader(
-        "assets/shaders/SimpleVertexShader.vertexshader",
-        "assets/shaders/SimpleFragmentShader.fragmentshader");
-
-    MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/Ship.obj");
+    MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/teapot.obj");
+	TextureAsset* texture = asset_manager_.get_texture_asset("assets/models/default.jpg");
+	ShaderAsset* shader = asset_manager_.get_shader_asset("assets/shaders/SimpleShader");
 
     example_objects_.emplace_back();
     example_objects_[0].set_mesh(mesh);
+	example_objects_[0].set_texture(texture);
+	example_objects_[0].set_shader(shader);
     example_objects_[0].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(0, -2, 0)));
+	example_objects_[0].apply_transform(glm::scale(glm::mat4x4(), glm::vec3(0.02f, 0.02f, 0.02f)));
 
     example_objects_.emplace_back();
     example_objects_[1].set_mesh(mesh);
+	example_objects_[1].set_texture(texture);
+	example_objects_[1].set_shader(shader);
     example_objects_[1].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(1, 2, 1)));
+	example_objects_[1].apply_transform(glm::scale(glm::mat4x4(), glm::vec3(0.02f, 0.02f, 0.02f)));
 
     setup_cameras();
 }
@@ -71,34 +77,20 @@ void RenderingSystem::handle_key_press(const Event& e) {
 void RenderingSystem::render() {
     start_render();
 
-    for (auto& object : example_objects_) {
-        object.render_views(cameras_, 4, example_shader_.program_id_);
-    }
+	for (size_t i = 0; i < cameras_.size(); i++) {
+		GLint x = 320 * (i % 2);
+		GLint y = 240 - 240 * (i / 2);
+
+		glViewport(x, y, 320, 240);
+		for (auto& object : example_objects_) {
+			object.render(cameras_[i]);
+		}
+	}
 
     end_render();
 }
 
 bool RenderingSystem::init_window() {
-    SDL_Init(SDL_INIT_EVERYTHING);
-
-    const int sdl_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
-
-    const int screen_width = 640;
-    const int screen_height = 480;
-
-    window_ = SDL_CreateWindow("WienerTakesAll",
-                               SDL_WINDOWPOS_UNDEFINED,
-                               SDL_WINDOWPOS_UNDEFINED,
-                               screen_width,
-                               screen_height,
-                               sdl_flags);
-
-    if (window_ == NULL) {
-        std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
-        return false;
-    }
-
-
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
@@ -115,7 +107,6 @@ bool RenderingSystem::init_window() {
         return false;
     }
 
-
     glGenVertexArrays(1, &vertex_array_id_);
     glBindVertexArray(vertex_array_id_);
 
@@ -126,10 +117,6 @@ void RenderingSystem::start_render() const {
     //Clear the buffers and setup the opengl requirements
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glUseProgram(example_shader_.program_id_);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);

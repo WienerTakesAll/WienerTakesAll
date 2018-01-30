@@ -9,12 +9,32 @@
 #include <iostream>
 
 AssetManager::AssetManager() {
+	const int sdl_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
+
+	const int screen_width = 640;
+	const int screen_height = 480;
+
+	window_ = SDL_CreateWindow("WienerTakesAll",
+		SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED,
+		screen_width,
+		screen_height,
+		sdl_flags);
+
+	if (window_ == NULL) {
+		std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
+	}
+
 }
 
 
 AssetManager::~AssetManager() {
 }
 
+
+SDL_Window* AssetManager::get_window() const {
+	return window_;
+}
 
 MeshAsset* AssetManager::get_mesh_asset(const std::string& filepath) {
     auto asset = mesh_assets_.find(filepath);
@@ -27,23 +47,47 @@ MeshAsset* AssetManager::get_mesh_asset(const std::string& filepath) {
     return &asset->second;
 }
 
+TextureAsset* AssetManager::get_texture_asset(const std::string& file_path) {
+	auto asset = texture_assets_.find(file_path);
+
+	if (asset == texture_assets_.end()) {
+		load_texture_from_file(file_path);
+		asset = texture_assets_.find(file_path);
+	}
+
+	return &asset->second;
+}
+
+ShaderAsset* AssetManager::get_shader_asset(const std::string& file_path) {
+	auto asset = shader_assets_.find(file_path);
+
+	if (asset == shader_assets_.end()) {
+		load_shader_from_file(file_path);
+		asset = shader_assets_.find(file_path);
+	}
+
+	return &asset->second;
+}
+
 void AssetManager::load_mesh_from_file(const std::string& file_path) {
     Assimp::Importer importer;
 
     auto mesh_map = mesh_assets_.emplace(file_path, MeshAsset());
 
     if (!mesh_map.second) {
-        std::cout << "AssetManager emplacement failed!" << std::endl;
+        std::cerr << "AssetManager emplacement failed!" << std::endl;
+		return;
     }
 
     MeshAsset& mesh_data = mesh_map.first->second;
+	mesh_data.valid_ = false;
 
     const aiScene* scene = importer.ReadFile
                            ( file_path,
                              aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
 
     if (!scene) {
-        std::cout << importer.GetErrorString();
+        std::cerr << importer.GetErrorString();
         return;
     }
 
@@ -86,10 +130,46 @@ void AssetManager::load_mesh_from_file(const std::string& file_path) {
 
         //Load uvs
         if (mesh->HasTextureCoords(0)) {
-            vertex.uv_[0] = mesh->mTextureCoords[i][0].x;
-            vertex.uv_[1] = mesh->mTextureCoords[i][0].y;
+            vertex.uv_[0] = mesh->mTextureCoords[0][i].x;
+            vertex.uv_[1] = mesh->mTextureCoords[0][i].y;
         }
 
         mesh_data.vertices_.push_back(vertex);
     }
+
+	if (mesh_data.vertices_.size() > 0 && mesh_data.indices_.size() > 0) {
+		mesh_data.valid_ = true;
+	}
+}
+
+void AssetManager::load_texture_from_file(const std::string& file_path) {
+	auto texture_map = texture_assets_.emplace(file_path, TextureAsset());
+
+	if (!texture_map.second) {
+		std::cerr << "AssetManager emplacement failed!" << std::endl;
+		return;
+	}
+
+	TextureAsset& texture_data = texture_map.first->second;
+	texture_data.valid_ = texture_data.load_texture(file_path);
+
+	if (!texture_data.valid_) {
+		std::cout << "Could not load texture " << file_path << std::endl;
+	}
+}
+
+void AssetManager::load_shader_from_file(const std::string& file_path) {
+	auto shader_map = shader_assets_.emplace(file_path, ShaderAsset());
+
+	if (!shader_map.second) {
+		std::cerr << "AssetManager emplacement failed!" << std::endl;
+		return;
+	}
+
+	ShaderAsset& shader_data = shader_map.first->second;
+	shader_data.valid_ = shader_data.load_shader(file_path + ".vert", file_path + ".frag");
+
+	if (!shader_data.valid_) {
+		std::cout << "Could not load shader " << file_path << std::endl;
+	}
 }
