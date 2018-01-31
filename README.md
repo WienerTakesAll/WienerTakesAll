@@ -30,6 +30,10 @@
 4. Copy the `WienerTakesAll\assets` folder into `WienerTakesAll\Debug\`.
 4. Open the `WienerTakesAll.sln` solution and build for _Debug x86_.
 
+NOTE: On VS2017 the Windows 8.1 SDK and the UCRT SD must be installed since this is a VS2015 project.
+
+image::vs2015-2017.png
+
 Overall the required folder structure for dependencies (with version implied) is:
 ```
 WienerTakesAll
