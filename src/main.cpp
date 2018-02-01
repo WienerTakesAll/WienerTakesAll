@@ -11,7 +11,7 @@
 
 #include "InputManager.h"
 #include "RenderingSystem.h"
-
+#include "UISystem.h"
 
 
 int main(int argc, char* argv[]) {
@@ -25,6 +25,7 @@ int main(int argc, char* argv[]) {
     RenderingSystem rendering_system(asset_manager);
     InputManager input_manager;
     AudioSystem audio_system;
+    UISystem ui_system(asset_manager);
 
     if (!audio_system.init()) {
         std::cerr << "Audio system failed to initialize, continuing without audio " << std::endl;
@@ -55,8 +56,10 @@ int main(int argc, char* argv[]) {
         // Events
         rendering_system.send_events(events);
         input_manager.send_events(events);
+        ui_system.send_events(events);
         rendering_system.handle_events(events);
         audio_system.handle_events(events);
+        ui_system.handle_events(events);
         events.clear();
 
 
@@ -70,6 +73,8 @@ int main(int argc, char* argv[]) {
         rendering_system.render();
 
         // UI
+        ui_system.update();
+        ui_system.render();
 
     }
 

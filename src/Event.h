@@ -20,7 +20,7 @@ public:
         union ValueType {
             int         int_type;
             float       float_type;
-            //void*       pointer_type; Perhaps?
+            void*       pointer_type;
         };
         ValueType value;
     };
@@ -28,6 +28,7 @@ public:
     void add_value(std::string name, int arg);
     void add_value(std::string name, float arg);
     void add_value(std::string name, std::string&& arg);
+    void add_value(std::string name, void* arg);
 
     template<typename T>
     T get_value(const std::string& name, T otherwise) const;
