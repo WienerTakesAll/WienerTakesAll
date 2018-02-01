@@ -28,7 +28,7 @@ void Event::add_value(std::string name, std::string&& arg) {
 //get_value
 //Params: name of event, address to store result at, bool for error checking. if true and an error occurs then exit program
 template<>
-bool Event::get_value(const std::string& name, std::string* value, bool crash_on_fail) const {
+std::pair<std::string, bool> Event::get_value(const std::string& name, bool crash_on_fail) const {
     const auto val = string_values_.find(name); //val - pointer to the event "name"
 
     if (val == string_values_.end()) {
@@ -38,15 +38,14 @@ bool Event::get_value(const std::string& name, std::string* value, bool crash_on
             std::cerr << "Error: Value not found and program will crash on fail.";
             exit(EXIT_FAILURE);
         } else {
-            return false;
+            return std::make_pair("-1", false);
         }
     }
 
-    *value = val->second;       //update the value requested
-    return true;
+    return std::make_pair(val->second, true);
 }
 template<>
-bool Event::get_value(const std::string& name, int* value, bool crash_on_fail) const {
+std::pair<int, bool> Event::get_value(const std::string& name, bool crash_on_fail) const {
     const auto val = event_values_.find(name);
 
     if (val == event_values_.end()) {
@@ -56,7 +55,7 @@ bool Event::get_value(const std::string& name, int* value, bool crash_on_fail) c
             std::cerr << "Error: Value not found and program will crash on fail.";
             exit(EXIT_FAILURE);
         } else {
-            return false;
+            return std::make_pair(-1, false);
         }
     }
 
@@ -69,15 +68,14 @@ bool Event::get_value(const std::string& name, int* value, bool crash_on_fail) c
             std::cerr << "Error: Wrong type int and program will crash on fail.";
             exit(EXIT_FAILURE);
         } else {
-            return false;
+            return std::make_pair(-1, false);
         }
     }
 
-    *value = val->second.value.int_type;
-    return true;
+    return std::make_pair(val->second.value.int_type, true);
 }
 template<>
-bool Event::get_value(const std::string& name, float* value, bool crash_on_fail) const {
+std::pair<float, bool> Event::get_value(const std::string& name, bool crash_on_fail) const {
     const auto val = event_values_.find(name);
 
     if (val == event_values_.end()) {
@@ -87,7 +85,7 @@ bool Event::get_value(const std::string& name, float* value, bool crash_on_fail)
             std::cerr << "Error: Value not found and program will crash on fail.";
             exit(EXIT_FAILURE);
         } else {
-            return false;
+            return std::make_pair(-1.0, false);
         }
     }
 
@@ -100,10 +98,9 @@ bool Event::get_value(const std::string& name, float* value, bool crash_on_fail)
             std::cerr << "Error: Wrong type and program will crash on fail.";
             exit(EXIT_FAILURE);
         } else {
-            return false;
+            return std::make_pair(-1.0, false);
         }
     }
 
-    *value = val->second.value.float_type;
-    return true;
+    return std::make_pair(val->second.value.float_type, true);
 }

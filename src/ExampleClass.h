@@ -41,21 +41,18 @@ public:
 void ExampleClass::handle_example_event(const Event& some_event) {
     //Lets grab what values we might need
 
-    //neededString will be the string
-    std::string needed_string;
-    bool has_string = some_event.get_value<std::string>("I am a string type", &needed_string, false); // name of the type, address to store at, crash_on_fail bool
+    //neededString will be the pair (string, bool)
+    std::pair<std::string, bool> needed_string = some_event.get_value<std::string>("I am a string type", false); // name of the type, address to store at, crash_on_fail bool
 
-    //neededInt will be the int
-    int needed_int;
-    bool has_int = some_event.get_value<int>("I am an int type", &needed_int, false); // name of the type, address to store at, crash_on_fail bool
+    //neededInt will be the pair (int, bool)
+    std::pair<int, bool> needed_int = some_event.get_value<int>("I am an int type", false); // name of the type, address to store at, crash_on_fail bool
 
     //Same idea
-    float needed_float;
-    bool has_float = some_event.get_value<float>("I am a float type", &needed_float, false);
+    std::pair<float, bool> needed_float = some_event.get_value<float>("I am a float type", false);
 
     //...
     //Now we could do something based on these values.
-    std::cout << "String value: " << needed_string << std::endl;
-    std::cout << "int value: " << needed_int << std::endl;
-    std::cout << "float value: " << needed_float << std::endl;
+    std::cout << "String value: " << needed_string.first << std::endl;
+    std::cout << "int value: " << needed_int.first << std::endl;
+    std::cout << "float value: " << needed_float.first << std::endl;
 }
