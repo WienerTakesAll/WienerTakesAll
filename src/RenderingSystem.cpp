@@ -77,6 +77,7 @@ void RenderingSystem::handle_key_press(const Event& e) {
 void RenderingSystem::render() {
     start_render();
 
+    
 	for (size_t i = 0; i < cameras_.size(); i++) {
 		GLint x = 320 * (i % 2);
 		GLint y = 240 - 240 * (i / 2);
@@ -86,6 +87,7 @@ void RenderingSystem::render() {
 			object.render(cameras_[i]);
 		}
 	}
+    
 
     end_render();
 }
@@ -139,5 +141,5 @@ void RenderingSystem::setup_cameras() {
 }
 
 void RenderingSystem::end_render() const {
-    SDL_GL_SwapWindow(window_);
+    //SDL_GL_SwapWindow(window_);
 }

@@ -6,8 +6,11 @@
 #include "Shader.h"
 #include "UIObject.h"
 
+#include "GL/glew.h"
 #include "SDL.h"
 #include "SDL_opengl.h"
+
+#include "MeshAsset.h"
 
 class AssetManager;
 
@@ -25,7 +28,11 @@ private:
     void handle_key_press(const Event& e);
 
     AssetManager& asset_manager_;
-    UIObject* active_button_;
-    Shader example_shader_;
+    UIObject active_button_;
+    
+    MeshAsset example_mesh_;
+    ShaderAsset* example_shader_;
     std::vector<UIObject> ui_objects_;
+
+    SDL_Window* window_;
 };

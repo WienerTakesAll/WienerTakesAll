@@ -2,15 +2,18 @@
 
 #include <vector>
 
+#include "GL\glew.h"
 #include "SDL_opengl.h"
+
+#include "glm\glm.hpp"
 
 class MeshAsset {
 public:
     struct VertexData {
-        float position_[3];
-        float normal_[3];
-        float colors_[3];
-        float uv_[2];
+        glm::vec3 position_;
+        glm::vec3 normal_;
+        glm::vec3 colors_;
+        glm::vec2 uv_;
     };
 	bool valid_;
     std::vector<VertexData> vertices_;
