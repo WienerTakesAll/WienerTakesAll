@@ -1,0 +1,37 @@
+WienerTakesAll
+├── Debug
+│   ├── SDL2.dll
+│   ├── SDL2_image.dll
+│   ├── SDL2_mixer.dll
+│   ├── assimp-vc140-mt.dll
+│   ├── glew32.dll
+│   ├── libjpeg-9.dll
+│   ├── libpng16-16.dll
+│   ├── libtiff-5.dll
+│   ├── libwebp-7.dll
+│   └── zlib1.dll
+├── README.md
+├── WienerTakesAll.sln
+├── WienerTakesAll.vcxproj
+├── WienerTakesAll.vcxproj.filters
+├── assets
+├── lib
+│   ├── include
+│   │   ├── SDL*.h
+│   │   ├── GL
+│   │   │   └── <glew-headers>
+│   │   ├── glm
+│   │   │   └── <glm-headers>
+│   │   └── assimp
+│   │       └── <assimp-headers>
+│   └── x86
+│       ├── SDL2.lib
+│       ├── SDL2_image.lib
+│       ├── SDL2_mixer.lib
+│       ├── SDL2main.lib
+│       ├── SDL2test.lib
+│       ├── assimp-vc140-mt.lib
+│       ├── glew32.lib
+│       └── glew32s.lib
+└── src
+21 directories, 475 files
