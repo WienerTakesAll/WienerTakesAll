@@ -3,6 +3,7 @@
 
 #include "AssetManager.h"
 #include "EventSystem.h"
+#include "PhysicsSystem.h"
 
 #include "SDL.h"
 
@@ -23,6 +24,7 @@ int main(int argc, char* args[]) {
     RenderingSystem rendering_system(asset_manager);
     InputManager input_manager;
     AudioSystem audio_system;
+    PhysicsSystem physics_system;
 
     if (!audio_system.init()) {
         std::cerr << "Audio system failed to initialize, continuing without audio " << std::endl;
