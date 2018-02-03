@@ -1,6 +1,8 @@
 # Project
 build/
 WienerTakesAll
+lib
+lib.zip
 
 # User-specific files
 *.suo
