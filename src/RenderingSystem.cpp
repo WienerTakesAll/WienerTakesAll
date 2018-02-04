@@ -20,7 +20,7 @@ void RenderingSystem::load(const Event& e) {
     init_window();
 
     MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/teapot.obj");
-    TextureAsset* texture = asset_manager_.get_texture_asset("assets/models/default.png");
+    TextureAsset* texture = asset_manager_.get_texture_asset("assets/textures/default.png");
     ShaderAsset* shader = asset_manager_.get_shader_asset("assets/shaders/SimpleShader");
 
     example_objects_.emplace_back();
