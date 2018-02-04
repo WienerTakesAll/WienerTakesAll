@@ -35,6 +35,13 @@ function finish {
 
 trap finish EXIT
 
+#GLM, ASSIMP, GLEW, libpng
+if [[ "$MACHINE" = "Linux" ]]; then
+    apt-get install -y libglm-dev libglew-dev libassimp-dev libpng-dev libjpeg-dev
+elif [[ "$MACHINE" = "Mac" ]]; then
+    brew install glm glew assimp cmake astyle libpng
+fi
+
 #SDL2.0
 wget https://www.libsdl.org/release/SDL2-2.0.7.tar.gz
 tar xzf SDL2-2.0.7.tar.gz
@@ -63,9 +70,3 @@ make -j4
 make install -j4
 cd $DIR
 
-#GLM, ASSIMP, GLEW, libpng
-if [[ "$MACHINE" = "Linux" ]]; then
-    apt-get install -y libglm-dev libglew-dev libassimp-dev libpng-dev
-elif [[ "$MACHINE" = "Mac" ]]; then
-    brew install glm glew assimp cmake astyle libpng
-fi
