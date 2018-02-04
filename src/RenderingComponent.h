@@ -13,7 +13,7 @@ class ShaderAsset;
 
 class RenderingComponent {
 public:
-	RenderingComponent();
+    RenderingComponent();
     //Renders the object from the camera perspective.
     void render(glm::mat4x4 camera) const;
 
@@ -21,8 +21,8 @@ public:
     void set_transform(glm::mat4x4 transform);
 
     void set_mesh(MeshAsset* mesh);
-	void set_texture(TextureAsset* texture);
-	void set_shader(ShaderAsset* shader);
+    void set_texture(TextureAsset* texture);
+    void set_shader(ShaderAsset* shader);
 
 private:
     void setupBuffer();
@@ -31,6 +31,6 @@ private:
     GLuint gl_index_buffer_;
     glm::mat4 transform_matrix_;
     MeshAsset* mesh_;
-	TextureAsset* texture_;
-	ShaderAsset* shader_;
+    TextureAsset* texture_;
+    ShaderAsset* shader_;
 };

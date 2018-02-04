@@ -29,7 +29,7 @@ private:
 
     AssetManager& asset_manager_;
     UIObject active_button_;
-    
+
     MeshAsset example_mesh_;
     ShaderAsset* example_shader_;
     std::vector<UIObject> ui_objects_;

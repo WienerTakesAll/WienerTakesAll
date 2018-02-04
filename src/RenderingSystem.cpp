@@ -9,7 +9,7 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
 
-	window_ = asset_manager.get_window();
+    window_ = asset_manager.get_window();
 }
 
 void RenderingSystem::update() {
@@ -20,22 +20,22 @@ void RenderingSystem::load(const Event& e) {
     init_window();
 
     MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/teapot.obj");
-	TextureAsset* texture = asset_manager_.get_texture_asset("assets/models/default.jpg");
-	ShaderAsset* shader = asset_manager_.get_shader_asset("assets/shaders/SimpleShader");
+    TextureAsset* texture = asset_manager_.get_texture_asset("assets/models/default.jpg");
+    ShaderAsset* shader = asset_manager_.get_shader_asset("assets/shaders/SimpleShader");
 
     example_objects_.emplace_back();
     example_objects_[0].set_mesh(mesh);
-	example_objects_[0].set_texture(texture);
-	example_objects_[0].set_shader(shader);
+    example_objects_[0].set_texture(texture);
+    example_objects_[0].set_shader(shader);
     example_objects_[0].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(0, -2, 0)));
-	example_objects_[0].apply_transform(glm::scale(glm::mat4x4(), glm::vec3(0.02f, 0.02f, 0.02f)));
+    example_objects_[0].apply_transform(glm::scale(glm::mat4x4(), glm::vec3(0.02f, 0.02f, 0.02f)));
 
     example_objects_.emplace_back();
     example_objects_[1].set_mesh(mesh);
-	example_objects_[1].set_texture(texture);
-	example_objects_[1].set_shader(shader);
+    example_objects_[1].set_texture(texture);
+    example_objects_[1].set_shader(shader);
     example_objects_[1].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(1, 2, 1)));
-	example_objects_[1].apply_transform(glm::scale(glm::mat4x4(), glm::vec3(0.02f, 0.02f, 0.02f)));
+    example_objects_[1].apply_transform(glm::scale(glm::mat4x4(), glm::vec3(0.02f, 0.02f, 0.02f)));
 
     setup_cameras();
 }
@@ -77,17 +77,18 @@ void RenderingSystem::handle_key_press(const Event& e) {
 void RenderingSystem::render() {
     start_render();
 
-    
-	for (size_t i = 0; i < cameras_.size(); i++) {
-		GLint x = 320 * (i % 2);
-		GLint y = 240 - 240 * (i / 2);
 
-		glViewport(x, y, 320, 240);
-		for (auto& object : example_objects_) {
-			object.render(cameras_[i]);
-		}
-	}
-    
+    for (size_t i = 0; i < cameras_.size(); i++) {
+        GLint x = 320 * (i % 2);
+        GLint y = 240 - 240 * (i / 2);
+
+        glViewport(x, y, 320, 240);
+
+        for (auto& object : example_objects_) {
+            object.render(cameras_[i]);
+        }
+    }
+
 
     end_render();
 }
