@@ -63,9 +63,9 @@ make -j4
 make install -j4
 cd $DIR
 
-#GLM, ASSIMP, GLEW
+#GLM, ASSIMP, GLEW, libpng
 if [[ "$MACHINE" = "Linux" ]]; then
-    apt-get install -y libglm-dev libglew-dev libassimp-dev
+    apt-get install -y libglm-dev libglew-dev libassimp-dev libpng-dev
 elif [[ "$MACHINE" = "Mac" ]]; then
-    brew install glm glew assimp cmake astyle
+    brew install glm glew assimp cmake astyle libpng
 fi
