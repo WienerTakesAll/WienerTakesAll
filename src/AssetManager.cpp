@@ -8,18 +8,20 @@
 
 #include <iostream>
 
+namespace {
+    const int SDL_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
+
+    const int SCREEN_WIDTH = 640;
+    const int SCREEN_HEIGHT = 480;
+}
+
 AssetManager::AssetManager() {
-    const int sdl_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
-
-    const int screen_width = 640;
-    const int screen_height = 480;
-
     window_ = SDL_CreateWindow("WienerTakesAll",
                                SDL_WINDOWPOS_UNDEFINED,
                                SDL_WINDOWPOS_UNDEFINED,
-                               screen_width,
-                               screen_height,
-                               sdl_flags);
+                               SCREEN_WIDTH,
+                               SCREEN_HEIGHT,
+                               SDL_FLAGS);
 
     if (window_ == NULL) {
         std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;

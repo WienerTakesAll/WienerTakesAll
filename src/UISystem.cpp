@@ -6,6 +6,7 @@ UISystem::UISystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &UISystem::handle_load, this);
 
+    // Hard-coded sample UI button mesh
     MeshAsset::VertexData vert;
 
     vert.position_ = { 0.0f, 0.0f, 1.0f };
