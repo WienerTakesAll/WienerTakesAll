@@ -1,10 +1,11 @@
+#include <cassert>
 #include <iostream>
-
 
 #include "AssetManager.h"
 #include "EventSystem.h"
 
 #include "SDL.h"
+#include "SDL_image.h"
 
 #include "AudioSystem.h"
 #include "ExampleClass.h"
@@ -13,10 +14,16 @@
 #include "RenderingSystem.h"
 #include "UISystem.h"
 
+namespace {
+    const int IMG_INIT_FLAGS = IMG_INIT_PNG;
+}
+
 
 int main(int argc, char* argv[]) {
 
     SDL_Init(SDL_INIT_EVERYTHING);
+
+    assert(IMG_Init(IMG_INIT_FLAGS) == IMG_INIT_FLAGS);
 
     std::vector<Event> events;
     events.emplace_back(EventType::LOAD_EVENT);

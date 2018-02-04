@@ -37,7 +37,7 @@ trap finish EXIT
 
 #GLM, ASSIMP, GLEW, libpng
 if [[ "$MACHINE" = "Linux" ]]; then
-    apt-get install -y libglm-dev libglew-dev libassimp-dev libpng-dev libjpeg-dev
+    apt-get install -y libglm-dev libglew-dev libassimp-dev libpng16-dev libjpeg-dev
 elif [[ "$MACHINE" = "Mac" ]]; then
     brew install glm glew assimp cmake astyle libpng
 fi
