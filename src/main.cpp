@@ -14,6 +14,10 @@
 #include "RenderingSystem.h"
 
 
+namespace {
+    // Typedef for the length of one frame (60fps ~= 0.01666 seconds per frame)
+    using FrameDuration = std::chrono::duration<long int, std::ratio<1, 60>>;
+}
 
 int main(int argc, char* args[]) {
 
@@ -32,7 +36,6 @@ int main(int argc, char* args[]) {
     // Create World
 
     bool game_is_running = true;
-    using FrameDuration = std::chrono::duration<long int, std::ratio<1, 60>>;
 
     while (game_is_running) {
         auto start_time = std::chrono::steady_clock::now();
@@ -73,8 +76,13 @@ int main(int argc, char* args[]) {
         // UI
 
         // Maintain a maximum frame rate of 60fps
-        while ( std::chrono::duration_cast<FrameDuration>(std::chrono::steady_clock::now() - start_time).count() < 1 ) {
+        auto elapsed_time = std::chrono::steady_clock::now() - start_time;
+        auto elapsed_frames = std::chrono::duration_cast<FrameDuration>(elapsed_time);
+
+        while ( game_is_running && elapsed_frames.count() < 1 ) {
             // do nothing
+            elapsed_time = std::chrono::steady_clock::now() - start_time;
+            elapsed_frames = std::chrono::duration_cast<FrameDuration>(elapsed_time);
         }
     }
 
