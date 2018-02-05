@@ -3,7 +3,7 @@
 #include "MusicAsset.h"
 #include "SoundAsset.h"
 
-namespace AudioSettings {
+struct AudioSettings {
     // Sound sampling frequency in Hz. Change to "22050" if too slow.
     int mix_freq_hz = 44100;
     // Number of sound channels for output. 1 = Mono, 2 = Stereo. Indepent from mixing channels.

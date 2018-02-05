@@ -90,11 +90,11 @@ bool RenderingSystem::init_window() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     window_ = SDL_CreateWindow("WienerTakesAll",
-                              SDL_WINDOWPOS_UNDEFINED,
-                              SDL_WINDOWPOS_UNDEFINED,
-                              screen_width,
-                              screen_height,
-                              sdl_flags);
+                               SDL_WINDOWPOS_UNDEFINED,
+                               SDL_WINDOWPOS_UNDEFINED,
+                               screen_width,
+                               screen_height,
+                               sdl_flags);
 
     if (window_ == NULL) {
         std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;

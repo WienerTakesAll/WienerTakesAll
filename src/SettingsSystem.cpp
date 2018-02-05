@@ -1,11 +1,21 @@
 #include "SettingsSystem.h"
-#include "SettingType.h"
 #include "InputSettings.h"
+#include "AudioSettings.h"
 #include <SDL.h>
+
+namespace {
+    using Key = const std::string; // Convenience typedef
+    Key KEY_INPUT = "input";
+    Key KEY_INPUT_DEADZONE = "deadzone";
+
+    Key KEY_AUDIO = "audio";
+}
 
 SettingsSystem::SettingsSystem(std::string config_file)
     : config_file_(config_file) {
     add_event_handler(EventType::KEYPRESS_EVENT, &SettingsSystem::handle_keypress_event, this);
+    input_settings_ = std::make_shared<InputSettings>();
+    audio_settings_ = std::make_shared<AudioSettings>();
 
     if (!reload_settings()) {
         std::cerr << "Unable to load settings" << std::endl;
@@ -13,7 +23,6 @@ SettingsSystem::SettingsSystem(std::string config_file)
 }
 
 bool SettingsSystem::reload_settings() {
-    static const std::string KEY_INPUT = "input";
     std::cout << "Loading settings" << std::endl;
 
     try {
@@ -24,9 +33,47 @@ bool SettingsSystem::reload_settings() {
     }
 
     if (head_node_[KEY_INPUT]) {
-        update_setting(KEY_INPUT, InputSettings::CONFIG_MAPPING);
+        if (!reload_input_settings()) {
+            std::cerr << "Failed to reload input settings" << std::endl;
+            return false;
+        }
     }
 
+    if (head_node_[KEY_AUDIO]) {
+        if (!reload_audio_settings()) {
+            std::cerr << "Failed to reload audio settings" << std::endl;
+            return false;
+        }
+    }
+
+    return true;
+}
+
+std::shared_ptr<InputSettings> SettingsSystem::get_input_settings() {
+    return input_settings_;
+}
+
+std::shared_ptr<AudioSettings> SettingsSystem::get_audio_settings() {
+    return audio_settings_;
+}
+
+bool SettingsSystem::reload_input_settings() {
+    auto deadzone_node = load_node({KEY_INPUT, KEY_INPUT_DEADZONE});
+
+    if (deadzone_node) {
+        try {
+            input_settings_->deadzone = deadzone_node.as<int>();
+        } catch (YAML::TypedBadConversion<int> e) {
+            std::cerr << "Error: failed to read setting {input, deadzone} as the value was not an int" << std::endl;
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool SettingsSystem::reload_audio_settings() {
+    // Add hot-reloadable audio settings here
     return true;
 }
 
@@ -72,28 +119,3 @@ void SettingsSystem::handle_keypress_event(const Event& e) {
     }
 }
 
-bool SettingsSystem::update_setting(const std::string top_key, const std::map<std::string, std::pair<const SettingType, void* const>>& mappings) {
-    for ( const auto& it : mappings ) {
-        std::string key = it.first;
-
-        if (head_node_[top_key][key]) {
-            auto pair = it.second;
-            const SettingType type = pair.first;
-            void* const target = pair.second;
-            const std::vector<std::string> keys = {top_key, key};
-
-            switch (type) {
-                case SettingType::INT:
-                    load_key( keys, *static_cast<int* const>( target ) );
-                    break;
-
-                default:
-                    std::cerr << "Unknown setting type detected" << std::endl;
-                    break;
-                    // return false;
-            }
-        }
-    }
-
-    return true;
-}

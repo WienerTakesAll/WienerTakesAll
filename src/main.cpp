@@ -14,7 +14,7 @@
 
 #include "SettingsSystem.h"
 
-const char* SETTINGS_FILE = "config/config.yaml";
+const std::string SETTINGS_FILE = "config/config.yaml";
 
 int main(int argc, char* args[]) {
 
@@ -24,10 +24,11 @@ int main(int argc, char* args[]) {
     AssetManager asset_manager;
     SettingsSystem settings_system(SETTINGS_FILE);
     RenderingSystem rendering_system(asset_manager);
-    InputManager input_manager;
+    InputManager input_manager(settings_system.get_input_settings());
+    std::shared_ptr<InputSettings> settings_;
     AudioSystem audio_system;
 
-    if (!audio_system.init()) {
+    if (!audio_system.init(settings_system.get_audio_settings())) {
         std::cerr << "Audio system failed to initialize, continuing without audio " << std::endl;
     }
 

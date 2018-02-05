@@ -5,7 +5,8 @@
 #include "InputSettings.h"
 #include "SDL.h"
 
-InputManager::InputManager() {
+InputManager::InputManager(std::shared_ptr<InputSettings> settings)
+    : settings_(settings) {
     int num_controllers_player = SDL_NumJoysticks();
 
     // Link player controllers_
@@ -27,8 +28,8 @@ InputManager::InputManager() {
     }
 
     // Create AI controllers_
-    if (num_controllers_player < InputSettings::MAX_PLAYERS) {
-        for (int player_id = num_controllers_player; player_id < InputSettings::MAX_PLAYERS; ++player_id) {
+    if (num_controllers_player < settings_->MAX_PLAYERS) {
+        for (int player_id = num_controllers_player; player_id < settings_->MAX_PLAYERS; ++player_id) {
             // Create AI controller
             std::cout << "Create AI Controller for player " << player_id << " here" << std::endl;
         }
@@ -190,7 +191,7 @@ void InputManager::process_input(SDL_Event* event) {
             int key = event->caxis.axis;
             int value = event->caxis.value; // Current displacement of joystick
 
-            if ((value > -InputSettings::DEADZONE) && (value < InputSettings::DEADZONE)) {
+            if ((value > -settings_->deadzone) && (value < settings_->deadzone)) {
                 break;
             }
 
