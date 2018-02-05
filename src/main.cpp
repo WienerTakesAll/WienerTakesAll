@@ -56,9 +56,11 @@ int main(int argc, char* args[]) {
         // Events
         rendering_system.send_events(events);
         input_manager.send_events(events);
-        settings_system.handle_events(events);
+        settings_system.send_events(events);
+
         rendering_system.handle_events(events);
         audio_system.handle_events(events);
+        settings_system.handle_events(events);
         events.clear();
 
 
