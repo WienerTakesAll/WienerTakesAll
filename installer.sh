@@ -21,7 +21,7 @@ if [[ "$MACHINE" = "Linux" ]]; then
     fi
 fi
 
-DIR=`pwd`
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 function finish {
     echo "Cleaning up..."
@@ -74,8 +74,9 @@ cd $DIR
 
 # Physx
 
-wget http://enochtsang.com:9000/physx.zip
-unzip physx.zip
+(cd $DIR && \
+    wget http://enochtsang.com:9000/physx.zip && \
+    unzip physx.zip )
 
 if [[ "$MACHINE" = "Linux" ]]; then
     cp physx/linux64/*.so /usr/local/lib

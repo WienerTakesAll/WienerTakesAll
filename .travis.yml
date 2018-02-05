@@ -7,6 +7,10 @@ before_script:
     - chmod +x docker_build.sh
     - ./docker_build.sh init
 
+install:
+    - wget http://enochtsang.com:9000/physx.zip
+    - unzip physx.zip
+
 script:
     - ./docker_build.sh all
 

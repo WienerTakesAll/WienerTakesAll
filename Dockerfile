@@ -1,8 +1,10 @@
 FROM ubuntu:xenial
 
-COPY installer.sh /
+COPY installer.sh /WienerTakesAll/
 
 ENV DEBIAN_FRONTEND non-interactive
+
+WORKDIR /WienerTakesAll/
 
 RUN apt-get update && \
 	apt-get -qq install \
@@ -14,4 +16,3 @@ RUN apt-get update && \
 		pkg-config && \
 	./installer.sh
 
-WORKDIR /WienerTakesAll/
