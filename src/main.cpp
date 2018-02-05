@@ -8,7 +8,7 @@
 
 #include "AudioSystem.h"
 #include "ExampleClass.h"
-
+#include "GameplaySystem.h"
 #include "InputManager.h"
 #include "RenderingSystem.h"
 
@@ -17,11 +17,12 @@ int main(int argc, char* args[]) {
     std::vector<Event> events;
     events.emplace_back(EventType::LOAD_EVENT);
 
-    AssetManager asset_manager;
-    RenderingSystem rendering_system(asset_manager);
-    InputManager input_manager;
     AudioSystem audio_system;
+    AssetManager asset_manager;
+    GameplaySystem gameplay_system;
+    InputManager input_manager;
     PhysicsSystem physics_system;
+    RenderingSystem rendering_system(asset_manager);
 
     if (!audio_system.init()) {
         std::cerr << "Audio system failed to initialize, continuing without audio " << std::endl;
@@ -50,19 +51,22 @@ int main(int argc, char* args[]) {
         }
 
         // Events
-        rendering_system.send_events(events);
         input_manager.send_events(events);
+        gameplay_system.send_events(events);
+        rendering_system.send_events(events);
+
+        gameplay_system.handle_events(events);
         rendering_system.handle_events(events);
         audio_system.handle_events(events);
         events.clear();
 
 
         // Gameplay
+        gameplay_system.update();
 
         // Physics
 
         // Rendering
-
         rendering_system.update();
         rendering_system.render();
 
