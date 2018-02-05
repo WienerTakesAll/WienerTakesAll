@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <thread>
 
 
 #include "AssetManager.h"
@@ -15,8 +16,8 @@
 
 
 namespace {
-    // Typedef for the length of one frame (60fps ~= 0.01666 seconds per frame)
-    using FrameDuration = std::chrono::duration<long int, std::ratio<1, 60>>;
+    // Typedef for the length of one frame (60fps ~= 16.66 milliseconds per frame)
+    const auto frame_duration_ms = std::chrono::milliseconds( 16 );
 }
 
 int main(int argc, char* args[]) {
@@ -38,7 +39,7 @@ int main(int argc, char* args[]) {
     bool game_is_running = true;
 
     while (game_is_running) {
-        auto start_time = std::chrono::steady_clock::now();
+        auto frame_end_time = std::chrono::steady_clock::now() + frame_duration_ms;
         SDL_Event event;
 
         // Input
@@ -76,13 +77,8 @@ int main(int argc, char* args[]) {
         // UI
 
         // Maintain a maximum frame rate of 60fps
-        auto elapsed_time = std::chrono::steady_clock::now() - start_time;
-        auto elapsed_frames = std::chrono::duration_cast<FrameDuration>(elapsed_time);
-
-        while ( game_is_running && elapsed_frames.count() < 1 ) {
-            // do nothing
-            elapsed_time = std::chrono::steady_clock::now() - start_time;
-            elapsed_frames = std::chrono::duration_cast<FrameDuration>(elapsed_time);
+        if ( game_is_running ) {
+            std::this_thread::sleep_until( frame_end_time );
         }
     }
 
