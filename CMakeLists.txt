@@ -33,9 +33,15 @@ target_include_directories(
     "physx/include/"
 )
 
-file(GLOB linux64_physx_libs
-    "physx/linux64/*"
-)
+if(UNIX AND NOT APPLE)
+	file(GLOB physx_libs "physx/linux64/*" )
+endif()
+
+if(APPLE)
+	file(GLOB physx_libs "physx/osx/*")
+endif()
+
+
 target_link_libraries(${PROJECT_NAME}
 	${SDL2_LIBRARY}
 	${SDL2_MIXER_LIBRARIES}
@@ -45,5 +51,5 @@ target_link_libraries(${PROJECT_NAME}
 	${GLM_LIBRARIES}
 	${ASSIMP_LIBRARIES}
 	${OPENGL_LIBRARIES}
-	${linux64_physx_libs}
+	${physx_libs}
 )

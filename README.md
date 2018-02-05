@@ -7,11 +7,11 @@
 1. Run `installer.sh` to install runtime libraries.
 2. Install Docker
 3. Create the docker image using `./docker_build.sh init`
-4. Compile the source using `./docker_build.sh all` 
+4. Compile the source using `./docker_build.sh all`
 
 ### Windows
 
-1. Download all the libraries into the root of the project at http://echtsang.com:9000/lib.zip.
+1. Download all the libraries into the root of the project at http://enochtsang.com:9000/lib.zip.
 	If that link doesn't work, try http://198.199.70.199:9000/lib.zip.
 2. Unzip the file so that the directory structure is:
 	- `WienerTakesAll\lib\include\`
