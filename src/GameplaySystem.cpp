@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "GameObjectCounter.h"
 #include "GameplaySystem.h"
 
 #include "SDL.h"
@@ -24,11 +25,13 @@ void GameplaySystem::handle_load(const Event& e) {
     // Initialize gameplay here
     std::cout << "Gameplay initialized here" << std::endl;
 
+    GameObjectCounter* counter = GameObjectCounter::get_instance();
+
     // Ship 1
     EventSystem::queue_event(
         Event(
             EventType::ADD_EXAMPLE_SHIP_EVENT,
-            "object_id", 0,
+            "object_id", counter->assign_id(),
             // TODO: Pass glm::vec3 in events
             "pos_x", 0,
             "pos_y", -2,
@@ -41,7 +44,7 @@ void GameplaySystem::handle_load(const Event& e) {
     EventSystem::queue_event(
         Event(
             EventType::ADD_EXAMPLE_SHIP_EVENT,
-            "object_id", 1,
+            "object_id", counter->assign_id(),
             // TODO: Pass glm::vec3 in events
             "pos_x", 1,
             "pos_y", 2,
