@@ -14,7 +14,9 @@
 
 #include "SettingsSystem.h"
 
-const std::string SETTINGS_FILE = "config/config.yaml";
+namespace {
+    const std::string SETTINGS_FILE = "config/config.yaml";
+}
 
 int main(int argc, char* args[]) {
 
@@ -56,15 +58,11 @@ int main(int argc, char* args[]) {
 
         // Events
         input_manager.send_events(events);
-<<<<<<< HEAD
-        settings_system.send_events(events);
-
-=======
         gameplay_system.send_events(events);
         rendering_system.send_events(events);
+        settings_system.send_events(events);
 
         gameplay_system.handle_events(events);
->>>>>>> 62b359ded1cd90912bfbaca77ff8fa2d693d266c
         rendering_system.handle_events(events);
         audio_system.handle_events(events);
         settings_system.handle_events(events);
