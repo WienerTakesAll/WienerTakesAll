@@ -20,6 +20,7 @@ private:
     void load(const Event& e);
     void handle_key_press(const Event& e);
     void handle_add_game_object(const Event& e);
+    void handle_idle_game_object(const Event& e);
 
     void start_render() const;
     void setup_cameras();

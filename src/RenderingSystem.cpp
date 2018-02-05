@@ -9,13 +9,10 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
     EventSystem::add_event_handler(EventType::ADD_GAME_OBJECT_EVENT, &RenderingSystem::handle_add_game_object, this);
+    EventSystem::add_event_handler(EventType::IDLE_GAME_OBJECT_EVENT, &RenderingSystem::handle_idle_game_object, this);
 }
 
 void RenderingSystem::update() {
-    // Ambient rotation should be done in gameplay
-    if (example_objects_.size() > 0) {
-        example_objects_[1].apply_transform(glm::rotate(glm::mat4x4(), 0.01f, glm::vec3(1, 1, 1)));
-    }
 }
 
 void RenderingSystem::load(const Event& e) {
@@ -90,6 +87,16 @@ void RenderingSystem::handle_add_game_object(const Event& e) {
     example_objects_.emplace_back();
     example_objects_[object_id].set_mesh(mesh);
     example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
+}
+
+void RenderingSystem::handle_idle_game_object(const Event& e) {
+    // Load game object parameters
+    int object_id = e.get_value<int>("object_id", -1);
+    assert(object_id != -1 && object_id < example_objects_.size());
+
+    float rotation_rad = e.get_value<float>("rotation_rad", 0.0f);
+
+    example_objects_[object_id].apply_transform(glm::rotate(glm::mat4x4(), rotation_rad, glm::vec3(1, 1, 1)));
 }
 
 void RenderingSystem::render() {
