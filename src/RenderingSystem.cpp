@@ -8,29 +8,18 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
+    EventSystem::add_event_handler(EventType::ADD_GAME_OBJECT_EVENT, &RenderingSystem::handle_add_game_object, this);
 }
 
 void RenderingSystem::update() {
-    example_objects_[1].apply_transform(glm::rotate(glm::mat4x4(), 0.01f, glm::vec3(1, 1, 1)));
+    // Ambient rotation should be done in gameplay
+    if (example_objects_.size() > 0) {
+        example_objects_[1].apply_transform(glm::rotate(glm::mat4x4(), 0.01f, glm::vec3(1, 1, 1)));
+    }
 }
 
 void RenderingSystem::load(const Event& e) {
     init_window();
-
-    example_shader_.load_shader(
-        "assets/shaders/SimpleVertexShader.vertexshader",
-        "assets/shaders/SimpleFragmentShader.fragmentshader");
-
-    MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/Ship.obj");
-
-    example_objects_.emplace_back();
-    example_objects_[0].set_mesh(mesh);
-    example_objects_[0].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(0, -2, 0)));
-
-    example_objects_.emplace_back();
-    example_objects_[1].set_mesh(mesh);
-    example_objects_[1].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(1, 2, 1)));
-
     setup_cameras();
 }
 
@@ -66,6 +55,41 @@ void RenderingSystem::handle_key_press(const Event& e) {
         cam *= transform;
     }
 
+}
+
+void RenderingSystem::handle_add_game_object(const Event& e) {
+    // Load game object parameters
+    int object_id = e.get_value<int>("object_id", -1);
+    assert(object_id != -1);
+
+    std::string vertex_shader_path = e.get_value<std::string>("vertex_shader", "");
+    assert(vertex_shader_path != "");
+
+    std::string fragment_shader_path = e.get_value<std::string>("fragment_shader", "");
+    assert(fragment_shader_path != "");
+
+    std::string mesh_path = e.get_value<std::string>("mesh", "");
+    assert(mesh_path != "");
+
+    int x = e.get_value<int>("pos_x", -999);
+    assert(x != -999);
+
+    int y = e.get_value<int>("pos_y", -999);
+    assert(y != -999);
+
+    int z = e.get_value<int>("pos_z", -999);
+    assert(z != -999);
+
+    example_shader_.load_shader(
+        vertex_shader_path,
+        fragment_shader_path
+    );
+
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(mesh_path);
+
+    example_objects_.emplace_back();
+    example_objects_[object_id].set_mesh(mesh);
+    example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
 }
 
 void RenderingSystem::render() {
