@@ -15,7 +15,7 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
     EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &RenderingSystem::handle_add_example_ship, this);
-    EventSystem::add_event_handler(EventType::IDLE_GAME_OBJECT_EVENT, &RenderingSystem::handle_idle_game_object, this);
+    EventSystem::add_event_handler(EventType::EXAMPLE_SHIP_IDLE_EVENT, &RenderingSystem::handle_example_ship_idle, this);
 }
 
 void RenderingSystem::update() {
@@ -88,7 +88,7 @@ void RenderingSystem::handle_add_example_ship(const Event& e) {
     example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
 }
 
-void RenderingSystem::handle_idle_game_object(const Event& e) {
+void RenderingSystem::handle_example_ship_idle(const Event& e) {
     // Load game object parameters
     int object_id = e.get_value<int>("object_id", -1);
     assert(object_id != -1 && object_id < example_objects_.size());
