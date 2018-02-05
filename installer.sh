@@ -27,8 +27,10 @@ function finish {
     echo "Cleaning up..."
     rm $DIR/SDL2-2.0.7.tar.gz || true
     rm $DIR/SDL2_mixer-2.0.2.tar.gz || true
+    rm $DIR/SDL2_image-2.0.0.tar.gz || true
     rm -rf $DIR/SDL2-2.0.7 || true
     rm -rf $DIR/SDL2_mixer-2.0.2 || true
+    rm -rf $DIR/SDL2_image-2.0.0 || true
     rm -rf $DIR/yaml-cpp || true
 }
 
@@ -48,6 +50,15 @@ wget https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-2.0.2.tar.gz
 tar xzf SDL2_mixer-2.0.2.tar.gz
 cd SDL2_mixer-2.0.2
 
+./configure
+make -j4
+make install -j4
+cd $DIR
+
+#SDL2_image
+wget https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.0.tar.gz
+tar xzf SDL2_image-2.0.0.tar.gz
+cd SDL2_image-2.0.0
 ./configure
 make -j4
 make install -j4
