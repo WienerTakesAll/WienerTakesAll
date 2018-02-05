@@ -2,8 +2,7 @@
 
 #include "PxPhysicsAPI.h"
 
-class PhysicsSystem
-{
+class PhysicsSystem {
 public:
     PhysicsSystem();
     ~PhysicsSystem();

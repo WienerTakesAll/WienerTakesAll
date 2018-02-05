@@ -63,7 +63,14 @@ make -j4
 make install -j4
 cd $DIR
 
-#GLM, ASSIMP, GLEW
+# Physx Shared Libraries
+if [[ "$MACHINE" = "Linux" ]]; then
+    cp physx/linux64/*.so /usr/local/lib
+elif [[ "$MACHINE" = "Mac" ]]; then
+    cp physx/osx/*.so /usr/local/lib
+fi
+
+#GLM, ASSIMP, GLEW, Physx
 if [[ "$MACHINE" = "Linux" ]]; then
     apt-get install -y libglm-dev libglew-dev libassimp-dev
 elif [[ "$MACHINE" = "Mac" ]]; then

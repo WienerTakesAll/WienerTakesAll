@@ -1,6 +1,5 @@
 #include <iostream>
 
-
 #include "AssetManager.h"
 #include "EventSystem.h"
 #include "PhysicsSystem.h"
@@ -12,8 +11,6 @@
 
 #include "InputManager.h"
 #include "RenderingSystem.h"
-
-
 
 int main(int argc, char* args[]) {
 
