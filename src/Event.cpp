@@ -1,5 +1,5 @@
 #include <typeinfo>
-
+#include <assert.h>
 #include "Event.h"
 
 Event::Event(EventType e_type)
@@ -32,12 +32,12 @@ std::pair<std::string, bool> Event::get_value(const std::string& name, bool cras
     const auto val = string_values_.find(name); //val - pointer to the event "name"
 
     if (val == string_values_.end()) {
-        std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
 
         if (crash_on_fail == true) {   //if there is an error and crash is set to true crash program
-            std::cerr << "Error: Value not found and program will crash on fail.";
-            exit(EXIT_FAILURE);
+            assert(crash_on_fail);
+            std::cout << "Error: Value not found and program will crash on fail.";
         } else {
+            std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
             return std::make_pair("-1", false);
         }
     }
@@ -49,25 +49,25 @@ std::pair<int, bool> Event::get_value(const std::string& name, bool crash_on_fai
     const auto val = event_values_.find(name);
 
     if (val == event_values_.end()) {
-        std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
 
         if (crash_on_fail == true) {
-            std::cerr << "Error: Value not found and program will crash on fail.";
-            exit(EXIT_FAILURE);
+            assert(crash_on_fail);
+            std::cout << "Error: Value not found and program will crash on fail.";
         } else {
+            std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
             return std::make_pair(-1, false);
         }
     }
 
     if (val->second.type_name != typeid(int).name()) {
-        std::cout
-                << "Wrong type int instead of " << val->second.type_name
-                << " in value " << name << " of event " << static_cast<int>(event_type) << "!" << std::endl;
 
         if (crash_on_fail == true) {
-            std::cerr << "Error: Wrong type int and program will crash on fail.";
-            exit(EXIT_FAILURE);
+            assert(crash_on_fail);
+            std::cout << "Error: Wrong type and program will crash on fail.";
         } else {
+            std::cout
+                    << "Wrong type int instead of " << val->second.type_name
+                    << " in value " << name << " of event " << static_cast<int>(event_type) << "!" << std::endl;
             return std::make_pair(-1, false);
         }
     }
@@ -79,25 +79,25 @@ std::pair<float, bool> Event::get_value(const std::string& name, bool crash_on_f
     const auto val = event_values_.find(name);
 
     if (val == event_values_.end()) {
-        std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
 
         if (crash_on_fail == true) {
-            std::cerr << "Error: Value not found and program will crash on fail.";
-            exit(EXIT_FAILURE);
+            assert(crash_on_fail);
+            std::cout << "Error: Value not found and program will crash on fail.";
         } else {
+            std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
             return std::make_pair(-1.0, false);
         }
     }
 
     if (val->second.type_name != typeid(float).name()) {
-        std::cout
-                << "Wrong type int instead of " << val->second.type_name
-                << " in value " << name << " of event " << static_cast<int>(event_type) << "!" << std::endl;
 
         if (crash_on_fail == true) {
-            std::cerr << "Error: Wrong type and program will crash on fail.";
-            exit(EXIT_FAILURE);
+            assert(crash_on_fail);
+            std::cout << "Error: Wrong type and program will crash on fail.";
         } else {
+            std::cout
+                    << "Wrong type int instead of " << val->second.type_name
+                    << " in value " << name << " of event " << static_cast<int>(event_type) << "!" << std::endl;
             return std::make_pair(-1.0, false);
         }
     }
