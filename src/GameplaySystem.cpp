@@ -35,8 +35,7 @@ void GameplaySystem::handle_load(const Event& e) {
             // TODO: Pass glm::vec3 in events
             "pos_x", 0,
             "pos_y", -2,
-            "pos_z", 0,
-            "idle_rotate", 0//,
+            "pos_z", 0//,
             // "name", "Ship 1"
         )
     );
@@ -49,10 +48,10 @@ void GameplaySystem::handle_load(const Event& e) {
             "vertex_shader", "assets/shaders/SimpleVertexShader.vertexshader",
             "fragment_shader", "assets/shaders/SimpleFragmentShader.fragmentshader",
             "mesh", "assets/models/Ship.obj",
+            // TODO: Pass glm::vec3 in events
             "pos_x", 1,
             "pos_y", 2,
-            "pos_z", 1,
-            "idle_rotate", 1//,
+            "pos_z", 1//,
             // "name", "Ship 2"
         )
     );
