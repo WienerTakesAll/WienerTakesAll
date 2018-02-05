@@ -2,6 +2,11 @@
 
 #include "AssetManager.h"
 
+namespace {
+    const int UI_VIEW_PORT_WIDTH = 640;
+    const int UI_VIEW_PORT_HEIGHT = 480;
+}
+
 UISystem::UISystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &UISystem::handle_load, this);
@@ -53,7 +58,7 @@ void UISystem::render() const {
 }
 
 void UISystem::start_render() const {
-    glViewport(0, 0, 640, 480);
+    glViewport(0, 0, UI_VIEW_PORT_WIDTH, UI_VIEW_PORT_HEIGHT);
     glDisable(GL_DEPTH_TEST);
 }
 
