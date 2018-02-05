@@ -27,11 +27,8 @@ void GameplaySystem::handle_load(const Event& e) {
     // Ship 1
     EventSystem::queue_event(
         Event(
-            EventType::ADD_GAME_OBJECT_EVENT,
+            EventType::ADD_EXAMPLE_SHIP_EVENT,
             "object_id", 0,
-            "vertex_shader", "assets/shaders/SimpleVertexShader.vertexshader",
-            "fragment_shader", "assets/shaders/SimpleFragmentShader.fragmentshader",
-            "mesh", "assets/models/Ship.obj",
             // TODO: Pass glm::vec3 in events
             "pos_x", 0,
             "pos_y", -2,
@@ -43,11 +40,8 @@ void GameplaySystem::handle_load(const Event& e) {
     // Ship 2
     EventSystem::queue_event(
         Event(
-            EventType::ADD_GAME_OBJECT_EVENT,
+            EventType::ADD_EXAMPLE_SHIP_EVENT,
             "object_id", 1,
-            "vertex_shader", "assets/shaders/SimpleVertexShader.vertexshader",
-            "fragment_shader", "assets/shaders/SimpleFragmentShader.fragmentshader",
-            "mesh", "assets/models/Ship.obj",
             // TODO: Pass glm::vec3 in events
             "pos_x", 1,
             "pos_y", 2,

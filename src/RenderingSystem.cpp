@@ -4,11 +4,17 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+namespace {
+    const std::string SHIP_VERTEX_SHADER_PATH = "assets/shaders/SimpleVertexShader.vertexshader";
+    const std::string SHIP_FRAGMENT_SHADER_PATH = "assets/shaders/SimpleFragmentShader.fragmentshader";
+    const std::string SHIP_MESH_PATH = "assets/models/Ship.obj";
+}
+
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
-    EventSystem::add_event_handler(EventType::ADD_GAME_OBJECT_EVENT, &RenderingSystem::handle_add_game_object, this);
+    EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &RenderingSystem::handle_add_example_ship, this);
     EventSystem::add_event_handler(EventType::IDLE_GAME_OBJECT_EVENT, &RenderingSystem::handle_idle_game_object, this);
 }
 
@@ -54,19 +60,10 @@ void RenderingSystem::handle_key_press(const Event& e) {
 
 }
 
-void RenderingSystem::handle_add_game_object(const Event& e) {
+void RenderingSystem::handle_add_example_ship(const Event& e) {
     // Load game object parameters
     int object_id = e.get_value<int>("object_id", -1);
     assert(object_id != -1);
-
-    std::string vertex_shader_path = e.get_value<std::string>("vertex_shader", "");
-    assert(vertex_shader_path != "");
-
-    std::string fragment_shader_path = e.get_value<std::string>("fragment_shader", "");
-    assert(fragment_shader_path != "");
-
-    std::string mesh_path = e.get_value<std::string>("mesh", "");
-    assert(mesh_path != "");
 
     int x = e.get_value<int>("pos_x", -999);
     assert(x != -999);
@@ -77,13 +74,15 @@ void RenderingSystem::handle_add_game_object(const Event& e) {
     int z = e.get_value<int>("pos_z", -999);
     assert(z != -999);
 
+    // Load ship assets
     example_shader_.load_shader(
-        vertex_shader_path,
-        fragment_shader_path
+        SHIP_VERTEX_SHADER_PATH,
+        SHIP_FRAGMENT_SHADER_PATH
     );
 
-    MeshAsset* mesh = asset_manager_.get_mesh_asset(mesh_path);
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(SHIP_MESH_PATH);
 
+    // Store ship
     example_objects_.emplace_back();
     example_objects_[object_id].set_mesh(mesh);
     example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
