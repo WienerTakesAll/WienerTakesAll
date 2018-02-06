@@ -1,8 +1,8 @@
 #include <iostream>
 
-
 #include "AssetManager.h"
 #include "EventSystem.h"
+#include "PhysicsSystem.h"
 
 #include "SDL.h"
 
@@ -11,8 +11,6 @@
 #include "GameplaySystem.h"
 #include "InputManager.h"
 #include "RenderingSystem.h"
-
-
 
 int main(int argc, char* args[]) {
 
@@ -23,6 +21,7 @@ int main(int argc, char* args[]) {
     AssetManager asset_manager;
     GameplaySystem gameplay_system;
     InputManager input_manager;
+    PhysicsSystem physics_system;
     RenderingSystem rendering_system(asset_manager);
 
     if (!audio_system.init()) {
