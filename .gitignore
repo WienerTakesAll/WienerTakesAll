@@ -1,6 +1,10 @@
 # Project
 build/
 WienerTakesAll
+lib
+lib.zip
+physx
+physx.zip
 
 # User-specific files
 *.suo
