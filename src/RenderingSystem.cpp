@@ -4,33 +4,25 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+namespace {
+    const std::string SHIP_VERTEX_SHADER_PATH = "assets/shaders/SimpleVertexShader.vertexshader";
+    const std::string SHIP_FRAGMENT_SHADER_PATH = "assets/shaders/SimpleFragmentShader.fragmentshader";
+    const std::string SHIP_MESH_PATH = "assets/models/Ship.obj";
+}
+
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
+    EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &RenderingSystem::handle_add_example_ship, this);
+    EventSystem::add_event_handler(EventType::EXAMPLE_SHIP_IDLE_EVENT, &RenderingSystem::handle_example_ship_idle, this);
 }
 
 void RenderingSystem::update() {
-    example_objects_[1].apply_transform(glm::rotate(glm::mat4x4(), 0.01f, glm::vec3(1, 1, 1)));
 }
 
 void RenderingSystem::load(const Event& e) {
     init_window();
-
-    example_shader_.load_shader(
-        "assets/shaders/SimpleVertexShader.vertexshader",
-        "assets/shaders/SimpleFragmentShader.fragmentshader");
-
-    MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/Ship.obj");
-
-    example_objects_.emplace_back();
-    example_objects_[0].set_mesh(mesh);
-    example_objects_[0].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(0, -2, 0)));
-
-    example_objects_.emplace_back();
-    example_objects_[1].set_mesh(mesh);
-    example_objects_[1].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(1, 2, 1)));
-
     setup_cameras();
 }
 
@@ -66,6 +58,44 @@ void RenderingSystem::handle_key_press(const Event& e) {
         cam *= transform;
     }
 
+}
+
+void RenderingSystem::handle_add_example_ship(const Event& e) {
+    // Load game object parameters
+    int object_id = e.get_value<int>("object_id", -1);
+    assert(object_id != -1);
+
+    int x = e.get_value<int>("pos_x", -999);
+    assert(x != -999);
+
+    int y = e.get_value<int>("pos_y", -999);
+    assert(y != -999);
+
+    int z = e.get_value<int>("pos_z", -999);
+    assert(z != -999);
+
+    // Load ship assets
+    example_shader_.load_shader(
+        SHIP_VERTEX_SHADER_PATH,
+        SHIP_FRAGMENT_SHADER_PATH
+    );
+
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(SHIP_MESH_PATH);
+
+    // Store ship
+    example_objects_.emplace_back();
+    example_objects_[object_id].set_mesh(mesh);
+    example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
+}
+
+void RenderingSystem::handle_example_ship_idle(const Event& e) {
+    // Load game object parameters
+    int object_id = e.get_value<int>("object_id", -1);
+    assert(object_id != -1 && object_id < example_objects_.size());
+
+    float rotation_rad = e.get_value<float>("rotation_rad", 0.0f);
+
+    example_objects_[object_id].apply_transform(glm::rotate(glm::mat4x4(), rotation_rad, glm::vec3(1, 1, 1)));
 }
 
 void RenderingSystem::render() {

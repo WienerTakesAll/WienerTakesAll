@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "GameObjectCounter.h"
 #include "GameplaySystem.h"
 
 #include "SDL.h"
@@ -11,11 +12,46 @@ GameplaySystem::GameplaySystem() {
 
 void GameplaySystem::update() {
     // Update game state here
+    EventSystem::queue_event (
+        Event (
+            EventType::EXAMPLE_SHIP_IDLE_EVENT,
+            "object_id", 1,
+            "rotation_rad", 0.01f
+        )
+    );
 }
 
 void GameplaySystem::handle_load(const Event& e) {
     // Initialize gameplay here
     std::cout << "Gameplay initialized here" << std::endl;
+
+    GameObjectCounter* counter = GameObjectCounter::get_instance();
+
+    // Ship 1
+    EventSystem::queue_event(
+        Event(
+            EventType::ADD_EXAMPLE_SHIP_EVENT,
+            "object_id", counter->assign_id(),
+            // TODO: Pass glm::vec3 in events
+            "pos_x", 0,
+            "pos_y", -2,
+            "pos_z", 0//,
+            // "name", "Ship 1"
+        )
+    );
+
+    // Ship 2
+    EventSystem::queue_event(
+        Event(
+            EventType::ADD_EXAMPLE_SHIP_EVENT,
+            "object_id", counter->assign_id(),
+            // TODO: Pass glm::vec3 in events
+            "pos_x", 1,
+            "pos_y", 2,
+            "pos_z", 1//,
+            // "name", "Ship 2"
+        )
+    );
 }
 
 void GameplaySystem::handle_key_press(const Event& e) {
