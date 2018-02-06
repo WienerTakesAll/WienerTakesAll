@@ -15,7 +15,7 @@
 #include "SettingsSystem.h"
 
 namespace {
-    const std::string SETTINGS_FILE = "config/config.yaml";
+    const std::string SETTINGS_FILE = "config/config.yml";
 }
 
 int main(int argc, char* args[]) {
