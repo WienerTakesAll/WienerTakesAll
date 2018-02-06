@@ -17,7 +17,7 @@
 
 namespace {
     // Typedef for the length of one frame (60fps ~= 16.66 milliseconds per frame)
-    const auto frame_duration_ms = std::chrono::milliseconds( 16 );
+    const auto FRAME_DURATION_MS = std::chrono::milliseconds( 16 );
 }
 
 int main(int argc, char* args[]) {
@@ -39,7 +39,7 @@ int main(int argc, char* args[]) {
     bool game_is_running = true;
 
     while (game_is_running) {
-        auto frame_end_time = std::chrono::steady_clock::now() + frame_duration_ms;
+        auto frame_end_time = std::chrono::steady_clock::now() + FRAME_DURATION_MS;
         SDL_Event event;
 
         // Input
