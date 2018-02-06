@@ -21,7 +21,7 @@ int main(int argc, char* args[]) {
     AssetManager asset_manager;
     GameplaySystem gameplay_system;
     InputManager input_manager;
-    PhysicsSystem physics_system;
+    PhysicsSystem physics_system(asset_manager);
     RenderingSystem rendering_system(asset_manager);
 
     if (!audio_system.init()) {
@@ -53,9 +53,11 @@ int main(int argc, char* args[]) {
         // Events
         input_manager.send_events(events);
         gameplay_system.send_events(events);
+        physics_system.send_events(events);
         rendering_system.send_events(events);
 
         gameplay_system.handle_events(events);
+        physics_system.handle_events(events);
         rendering_system.handle_events(events);
         audio_system.handle_events(events);
         events.clear();
@@ -65,6 +67,7 @@ int main(int argc, char* args[]) {
         gameplay_system.update();
 
         // Physics
+        physics_system.update();
 
         // Rendering
         rendering_system.update();
