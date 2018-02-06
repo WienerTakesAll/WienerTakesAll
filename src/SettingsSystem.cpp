@@ -4,7 +4,7 @@
 #include <SDL.h>
 
 namespace {
-    using Key = const std::string; // Convenience typedef
+    typedef const std::string Key; // Convenience typedef
     Key KEY_INPUT = "input";
     Key KEY_INPUT_DEADZONE = "deadzone";
 
