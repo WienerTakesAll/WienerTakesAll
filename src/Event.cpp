@@ -34,7 +34,7 @@ std::pair<std::string, bool> Event::get_value(const std::string& name, bool cras
     if (val == string_values_.end()) {                          //the case when crash on fail is not true and value is not found
         assert((!crash_on_fail));       //if the value is not found and crash_on_fail is true crash the program
 
-        std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
+        std::cerr << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
         return std::make_pair("-1", false);
     }
 
@@ -47,14 +47,14 @@ std::pair<int, bool> Event::get_value(const std::string& name, bool crash_on_fai
     if (val == event_values_.end()) {
         assert((!crash_on_fail));       //if the value is not found and crash_on_fail is true crash the program
 
-        std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
+        std::cerr << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
         return std::make_pair(-1, false);
     }
 
     if (val->second.type_name != typeid(int).name()) {          //the case when crash on fail is not true and value is not found
         assert((!crash_on_fail));       //if the value is not found and crash_on_fail is true crash the program
 
-        std::cout
+        std::cerr
                 << "Wrong type int instead of " << val->second.type_name
                 << " in value " << name << " of event " << static_cast<int>(event_type) << "!" << std::endl;
         return std::make_pair(-1, false);
@@ -69,14 +69,14 @@ std::pair<float, bool> Event::get_value(const std::string& name, bool crash_on_f
     if (val == event_values_.end()) {                           //the case when crash on fail is not true and value is not found
         assert((!crash_on_fail));       //if the value is not found and crash_on_fail is true crash the program
 
-        std::cout << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
+        std::cerr << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
         return std::make_pair(-1.0, false);
     }
 
     if (val->second.type_name != typeid(float).name()) {        //the case when crash on fail is not true and value is not found
         assert((!crash_on_fail));       //if the value is not found and crash_on_fail is true crash the program
 
-        std::cout
+        std::cerr
                 << "Wrong type int instead of " << val->second.type_name
                 << " in value " << name << " of event " << static_cast<int>(event_type) << "!" << std::endl;
         return std::make_pair(-1.0, false);
