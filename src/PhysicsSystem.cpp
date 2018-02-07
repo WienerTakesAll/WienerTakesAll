@@ -4,6 +4,8 @@
 
 #include <assert.h>
 
+const physx::PxVec3 GRAVITY(0.0f, 0.05f*-9.81f, 0.0f);
+
 PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
     : gFoundation_(PxCreateFoundation(PX_FOUNDATION_VERSION, gAllocator_, gErrorCallback_))
     , gScale_()
@@ -19,7 +21,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
     physx::PxVehicleSetUpdateMode(physx::PxVehicleUpdateMode::eVELOCITY_CHANGE);
 
     physx::PxSceneDesc sceneDesc(gPhysics_->getTolerancesScale());
-    sceneDesc.gravity = physx::PxVec3(0.0f, 0.05f*-9.81f, 0.0f);
+    sceneDesc.gravity = GRAVITY;
 
     physx::PxDefaultCpuDispatcher* dispatcher = physx::PxDefaultCpuDispatcherCreate(3);
     sceneDesc.cpuDispatcher = dispatcher;
@@ -56,9 +58,18 @@ void PhysicsSystem::update()
     if (!gScene_)
         return;
 
+    std::vector<physx::PxVehicleWheels*> wheels;
+
+    for (auto& object : dynamic_objects_) {
+        if (object.get_wheels()) {
+            wheels.push_back(object.get_wheels());
+        }
+    }
+
     for (int i = 0; i < 4; i++)
     {
         gScene_->simulate(0.16f/4);
+        physx::PxVehicleUpdates(0.16f/4, GRAVITY, *frictionPairs, 2, &wheels.front(), NULL);
         gScene_->fetchResults(true);
     }
 
@@ -102,10 +113,13 @@ void PhysicsSystem::handle_add_example_ship(const Event& e)
     MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/Ship.obj");
 
     dynamic_objects_.emplace_back(object_id);
-    dynamic_objects_.back().set_mesh(gPhysics_, gCooking_, mesh);
+    dynamic_objects_.back().create_vehicle(gPhysics_, gCooking_, mesh);
     dynamic_objects_.back().set_transform(transform);
 
-    gScene_->addActor(*dynamic_objects_.back().get_actor());
+    auto actor = dynamic_objects_.back().get_actor();
+    gScene_->addActor(*actor);
+    frictionPairs = createFrictionPairs(dynamic_objects_.back().get_material());
+
 }
 
 void PhysicsSystem::handle_add_terrain(const Event& e)
@@ -117,6 +131,40 @@ void PhysicsSystem::handle_add_terrain(const Event& e)
 
     static_objects_.emplace_back(object_id);
     static_objects_.back().set_mesh(gPhysics_, gCooking_, mesh);
-
+   
     gScene_->addActor(*static_objects_.back().get_actor());
+}
+
+
+
+
+physx::PxVehicleDrivableSurfaceToTireFrictionPairs* PhysicsSystem::createFrictionPairs (const physx::PxMaterial* defaultMaterial) {
+    using namespace physx;
+
+    PxU32 SURFACE_TYPE_TARMAC = 1;
+    PxU32 MAX_NUM_TIRE_TYPES = 1;
+    PxU32 MAX_NUM_SURFACE_TYPES = 1;
+    
+    PxReal gTireFrictionMultipliers[1][1] = { {0.5f} };
+
+    PxVehicleDrivableSurfaceType surfaceTypes[1];
+    surfaceTypes[0].mType = SURFACE_TYPE_TARMAC;
+
+    const PxMaterial* surfaceMaterials[1];
+    surfaceMaterials[0] = defaultMaterial;
+
+    PxVehicleDrivableSurfaceToTireFrictionPairs* surfaceTirePairs =
+        PxVehicleDrivableSurfaceToTireFrictionPairs::allocate(MAX_NUM_TIRE_TYPES,
+            MAX_NUM_SURFACE_TYPES);
+
+    surfaceTirePairs->setup(MAX_NUM_TIRE_TYPES, MAX_NUM_SURFACE_TYPES, surfaceMaterials, surfaceTypes);
+
+    for (PxU32 i = 0; i < MAX_NUM_SURFACE_TYPES; i++)
+    {
+        for (PxU32 j = 0; j < MAX_NUM_TIRE_TYPES; j++)
+        {
+            surfaceTirePairs->setTypePairFriction(i, j, gTireFrictionMultipliers[i][j]);
+        }
+    }
+    return surfaceTirePairs;
 }

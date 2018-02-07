@@ -17,6 +17,7 @@ private:
     void handle_add_example_ship(const Event& e);
     void handle_add_terrain(const Event& e);
 
+
     physx::PxDefaultAllocator gAllocator_;
     physx::PxDefaultErrorCallback gErrorCallback_;
     physx::PxTolerancesScale gScale_;
@@ -29,4 +30,7 @@ private:
 
     std::vector<PhysicsComponent<false>> dynamic_objects_;
     std::vector<PhysicsComponent<true>> static_objects_;
-};
+
+    physx::PxVehicleDrivableSurfaceToTireFrictionPairs* frictionPairs;
+    physx::PxVehicleDrivableSurfaceToTireFrictionPairs* createFrictionPairs(const physx::PxMaterial* defaultMaterial);
+}
