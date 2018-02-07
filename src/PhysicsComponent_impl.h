@@ -26,7 +26,6 @@ auto PhysicsComponent<static_actor>::get_actor() {
     return gActor_;
 }
 
-/*
 template <bool static_actor>
 physx::PxMaterial* PhysicsComponent<static_actor>::get_material() {
     return gMaterial_;
@@ -36,7 +35,6 @@ template <bool static_actor>
 physx::PxVehicleWheels* PhysicsComponent<static_actor>::get_wheels() {
     return gDrive4W_;
 }
-*/
 
 template <bool static_actor>
 void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::PxCooking* cooking, MeshAsset* mesh) {
