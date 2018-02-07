@@ -4,7 +4,10 @@
 #include <unordered_map>
 #include <string>
 
-enum class EventType {ADD_EXAMPLE_SHIP_EVENT, EXAMPLE_SHIP_IDLE_EVENT, LOAD_EVENT, DUMMY_EVENT, KEYPRESS_EVENT, EVENT_COUNT};
+enum class EventType {
+    ADD_EXAMPLE_SHIP_EVENT, ADD_TERRAIN_EVENT, EXAMPLE_SHIP_IDLE_EVENT, LOAD_EVENT, DUMMY_EVENT,
+    OBJECT_TRANSFORM_EVENT, KEYPRESS_EVENT, EVENT_COUNT
+};
 
 //For how to handle events, please view EventSystem.h
 class Event {

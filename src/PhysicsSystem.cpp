@@ -12,20 +12,38 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
     , gScene_(nullptr)
     , asset_manager_(asset_manager) {
     EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &PhysicsSystem::handle_add_example_ship, this);
+    EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &PhysicsSystem::handle_add_terrain, this);
    
-    auto tol = gPhysics_->getTolerancesScale();
+    PxInitVehicleSDK(*gPhysics_);
+    physx::PxVehicleSetBasisVectors(physx::PxVec3(0, 1, 0), physx::PxVec3(0, 0, 1));
+    physx::PxVehicleSetUpdateMode(physx::PxVehicleUpdateMode::eVELOCITY_CHANGE);
 
-    physx::PxSceneDesc sceneDesc(tol);
-    sceneDesc.setToDefault(gScale_);
+    physx::PxSceneDesc sceneDesc(gPhysics_->getTolerancesScale());
+    sceneDesc.gravity = physx::PxVec3(0.0f, 0.05f*-9.81f, 0.0f);
 
-    bool v = gPhysics_->getTolerancesScale().isValid();
+    physx::PxDefaultCpuDispatcher* dispatcher = physx::PxDefaultCpuDispatcherCreate(3);
+    sceneDesc.cpuDispatcher = dispatcher;
+
+#if PX_WINDOWS
+    // create GPU dispatcher
+    physx::PxCudaContextManagerDesc cudaContextManagerDesc;
+    auto mCudaContextManager = PxCreateCudaContextManager(*gFoundation_, cudaContextManagerDesc);
+    sceneDesc.gpuDispatcher = mCudaContextManager->getGpuDispatcher();
+#endif
+
+    sceneDesc.filterShader = &physx::PxDefaultSimulationFilterShader;
+
+    bool v = sceneDesc.isValid();
 
     gScene_ = gPhysics_->createScene(sceneDesc);
-    assert(gScene_ != nullptr);
+
+
 
 }
 
 PhysicsSystem::~PhysicsSystem() {
+    physx::PxCloseVehicleSDK();
+
     gCooking_->release();
     gPhysics_->release();
     gFoundation_->release();
@@ -35,77 +53,70 @@ PhysicsSystem::~PhysicsSystem() {
 
 void PhysicsSystem::update()
 {
-    if (gScene_ == nullptr)
+    if (!gScene_)
         return;
 
-    gScene_->simulate(0.16f);
-    gScene_->fetchResults(true);
+    for (int i = 0; i < 4; i++)
+    {
+        gScene_->simulate(0.16f/4);
+        gScene_->fetchResults(true);
+    }
 
-    physx::PxVec3 vel = gTestObject_->getLinearVelocity();
-    std::cout << vel.x << " " << vel.y << " " << vel.z << std::endl;
+    for (auto& object : dynamic_objects_)
+    {
+        if (object.is_valid())
+        {
+            physx::PxTransform transform = object.get_actor()->getGlobalPose();
+
+            EventSystem::queue_event(
+                Event(
+                    EventType::OBJECT_TRANSFORM_EVENT,
+                    "object_id", static_cast<int>(object.get_id()),
+                    "pos_x", transform.p.x,
+                    "pos_y", transform.p.y,
+                    "pos_z", transform.p.z
+                )
+            );
+        }
+    }
 }
 
 
 
 void PhysicsSystem::handle_add_example_ship(const Event& e)
 {
+    int object_id = e.get_value<int>("object_id", -1);
+    assert(object_id != -1);
+
+    physx::PxTransform transform(0.f,0.f,0.f);
+
+    transform.p.x = e.get_value<int>("pos_x", -999);
+    assert(transform.p.x != -999);
+
+    transform.p.y = e.get_value<int>("pos_y", -999);
+    assert(transform.p.y != -999);
+
+    transform.p.z = e.get_value<int>("pos_z", -999);
+    assert(transform.p.z != -999);
 
     MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/Ship.obj");
 
-    physx::PxTriangleMeshDesc meshDesc;
-    physx::PxStridedData data;
+    dynamic_objects_.emplace_back(object_id);
+    dynamic_objects_.back().set_mesh(gPhysics_, gCooking_, mesh);
+    dynamic_objects_.back().set_transform(transform);
 
-    std::vector<physx::PxVec3> physVerts;
-    std::vector<physx::PxU32> physIndices;
-    
-    for (auto& vert : mesh->vertices_) {
-        physx::PxVec3 point;
+    gScene_->addActor(*dynamic_objects_.back().get_actor());
+}
 
-        point.x = vert.position_[0];
-        point.y = vert.position_[1];
-        point.z = vert.position_[2];
+void PhysicsSystem::handle_add_terrain(const Event& e)
+{
+    int object_id = e.get_value<int>("object_id", -1);
+    assert(object_id != -1);
 
-        physVerts.push_back(point);
-    }
+    MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/Terrain.obj");
 
-    for (auto& ind : mesh->indices_) {
-        physx::PxU32 index;
+    static_objects_.emplace_back(object_id);
+    static_objects_.back().set_mesh(gPhysics_, gCooking_, mesh);
 
-        index = ind;
-
-        physIndices.push_back(index);
-    }
-
-    meshDesc.points.count = physVerts.size();
-    meshDesc.points.data = &physVerts.front();
-    meshDesc.points.stride = sizeof(physx::PxVec3);
-    
-    meshDesc.triangles.count = physIndices.size();
-    meshDesc.triangles.data = &physIndices.front();
-    meshDesc.triangles.stride = sizeof(physx::PxU32);
-
-    physx::PxDefaultMemoryOutputStream writeBuffer;
-    physx::PxTriangleMeshCookingResult::Enum result;
-    bool status = gCooking_->cookTriangleMesh(meshDesc, writeBuffer, &result);
-    if (!status)
-    {
-        std::cerr << "Could not create Physx mesh";
-        return;
-    }
-
-    physx::PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
-    gTestMesh_ = gPhysics_->createTriangleMesh(readBuffer);
-
-    physx::PxTransform physTransform(0, 0, 0);
-    gMaterial_ = gPhysics_->createMaterial(0.1f, 0.1f, 0.1f);
-
-    physx::PxTriangleMeshGeometry meshGeometry(gTestMesh_);
-
-    gMeshShape_ = physx::PxRigidActorExt::createExclusiveShape(*gActor_, meshGeometry, *gMaterial_);
-
-    gTestObject_ = physx::PxCreateDynamic(*gPhysics_, physTransform, *gMeshShape_, 1.0f);
-
-    gScene_->addActor(*gTestObject_);
-
-    return;
+    gScene_->addActor(*static_objects_.back().get_actor());
 }

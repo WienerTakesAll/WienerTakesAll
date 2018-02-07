@@ -1,8 +1,8 @@
 #pragma once
 
 #include "PxPhysicsAPI.h"
-
 #include "EventSystem.h"
+#include "PhysicsComponent.h"
 
 class AssetManager;
 
@@ -15,6 +15,7 @@ public:
 
 private:
     void handle_add_example_ship(const Event& e);
+    void handle_add_terrain(const Event& e);
 
     physx::PxDefaultAllocator gAllocator_;
     physx::PxDefaultErrorCallback gErrorCallback_;
@@ -24,11 +25,8 @@ private:
     physx::PxCooking* gCooking_;
     physx::PxScene* gScene_;
 
-    physx::PxRigidActor* gActor_;
-    physx::PxMaterial* gMaterial_;
-    physx::PxTriangleMesh* gTestMesh_;
-    physx::PxShape* gMeshShape_;
-    physx::PxRigidDynamic* gTestObject_;
-
     AssetManager& asset_manager_;
+
+    std::vector<PhysicsComponent<false>> dynamic_objects_;
+    std::vector<PhysicsComponent<true>> static_objects_;
 };

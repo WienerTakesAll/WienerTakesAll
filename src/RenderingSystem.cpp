@@ -8,6 +8,7 @@ namespace {
     const std::string SHIP_VERTEX_SHADER_PATH = "assets/shaders/SimpleVertexShader.vertexshader";
     const std::string SHIP_FRAGMENT_SHADER_PATH = "assets/shaders/SimpleFragmentShader.fragmentshader";
     const std::string SHIP_MESH_PATH = "assets/models/Ship.obj";
+    const std::string TERRAIN_MESH_PATH = "assets/models/Terrain.obj";
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
@@ -15,7 +16,9 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
     EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &RenderingSystem::handle_add_example_ship, this);
+    EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &RenderingSystem::handle_add_terrain, this);
     EventSystem::add_event_handler(EventType::EXAMPLE_SHIP_IDLE_EVENT, &RenderingSystem::handle_example_ship_idle, this);
+    EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
 }
 
 void RenderingSystem::update() {
@@ -88,6 +91,18 @@ void RenderingSystem::handle_add_example_ship(const Event& e) {
     example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
 }
 
+void RenderingSystem::handle_add_terrain(const Event& e) {
+    // Load game object parameters
+    int object_id = e.get_value<int>("object_id", -1);
+    assert(object_id != -1);
+
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(TERRAIN_MESH_PATH);
+
+    // Store terrain
+    example_objects_.emplace_back();
+    example_objects_[object_id].set_mesh(mesh);
+}
+
 void RenderingSystem::handle_example_ship_idle(const Event& e) {
     // Load game object parameters
     int object_id = e.get_value<int>("object_id", -1);
@@ -96,6 +111,22 @@ void RenderingSystem::handle_example_ship_idle(const Event& e) {
     float rotation_rad = e.get_value<float>("rotation_rad", 0.0f);
 
     example_objects_[object_id].apply_transform(glm::rotate(glm::mat4x4(), rotation_rad, glm::vec3(1, 1, 1)));
+}
+
+void RenderingSystem::handle_object_transform(const Event& e) {
+    int object_id = e.get_value<int>("object_id", -1);
+    assert(object_id != -1);
+
+    float x = e.get_value<float>("pos_x", -999);
+    assert(x != -999);
+
+    float y = e.get_value<float>("pos_y", -999);
+    assert(y != -999);
+
+    float z = e.get_value<float>("pos_z", -999);
+    assert(z != -999);
+
+    example_objects_[object_id].set_transform(glm::translate(glm::mat4(), glm::vec3(x, y, z)));
 }
 
 void RenderingSystem::render() {

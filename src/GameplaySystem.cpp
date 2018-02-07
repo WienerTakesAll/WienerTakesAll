@@ -52,6 +52,15 @@ void GameplaySystem::handle_load(const Event& e) {
             // "name", "Ship 2"
         )
     );
+
+    // Terrain
+    EventSystem::queue_event(
+        Event(
+            EventType::ADD_TERRAIN_EVENT,
+            "object_id", counter->assign_id()
+        )
+    );
+
 }
 
 void GameplaySystem::handle_key_press(const Event& e) {

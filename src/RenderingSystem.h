@@ -4,6 +4,7 @@
 #include "RenderingComponent.h"
 #include "Shader.h"
 
+#include "GL\glew.h"
 #include "SDL_opengl.h"
 #include "SDL.h"
 
@@ -21,6 +22,8 @@ private:
     void handle_key_press(const Event& e);
     void handle_add_example_ship(const Event& e);
     void handle_example_ship_idle(const Event& e);
+    void handle_add_terrain(const Event& e);
+    void handle_object_transform(const Event& e);
 
     void start_render() const;
     void setup_cameras();
