@@ -1,4 +1,6 @@
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 #include "AssetManager.h"
 #include "EventSystem.h"
@@ -11,6 +13,11 @@
 #include "GameplaySystem.h"
 #include "InputManager.h"
 #include "RenderingSystem.h"
+
+namespace {
+    // Length of one frame (60fps ~= 16.66 milliseconds per frame)
+    const auto FRAME_DURATION_MS = std::chrono::milliseconds( 16 );
+}
 
 int main(int argc, char* args[]) {
 
@@ -33,6 +40,7 @@ int main(int argc, char* args[]) {
     bool game_is_running = true;
 
     while (game_is_running) {
+        auto frame_end_time = std::chrono::steady_clock::now() + FRAME_DURATION_MS;
         SDL_Event event;
 
         // Input
@@ -72,6 +80,10 @@ int main(int argc, char* args[]) {
 
         // UI
 
+        // Maintain a maximum frame rate of 60fps
+        if ( game_is_running ) {
+            std::this_thread::sleep_until( frame_end_time );
+        }
     }
 
     return 0;
