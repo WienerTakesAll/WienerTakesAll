@@ -109,8 +109,6 @@ void RenderingSystem::render() {
 }
 
 bool RenderingSystem::init_window() {
-    SDL_Init(SDL_INIT_EVERYTHING);
-
     const int sdl_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
     const int screen_width = 640;
