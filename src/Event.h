@@ -30,7 +30,7 @@ public:
     void add_value(std::string name, std::string&& arg);
 
     template<typename T>
-    T get_value(const std::string& name, T otherwise) const;
+    std::pair<T, bool> get_value(const std::string& name, bool crash_on_fail) const;
 
 private:
 

@@ -27,13 +27,15 @@ void RenderingSystem::load(const Event& e) {
 }
 
 void RenderingSystem::handle_key_press(const Event& e) {
-    int player_id = e.get_value<int>("player_id", -1);
-    int key = e.get_value<int>("key", -1);
-    // int value = e.get_value<int>("value", 0);
+    //function calls to get_value: param1= string:name, param2 = bool:crash_on_fail
+    //pair.first == the int, pair.second == bool
+    std::pair<int, bool> player_id = e.get_value<int>("player_id", true);
+    std::pair<int, bool> key = e.get_value<int>("key", true);
+    std::pair<int, bool> value = e.get_value<int>("value", true);
 
     glm::mat4 transform;
 
-    switch (key) {
+    switch (key.first) {
         case SDLK_a:
             transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(0, 1, 0));
             break;
@@ -62,17 +64,17 @@ void RenderingSystem::handle_key_press(const Event& e) {
 
 void RenderingSystem::handle_add_example_ship(const Event& e) {
     // Load game object parameters
-    int object_id = e.get_value<int>("object_id", -1);
-    assert(object_id != -1);
+    std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
+    assert(object_id.second);
 
-    int x = e.get_value<int>("pos_x", -999);
-    assert(x != -999);
+    std::pair<int, bool> x = e.get_value<int>("pos_x", true);
+    assert(x.second);
 
-    int y = e.get_value<int>("pos_y", -999);
-    assert(y != -999);
+    std::pair<int, bool> y = e.get_value<int>("pos_y", true);
+    assert(y.second);
 
-    int z = e.get_value<int>("pos_z", -999);
-    assert(z != -999);
+    std::pair<int, bool> z = e.get_value<int>("pos_z", true);
+    assert(z.second);
 
     // Load ship assets
     example_shader_.load_shader(
@@ -84,18 +86,18 @@ void RenderingSystem::handle_add_example_ship(const Event& e) {
 
     // Store ship
     example_objects_.emplace_back();
-    example_objects_[object_id].set_mesh(mesh);
-    example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
+    example_objects_[object_id.first].set_mesh(mesh);
+    example_objects_[object_id.first].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
 }
 
 void RenderingSystem::handle_example_ship_idle(const Event& e) {
     // Load game object parameters
-    int object_id = e.get_value<int>("object_id", -1);
-    assert(object_id != -1 && object_id < example_objects_.size());
+    std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
+    assert(object_id.second && object_id.first < example_objects_.size());
 
-    float rotation_rad = e.get_value<float>("rotation_rad", 0.0f);
+    std::pair<float, bool> rotation_rad = e.get_value<float>("rotation_rad", true);
 
-    example_objects_[object_id].apply_transform(glm::rotate(glm::mat4x4(), rotation_rad, glm::vec3(1, 1, 1)));
+    example_objects_[object_id.first].apply_transform(glm::rotate(glm::mat4x4(), rotation_rad.first, glm::vec3(1, 1, 1)));
 }
 
 void RenderingSystem::render() {
