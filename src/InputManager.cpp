@@ -187,11 +187,11 @@ void InputManager::process_input(SDL_Event* event) {
         }
 
         case SDL_CONTROLLERAXISMOTION: {
-            int key = event->caxis.axis;
-            int value = event->caxis.value; // Current displacement of joystick
+            key = event->caxis.axis;
+            value = event->caxis.value; // Current displacement of joystick
 
             if ((value > -DEADZONE) && (value < DEADZONE)) {
-                break;
+                //break;
             }
 
             player_id = event->caxis.which; // Joystick ID of event sender

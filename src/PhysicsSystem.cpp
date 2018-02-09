@@ -4,6 +4,7 @@
 #include "SDL.h"
 
 #include <assert.h>
+#include <glm/gtx/quaternion.hpp>
 
 const physx::PxVec3 GRAVITY(0.0f, 0.05f*-9.81f, 0.0f);
 
@@ -34,6 +35,55 @@ physx::PxQueryHitType::Enum WheelRaycastPreFilter
         physx::PxQueryHitType::eNONE : physx::PxQueryHitType::eBLOCK);
 }
 
+physx::PxVehicleKeySmoothingData gKeySmoothingData =
+{
+    {
+        3.0f,    //rise rate eANALOG_INPUT_ACCEL
+        3.0f,    //rise rate eANALOG_INPUT_BRAKE
+        10.0f,    //rise rate eANALOG_INPUT_HANDBRAKE
+        2.5f,    //rise rate eANALOG_INPUT_STEER_LEFT
+        2.5f,    //rise rate eANALOG_INPUT_STEER_RIGHT
+    },
+    {
+        5.0f,    //fall rate eANALOG_INPUT__ACCEL
+        5.0f,    //fall rate eANALOG_INPUT__BRAKE
+        10.0f,    //fall rate eANALOG_INPUT__HANDBRAKE
+        5.0f,    //fall rate eANALOG_INPUT_STEER_LEFT
+        5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
+    }
+};
+
+physx::PxVehiclePadSmoothingData gPadSmoothingData =
+{
+    {
+        6.0f,    //rise rate eANALOG_INPUT_ACCEL
+        6.0f,    //rise rate eANALOG_INPUT_BRAKE
+        12.0f,    //rise rate eANALOG_INPUT_HANDBRAKE
+        2.5f,    //rise rate eANALOG_INPUT_STEER_LEFT
+        2.5f,    //rise rate eANALOG_INPUT_STEER_RIGHT
+    },
+    {
+        10.0f,    //fall rate eANALOG_INPUT_ACCEL
+        10.0f,    //fall rate eANALOG_INPUT_BRAKE
+        12.0f,    //fall rate eANALOG_INPUT_HANDBRAKE
+        5.0f,    //fall rate eANALOG_INPUT_STEER_LEFT
+        5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
+    }
+};
+
+physx::PxF32 gSteerVsForwardSpeedData[2 * 8] =
+{
+    0.0f,        0.75f,
+    5.0f,        0.75f,
+    30.0f,        0.125f,
+    120.0f,        0.1f,
+    PX_MAX_F32, PX_MAX_F32,
+    PX_MAX_F32, PX_MAX_F32,
+    PX_MAX_F32, PX_MAX_F32,
+    PX_MAX_F32, PX_MAX_F32
+};
+physx::PxFixedSizeLookupTable<8> gSteerVsForwardSpeedTable(gSteerVsForwardSpeedData, 4);
+
 
 
 PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
@@ -42,7 +92,8 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
     , gPhysics_(PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation_, gScale_))
     , gCooking_(PxCreateCooking(PX_PHYSICS_VERSION, *gFoundation_, gScale_))
     , gScene_(nullptr)
-    , asset_manager_(asset_manager) {
+    , asset_manager_(asset_manager) 
+    , forwardDrive(0.0f), horizontalDrive(0.0f) {
     EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &PhysicsSystem::handle_add_example_ship, this);
     EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &PhysicsSystem::handle_add_terrain, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &PhysicsSystem::handle_key_press, this);
@@ -89,20 +140,42 @@ void PhysicsSystem::update()
 {
     if (!gScene_)
         return;
+    
+    using namespace physx;
 
     std::vector<physx::PxVehicleWheels*> wheels;
 
     for (auto& object : dynamic_objects_) {
+        auto pose = object.get_actor()->getGlobalPose();
+        auto rotate = glm::toMat4(glm::quat(pose.q.w,pose.q.x,pose.q.y,pose.q.z));
+
+        object.get_actor()->addForce(physx::PxVec3(rotate[2][0]*forwardDrive, 0.f, rotate[2][2]*forwardDrive));
+        object.get_actor()->addTorque(physx::PxVec3(0.f, horizontalDrive*0.1f, 0.f));
+
         if (object.get_wheels()) {
             wheels.push_back(object.get_wheels());
+            break;
         }
     }
 
-    for (int i = 0; i < 4; i++)
-    {
-        gScene_->simulate(0.16f/4);
 
+    for (int i = 0; i < 1; i++)
+    {
         if (wheels.size()) {
+            frictionPairs = createFrictionPairs(dynamic_objects_[0].get_material());
+
+            physx::PxVehicleDrive4WRawInputData gVehicleInputData;
+            gVehicleInputData.setAnalogAccel(1.0f);
+            gVehicleInputData.setAnalogBrake(0.0f);
+            gVehicleInputData.setAnalogHandbrake(0.0f);
+            gVehicleInputData.setAnalogSteer(1.0f);
+            gVehicleInputData.setGearUp(1.0f);
+            gVehicleInputData.setGearDown(0.0f);
+
+            auto actor = dynamic_objects_[0].get_wheels();
+            physx::PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData,
+                gSteerVsForwardSpeedTable, gVehicleInputData, 0.16f, false, *actor);
+
             physx::PxRaycastQueryResult sqResults[4];
             physx::PxRaycastHit sqHitBuffer[4];
             physx::PxBatchQueryDesc sqDesc(4, 0, 0);
@@ -113,10 +186,9 @@ void PhysicsSystem::update()
             physx::PxBatchQuery* batchQuery = gScene_->createBatchQuery(sqDesc);
 
             PxVehicleSuspensionRaycasts(batchQuery, 1, &wheels[0], 4, sqResults);
-            physx::PxVehicleUpdates(0.16f / 4, GRAVITY, *frictionPairs, 2, &wheels[0], NULL);
-
+            physx::PxVehicleUpdates(0.16f, GRAVITY, *frictionPairs, 1, &wheels[0], NULL);
         }
-
+        gScene_->simulate(0.16f);
         gScene_->fetchResults(true);
     }
 
@@ -132,7 +204,11 @@ void PhysicsSystem::update()
                     "object_id", static_cast<int>(object.get_id()),
                     "pos_x", transform.p.x,
                     "pos_y", transform.p.y,
-                    "pos_z", transform.p.z
+                    "pos_z", transform.p.z,
+                    "qua_w", transform.q.w,
+                    "qua_x", transform.q.x,
+                    "qua_y", transform.q.y,
+                    "qua_z", transform.q.z
                 )
             );
         }
@@ -142,16 +218,17 @@ void PhysicsSystem::update()
 void PhysicsSystem::handle_key_press(const Event& e) {
     int player_id = e.get_value<int>("player_id", -1);
     int key = e.get_value<int>("key", -1);
-    // int value = e.get_value<int>("value", 0);
+    int value = e.get_value<int>("value", 0);
 
     switch (key) {
 
-    case SDLK_w:
-        for (auto& actor : dynamic_objects_)
-        {
-            actor.get_actor()->addForce(physx::PxVec3(0.f, 0.f, -1.f));
-        }
-        break;
+    case SDL_CONTROLLER_AXIS_LEFTY:
+        forwardDrive = (float)value / -32768;
+        break; 
+
+    case SDL_CONTROLLER_AXIS_LEFTX:
+        horizontalDrive = (float)value / -32768;
+        break; 
 
     default:
         break;
@@ -176,7 +253,7 @@ void PhysicsSystem::handle_add_example_ship(const Event& e)
     transform.p.z = e.get_value<int>("pos_z", -999);
     assert(transform.p.z != -999);
 
-    MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/Ship.obj");
+    MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/carBoxModel.obj");
 
     dynamic_objects_.emplace_back(object_id);
     dynamic_objects_.back().create_vehicle(gPhysics_, gCooking_, mesh);
@@ -184,8 +261,7 @@ void PhysicsSystem::handle_add_example_ship(const Event& e)
 
     auto actor = dynamic_objects_.back().get_actor();
     gScene_->addActor(*actor);
-    frictionPairs = createFrictionPairs(dynamic_objects_.back().get_material());
-
+    
 }
 
 void PhysicsSystem::handle_add_terrain(const Event& e)
@@ -207,7 +283,7 @@ void PhysicsSystem::handle_add_terrain(const Event& e)
 physx::PxVehicleDrivableSurfaceToTireFrictionPairs* PhysicsSystem::createFrictionPairs (const physx::PxMaterial* defaultMaterial) {
     using namespace physx;
 
-    PxU32 SURFACE_TYPE_TARMAC = 1;
+    PxU32 SURFACE_TYPE_TARMAC = static_cast<PxU32>(CollisionFlags::DRIVABLE_SURFACE);
     PxU32 MAX_NUM_TIRE_TYPES = 1;
     PxU32 MAX_NUM_SURFACE_TYPES = 1;
     
@@ -232,5 +308,7 @@ physx::PxVehicleDrivableSurfaceToTireFrictionPairs* PhysicsSystem::createFrictio
             surfaceTirePairs->setTypePairFriction(i, j, gTireFrictionMultipliers[i][j]);
         }
     }
+
+
     return surfaceTirePairs;
 }

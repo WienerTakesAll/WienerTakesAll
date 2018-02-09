@@ -28,7 +28,7 @@ public:
 
     physx::PxMaterial* get_material();
 
-    physx::PxVehicleWheels* get_wheels();
+    physx::PxVehicleDrive4W* get_wheels();
 
     void set_mesh(physx::PxPhysics* physics, physx::PxCooking* cooking, MeshAsset* mesh);
     void create_vehicle(physx::PxPhysics* physics, physx::PxCooking* cooking, MeshAsset* mesh);

@@ -3,11 +3,12 @@
 #include "AssetManager.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 namespace {
     const std::string SHIP_VERTEX_SHADER_PATH = "assets/shaders/SimpleVertexShader.vertexshader";
     const std::string SHIP_FRAGMENT_SHADER_PATH = "assets/shaders/SimpleFragmentShader.fragmentshader";
-    const std::string SHIP_MESH_PATH = "assets/models/Ship.obj";
+    const std::string SHIP_MESH_PATH = "assets/models/carBoxModel.obj";
     const std::string TERRAIN_MESH_PATH = "assets/models/Terrain.obj";
 }
 
@@ -126,11 +127,29 @@ void RenderingSystem::handle_object_transform(const Event& e) {
     float z = e.get_value<float>("pos_z", -999);
     assert(z != -999);
 
+
+
+    float qw = e.get_value<float>("qua_w", -999);
+    assert(qw != -999);
+
+    float qx = e.get_value<float>("qua_x", -999);
+    assert(qx != -999);
+
+    float qy = e.get_value<float>("qua_y", -999);
+    assert(qy != -999);
+
+    float qz = e.get_value<float>("qua_z", -999);
+    assert(qz != -999);
+
+
+
     example_objects_[object_id].set_transform(glm::translate(glm::mat4(), glm::vec3(x, y, z)));
+    example_objects_[object_id].apply_transform(glm::toMat4(glm::quat(qw, qx, qy, qz)));
 }
 
 void RenderingSystem::render() {
     start_render();
+    setup_cameras();
 
     for (auto& object : example_objects_) {
         object.render_views(cameras_, 4, example_shader_.program_id_);
@@ -140,7 +159,6 @@ void RenderingSystem::render() {
 }
 
 bool RenderingSystem::init_window() {
-    SDL_Init(SDL_INIT_EVERYTHING);
 
     const int sdl_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
@@ -199,17 +217,23 @@ void RenderingSystem::start_render() const {
 void RenderingSystem::setup_cameras() {
     glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 100.0f);
 
-    cameras_[0] = glm::translate(glm::mat4(), glm::vec3(5.f * std::sin(0), 5.f * std::sin(0), 5.f * std::cos(0)));
-    cameras_[0] = P * glm::lookAt(glm::vec3(cameras_[0][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    glm::mat4x4 transform;
+    if (example_objects_.size())
+         transform = example_objects_[0].get_transform();
 
-    cameras_[1] = glm::translate(glm::mat4(), glm::vec3(5.f * std::cos(0), 5.f * std::cos(0), 5.f * std::sin(0)));
-    cameras_[1] = P * glm::lookAt(glm::vec3(cameras_[1][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
 
-    cameras_[2] = glm::translate(glm::mat4(), glm::vec3(5.f * std::cos(std::sqrt(0)), 5.f * std::cos(0), 5.f * std::sin(0)));
-    cameras_[2] = P * glm::lookAt(glm::vec3(cameras_[2][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    cameras_[0] = glm::translate(transform, glm::vec3(0,3,5));
+    cameras_[0] = P * glm::lookAt(glm::vec3(cameras_[0][3]), car_pos, glm::vec3(0, 1, 0));
 
-    cameras_[3] = glm::translate(glm::mat4(), glm::vec3(15.f * std::sin(0), 15.f * std::sin(0), 15.f * std::cos(0)));
-    cameras_[3] = P * glm::lookAt(glm::vec3(cameras_[3][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    cameras_[1] = glm::translate(glm::mat4(), glm::vec3(5.f, 5.f, 0.f));
+    cameras_[1] = P * glm::lookAt(glm::vec3(cameras_[1][3]), car_pos, glm::vec3(0, 1, 0));
+
+    cameras_[2] = glm::translate(transform, glm::vec3(0, 3, 5));
+    cameras_[2] = P * glm::lookAt(glm::vec3(cameras_[2][3]), car_pos, glm::vec3(0, 1, 0));
+
+    cameras_[3] = glm::translate(transform, glm::vec3(-5.f, 0.f, -5.f));
+    cameras_[3] = P * glm::lookAt(glm::vec3(cameras_[3][3]), car_pos, glm::vec3(0, 1, 0));
 }
 
 void RenderingSystem::end_render() const {

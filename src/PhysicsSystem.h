@@ -33,4 +33,6 @@ private:
 
     physx::PxVehicleDrivableSurfaceToTireFrictionPairs* frictionPairs;
     physx::PxVehicleDrivableSurfaceToTireFrictionPairs* createFrictionPairs(const physx::PxMaterial* defaultMaterial);
+
+    float forwardDrive, horizontalDrive;
 };
