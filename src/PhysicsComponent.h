@@ -8,7 +8,10 @@
 enum class CollisionFlags
 {
     WHEELS = (1 << 0),
-    TERRAIN = (1 << 1)
+    TERRAIN = (1 << 1),
+
+    UNDRIVABLE_SURFACE = 0,
+    DRIVABLE_SURFACE = (1 << 8)
 };
 
 template <bool static_actor>

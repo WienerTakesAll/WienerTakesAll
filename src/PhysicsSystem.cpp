@@ -6,6 +6,35 @@
 
 const physx::PxVec3 GRAVITY(0.0f, 0.05f*-9.81f, 0.0f);
 
+
+
+void setupDrivableSurface(physx::PxFilterData& filterData)
+{
+    filterData.word3 = static_cast<physx::PxU32>(CollisionFlags::DRIVABLE_SURFACE);
+}
+
+void setupNonDrivableSurface(physx::PxFilterData& filterData)
+{
+    filterData.word3 = static_cast<physx::PxU32>(CollisionFlags::UNDRIVABLE_SURFACE);
+}
+
+physx::PxQueryHitType::Enum WheelRaycastPreFilter
+(physx::PxFilterData filterData0, physx::PxFilterData filterData1,
+    const void* constantBlock, physx::PxU32 constantBlockSize,
+    physx::PxHitFlags& queryFlags)
+{
+    //filterData0 is the vehicle suspension raycast.
+    //filterData1 is the shape potentially hit by the raycast.
+    PX_UNUSED(constantBlockSize);
+    PX_UNUSED(constantBlock);
+    PX_UNUSED(filterData0);
+    PX_UNUSED(queryFlags);
+    return ((0 == (filterData1.word3 & static_cast<physx::PxU32>(CollisionFlags::DRIVABLE_SURFACE))) ?
+        physx::PxQueryHitType::eNONE : physx::PxQueryHitType::eBLOCK);
+}
+
+
+
 PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
     : gFoundation_(PxCreateFoundation(PX_FOUNDATION_VERSION, gAllocator_, gErrorCallback_))
     , gScale_()
@@ -69,7 +98,22 @@ void PhysicsSystem::update()
     for (int i = 0; i < 4; i++)
     {
         gScene_->simulate(0.16f/4);
-        physx::PxVehicleUpdates(0.16f/4, GRAVITY, *frictionPairs, 2, &wheels.front(), NULL);
+
+        if (wheels.size()) {
+            physx::PxRaycastQueryResult sqResults[4];
+            physx::PxRaycastHit sqHitBuffer[4];
+            physx::PxBatchQueryDesc sqDesc(4, 0, 0);
+            sqDesc.queryMemory.userRaycastResultBuffer = sqResults;
+            sqDesc.queryMemory.userRaycastTouchBuffer = sqHitBuffer;
+            sqDesc.queryMemory.raycastTouchBufferSize = 4;
+            sqDesc.preFilterShader = &WheelRaycastPreFilter;
+            physx::PxBatchQuery* batchQuery = gScene_->createBatchQuery(sqDesc);
+
+            PxVehicleSuspensionRaycasts(batchQuery, 1, &wheels[0], 4, sqResults);
+            physx::PxVehicleUpdates(0.16f / 4, GRAVITY, *frictionPairs, 2, &wheels[0], NULL);
+
+        }
+                
         gScene_->fetchResults(true);
     }
 

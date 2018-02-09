@@ -26,7 +26,6 @@ auto PhysicsComponent<static_actor>::get_actor() {
     return gActor_;
 }
 
-/*
 template <bool static_actor>
 physx::PxMaterial* PhysicsComponent<static_actor>::get_material() {
     return gMaterial_;
@@ -36,7 +35,6 @@ template <bool static_actor>
 physx::PxVehicleWheels* PhysicsComponent<static_actor>::get_wheels() {
     return gDrive4W_;
 }
-*/
 
 template <bool static_actor>
 void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::PxCooking* cooking, MeshAsset* mesh) {
@@ -116,14 +114,19 @@ void PhysicsComponent<static_actor>::create_vehicle(physx::PxPhysics* physics, p
     set_mesh(physics, cooking, mesh);
 
     physx::PxFilterData wheelQryFilterData;
+    wheelQryFilterData.word3 = static_cast<physx::PxU32>(CollisionFlags::UNDRIVABLE_SURFACE);
     physx::PxFilterData chassisQryFilterData;
-    
+    chassisQryFilterData.word3 = static_cast<physx::PxU32>(CollisionFlags::UNDRIVABLE_SURFACE);
+
     physx::PxFilterData wheelSimFilterData;
     wheelSimFilterData.word0 = static_cast<physx::PxU32>(CollisionFlags::WHEELS);
+    wheelSimFilterData.word1 = static_cast<physx::PxU32>(CollisionFlags::TERRAIN);
+    wheelSimFilterData.word3 = static_cast<physx::PxU32>(CollisionFlags::UNDRIVABLE_SURFACE);
 
     physx::PxFilterData chassisSimFilterData;
-    wheelSimFilterData.word0 = static_cast<physx::PxU32>(CollisionFlags::WHEELS);
-
+    chassisSimFilterData.word0 = static_cast<physx::PxU32>(CollisionFlags::WHEELS);
+    chassisSimFilterData.word1 = static_cast<physx::PxU32>(CollisionFlags::TERRAIN);
+    chassisSimFilterData.word3 = static_cast<physx::PxU32>(CollisionFlags::UNDRIVABLE_SURFACE);
 
     physx::PxVehicleWheelsSimData* wheelsSimData = physx::PxVehicleWheelsSimData::allocate(4);
     setup_wheels(wheelsSimData);
@@ -266,7 +269,7 @@ void PhysicsComponent<static_actor>::setup_wheels(physx::PxVehicleWheelsSimData*
 
     //Set up the filter data of the raycast that will be issued by each suspension.
     PxFilterData qryFilterData;
-    //setupNonDrivableSurface(qryFilterData);
+    qryFilterData.word3 = static_cast<physx::PxU32>(CollisionFlags::DRIVABLE_SURFACE);
 
     //Set the wheel, tire and suspension data.
     //Set the geometry data.
