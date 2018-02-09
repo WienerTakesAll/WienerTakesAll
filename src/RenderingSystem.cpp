@@ -38,19 +38,19 @@ void RenderingSystem::handle_key_press(const Event& e) {
 
     switch (key) {
         case SDLK_a:
-            transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(0, 1, 0));
+            //transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(0, 1, 0));
             break;
 
         case SDLK_d:
-            transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(0, 1, 0));
+            //transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(0, 1, 0));
             break;
 
         case SDLK_w:
-            transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(1, 0, 0));
+            //transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(1, 0, 0));
             break;
 
         case SDLK_s:
-            transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(1, 0, 0));
+            //transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(1, 0, 0));
             break;
 
         default:

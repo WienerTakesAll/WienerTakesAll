@@ -1,6 +1,7 @@
 #include "PhysicsSystem.h"
 
 #include "AssetManager.h"
+#include "SDL.h"
 
 #include <assert.h>
 
@@ -44,7 +45,9 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
     , asset_manager_(asset_manager) {
     EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &PhysicsSystem::handle_add_example_ship, this);
     EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &PhysicsSystem::handle_add_terrain, this);
-   
+    EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &PhysicsSystem::handle_key_press, this);
+
+
     PxInitVehicleSDK(*gPhysics_);
     physx::PxVehicleSetBasisVectors(physx::PxVec3(0, 1, 0), physx::PxVec3(0, 0, 1));
     physx::PxVehicleSetUpdateMode(physx::PxVehicleUpdateMode::eVELOCITY_CHANGE);
@@ -113,7 +116,7 @@ void PhysicsSystem::update()
             physx::PxVehicleUpdates(0.16f / 4, GRAVITY, *frictionPairs, 2, &wheels[0], NULL);
 
         }
-                
+
         gScene_->fetchResults(true);
     }
 
@@ -136,7 +139,26 @@ void PhysicsSystem::update()
     }
 }
 
+void PhysicsSystem::handle_key_press(const Event& e) {
+    int player_id = e.get_value<int>("player_id", -1);
+    int key = e.get_value<int>("key", -1);
+    // int value = e.get_value<int>("value", 0);
 
+    switch (key) {
+
+    case SDLK_w:
+        for (auto& actor : dynamic_objects_)
+        {
+            actor.get_actor()->addForce(physx::PxVec3(0.f, 0.f, -1.f));
+        }
+        break;
+
+    default:
+        break;
+    }
+
+
+}
 
 void PhysicsSystem::handle_add_example_ship(const Event& e)
 {
