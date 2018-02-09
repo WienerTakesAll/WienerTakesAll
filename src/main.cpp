@@ -20,6 +20,7 @@ namespace {
 }
 
 int main(int argc, char* args[]) {
+    SDL_Init(SDL_INIT_EVERYTHING);
 
     std::vector<Event> events;
     events.emplace_back(EventType::LOAD_EVENT);
@@ -63,6 +64,7 @@ int main(int argc, char* args[]) {
         gameplay_system.send_events(events);
         rendering_system.send_events(events);
 
+        input_manager.handle_events(events);
         gameplay_system.handle_events(events);
         rendering_system.handle_events(events);
         audio_system.handle_events(events);
