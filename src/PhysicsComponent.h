@@ -10,6 +10,8 @@ enum class CollisionFlags
     WHEELS = (1 << 0),
     TERRAIN = (1 << 1),
 
+
+    COLLISION_WHEEL_AGAINST = TERRAIN,
     UNDRIVABLE_SURFACE = 0,
     DRIVABLE_SURFACE = (1 << 8)
 };
@@ -25,8 +27,10 @@ public:
     bool is_valid();
     unsigned int get_id();
     auto get_actor();
+    void set_actor(physx::PxRigidDynamic* actor);
 
     physx::PxMaterial* get_material();
+    physx::PxConvexMesh* get_mesh();
 
     physx::PxVehicleDrive4W* get_wheels();
 

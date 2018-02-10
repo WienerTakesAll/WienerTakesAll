@@ -229,11 +229,11 @@ void RenderingSystem::setup_cameras() {
     cameras_[1] = glm::translate(glm::mat4(), glm::vec3(5.f, 5.f, 0.f));
     cameras_[1] = P * glm::lookAt(glm::vec3(cameras_[1][3]), car_pos, glm::vec3(0, 1, 0));
 
-    cameras_[2] = glm::translate(transform, glm::vec3(0, 3, 5));
+    cameras_[2] = glm::translate(transform, glm::vec3(5, 3, 0));
     cameras_[2] = P * glm::lookAt(glm::vec3(cameras_[2][3]), car_pos, glm::vec3(0, 1, 0));
 
-    cameras_[3] = glm::translate(transform, glm::vec3(-5.f, 0.f, -5.f));
-    cameras_[3] = P * glm::lookAt(glm::vec3(cameras_[3][3]), car_pos, glm::vec3(0, 1, 0));
+    cameras_[3] = glm::translate(glm::mat4(), glm::vec3(-15.f, 2.f, -15.f));
+    cameras_[3] = P * glm::lookAt(glm::vec3(cameras_[3][3]), glm::vec3(0,0,0), glm::vec3(0, 1, 0));
 }
 
 void RenderingSystem::end_render() const {

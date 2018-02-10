@@ -34,7 +34,7 @@ void GameplaySystem::handle_load(const Event& e) {
             "object_id", counter->assign_id(),
             // TODO: Pass glm::vec3 in events
             "pos_x", 4,
-            "pos_y", 5,
+            "pos_y", 2,
             "pos_z", 0//,
             // "name", "Ship 1"
         )

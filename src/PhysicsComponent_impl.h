@@ -28,8 +28,18 @@ auto PhysicsComponent<static_actor>::get_actor() {
 }
 
 template <bool static_actor>
+void PhysicsComponent<static_actor>::set_actor(physx::PxRigidDynamic* actor) {
+    gActor_ = actor;
+}
+
+template <bool static_actor>
 physx::PxMaterial* PhysicsComponent<static_actor>::get_material() {
     return gMaterial_;
+}
+
+template <bool static_actor>
+physx::PxConvexMesh* PhysicsComponent<static_actor>::get_mesh() {
+    return gMesh_;
 }
 
 template <bool static_actor>
@@ -39,6 +49,7 @@ physx::PxVehicleDrive4W* PhysicsComponent<static_actor>::get_wheels() {
 
 template <bool static_actor>
 void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::PxCooking* cooking, MeshAsset* mesh) {
+
 
     physx::PxConvexMeshDesc meshDesc;
 
@@ -96,18 +107,30 @@ void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::
     gMesh_ = physics->createConvexMesh(readBuffer);
 
     physx::PxTransform physTransform(1, 0, 0);
-    gMaterial_ = physics->createMaterial(0.1f, 0.1f, 0.1f);
+    gMaterial_ = physics->createMaterial(0.9f, 0.9f, 0.9f);
 
     gMeshGeometry_ = new physx::PxConvexMeshGeometry(gMesh_);
 
     createActor(physics, physTransform, gMeshShape_, 1.0f);
     gMeshShape_ = physx::PxRigidActorExt::createExclusiveShape(*gActor_, *gMeshGeometry_, *gMaterial_);
 
-    physx::PxFilterData filterData;
-    filterData.word0 = static_cast<physx::PxU32>(CollisionFlags::TERRAIN);
-    filterData.word1 = static_cast<physx::PxU32>(CollisionFlags::WHEELS);
-    filterData.word3 = static_cast<physx::PxU32>(CollisionFlags::DRIVABLE_SURFACE);
-    gMeshShape_->setSimulationFilterData(filterData);
+    if (static_actor)
+    {
+        physx::PxFilterData filterData;
+        filterData.word0 = static_cast<physx::PxU32>(CollisionFlags::TERRAIN);
+        filterData.word1 = static_cast<physx::PxU32>(CollisionFlags::COLLISION_WHEEL_AGAINST);
+        filterData.word3 = static_cast<physx::PxU32>(CollisionFlags::DRIVABLE_SURFACE);
+        gMeshShape_->setSimulationFilterData(filterData);
+    }
+    else
+    {
+        physx::PxFilterData filterData;
+        filterData.word0 = static_cast<physx::PxU32>(CollisionFlags::TERRAIN);
+        filterData.word1 = static_cast<physx::PxU32>(CollisionFlags::TERRAIN);
+        filterData.word3 = static_cast<physx::PxU32>(CollisionFlags::UNDRIVABLE_SURFACE);
+        gMeshShape_->setSimulationFilterData(filterData);
+    }
+
 
     valid_ = true;
 }
@@ -118,9 +141,12 @@ void PhysicsComponent<static_actor>::set_transform(physx::PxTransform& transform
     gActor_->setGlobalPose(transform);
 }
 
+
 template <bool static_actor>
 void PhysicsComponent<static_actor>::create_vehicle(physx::PxPhysics* physics, physx::PxCooking* cooking, MeshAsset* mesh) {
     static_assert(!static_actor, "Vehicles cannot be static actors");
+
+    physx::PxVec3 chassisCMOffset(0.f, 0.2f, 0.f);
 
     set_mesh(physics, cooking, mesh);
     gActor_ = physics->createRigidDynamic(physx::PxTransform(physx::PxIdentity));
@@ -150,13 +176,14 @@ void PhysicsComponent<static_actor>::create_vehicle(physx::PxPhysics* physics, p
     physx::PxVehicleDriveSimData4W driveSimData;
     setup_drive_sim(driveSimData, wheelsSimData);
 
-    physx::PxCapsuleGeometry wheelGeometry(0.1f,0.1f);
+    //physx::PxBoxGeometry wheelGeometry(0.4f, 0.4f, 0.4f);
+    physx::PxSphereGeometry wheelGeometry(0.2f);
     physx::PxVec3 wheelCenterOffsets[4];
 
-    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-0.5, 0, 0.5);
-    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = physx::PxVec3(0.5, 0, 0.5);
-    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-0.5, 0, -0.5);
-    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(0.5, 0, -0.5);
+    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-0.5, 0.5, 0.5);
+    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = physx::PxVec3(0.5, 0.5, 0.5);
+    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-0.5, 0.5, -0.5);
+    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(0.5, 0.5, -0.5);
 
     for (physx::PxU32 i = 0; i < 4; i++) {
         physx::PxShape* wheelShape = physx::PxRigidActorExt::createExclusiveShape(*gActor_, wheelGeometry, *gMaterial_);
@@ -166,16 +193,17 @@ void PhysicsComponent<static_actor>::create_vehicle(physx::PxPhysics* physics, p
     }
 
     //Add the chassis shapes to the actor.
+
     for (physx::PxU32 i = 0; i < 1; i++) {
         physx::PxShape* chassisShape = physx::PxRigidActorExt::createExclusiveShape(*gActor_, *gMeshGeometry_, *gMaterial_);
         chassisShape->setQueryFilterData(chassisQryFilterData);
         chassisShape->setSimulationFilterData(chassisSimFilterData);
-        chassisShape->setLocalPose(physx::PxTransform(physx::PxIdentity));
+        chassisShape->setLocalPose(physx::PxTransform(chassisCMOffset));
     }
 
-    gActor_->setMass(1.0f);
+    gActor_->setMass(1500.0f);
     gActor_->setMassSpaceInertiaTensor(physx::PxVec3(0.5f,0.5f,0.5f));
-    gActor_->setCMassLocalPose(physx::PxTransform(physx::PxIdentity));
+    gActor_->setCMassLocalPose(physx::PxTransform(chassisCMOffset));
 
     gDrive4W_ = physx::PxVehicleDrive4W::allocate(4);
     gDrive4W_->setup(physics, gActor_, *wheelsSimData, driveSimData, 0);
@@ -188,14 +216,16 @@ template <bool static_actor>
 void PhysicsComponent<static_actor>::setup_wheels(physx::PxVehicleWheelsSimData* wheelsSimData) {
     using namespace physx;
 
+    physx::PxVec3 chassisCMOffset(0.f, 0.2f, 0.f);
+
     physx::PxVehicleWheelData wheels[4];
 
     {
         //Set up the wheel data structures with mass, moi, radius, width.
         for (physx::PxU32 i = 0; i < 4; i++)
         {
-            wheels[i].mMass = 0.1f;
-            wheels[i].mMOI = 1.f;
+            wheels[i].mMass = 100.0f;
+            wheels[i].mMOI = 0.1f;
             wheels[i].mRadius = .1f;
             wheels[i].mWidth = .2f;
         }
@@ -214,18 +244,16 @@ void PhysicsComponent<static_actor>::setup_wheels(physx::PxVehicleWheelsSimData*
         //Set up the tires.
         for (physx::PxU32 i = 0; i < 4; i++)
         {
-            tires[i].mType = 1;
+            tires[i].mType = 0;
         }
     }
 
-
-    PxVec3 chassisCMOffset(0.f, 0.f, 0.f);
     physx::PxVec3 wheelCenterOffsets[4];
 
-    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-0.5, 0, 0.5);
-    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = physx::PxVec3(0.5, 0, 0.5);
-    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-0.5, 0, -0.5);
-    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(0.5, 0, -0.5);
+    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-0.5, 0.5, -0.5);
+    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = physx::PxVec3(0.5, 0.5, -0.5);
+    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-0.5, 0.5, 0.5);
+    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(0.5, 0.5, 0.5);
 
     //Set up the suspensions
     PxVehicleSuspensionData suspensions[PX_MAX_NB_WHEELS];
@@ -234,14 +262,14 @@ void PhysicsComponent<static_actor>::setup_wheels(physx::PxVehicleWheelsSimData*
         PxF32 suspSprungMasses[PX_MAX_NB_WHEELS];
         PxVehicleComputeSprungMasses
         (4, wheelCenterOffsets,
-            chassisCMOffset, 1.0f, 1, suspSprungMasses);
+            chassisCMOffset, 1500.f, 1, suspSprungMasses);
 
         //Set the suspension data.
         for (PxU32 i = 0; i < 4; i++)
         {
             suspensions[i].mMaxCompression = 0.3f;
             suspensions[i].mMaxDroop = 0.1f;
-            suspensions[i].mSpringStrength = 35000.0f;
+            suspensions[i].mSpringStrength = 35000.f;
             suspensions[i].mSpringDamperRate = 4500.0f;
             suspensions[i].mSprungMass = suspSprungMasses[i];
         }
@@ -291,7 +319,9 @@ void PhysicsComponent<static_actor>::setup_wheels(physx::PxVehicleWheelsSimData*
 
     //Set up the filter data of the raycast that will be issued by each suspension.
     PxFilterData qryFilterData;
-    qryFilterData.word3 = static_cast<physx::PxU32>(CollisionFlags::UNDRIVABLE_SURFACE);
+    qryFilterData.word0 = static_cast<physx::PxU32>(CollisionFlags::WHEELS);
+    qryFilterData.word1 = static_cast<physx::PxU32>(CollisionFlags::TERRAIN);
+    qryFilterData.word3 = static_cast<physx::PxU32>(CollisionFlags::DRIVABLE_SURFACE);
 
     //Set the wheel, tire and suspension data.
     //Set the geometry data.
@@ -308,6 +338,9 @@ void PhysicsComponent<static_actor>::setup_wheels(physx::PxVehicleWheelsSimData*
         wheelsSimData->setSceneQueryFilterData(i, qryFilterData);
         wheelsSimData->setWheelShapeMapping(i, i);
     }
+
+
+
 
 }
 
@@ -339,8 +372,8 @@ void PhysicsComponent<static_actor>::setup_drive_sim(physx::PxVehicleDriveSimDat
     PxVehicleAckermannGeometryData ackermann;
     ackermann.mAccuracy = 1.0f;
     ackermann.mAxleSeparation =
-        wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_LEFT).z -
-        wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eREAR_LEFT).z;
+        wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eREAR_LEFT).z -
+        wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_LEFT).z;
     ackermann.mFrontWidth =
         wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_RIGHT).x -
         wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_LEFT).x;
