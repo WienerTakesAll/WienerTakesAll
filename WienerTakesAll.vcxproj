@@ -130,6 +130,7 @@
     <ClInclude Include="src\GameplaySystem.h" />
     <ClInclude Include="src\InputManager.h" />
     <ClInclude Include="src\MeshAsset.h" />
+    <ClInclude Include="src\MeshStuff.h" />
     <ClInclude Include="src\MusicAsset.h" />
     <ClInclude Include="src\PhysicsComponent.h" />
     <ClInclude Include="src\PhysicsSystem.h" />

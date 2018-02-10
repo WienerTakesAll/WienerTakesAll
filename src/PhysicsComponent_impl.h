@@ -117,17 +117,17 @@ void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::
     if (static_actor)
     {
         physx::PxFilterData filterData;
-        filterData.word0 = static_cast<physx::PxU32>(CollisionFlags::TERRAIN);
-        filterData.word1 = static_cast<physx::PxU32>(CollisionFlags::COLLISION_WHEEL_AGAINST);
-        filterData.word3 = static_cast<physx::PxU32>(CollisionFlags::DRIVABLE_SURFACE);
+        filterData.word0 = COLLISION_FLAG_GROUND;
+        filterData.word1 = COLLISION_FLAG_GROUND_AGAINST;
+        filterData.word3 = SAMPLEVEHICLE_DRIVABLE_SURFACE;
         gMeshShape_->setSimulationFilterData(filterData);
     }
     else
     {
         physx::PxFilterData filterData;
-        filterData.word0 = static_cast<physx::PxU32>(CollisionFlags::TERRAIN);
-        filterData.word1 = static_cast<physx::PxU32>(CollisionFlags::TERRAIN);
-        filterData.word3 = static_cast<physx::PxU32>(CollisionFlags::UNDRIVABLE_SURFACE);
+        filterData.word0 = 0;
+        filterData.word1 = 0;
+        filterData.word3 = SAMPLEVEHICLE_DRIVABLE_SURFACE;
         gMeshShape_->setSimulationFilterData(filterData);
     }
 

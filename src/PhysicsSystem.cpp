@@ -8,10 +8,13 @@
 #include <assert.h>
 #include <glm/gtx/quaternion.hpp>
 
+
+#include "MeshStuff.h"
+
 const physx::PxVec3 GRAVITY(0.0f, 0.05f*-9.81f, 0.0f);
 
 
-
+/*
 void setupDrivableSurface(physx::PxFilterData& filterData)
 {
     filterData.word3 = static_cast<physx::PxU32>(CollisionFlags::DRIVABLE_SURFACE);
@@ -36,6 +39,8 @@ physx::PxQueryHitType::Enum WheelRaycastPreFilter
     return ((0 == (filterData1.word3 & static_cast<physx::PxU32>(CollisionFlags::DRIVABLE_SURFACE))) ?
         physx::PxQueryHitType::eNONE : physx::PxQueryHitType::eBLOCK);
 }
+*/
+
 
 physx::PxVehicleKeySmoothingData gKeySmoothingData =
 {
@@ -654,6 +659,11 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
     }
 
 
+    PxPvd*  pvd = PxCreatePvd(*gFoundation_);
+    PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
+    pvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
+
+
 
 
 }
@@ -667,7 +677,7 @@ PhysicsSystem::~PhysicsSystem() {
 }
 
 
-float gearedUp = 50.f;
+float gearedUp = 5.f;
 
 void PhysicsSystem::update()
 {
@@ -693,7 +703,7 @@ void PhysicsSystem::update()
 
 
 
-    int SIM_STEPS = 100;
+    int SIM_STEPS = 4;
     
     for (int i = 0; i < SIM_STEPS; i++)
     {
@@ -701,8 +711,9 @@ void PhysicsSystem::update()
 
 
             physx::PxVehicleDrive4WRawInputData gVehicleInputData;
+            gVehicleInputData.setDigitalAccel(true);
 
-            gVehicleInputData.setAnalogAccel(std::max(0.f,0.01f*forwardDrive));
+            gVehicleInputData.setAnalogAccel(std::max(0.f,forwardDrive));
             gVehicleInputData.setAnalogBrake(0.0f);
             gVehicleInputData.setAnalogHandbrake(0.0f);
             gVehicleInputData.setAnalogSteer(horizontalDrive);
@@ -719,7 +730,7 @@ void PhysicsSystem::update()
             gVehicleInputData.setGearDown(0.0f);
 
             PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs
-            (gPadSmoothingData, gSteerVsForwardSpeedTable, gVehicleInputData, 0.16f, true, (PxVehicleDrive4W&)*mVehicles[0]);
+            (gPadSmoothingData, gSteerVsForwardSpeedTable, gVehicleInputData, 0.16f / SIM_STEPS, false, (PxVehicleDrive4W&)*mVehicles[0]);
 
             if (NULL == mSqWheelRaycastBatchQuery)
             {
@@ -779,6 +790,83 @@ void PhysicsSystem::handle_key_press(const Event& e) {
 
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PxConvexMesh* createConvexMesh(const PxVec3* verts, const PxU32 numVerts, PxPhysics& physics, PxCooking& cooking)
+{
+    // Create descriptor for convex mesh
+    PxConvexMeshDesc convexDesc;
+    convexDesc.points.count = numVerts;
+    convexDesc.points.stride = sizeof(PxVec3);
+    convexDesc.points.data = verts;
+    convexDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX;
+
+    PxConvexMesh* convexMesh = NULL;
+    PxDefaultMemoryOutputStream buf;
+    if (cooking.cookConvexMesh(convexDesc, buf))
+    {
+        PxDefaultMemoryInputData id(buf.getData(), buf.getSize());
+        convexMesh = physics.createConvexMesh(id);
+    }
+
+    return convexMesh;
+}
+
+PxConvexMesh* createCylinderConvexMesh(const PxF32 width, const PxF32 radius, const PxU32 numCirclePoints, PxPhysics& physics, PxCooking& cooking)
+{
+#define  MAX_NUM_VERTS_IN_CIRCLE 16
+    PX_ASSERT(numCirclePoints<MAX_NUM_VERTS_IN_CIRCLE);
+    PxVec3 verts[2 * MAX_NUM_VERTS_IN_CIRCLE];
+    PxU32 numVerts = 2 * numCirclePoints;
+    const PxF32 dtheta = 2 * PxPi / (1.0f*numCirclePoints);
+    for (PxU32 i = 0; i<MAX_NUM_VERTS_IN_CIRCLE; i++)
+    {
+        const PxF32 theta = dtheta*i;
+        const PxF32 cosTheta = radius*PxCos(theta);
+        const PxF32 sinTheta = radius*PxSin(theta);
+        verts[2 * i + 0] = PxVec3(-0.5f*width, cosTheta, sinTheta);
+        verts[2 * i + 1] = PxVec3(+0.5f*width, cosTheta, sinTheta);
+    }
+
+    return createConvexMesh(verts, numVerts, physics, cooking);
+}
+
+PxConvexMesh* createWheelConvexMesh(const PxVec3* verts, const PxU32 numVerts, PxPhysics& physics, PxCooking& cooking)
+{
+    //Extract the wheel radius and width from the aabb of the wheel convex mesh.
+    PxVec3 wheelMin(PX_MAX_F32, PX_MAX_F32, PX_MAX_F32);
+    PxVec3 wheelMax(-PX_MAX_F32, -PX_MAX_F32, -PX_MAX_F32);
+    for (PxU32 i = 0; i<numVerts; i++)
+    {
+        wheelMin.x = PxMin(wheelMin.x, verts[i].x);
+        wheelMin.y = PxMin(wheelMin.y, verts[i].y);
+        wheelMin.z = PxMin(wheelMin.z, verts[i].z);
+        wheelMax.x = PxMax(wheelMax.x, verts[i].x);
+        wheelMax.y = PxMax(wheelMax.y, verts[i].y);
+        wheelMax.z = PxMax(wheelMax.z, verts[i].z);
+    }
+    const PxF32 wheelWidth = wheelMax.x - wheelMin.x;
+    const PxF32 wheelRadius = PxMax(wheelMax.y, wheelMax.z);
+
+    return createCylinderConvexMesh(wheelWidth, wheelRadius, 8, physics, cooking);
+}
+
+
+
 void PhysicsSystem::handle_add_example_ship(const Event& e)
 {
     int object_id = e.get_value<int>("object_id", -1);
@@ -803,7 +891,16 @@ void PhysicsSystem::handle_add_example_ship(const Event& e)
     auto mat = vehicle.get_material();
     auto mesh_mesh = vehicle.get_mesh();
 
-    PxConvexMesh* wheel_mesh[4] = { mesh_mesh,mesh_mesh,mesh_mesh,mesh_mesh };
+
+    float s = 0.5f;
+    PxVec3 verts[8] = {
+        {s,s,s}, {-s,s,s},{ s,s,-s },{ -s,s,-s },
+       { s,-s,s },{ -s,-s,s },{ s,-s,-s },{ -s,-s,-s }
+    };
+
+    PxConvexMesh* convexMesh = createWheelConvexMesh(verts,8,*gPhysics_,*gCooking_);
+
+    PxConvexMesh* wheel_mesh[4] = { convexMesh,convexMesh,convexMesh,convexMesh };
 
     PxVec3 wheelCenterOffsets[4];
     wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-0.5, 0.5, 0.5);
@@ -835,7 +932,7 @@ void PhysicsSystem::handle_add_terrain(const Event& e)
 physx::PxVehicleDrivableSurfaceToTireFrictionPairs* PhysicsSystem::createFrictionPairs (const physx::PxMaterial* defaultMaterial) {
     using namespace physx;
 
-    PxU32 SURFACE_TYPE_TARMAC = static_cast<PxU32>(CollisionFlags::DRIVABLE_SURFACE);
+    PxU32 SURFACE_TYPE_TARMAC;// = static_cast<PxU32>(CollisionFlags::DRIVABLE_SURFACE);
     PxU32 MAX_NUM_TIRE_TYPES = 1;
     PxU32 MAX_NUM_SURFACE_TYPES = 1;
     
