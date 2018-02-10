@@ -35,6 +35,7 @@ private:
     physx::PxDefaultErrorCallback gErrorCallback_;
     physx::PxTolerancesScale gScale_;
     physx::PxFoundation* gFoundation_;
+	physx::PxPvd* gPvd_;
     physx::PxPhysics* gPhysics_;
     physx::PxCooking* gCooking_;
     physx::PxScene* gScene_;

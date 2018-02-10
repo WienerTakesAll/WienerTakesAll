@@ -570,7 +570,8 @@ void PhysicsSystem::create4WVehicle
 PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
     : gFoundation_(PxCreateFoundation(PX_FOUNDATION_VERSION, gAllocator_, gErrorCallback_))
     , gScale_()
-    , gPhysics_(PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation_, gScale_))
+	, gPvd_(PxCreatePvd(*gFoundation_))
+    , gPhysics_(PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation_, gScale_, false, gPvd_))
     , gCooking_(PxCreateCooking(PX_PHYSICS_VERSION, *gFoundation_, gScale_))
     , gScene_(nullptr)
     , mSqWheelRaycastBatchQuery(NULL)
@@ -581,6 +582,8 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &PhysicsSystem::handle_add_terrain, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &PhysicsSystem::handle_key_press, this);
 
+	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
+	gPvd_->connect(*transport, PxPvdInstrumentationFlag::eALL);
 
     PxInitVehicleSDK(*gPhysics_);
     physx::PxVehicleSetBasisVectors(physx::PxVec3(0, 1, 0), physx::PxVec3(0, 0, 1));
@@ -659,12 +662,6 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
     }
 
 
-    PxPvd*  pvd = PxCreatePvd(*gFoundation_);
-    PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
-    pvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
-
-
-
 
 }
 
@@ -673,6 +670,7 @@ PhysicsSystem::~PhysicsSystem() {
 
     gCooking_->release();
     gPhysics_->release();
+	gPvd_->release();
     gFoundation_->release();
 }
 
@@ -936,7 +934,7 @@ physx::PxVehicleDrivableSurfaceToTireFrictionPairs* PhysicsSystem::createFrictio
     PxU32 MAX_NUM_TIRE_TYPES = 1;
     PxU32 MAX_NUM_SURFACE_TYPES = 1;
     
-    PxReal gTireFrictionMultipliers[1][1] = { {1.0f} };
+    PxReal gTireFrictionMultipliers[1][1] = { {10.0f} };
 
     PxVehicleDrivableSurfaceType surfaceTypes[1];
     surfaceTypes[0].mType = SURFACE_TYPE_TARMAC;
