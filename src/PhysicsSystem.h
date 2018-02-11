@@ -48,8 +48,8 @@ private:
     std::vector<PhysicsComponent<true>> static_objects_;
 
 
-    float forwardDrive, horizontalDrive;
-
+    float forwardDrive, horizontalDrive, backwardDrive;
+    bool handBreak;
 
 
 

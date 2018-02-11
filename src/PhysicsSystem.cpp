@@ -583,7 +583,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
     , gScene_(nullptr)
     , mSqWheelRaycastBatchQuery(NULL)
     , asset_manager_(asset_manager) 
-    , forwardDrive(0.0f), horizontalDrive(0.0f)
+    , forwardDrive(0.0f), horizontalDrive(0.0f), backwardDrive(0.0f), handBreak(false)
     , mNumVehicles(0) {
     EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &PhysicsSystem::handle_add_example_ship, this);
     EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &PhysicsSystem::handle_add_terrain, this);
@@ -695,20 +695,12 @@ void PhysicsSystem::update()
             gVehicleInputData.setDigitalAccel(true);
 
             gVehicleInputData.setAnalogAccel(std::max(forwardDrive,0.f));
-            gVehicleInputData.setAnalogBrake(0.0f);
-            gVehicleInputData.setAnalogHandbrake(0.0f);
-            gVehicleInputData.setAnalogSteer(horizontalDrive);
-            if (gearedUp > 0.f && false)
-            {
-                gVehicleInputData.setGearUp(1.f);
-                gearedUp--;
-            }
-            else
-            {
-                gVehicleInputData.setGearUp(0.f);
-            }
+            gVehicleInputData.setAnalogBrake(backwardDrive);
+            gVehicleInputData.setAnalogHandbrake(handBreak*1.0f);
+            handBreak = false;
 
-            gVehicleInputData.setGearDown(0.0f);
+            gVehicleInputData.setAnalogSteer(horizontalDrive);
+
 
             PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs
             (gPadSmoothingData, gSteerVsForwardSpeedTable, gVehicleInputData, 0.16f / SIM_STEPS, false, (PxVehicleDrive4W&)*mVehicles[0]);
@@ -768,9 +760,17 @@ void PhysicsSystem::handle_key_press(const Event& e) {
         forwardDrive = (float)value / 32768;
         break; 
 
+
+    case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
+        backwardDrive = (float)value / 32768;
+        break;
+
     case SDL_CONTROLLER_AXIS_LEFTX:
         horizontalDrive = (float)value / -32768;
         break; 
+
+    case SDL_CONTROLLER_BUTTON_B:
+        handBreak = true;
 
     default:
         break;
