@@ -366,10 +366,7 @@ void createVehicle4WSimulationData
     PxF32 suspSprungMasses[4];
     PxVehicleComputeSprungMasses(4, wheelCentreOffsets, chassisCMOffset, chassisMass, 1, suspSprungMasses);
 
-    suspSprungMasses[0] = 360.f;
-    suspSprungMasses[1] = 360.f;
-    suspSprungMasses[2] = 360.f;
-    suspSprungMasses[3] = 360.f;
+
 
     //Extract the wheel radius and width from the wheel convex meshes.
     PxF32 wheelWidths[4];
@@ -729,8 +726,6 @@ void PhysicsSystem::update()
             PxVehicleWheelQueryResult vehicleQueryResults[1] = { { wheelQueryResults, mVehicles[0]->mWheelsSimData.getNbWheels() } };
             physx::PxVehicleUpdates(0.16f / SIM_STEPS, GRAVITY, *mSurfaceTirePairs, 1, mVehicles, vehicleQueryResults);
 
-            std::cout << vehicleQueryResults[0].wheelQueryResults->isInAir << "\t" << vehicleQueryResults[0].wheelQueryResults->tireFriction << std::endl;
-
         }
 
 
@@ -904,10 +899,10 @@ void PhysicsSystem::handle_add_example_ship(const Event& e)
     //mesh_mesh = createWheelConvexMesh(verts, 8, *gPhysics_, *gCooking_);
 
     PxVec3 wheelCenterOffsets[4];
-    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-1.5f, 0.f, 1.f);
-    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = physx::PxVec3(1.5f, 0.f, 1.f);
-    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-1.5f, 0.f, -1.f);
-    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(1.5f, 0.f, -1.f);
+    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-1.5f, 0.5f, 1.f);
+    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = physx::PxVec3(1.5f, 0.5f, 1.f);
+    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-1.5f, 0.5f, -1.f);
+    wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(1.5f, 0.5f, -1.f);
 
     create4WVehicle(*gScene_, *gPhysics_, *gCooking_, *mat, 1500.f, wheelCenterOffsets, mesh_mesh, wheel_mesh, transform, true);
     vehicle.set_actor(mVehicles[mNumVehicles - 1]->getRigidDynamicActor());
