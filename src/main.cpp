@@ -12,6 +12,8 @@
 #include "InputManager.h"
 #include "RenderingSystem.h"
 
+#include <stdlib.h>
+
 int main(int argc, char* args[]) {
     SDL_Init(SDL_INIT_EVERYTHING);
 
@@ -76,7 +78,7 @@ int main(int argc, char* args[]) {
         rendering_system.render();
 
         // UI
-
+        _sleep(16);
     }
 
     return 0;

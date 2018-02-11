@@ -106,28 +106,33 @@ void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::
     physx::PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
     gMesh_ = physics->createConvexMesh(readBuffer);
 
-    physx::PxTransform physTransform(1, 0, 0);
-    gMaterial_ = physics->createMaterial(0.9f, 0.9f, 0.9f);
+    physx::PxTransform physTransform(0, 0, 0);
+    gMaterial_ = physics->createMaterial(5.f, 5.f, 5.f);
 
     gMeshGeometry_ = new physx::PxConvexMeshGeometry(gMesh_);
 
+    gMeshShape_ = physics->createShape(*gMeshGeometry_, *gMaterial_, true);
     createActor(physics, physTransform, gMeshShape_, 1.0f);
-    gMeshShape_ = physx::PxRigidActorExt::createExclusiveShape(*gActor_, *gMeshGeometry_, *gMaterial_);
 
     if (static_actor)
     {
         physx::PxFilterData filterData;
+        filterData.word3 = SAMPLEVEHICLE_DRIVABLE_SURFACE;
+        gMeshShape_->setQueryFilterData(filterData);
+
         filterData.word0 = COLLISION_FLAG_GROUND;
         filterData.word1 = COLLISION_FLAG_GROUND_AGAINST;
-        filterData.word3 = SAMPLEVEHICLE_DRIVABLE_SURFACE;
+        filterData.word3 = 0;
+
         gMeshShape_->setSimulationFilterData(filterData);
     }
     else
     {
         physx::PxFilterData filterData;
-        filterData.word0 = 0;
-        filterData.word1 = 0;
-        filterData.word3 = SAMPLEVEHICLE_DRIVABLE_SURFACE;
+        filterData.word0 = COLLISION_FLAG_WHEEL;
+        filterData.word1 = COLLISION_FLAG_WHEEL_AGAINST;
+        filterData.word3 = SAMPLEVEHICLE_UNDRIVABLE_SURFACE;
+        gMeshShape_->setQueryFilterData(filterData);
         gMeshShape_->setSimulationFilterData(filterData);
     }
 

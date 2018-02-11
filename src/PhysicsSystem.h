@@ -4,6 +4,8 @@
 #include "EventSystem.h"
 #include "PhysicsComponent.h"
 
+#include <assert.h>
+
 class AssetManager;
 
 #define MAX_NUM_4W_VEHICLES 10
@@ -35,7 +37,7 @@ private:
     physx::PxDefaultErrorCallback gErrorCallback_;
     physx::PxTolerancesScale gScale_;
     physx::PxFoundation* gFoundation_;
-	physx::PxPvd* gPvd_;
+    physx::PxPvd* gPvd_;
     physx::PxPhysics* gPhysics_;
     physx::PxCooking* gCooking_;
     physx::PxScene* gScene_;
@@ -45,8 +47,6 @@ private:
     std::vector<PhysicsComponent<false>> dynamic_objects_;
     std::vector<PhysicsComponent<true>> static_objects_;
 
-    physx::PxVehicleDrivableSurfaceToTireFrictionPairs* frictionPairs;
-    physx::PxVehicleDrivableSurfaceToTireFrictionPairs* createFrictionPairs(const physx::PxMaterial* defaultMaterial);
 
     float forwardDrive, horizontalDrive;
 
@@ -112,7 +112,14 @@ private:
                 PX_UNUSED(constantBlockSize);
                 PX_UNUSED(constantBlock);
                 PX_UNUSED(filterData0);
-                return ((0 == (filterData1.word3 & SAMPLEVEHICLE_DRIVABLE_SURFACE)) ? PxQueryHitType::eNONE : PxQueryHitType::eBLOCK);
+
+                if ((0 == (filterData1.word3 & SAMPLEVEHICLE_DRIVABLE_SURFACE))) {
+                    return PxQueryHitType::eNONE;
+                }
+                else {
+                    return PxQueryHitType::eBLOCK;
+                }
+                
             };
         }
 

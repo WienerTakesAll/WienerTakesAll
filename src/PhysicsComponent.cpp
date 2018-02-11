@@ -2,7 +2,8 @@
 
 template <>
 void PhysicsComponent<true>::createActor(physx::PxPhysics* physics, physx::PxTransform& transform, physx::PxShape* shape, physx::PxReal density) {
-    gActor_ = physics->createRigidStatic(transform);
+    gActor_ = physx::PxCreateStatic(*physics, transform, *shape);
+    //gActor_ = physics->createRigidStatic(transform);
 }
 
 template <>
