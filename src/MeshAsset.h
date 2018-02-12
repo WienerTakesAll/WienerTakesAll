@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "GL\glew.h"
+#include "GL/glew.h"
 #include "SDL_opengl.h"
 
 struct MeshAsset {
