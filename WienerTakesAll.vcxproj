@@ -77,7 +77,6 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>lib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/std:[c++14] %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -112,6 +111,7 @@
     <ClCompile Include="src\InputManager.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PhysicsComponent.cpp" />
+    <ClCompile Include="src\PhysicsSettings.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
     <ClCompile Include="src\RenderingComponent.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
@@ -133,6 +133,7 @@
     <ClInclude Include="src\MeshStuff.h" />
     <ClInclude Include="src\MusicAsset.h" />
     <ClInclude Include="src\PhysicsComponent.h" />
+    <ClInclude Include="src\PhysicsSettings.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\RenderingComponent.h" />
     <ClInclude Include="src\RenderingSystem.h" />
