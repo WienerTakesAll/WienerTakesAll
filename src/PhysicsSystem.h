@@ -28,19 +28,19 @@ private:
     void handle_add_terrain(const Event& e);
     void handle_key_press(const Event& e);
 
-    void create4WVehicle
+    void create_4w_vehicle
     (PxScene& scene, PxPhysics& physics, PxCooking& cooking, const PxMaterial& material,
      const PxF32 chassisMass, const PxVec3* wheelCentreOffsets4, PxConvexMesh* chassisConvexMesh, PxConvexMesh** wheelConvexMeshes4,
      const PxTransform& startTransform, const bool useAutoGearFlag);
 
-    physx::PxDefaultAllocator gAllocator_;
-    physx::PxDefaultErrorCallback gErrorCallback_;
-    physx::PxTolerancesScale gScale_;
-    physx::PxFoundation* gFoundation_;
-    physx::PxPvd* gPvd_;
-    physx::PxPhysics* gPhysics_;
-    physx::PxCooking* gCooking_;
-    physx::PxScene* gScene_;
+    physx::PxDefaultAllocator g_allocator_;
+    physx::PxDefaultErrorCallback g_error_callback_;
+    physx::PxTolerancesScale g_scale_;
+    physx::PxFoundation* g_foundation_;
+    physx::PxPvd* g_pvd_;
+    physx::PxPhysics* g_physics_;
+    physx::PxCooking* g_cooking_;
+    physx::PxScene* g_scene_;
 
     AssetManager& asset_manager_;
 
@@ -48,15 +48,15 @@ private:
     std::vector<PhysicsComponent<true>> static_objects_;
 
 
-    float forwardDrive, horizontalDrive, backwardDrive;
-    bool handBreak;
+    float forward_drive_, horizontal_drive_, backward_drive_;
+    bool hand_break_;
 
 
 
     //Array of all cars and report data for each car.
-    PxVehicleWheels* mVehicles[MAX_NUM_4W_VEHICLES];
-    PxVehicleWheelQueryResult mVehicleWheelQueryResults[MAX_NUM_4W_VEHICLES];
-    PxU32 mNumVehicles;
+    PxVehicleWheels* vehicles_[MAX_NUM_4W_VEHICLES];
+    PxVehicleWheelQueryResult vehicle_wheel_query_results_[MAX_NUM_4W_VEHICLES];
+    PxU32 num_vehicles_;
 
     //sdk raycasts (for the suspension lines).
 
@@ -70,41 +70,41 @@ private:
         void free();
 
         //Create a PxBatchQuery instance that will be used as a single batched raycast of multiple suspension lines of multiple vehicles
-        PxBatchQuery* setUpBatchedSceneQuery(PxScene* scene);
+        PxBatchQuery* setup_batched_scene_query(PxScene* scene);
 
         //Get the buffer of scene query results that will be used by PxVehicleNWSuspensionRaycasts
-        PxRaycastQueryResult* getRaycastQueryResultBuffer() {
-            return mSqResults;
+        PxRaycastQueryResult* get_raycast_query_result_buffer() {
+            return sq_results_;
         }
 
         //Get the number of scene query results that have been allocated for use by PxVehicleNWSuspensionRaycasts
-        PxU32 getRaycastQueryResultBufferSize() const {
-            return mNumQueries;
+        PxU32 get_raycast_query_result_buffer_size() const {
+            return num_queries_;
         }
 
         //Set the pre-filter shader
-        void setPreFilterShader(PxBatchQueryPreFilterShader preFilterShader) {
-            mPreFilterShader = preFilterShader;
+        void set_pre_filter_shader(PxBatchQueryPreFilterShader preFilterShader) {
+            pre_filter_shader_ = preFilterShader;
         }
 
     private:
 
         //One result for each wheel.
-        PxRaycastQueryResult* mSqResults;
-        PxU32 mNbSqResults;
+        PxRaycastQueryResult* sq_results_;
+        PxU32 nb_sq_results_;
 
         //One hit for each wheel.
-        PxRaycastHit* mSqHitBuffer;
+        PxRaycastHit* sq_hit_buffer_;
 
         //Filter shader used to filter drivable and non-drivable surfaces
-        PxBatchQueryPreFilterShader mPreFilterShader;
+        PxBatchQueryPreFilterShader pre_filter_shader_;
 
         //Maximum number of suspension raycasts that can be supported by the allocated buffers
         //assuming a single query and hit per suspension line.
-        PxU32 mNumQueries;
+        PxU32 num_queries_;
 
         void init() {
-            mPreFilterShader = [](
+            pre_filter_shader_ = [](
                                    PxFilterData filterData0,
                                    PxFilterData filterData1,
                                    const void* constantBlock, PxU32 constantBlockSize,
@@ -132,7 +132,7 @@ private:
         ~SampleVehicleSceneQueryData() {
         }
     };
-    SampleVehicleSceneQueryData* mSqData;
+    SampleVehicleSceneQueryData* sq_data_;
 
 
 
@@ -144,7 +144,7 @@ private:
 
 
 
-    PxBatchQuery* mSqWheelRaycastBatchQuery;
+    PxBatchQuery* sq_wheel_raycast_batch_query_;
 
     //Reports for each wheel.
     class SampleVehicleWheelQueryResults {
@@ -156,22 +156,22 @@ private:
         //Free allocated buffer.
         void free();
 
-        PxWheelQueryResult* addVehicle(const PxU32 numWheels);
+        PxWheelQueryResult* add_vehicle(const PxU32 numWheels);
 
     private:
 
         //One result for each wheel.
-        PxWheelQueryResult* mWheelQueryResults;
+        PxWheelQueryResult* wheel_query_results_;
 
         //Maximum number of wheels.
-        PxU32 mMaxNumWheels;
+        PxU32 max_num_wheels_;
 
         //Number of wheels
-        PxU32 mNumWheels;
+        PxU32 num_wheels_;
 
 
         SampleVehicleWheelQueryResults()
-            : mWheelQueryResults(NULL), mMaxNumWheels(0), mNumWheels(0) {
+            : wheel_query_results_(NULL), max_num_wheels_(0), num_wheels_(0) {
             init();
         }
 
@@ -179,22 +179,22 @@ private:
         }
 
         void init() {
-            mWheelQueryResults = NULL;
-            mMaxNumWheels = 0;
-            mNumWheels = 0;
+            wheel_query_results_ = NULL;
+            max_num_wheels_ = 0;
+            num_wheels_ = 0;
         }
     };
 
 
-    SampleVehicleWheelQueryResults* mWheelQueryResults;
+    SampleVehicleWheelQueryResults* wheel_query_results;
 
     //Cached simulation data of focus vehicle in 4W mode.
-    PxVehicleWheelsSimData* mWheelsSimData4W;
-    PxVehicleDriveSimData4W mDriveSimData4W;
-    bool mIsIn3WMode;
+    PxVehicleWheelsSimData* wheels_sim_data_4w_;
+    PxVehicleDriveSimData4W drive_sim_data_4w_;
+    bool is_3w_mode_;
 
     //Friction from combinations of tire and surface types.
-    PxVehicleDrivableSurfaceToTireFrictionPairs* mSurfaceTirePairs;
+    PxVehicleDrivableSurfaceToTireFrictionPairs* surface_tire_pairs_;
 
 
     //Initialise a car back to its start transform and state.

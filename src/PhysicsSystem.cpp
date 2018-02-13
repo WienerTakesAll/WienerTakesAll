@@ -125,12 +125,12 @@ PhysicsSystem::SampleVehicleSceneQueryData* PhysicsSystem::SampleVehicleSceneQue
     sqData->init();
     PxU8* ptr = (PxU8*)sqData;
     ptr += size0;
-    sqData->mSqResults = (PxRaycastQueryResult*)ptr;
-    sqData->mNbSqResults = maxNumWheels;
+    sqData->sq_results_ = (PxRaycastQueryResult*)ptr;
+    sqData->nb_sq_results_ = maxNumWheels;
     ptr += size1;
-    sqData->mSqHitBuffer = (PxRaycastHit*)ptr;
+    sqData->sq_hit_buffer_ = (PxRaycastHit*)ptr;
     ptr += size2;
-    sqData->mNumQueries = maxNumWheels;
+    sqData->num_queries_ = maxNumWheels;
     return sqData;
 }
 
@@ -138,12 +138,12 @@ void PhysicsSystem::SampleVehicleSceneQueryData::free() {
     //PX_FREE(this);
 }
 
-PxBatchQuery* PhysicsSystem::SampleVehicleSceneQueryData::setUpBatchedSceneQuery(PxScene* scene) {
-    PxBatchQueryDesc sqDesc(mNbSqResults, 0, 0);
-    sqDesc.queryMemory.userRaycastResultBuffer = mSqResults;
-    sqDesc.queryMemory.userRaycastTouchBuffer = mSqHitBuffer;
-    sqDesc.queryMemory.raycastTouchBufferSize = mNumQueries;
-    sqDesc.preFilterShader = mPreFilterShader;
+PxBatchQuery* PhysicsSystem::SampleVehicleSceneQueryData::setup_batched_scene_query(PxScene* scene) {
+    PxBatchQueryDesc sqDesc(nb_sq_results_, 0, 0);
+    sqDesc.queryMemory.userRaycastResultBuffer = sq_results_;
+    sqDesc.queryMemory.userRaycastTouchBuffer = sq_hit_buffer_;
+    sqDesc.queryMemory.raycastTouchBufferSize = num_queries_;
+    sqDesc.preFilterShader = pre_filter_shader_;
     return scene->createBatchQuery(sqDesc);
 }
 
@@ -170,12 +170,12 @@ PhysicsSystem::SampleVehicleWheelQueryResults* PhysicsSystem::SampleVehicleWheel
     resData->init();
     PxU8* ptr = (PxU8*)resData;
     ptr += sizeof(SampleVehicleWheelQueryResults);
-    resData->mWheelQueryResults = (PxWheelQueryResult*)ptr;
+    resData->wheel_query_results_ = (PxWheelQueryResult*)ptr;
     ptr += sizeof(PxWheelQueryResult) * maxNumWheels;
-    resData->mMaxNumWheels = maxNumWheels;
+    resData->max_num_wheels_ = maxNumWheels;
 
     for (PxU32 i = 0; i < maxNumWheels; i++) {
-        new(&resData->mWheelQueryResults[i]) PxWheelQueryResult();
+        new(&resData->wheel_query_results_[i]) PxWheelQueryResult();
     }
 
     return resData;
@@ -185,10 +185,10 @@ void PhysicsSystem::SampleVehicleWheelQueryResults::free() {
     //PX_FREE(this);
 }
 
-PxWheelQueryResult* PhysicsSystem::SampleVehicleWheelQueryResults::addVehicle(const PxU32 numWheels) {
-    PX_ASSERT((mNumWheels + numWheels) <= mMaxNumWheels);
-    PxWheelQueryResult* r = &mWheelQueryResults[mNumWheels];
-    mNumWheels += numWheels;
+PxWheelQueryResult* PhysicsSystem::SampleVehicleWheelQueryResults::add_vehicle(const PxU32 numWheels) {
+    PX_ASSERT((num_wheels_ + numWheels) <= max_num_wheels_);
+    PxWheelQueryResult* r = &wheel_query_results_[num_wheels_];
+    num_wheels_ += numWheels;
     return r;
 }
 
@@ -495,11 +495,11 @@ void createVehicle4WSimulationData
 }
 
 
-void PhysicsSystem::create4WVehicle
+void PhysicsSystem::create_4w_vehicle
 (PxScene& scene, PxPhysics& physics, PxCooking& cooking, const PxMaterial& material,
  const PxF32 chassisMass, const PxVec3* wheelCentreOffsets4, PxConvexMesh* chassisConvexMesh, PxConvexMesh** wheelConvexMeshes4,
  const PxTransform& startTransform, const bool useAutoGearFlag) {
-    PX_ASSERT(mNumVehicles < MAX_NUM_4W_VEHICLES);
+    PX_ASSERT(num_vehicles_ < MAX_NUM_4W_VEHICLES);
 
     PxVehicleWheelsSimData* wheelsSimData = PxVehicleWheelsSimData::allocate(4);
     PxVehicleDriveSimData4W driveSimData;
@@ -549,39 +549,39 @@ void PhysicsSystem::create4WVehicle
     car->mDriveDynData.setUseAutoGears(useAutoGearFlag);
 
     //Increment the number of vehicles
-    mVehicles[mNumVehicles] = car;
-    mVehicleWheelQueryResults[mNumVehicles].nbWheelQueryResults = 4;
-    mVehicleWheelQueryResults[mNumVehicles].wheelQueryResults = mWheelQueryResults->addVehicle(4);
-    mNumVehicles++;
+    vehicles_[num_vehicles_] = car;
+    vehicle_wheel_query_results_[num_vehicles_].nbWheelQueryResults = 4;
+    vehicle_wheel_query_results_[num_vehicles_].wheelQueryResults = wheel_query_results->add_vehicle(4);
+    num_vehicles_++;
 
 
-    mDriveSimData4W = driveSimData;
+    drive_sim_data_4w_ = driveSimData;
 }
 
 PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
-    : gFoundation_(PxCreateFoundation(PX_FOUNDATION_VERSION, gAllocator_, gErrorCallback_))
-    , gScale_()
-    , gPvd_(PxCreatePvd(*gFoundation_))
-    , gPhysics_(PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation_, gScale_, false, gPvd_))
-    , gCooking_(PxCreateCooking(PX_PHYSICS_VERSION, *gFoundation_, gScale_))
-    , gScene_(nullptr)
-    , mSqWheelRaycastBatchQuery(NULL)
+    : g_foundation_(PxCreateFoundation(PX_FOUNDATION_VERSION, g_allocator_, g_error_callback_))
+    , g_scale_()
+    , g_pvd_(PxCreatePvd(*g_foundation_))
+    , g_physics_(PxCreatePhysics(PX_PHYSICS_VERSION, *g_foundation_, g_scale_, false, g_pvd_))
+    , g_cooking_(PxCreateCooking(PX_PHYSICS_VERSION, *g_foundation_, g_scale_))
+    , g_scene_(nullptr)
+    , sq_wheel_raycast_batch_query_(NULL)
     , asset_manager_(asset_manager)
-    , forwardDrive(0.0f), horizontalDrive(0.0f), backwardDrive(0.0f), handBreak(false)
-    , mNumVehicles(0) {
+    , forward_drive_(0.0f), horizontal_drive_(0.0f), backward_drive_(0.0f), hand_break_(false)
+    , num_vehicles_(0) {
     EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &PhysicsSystem::handle_add_example_ship, this);
     EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &PhysicsSystem::handle_add_terrain, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &PhysicsSystem::handle_key_press, this);
 
 
     PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
-    gPvd_->connect(*transport, PxPvdInstrumentationFlag::eALL);
+    g_pvd_->connect(*transport, PxPvdInstrumentationFlag::eALL);
 
-    PxInitVehicleSDK(*gPhysics_);
+    PxInitVehicleSDK(*g_physics_);
     physx::PxVehicleSetBasisVectors(physx::PxVec3(0, 1, 0), physx::PxVec3(0, 0, 1));
     physx::PxVehicleSetUpdateMode(physx::PxVehicleUpdateMode::eVELOCITY_CHANGE);
 
-    physx::PxSceneDesc sceneDesc(gPhysics_->getTolerancesScale());
+    physx::PxSceneDesc sceneDesc(g_physics_->getTolerancesScale());
     sceneDesc.gravity = GRAVITY;
 
     physx::PxDefaultCpuDispatcher* dispatcher = physx::PxDefaultCpuDispatcherCreate(3);
@@ -590,7 +590,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
 #if PX_WINDOWS
     // create GPU dispatcher
     physx::PxCudaContextManagerDesc cudaContextManagerDesc;
-    auto mCudaContextManager = PxCreateCudaContextManager(*gFoundation_, cudaContextManagerDesc);
+    auto mCudaContextManager = PxCreateCudaContextManager(*g_foundation_, cudaContextManagerDesc);
     sceneDesc.gpuDispatcher = mCudaContextManager->getGpuDispatcher();
 #endif
 
@@ -598,7 +598,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
 
     bool v = sceneDesc.isValid();
 
-    gScene_ = gPhysics_->createScene(sceneDesc);
+    g_scene_ = g_physics_->createScene(sceneDesc);
 
 
 
@@ -611,17 +611,17 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
 
     //Initialise all vehicle ptrs to null.
     for (PxU32 i = 0; i < MAX_NUM_4W_VEHICLES; i++) {
-        mVehicles[i] = NULL;
+        vehicles_[i] = NULL;
     }
 
     //Allocate simulation data so we can switch from 3-wheeled to 4-wheeled cars by switching simulation data.
-    mWheelsSimData4W = PxVehicleWheelsSimData::allocate(4);
+    wheels_sim_data_4w_ = PxVehicleWheelsSimData::allocate(4);
 
     //Scene query data for to allow raycasts for all suspensions of all vehicles.
-    mSqData = SampleVehicleSceneQueryData::allocate(MAX_NUM_4W_VEHICLES * 4);
+    sq_data_ = SampleVehicleSceneQueryData::allocate(MAX_NUM_4W_VEHICLES * 4);
 
     //Data to store reports for each wheel.
-    mWheelQueryResults = SampleVehicleWheelQueryResults::allocate(MAX_NUM_4W_VEHICLES * 4);
+    wheel_query_results = SampleVehicleWheelQueryResults::allocate(MAX_NUM_4W_VEHICLES * 4);
 
 
 
@@ -634,17 +634,17 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager)
 PhysicsSystem::~PhysicsSystem() {
     physx::PxCloseVehicleSDK();
 
-    gCooking_->release();
-    gPhysics_->release();
-    gPvd_->release();
-    gFoundation_->release();
+    g_cooking_->release();
+    g_physics_->release();
+    g_pvd_->release();
+    g_foundation_->release();
 }
 
 
 float gearedUp = 5.f;
 
 void PhysicsSystem::update() {
-    if (!gScene_) {
+    if (!g_scene_) {
         return;
     }
 
@@ -670,40 +670,40 @@ void PhysicsSystem::update() {
     int SIM_STEPS = 4;
 
     for (int i = 0; i < SIM_STEPS; i++) {
-        if (mNumVehicles) {
+        if (num_vehicles_) {
 
 
             physx::PxVehicleDrive4WRawInputData gVehicleInputData;
             gVehicleInputData.setDigitalAccel(true);
 
-            gVehicleInputData.setAnalogAccel(std::max(forwardDrive, 0.f));
-            gVehicleInputData.setAnalogBrake(backwardDrive);
-            gVehicleInputData.setAnalogHandbrake(handBreak * 1.0f);
-            handBreak = false;
+            gVehicleInputData.setAnalogAccel(std::max(forward_drive_, 0.f));
+            gVehicleInputData.setAnalogBrake(backward_drive_);
+            gVehicleInputData.setAnalogHandbrake(hand_break_ * 1.0f);
+            hand_break_ = false;
 
-            gVehicleInputData.setAnalogSteer(horizontalDrive);
+            gVehicleInputData.setAnalogSteer(horizontal_drive_);
 
 
             PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs
-            (gPadSmoothingData, gSteerVsForwardSpeedTable, gVehicleInputData, 0.16f / SIM_STEPS, false, (PxVehicleDrive4W&)*mVehicles[0]);
+            (gPadSmoothingData, gSteerVsForwardSpeedTable, gVehicleInputData, 0.16f / SIM_STEPS, false, (PxVehicleDrive4W&)*vehicles_[0]);
 
-            if (NULL == mSqWheelRaycastBatchQuery) {
-                mSqWheelRaycastBatchQuery = mSqData->setUpBatchedSceneQuery(gScene_);
+            if (NULL == sq_wheel_raycast_batch_query_) {
+                sq_wheel_raycast_batch_query_ = sq_data_->setup_batched_scene_query(g_scene_);
             }
 
-            PxVehicleSuspensionRaycasts(mSqWheelRaycastBatchQuery, mNumVehicles, mVehicles, mSqData->getRaycastQueryResultBufferSize(), mSqData->getRaycastQueryResultBuffer());
+            PxVehicleSuspensionRaycasts(sq_wheel_raycast_batch_query_, num_vehicles_, vehicles_, sq_data_->get_raycast_query_result_buffer_size(), sq_data_->get_raycast_query_result_buffer());
 
 
 
             PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-            PxVehicleWheelQueryResult vehicleQueryResults[1] = { { wheelQueryResults, mVehicles[0]->mWheelsSimData.getNbWheels() } };
-            physx::PxVehicleUpdates(0.16f / SIM_STEPS, GRAVITY, *mSurfaceTirePairs, 1, mVehicles, vehicleQueryResults);
+            PxVehicleWheelQueryResult vehicleQueryResults[1] = { { wheelQueryResults, vehicles_[0]->mWheelsSimData.getNbWheels() } };
+            physx::PxVehicleUpdates(0.16f / SIM_STEPS, GRAVITY, *surface_tire_pairs_, 1, vehicles_, vehicleQueryResults);
 
         }
 
 
-        gScene_->simulate(0.16f / SIM_STEPS);
-        gScene_->fetchResults(true);
+        g_scene_->simulate(0.16f / SIM_STEPS);
+        g_scene_->fetchResults(true);
     }
 
     for (auto& object : dynamic_objects_) {
@@ -729,27 +729,27 @@ void PhysicsSystem::update() {
 }
 
 void PhysicsSystem::handle_key_press(const Event& e) {
-    int player_id = e.get_value<int>("player_id", -1);
-    int key = e.get_value<int>("key", -1);
-    int value = e.get_value<int>("value", 0);
+    int player_id = e.get_value<int>("player_id", true).first;
+    int key = e.get_value<int>("key", true).first;
+    int value = e.get_value<int>("value", true).first;
 
     switch (key) {
 
         case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-            forwardDrive = (float)value / 32768;
+            forward_drive_ = (float)value / 32768;
             break;
 
 
         case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
-            backwardDrive = (float)value / 32768;
+            backward_drive_ = (float)value / 32768;
             break;
 
         case SDL_CONTROLLER_AXIS_LEFTX:
-            horizontalDrive = (float)value / -32768;
+            horizontal_drive_ = (float)value / -32768;
             break;
 
         case SDL_CONTROLLER_BUTTON_B:
-            handBreak = true;
+            hand_break_ = true;
 
         default:
             break;
@@ -835,29 +835,21 @@ PxConvexMesh* createWheelConvexMesh(const PxVec3* verts, const PxU32 numVerts, P
 
 void PhysicsSystem::handle_add_example_ship(const Event& e) {
 
-    if (mNumVehicles) {
+    if (num_vehicles_) {
         return;
     }
 
-    int object_id = e.get_value<int>("object_id", -1);
-    assert(object_id != -1);
-
+    int object_id = e.get_value<int>("object_id", true).first;
     physx::PxTransform transform(0.f, 0.f, 0.f);
 
-    transform.p.x = e.get_value<int>("pos_x", -999);
-    assert(transform.p.x != -999);
-
-    transform.p.y = e.get_value<int>("pos_y", -999);
-    assert(transform.p.y != -999);
-
-    transform.p.z = e.get_value<int>("pos_z", -999);
-    assert(transform.p.z != -999);
-
+    transform.p.x = e.get_value<int>("pos_x", true).first;
+    transform.p.y = e.get_value<int>("pos_y", true).first;
+    transform.p.z = e.get_value<int>("pos_z", true).first;
     MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/carBoxModel.obj");
 
     dynamic_objects_.emplace_back(object_id);
     auto& vehicle = dynamic_objects_.back();
-    vehicle.set_mesh(gPhysics_, gCooking_, mesh);
+    vehicle.set_mesh(g_physics_, g_cooking_, mesh);
     auto mat = vehicle.get_material();
     auto mesh_mesh = vehicle.get_mesh();
 
@@ -869,10 +861,10 @@ void PhysicsSystem::handle_add_example_ship(const Event& e) {
     };
 
     PxConvexMesh* wheel_mesh[4] = {
-        createWheelConvexMesh(verts, 8, *gPhysics_, *gCooking_),
-        createWheelConvexMesh(verts, 8, *gPhysics_, *gCooking_),
-        createWheelConvexMesh(verts, 8, *gPhysics_, *gCooking_),
-        createWheelConvexMesh(verts, 8, *gPhysics_, *gCooking_)
+        createWheelConvexMesh(verts, 8, *g_physics_, *g_cooking_),
+        createWheelConvexMesh(verts, 8, *g_physics_, *g_cooking_),
+        createWheelConvexMesh(verts, 8, *g_physics_, *g_cooking_),
+        createWheelConvexMesh(verts, 8, *g_physics_, *g_cooking_)
     };
 
     //mesh_mesh = createWheelConvexMesh(verts, 8, *gPhysics_, *gCooking_);
@@ -883,8 +875,8 @@ void PhysicsSystem::handle_add_example_ship(const Event& e) {
     wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-1.5f, 0.5f, -1.f);
     wheelCenterOffsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(1.5f, 0.5f, -1.f);
 
-    create4WVehicle(*gScene_, *gPhysics_, *gCooking_, *mat, 1500.f, wheelCenterOffsets, mesh_mesh, wheel_mesh, transform, true);
-    vehicle.set_actor(mVehicles[mNumVehicles - 1]->getRigidDynamicActor());
+    create_4w_vehicle(*g_scene_, *g_physics_, *g_cooking_, *mat, 1500.f, wheelCenterOffsets, mesh_mesh, wheel_mesh, transform, true);
+    vehicle.set_actor(vehicles_[num_vehicles_ - 1]->getRigidDynamicActor());
     vehicle.set_transform(transform);
 }
 
@@ -935,16 +927,15 @@ PxVehicleDrivableSurfaceToTireFrictionPairs* createFrictionPairs(const PxMateria
 }
 
 void PhysicsSystem::handle_add_terrain(const Event& e) {
-    int object_id = e.get_value<int>("object_id", -1);
-    assert(object_id != -1);
+    int object_id = e.get_value<int>("object_id", true).first;
 
     MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/Terrain.obj");
 
     static_objects_.emplace_back(object_id);
-    static_objects_.back().set_mesh(gPhysics_, gCooking_, mesh);
+    static_objects_.back().set_mesh(g_physics_, g_cooking_, mesh);
 
 
-    mSurfaceTirePairs = createFrictionPairs(static_objects_.back().get_material());
+    surface_tire_pairs_ = createFrictionPairs(static_objects_.back().get_material());
 
-    gScene_->addActor(*static_objects_.back().get_actor());
+    g_scene_->addActor(*static_objects_.back().get_actor());
 }

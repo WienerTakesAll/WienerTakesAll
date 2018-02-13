@@ -96,8 +96,7 @@ void RenderingSystem::handle_add_example_ship(const Event& e) {
 
 void RenderingSystem::handle_add_terrain(const Event& e) {
     // Load game object parameters
-    int object_id = e.get_value<int>("object_id", -1);
-    assert(object_id != -1);
+    int object_id = e.get_value<int>("object_id", true).first;
 
     MeshAsset* mesh = asset_manager_.get_mesh_asset(TERRAIN_MESH_PATH);
 
@@ -109,7 +108,7 @@ void RenderingSystem::handle_add_terrain(const Event& e) {
 void RenderingSystem::handle_example_ship_idle(const Event& e) {
     // Load game object parameters
     std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
-    assert(object_id.second && object_id.first < example_objects_.size());
+    assert(object_id.second && object_id.first < (int)example_objects_.size());
 
     std::pair<float, bool> rotation_rad = e.get_value<float>("rotation_rad", true);
 
@@ -117,33 +116,16 @@ void RenderingSystem::handle_example_ship_idle(const Event& e) {
 }
 
 void RenderingSystem::handle_object_transform(const Event& e) {
-    int object_id = e.get_value<int>("object_id", -1);
-    assert(object_id != -1);
+    int object_id = e.get_value<int>("object_id", true).first;
 
-    float x = e.get_value<float>("pos_x", -999);
-    assert(x != -999);
+    float x = e.get_value<float>("pos_x", true).first;
+    float y = e.get_value<float>("pos_y", true).first;
+    float z = e.get_value<float>("pos_z", true).first;
 
-    float y = e.get_value<float>("pos_y", -999);
-    assert(y != -999);
-
-    float z = e.get_value<float>("pos_z", -999);
-    assert(z != -999);
-
-
-
-    float qw = e.get_value<float>("qua_w", -999);
-    assert(qw != -999);
-
-    float qx = e.get_value<float>("qua_x", -999);
-    assert(qx != -999);
-
-    float qy = e.get_value<float>("qua_y", -999);
-    assert(qy != -999);
-
-    float qz = e.get_value<float>("qua_z", -999);
-    assert(qz != -999);
-
-
+    float qw = e.get_value<float>("qua_w", true).first;
+    float qx = e.get_value<float>("qua_x", true).first;
+    float qy = e.get_value<float>("qua_y", true).first;
+    float qz = e.get_value<float>("qua_z", true).first;
 
     example_objects_[object_id].set_transform(glm::translate(glm::mat4(), glm::vec3(x, y, z)));
     example_objects_[object_id].apply_transform(glm::toMat4(glm::quat(qw, qx, qy, qz)));
