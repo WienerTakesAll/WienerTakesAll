@@ -125,5 +125,8 @@
     <ClInclude Include="src\PhysicsSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\PhysicsComponent_impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

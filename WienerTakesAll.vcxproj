@@ -133,6 +133,7 @@
     <ClInclude Include="src\MeshStuff.h" />
     <ClInclude Include="src\MusicAsset.h" />
     <ClInclude Include="src\PhysicsComponent.h" />
+    <ClInclude Include="src\PhysicsComponent_impl.h" />
     <ClInclude Include="src\PhysicsSettings.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\RenderingComponent.h" />

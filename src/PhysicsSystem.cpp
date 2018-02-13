@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdio.h>
 
 #include <SDL.h>
 #include <glm/gtx/quaternion.hpp>
@@ -14,17 +15,29 @@
 using namespace physx;
 
 void SampleVehicleSetupDrivableShapeQueryFilterData(PxFilterData* qryFilterData) {
-    assert(0 == qryFilterData->word3, "word3 is reserved for filter data for vehicle raycast queries");
+    if (0 != qryFilterData->word3) {
+        std::cerr << "word3 is reserved for filter data for vehicle raycast queries" << std::endl;
+        assert(0 == qryFilterData->word3);
+    }
+
     qryFilterData->word3 = (PxU32)SAMPLEVEHICLE_DRIVABLE_SURFACE;
 }
 
 void SampleVehicleSetupNonDrivableShapeQueryFilterData(PxFilterData* qryFilterData) {
-    assert(0 == qryFilterData->word3, "word3 is reserved for filter data for vehicle raycast queries");
+    if (0 != qryFilterData->word3) {
+        std::cerr << "word3 is reserved for filter data for vehicle raycast queries" << std::endl;
+        assert(0 == qryFilterData->word3);
+    }
+
     qryFilterData->word3 = (PxU32)SAMPLEVEHICLE_UNDRIVABLE_SURFACE;
 }
 
 void SampleVehicleSetupVehicleShapeQueryFilterData(PxFilterData* qryFilterData) {
-    assert(0 == qryFilterData->word3, "word3 is reserved for filter data for vehicle raycast queries");
+    if (0 != qryFilterData->word3) {
+        std::cerr << "word3 is reserved for filter data for vehicle raycast queries" << std::endl;
+        assert(0 == qryFilterData->word3);
+    }
+
     qryFilterData->word3 = (PxU32)SAMPLEVEHICLE_UNDRIVABLE_SURFACE;
 }
 
