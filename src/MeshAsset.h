@@ -6,8 +6,7 @@
 #include "SDL_opengl.h"
 
 struct MeshAsset {
-    struct MeshData
-    {
+    struct MeshData {
         struct VertexData {
             float position_[3];
             float normal_[3];

@@ -51,8 +51,7 @@ void AssetManager::load_mesh_from_file(const std::string& file_path) {
         std::cout << "No mesh found in model " << file_path << std::endl;
     }
 
-    for (size_t i = 0; i < scene->mNumMeshes; i++)
-    {
+    for (size_t i = 0; i < scene->mNumMeshes; i++) {
         mesh_data.meshes_.emplace_back();
         auto& meshRef = mesh_data.meshes_.back();
         auto& mesh = scene->mMeshes[i];

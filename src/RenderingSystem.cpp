@@ -218,12 +218,14 @@ void RenderingSystem::setup_cameras() {
     glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 100.0f);
 
     glm::mat4x4 transform;
-    if (example_objects_.size())
-         transform = example_objects_[0].get_transform();
+
+    if (example_objects_.size()) {
+        transform = example_objects_[0].get_transform();
+    }
 
     glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
 
-    cameras_[0] = glm::translate(transform, glm::vec3(0,3,-5));
+    cameras_[0] = glm::translate(transform, glm::vec3(0, 3, -5));
     cameras_[0] = P * glm::lookAt(glm::vec3(cameras_[0][3]), car_pos, glm::vec3(0, 1, 0));
 
     cameras_[1] = glm::translate(glm::mat4(), glm::vec3(5.f, 5.f, 0.f));

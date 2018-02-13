@@ -30,8 +30,8 @@ private:
 
     void create4WVehicle
     (PxScene& scene, PxPhysics& physics, PxCooking& cooking, const PxMaterial& material,
-        const PxF32 chassisMass, const PxVec3* wheelCentreOffsets4, PxConvexMesh* chassisConvexMesh, PxConvexMesh** wheelConvexMeshes4,
-        const PxTransform& startTransform, const bool useAutoGearFlag);
+     const PxF32 chassisMass, const PxVec3* wheelCentreOffsets4, PxConvexMesh* chassisConvexMesh, PxConvexMesh** wheelConvexMeshes4,
+     const PxTransform& startTransform, const bool useAutoGearFlag);
 
     physx::PxDefaultAllocator gAllocator_;
     physx::PxDefaultErrorCallback gErrorCallback_;
@@ -60,8 +60,7 @@ private:
 
     //sdk raycasts (for the suspension lines).
 
-    class SampleVehicleSceneQueryData
-    {
+    class SampleVehicleSceneQueryData {
     public:
 
         //Allocate scene query data for up to maxNumWheels suspension raycasts.
@@ -74,13 +73,19 @@ private:
         PxBatchQuery* setUpBatchedSceneQuery(PxScene* scene);
 
         //Get the buffer of scene query results that will be used by PxVehicleNWSuspensionRaycasts
-        PxRaycastQueryResult* getRaycastQueryResultBuffer() { return mSqResults; }
+        PxRaycastQueryResult* getRaycastQueryResultBuffer() {
+            return mSqResults;
+        }
 
         //Get the number of scene query results that have been allocated for use by PxVehicleNWSuspensionRaycasts
-        PxU32 getRaycastQueryResultBufferSize() const { return mNumQueries; }
+        PxU32 getRaycastQueryResultBufferSize() const {
+            return mNumQueries;
+        }
 
-        //Set the pre-filter shader 
-        void setPreFilterShader(PxBatchQueryPreFilterShader preFilterShader) { mPreFilterShader = preFilterShader; }
+        //Set the pre-filter shader
+        void setPreFilterShader(PxBatchQueryPreFilterShader preFilterShader) {
+            mPreFilterShader = preFilterShader;
+        }
 
     private:
 
@@ -94,18 +99,16 @@ private:
         //Filter shader used to filter drivable and non-drivable surfaces
         PxBatchQueryPreFilterShader mPreFilterShader;
 
-        //Maximum number of suspension raycasts that can be supported by the allocated buffers 
+        //Maximum number of suspension raycasts that can be supported by the allocated buffers
         //assuming a single query and hit per suspension line.
         PxU32 mNumQueries;
 
-        void init()
-        {
+        void init() {
             mPreFilterShader = [](
-                PxFilterData filterData0,
-                PxFilterData filterData1,
-                const void* constantBlock, PxU32 constantBlockSize,
-                PxHitFlags& queryFlags)->PxQueryHitType::Enum
-            {
+                                   PxFilterData filterData0,
+                                   PxFilterData filterData1,
+                                   const void* constantBlock, PxU32 constantBlockSize,
+            PxHitFlags & queryFlags)->PxQueryHitType::Enum {
                 //filterData0 is the vehicle suspension raycast.
                 //filterData1 is the shape potentially hit by the raycast.
                 PX_UNUSED(queryFlags);
@@ -115,21 +118,18 @@ private:
 
                 if ((0 == (filterData1.word3 & SAMPLEVEHICLE_DRIVABLE_SURFACE))) {
                     return PxQueryHitType::eNONE;
-                }
-                else {
+                } else {
                     return PxQueryHitType::eBLOCK;
                 }
-                
+
             };
         }
 
-        SampleVehicleSceneQueryData()
-        {
+        SampleVehicleSceneQueryData() {
             init();
         }
 
-        ~SampleVehicleSceneQueryData()
-        {
+        ~SampleVehicleSceneQueryData() {
         }
     };
     SampleVehicleSceneQueryData* mSqData;
@@ -147,8 +147,7 @@ private:
     PxBatchQuery* mSqWheelRaycastBatchQuery;
 
     //Reports for each wheel.
-    class SampleVehicleWheelQueryResults
-    {
+    class SampleVehicleWheelQueryResults {
     public:
 
         //Allocate a buffer of wheel query results for up to maxNumWheels.
@@ -167,22 +166,19 @@ private:
         //Maximum number of wheels.
         PxU32 mMaxNumWheels;
 
-        //Number of wheels 
+        //Number of wheels
         PxU32 mNumWheels;
 
 
         SampleVehicleWheelQueryResults()
-            : mWheelQueryResults(NULL), mMaxNumWheels(0), mNumWheels(0)
-        {
+            : mWheelQueryResults(NULL), mMaxNumWheels(0), mNumWheels(0) {
             init();
         }
 
-        ~SampleVehicleWheelQueryResults()
-        {
+        ~SampleVehicleWheelQueryResults() {
         }
 
-        void init()
-        {
+        void init() {
             mWheelQueryResults = NULL;
             mMaxNumWheels = 0;
             mNumWheels = 0;

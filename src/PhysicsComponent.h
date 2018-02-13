@@ -6,8 +6,7 @@
 #include "MeshAsset.h"
 
 
-enum
-{
+enum {
     COLLISION_FLAG_GROUND = 1 << 0,
     COLLISION_FLAG_WHEEL = 1 << 1,
     COLLISION_FLAG_CHASSIS = 1 << 2,
@@ -22,14 +21,12 @@ enum
 };
 
 //Id of drivable surface (used by suspension raycast filtering).
-enum
-{
+enum {
     DRIVABLE_SURFACE_ID = 0xffffffff
 };
 
 //Drivable surface types.
-enum
-{
+enum {
     SURFACE_TYPE_MUD = 0,
     SURFACE_TYPE_TARMAC,
     SURFACE_TYPE_SNOW,
@@ -38,8 +35,7 @@ enum
 };
 
 //Tire types.
-enum
-{
+enum {
     TIRE_TYPE_WETS = 0,
     TIRE_TYPE_SLICKS,
     TIRE_TYPE_ICE,
@@ -47,8 +43,7 @@ enum
     MAX_NUM_TIRE_TYPES
 };
 
-enum
-{
+enum {
     SAMPLEVEHICLE_DRIVABLE_SURFACE = 0xffff0000,
     SAMPLEVEHICLE_UNDRIVABLE_SURFACE = 0x0000ffff
 };
@@ -56,7 +51,7 @@ template <bool static_actor>
 class PhysicsComponent {
 public:
     using PxActorType = typename std::conditional<static_actor, physx::PxRigidStatic, physx::PxRigidDynamic>::type;
-    
+
     PhysicsComponent(unsigned int id);
     ~PhysicsComponent();
 
@@ -75,7 +70,7 @@ public:
     void set_transform(physx::PxTransform& transform);
 private:
     void createActor(physx::PxPhysics* physics, physx::PxTransform& transform, physx::PxShape* shape, physx::PxReal density);
-   
+
     void setup_wheels(physx::PxVehicleWheelsSimData* wheelsSimData);
     void setup_drive_sim(physx::PxVehicleDriveSimData4W& driveSimData, physx::PxVehicleWheelsSimData* wheelsSimData);
 

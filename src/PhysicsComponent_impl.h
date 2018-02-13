@@ -57,8 +57,7 @@ void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::
     std::vector<physx::PxVec3> physVerts;
     std::vector<physx::PxU32> physIndices;
 
-    for (auto& mesh_data : mesh->meshes_)
-    {
+    for (auto& mesh_data : mesh->meshes_) {
         for (auto& vert : mesh_data.vertices_) {
             physx::PxVec3 point;
 
@@ -70,8 +69,7 @@ void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::
         }
     }
 
-    for (auto& mesh_data : mesh->meshes_)
-    {
+    for (auto& mesh_data : mesh->meshes_) {
         for (auto& ind : mesh_data.indices_) {
             physx::PxU32 index;
 
@@ -97,8 +95,8 @@ void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::
     physx::PxHullPolygon* meshPolygon = nullptr;
 
     bool status = cooking->cookConvexMesh(meshDesc, writeBuffer);
-    if (!status)
-    {
+
+    if (!status) {
         return;
     }
 
@@ -114,8 +112,7 @@ void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::
     gMeshShape_ = physics->createShape(*gMeshGeometry_, *gMaterial_, true);
     createActor(physics, physTransform, gMeshShape_, 1.0f);
 
-    if (static_actor)
-    {
+    if (static_actor) {
         physx::PxFilterData filterData;
         filterData.word3 = SAMPLEVEHICLE_DRIVABLE_SURFACE;
         gMeshShape_->setQueryFilterData(filterData);
@@ -125,9 +122,7 @@ void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::
         filterData.word3 = 0;
 
         gMeshShape_->setSimulationFilterData(filterData);
-    }
-    else
-    {
+    } else {
         physx::PxFilterData filterData;
         filterData.word0 = COLLISION_FLAG_WHEEL;
         filterData.word1 = COLLISION_FLAG_WHEEL_AGAINST;
@@ -207,7 +202,7 @@ void PhysicsComponent<static_actor>::create_vehicle(physx::PxPhysics* physics, p
     }
 
     gActor_->setMass(1500.0f);
-    gActor_->setMassSpaceInertiaTensor(physx::PxVec3(0.5f,0.5f,0.5f));
+    gActor_->setMassSpaceInertiaTensor(physx::PxVec3(0.5f, 0.5f, 0.5f));
     gActor_->setCMassLocalPose(physx::PxTransform(chassisCMOffset));
 
     gDrive4W_ = physx::PxVehicleDrive4W::allocate(4);
@@ -227,8 +222,7 @@ void PhysicsComponent<static_actor>::setup_wheels(physx::PxVehicleWheelsSimData*
 
     {
         //Set up the wheel data structures with mass, moi, radius, width.
-        for (physx::PxU32 i = 0; i < 4; i++)
-        {
+        for (physx::PxU32 i = 0; i < 4; i++) {
             wheels[i].mMass = 100.0f;
             wheels[i].mMOI = 0.1f;
             wheels[i].mRadius = .1f;
@@ -247,8 +241,7 @@ void PhysicsComponent<static_actor>::setup_wheels(physx::PxVehicleWheelsSimData*
     physx::PxVehicleTireData tires[PX_MAX_NB_WHEELS];
     {
         //Set up the tires.
-        for (physx::PxU32 i = 0; i < 4; i++)
-        {
+        for (physx::PxU32 i = 0; i < 4; i++) {
             tires[i].mType = 0;
         }
     }
@@ -267,11 +260,10 @@ void PhysicsComponent<static_actor>::setup_wheels(physx::PxVehicleWheelsSimData*
         PxF32 suspSprungMasses[PX_MAX_NB_WHEELS];
         PxVehicleComputeSprungMasses
         (4, wheelCenterOffsets,
-            chassisCMOffset, 1500.f, 1, suspSprungMasses);
+         chassisCMOffset, 1500.f, 1, suspSprungMasses);
 
         //Set the suspension data.
-        for (PxU32 i = 0; i < 4; i++)
-        {
+        for (PxU32 i = 0; i < 4; i++) {
             suspensions[i].mMaxCompression = 0.3f;
             suspensions[i].mMaxDroop = 0.1f;
             suspensions[i].mSpringStrength = 35000.f;
@@ -283,8 +275,8 @@ void PhysicsComponent<static_actor>::setup_wheels(physx::PxVehicleWheelsSimData*
         const PxF32 camberAngleAtRest = 0.0;
         const PxF32 camberAngleAtMaxDroop = 0.01f;
         const PxF32 camberAngleAtMaxCompression = -0.01f;
-        for (PxU32 i = 0; i < 4; i += 2)
-        {
+
+        for (PxU32 i = 0; i < 4; i += 2) {
             suspensions[i + 0].mCamberAtRest = camberAngleAtRest;
             suspensions[i + 1].mCamberAtRest = -camberAngleAtRest;
             suspensions[i + 0].mCamberAtMaxDroop = camberAngleAtMaxDroop;
@@ -301,8 +293,7 @@ void PhysicsComponent<static_actor>::setup_wheels(physx::PxVehicleWheelsSimData*
     PxVec3 tireForceAppCMOffsets[PX_MAX_NB_WHEELS];
     {
         //Set the geometry data.
-        for (PxU32 i = 0; i < 4; i++)
-        {
+        for (PxU32 i = 0; i < 4; i++) {
             //Vertical suspension travel.
             suspTravelDirections[i] = PxVec3(0, -1, 0);
 
@@ -331,8 +322,7 @@ void PhysicsComponent<static_actor>::setup_wheels(physx::PxVehicleWheelsSimData*
     //Set the wheel, tire and suspension data.
     //Set the geometry data.
     //Set the query filter data
-    for (PxU32 i = 0; i < 4; i++)
-    {
+    for (PxU32 i = 0; i < 4; i++) {
         wheelsSimData->setWheelData(i, wheels[i]);
         wheelsSimData->setTireData(i, tires[i]);
         wheelsSimData->setSuspensionData(i, suspensions[i]);

@@ -9,15 +9,14 @@ void RenderingComponent::render_views
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
 
-    for (size_t i = 0; i < mesh_->meshes_.size(); i++)
-    {
+    for (size_t i = 0; i < mesh_->meshes_.size(); i++) {
         glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffers_[i]);
         glVertexAttribPointer
         (0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
-            , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, position_)));
+         , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, position_)));
         glVertexAttribPointer
         (1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
-            , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, normal_)));
+         , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, normal_)));
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffers_[i]);
 
@@ -59,7 +58,9 @@ void RenderingComponent::setupBuffer() {
 
     size_t buffer_count = mesh_->meshes_.size();
 
-    if (!buffer_count) return;
+    if (!buffer_count) {
+        return;
+    }
 
     gl_vertex_buffers_.resize(buffer_count);
     gl_index_buffers_.resize(buffer_count);
@@ -67,8 +68,7 @@ void RenderingComponent::setupBuffer() {
     glGenBuffers(buffer_count, &gl_vertex_buffers_[0]);
     glGenBuffers(buffer_count, &gl_index_buffers_[0]);
 
-    for (size_t i = 0; i < buffer_count; i++)
-    {
+    for (size_t i = 0; i < buffer_count; i++) {
         glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffers_[i]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(MeshAsset::MeshData::VertexData)*mesh_->meshes_[i].vertices_.size(), &mesh_->meshes_[i].vertices_.front(), GL_STATIC_DRAW);
 
