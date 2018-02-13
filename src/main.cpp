@@ -1,4 +1,6 @@
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 #include "AssetManager.h"
 #include "EventSystem.h"
@@ -14,9 +16,13 @@
 
 #include <stdlib.h>
 
+namespace {
+    // Length of one frame (60fps ~= 16.66 milliseconds per frame)
+    const auto FRAME_DURATION_MS = std::chrono::milliseconds( 16 );
+}
+
 int main(int argc, char* args[]) {
     SDL_Init(SDL_INIT_EVERYTHING);
-
 
     std::vector<Event> events;
     events.emplace_back(EventType::LOAD_EVENT);
@@ -37,6 +43,7 @@ int main(int argc, char* args[]) {
     bool game_is_running = true;
 
     while (game_is_running) {
+        auto frame_end_time = std::chrono::steady_clock::now() + FRAME_DURATION_MS;
         SDL_Event event;
 
         // Input
@@ -60,6 +67,7 @@ int main(int argc, char* args[]) {
         physics_system.send_events(events);
         rendering_system.send_events(events);
 
+        input_manager.handle_events(events);
         gameplay_system.handle_events(events);
         physics_system.handle_events(events);
         rendering_system.handle_events(events);
@@ -78,7 +86,11 @@ int main(int argc, char* args[]) {
         rendering_system.render();
 
         // UI
-        _sleep(16);
+
+        // Maintain a maximum frame rate of 60fps
+        if ( game_is_running ) {
+            std::this_thread::sleep_until( frame_end_time );
+        }
     }
 
     return 0;

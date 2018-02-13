@@ -10,33 +10,7 @@ namespace {
 }
 
 InputManager::InputManager() {
-    int num_controllers_player = SDL_NumJoysticks();
-
-    // Link player controllers_
-    SDL_GameControllerEventState(SDL_ENABLE);
-    SDL_GameController* controller = nullptr;
-
-    for (int player_id = 0; player_id < num_controllers_player; ++player_id) {
-        if (SDL_IsGameController(player_id)) {
-            controller = SDL_GameControllerOpen(player_id);
-
-            if (controller) {
-                controllers_.push_back(controller);
-                std::cout << "Controller for player " << player_id << " linked" << std::endl;
-            } else {
-                std::cerr << "Could not open GameController " << player_id << ": " << SDL_GetError() << std::endl;
-            }
-
-        }
-    }
-
-    // Create AI controllers_
-    if (num_controllers_player < MAX_PLAYERS) {
-        for (int player_id = num_controllers_player; player_id < MAX_PLAYERS; ++player_id) {
-            // Create AI controller
-            std::cout << "Create AI Controller for player " << player_id << " here" << std::endl;
-        }
-    }
+    EventSystem::add_event_handler(EventType::LOAD_EVENT, &InputManager::handle_load_event, this);
 }
 
 void InputManager::process_input(SDL_Event* event) {
@@ -265,4 +239,34 @@ void InputManager::quit() {
 
     controllers_.clear();
     std::cout << "All controllers_ closed" << std::endl;
+}
+
+void InputManager::handle_load_event(const Event& e) {
+    int num_controllers_player = SDL_NumJoysticks();
+
+    // Link player controllers_
+    SDL_GameControllerEventState(SDL_ENABLE);
+    SDL_GameController* controller = nullptr;
+
+    for (int player_id = 0; player_id < num_controllers_player; ++player_id) {
+        if (SDL_IsGameController(player_id)) {
+            controller = SDL_GameControllerOpen(player_id);
+
+            if (controller) {
+                controllers_.push_back(controller);
+                std::cout << "Controller for player " << player_id << " linked" << std::endl;
+            } else {
+                std::cerr << "Could not open GameController " << player_id << ": " << SDL_GetError() << std::endl;
+            }
+
+        }
+    }
+
+    // Create AI controllers_
+    if (num_controllers_player < MAX_PLAYERS) {
+        for (int player_id = num_controllers_player; player_id < MAX_PLAYERS; ++player_id) {
+            // Create AI controller
+            std::cout << "Create AI Controller for player " << player_id << " here" << std::endl;
+        }
+    }
 }

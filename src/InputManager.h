@@ -14,5 +14,6 @@ public:
     void quit();
 
 private:
+    void handle_load_event(const Event& e);
     std::vector<SDL_GameController*> controllers_;
 };

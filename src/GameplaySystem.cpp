@@ -87,5 +87,5 @@ void GameplaySystem::handle_key_press(const Event& e) {
             break;
     }
     */
-    std::cout << "[Test] Gameplay handled keypress" << std::endl; // Remove when function is implemented
+    // std::cout << "[Test] Gameplay handled keypress" << std::endl; // Remove when function is implemented
 }
