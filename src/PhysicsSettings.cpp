@@ -1,24 +1,22 @@
 #include "PhysicsSettings.h"
 
 PhysicsSettings::PhysicsSettings()
-: gravity(physx::PxVec3 (0.0f, 0.1f * -9.81f, 0.0f))
-, g_pad_smoothing_data( {
-        {
-            6.0f,    //rise rate eANALOG_INPUT_ACCEL
-            6.0f,    //rise rate eANALOG_INPUT_BRAKE
-            12.0f,    //rise rate eANALOG_INPUT_HANDBRAKE
-            2.5f,    //rise rate eANALOG_INPUT_STEER_LEFT
-            2.5f,    //rise rate eANALOG_INPUT_STEER_RIGHT
-        },
-        {
-            10.0f,    //fall rate eANALOG_INPUT_ACCEL
-            10.0f,    //fall rate eANALOG_INPUT_BRAKE
-            12.0f,    //fall rate eANALOG_INPUT_HANDBRAKE
-            5.0f,    //fall rate eANALOG_INPUT_STEER_LEFT
-            5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
-        }
-    })
-{
+    : gravity(physx::PxVec3 (0.0f, 0.1f * -9.81f, 0.0f))
+    , g_pad_smoothing_data( {
+    {
+        6.0f,    //rise rate eANALOG_INPUT_ACCEL
+        6.0f,    //rise rate eANALOG_INPUT_BRAKE
+        12.0f,    //rise rate eANALOG_INPUT_HANDBRAKE
+        2.5f,    //rise rate eANALOG_INPUT_STEER_LEFT
+        2.5f,    //rise rate eANALOG_INPUT_STEER_RIGHT
+    }, {
+        10.0f,    //fall rate eANALOG_INPUT_ACCEL
+        10.0f,    //fall rate eANALOG_INPUT_BRAKE
+        12.0f,    //fall rate eANALOG_INPUT_HANDBRAKE
+        5.0f,    //fall rate eANALOG_INPUT_STEER_LEFT
+        5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
+    }
+}) {
     physx::PxF32 g_steer_vs_forward_speed_data[2 * 8] = {
         0.0f,        0.75f,
         5.0f,        0.75f,
