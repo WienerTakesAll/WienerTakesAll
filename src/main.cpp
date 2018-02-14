@@ -1,18 +1,20 @@
-#include <iostream>
 #include <chrono>
+#include <iostream>
+#include <stdlib.h>
 #include <thread>
 
+#include <SDL.h>
+
 #include "AssetManager.h"
-#include "EventSystem.h"
-#include "PhysicsSystem.h"
-
-#include "SDL.h"
-
 #include "AudioSystem.h"
+#include "EventSystem.h"
 #include "ExampleClass.h"
 #include "GameplaySystem.h"
 #include "InputManager.h"
+#include "PhysicsSystem.h"
+#include "PhysicsSettings.h"
 #include "RenderingSystem.h"
+
 
 namespace {
     // Length of one frame (60fps ~= 16.66 milliseconds per frame)
@@ -25,11 +27,13 @@ int main(int argc, char* args[]) {
     std::vector<Event> events;
     events.emplace_back(EventType::LOAD_EVENT);
 
+    PhysicsSettings physics_settings;
+
     AudioSystem audio_system;
     AssetManager asset_manager;
     GameplaySystem gameplay_system;
     InputManager input_manager;
-    PhysicsSystem physics_system;
+    PhysicsSystem physics_system(asset_manager, physics_settings);
     RenderingSystem rendering_system(asset_manager);
 
     if (!audio_system.init()) {
@@ -62,10 +66,12 @@ int main(int argc, char* args[]) {
         // Events
         input_manager.send_events(events);
         gameplay_system.send_events(events);
+        physics_system.send_events(events);
         rendering_system.send_events(events);
 
         input_manager.handle_events(events);
         gameplay_system.handle_events(events);
+        physics_system.handle_events(events);
         rendering_system.handle_events(events);
         audio_system.handle_events(events);
         events.clear();
@@ -75,6 +81,7 @@ int main(int argc, char* args[]) {
         gameplay_system.update();
 
         // Physics
+        physics_system.update();
 
         // Rendering
         rendering_system.update();
