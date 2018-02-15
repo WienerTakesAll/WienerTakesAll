@@ -50,7 +50,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     physx::PxVehicleSetBasisVectors(physx::PxVec3(0, 1, 0), physx::PxVec3(0, 0, 1));
     physx::PxVehicleSetUpdateMode(physx::PxVehicleUpdateMode::eVELOCITY_CHANGE);
 
-    // Scene Initialization 
+    // Scene Initialization
     physx::PxSceneDesc sceneDesc(g_physics_->getTolerancesScale());
     sceneDesc.gravity = settings_.gravity;
 
@@ -71,7 +71,6 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     for (PxU32 i = 0; i < MAX_NUM_4W_VEHICLES; i++) {
         vehicles_[i] = NULL;
     }
-
 }
 
 PhysicsSystem::~PhysicsSystem() {
@@ -86,67 +85,90 @@ PhysicsSystem::~PhysicsSystem() {
 void PhysicsSystem::update() {
     assert(g_scene_);
 
-    int SIM_STEPS = 4;
+    const int SIM_STEPS = 4;
 
     for (int i = 0; i < SIM_STEPS; i++) {
-        if (num_vehicles_) {
-
-
-            physx::PxVehicleDrive4WRawInputData gVehicleInputData;
-            gVehicleInputData.setDigitalAccel(true);
-
-            gVehicleInputData.setAnalogAccel(std::max(forward_drive_, 0.f));
-            gVehicleInputData.setAnalogBrake(backward_drive_);
-            gVehicleInputData.setAnalogHandbrake(hand_break_ * 1.0f);
-            hand_break_ = false;
-
-            gVehicleInputData.setAnalogSteer(horizontal_drive_);
-
-
-            PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs
-            (settings_.g_pad_smoothing_data, settings_.g_steer_vs_forward_speed_table, gVehicleInputData, 0.16f / SIM_STEPS, false, (PxVehicleDrive4W&)*vehicles_[0]);
-
-            if (NULL == sq_wheel_raycast_batch_query_) {
-                sq_wheel_raycast_batch_query_ = sq_data_->setup_batched_scene_query(g_scene_);
-            }
-
-            PxVehicleSuspensionRaycasts(sq_wheel_raycast_batch_query_, num_vehicles_, vehicles_, sq_data_->get_raycast_query_result_buffer_size(), sq_data_->get_raycast_query_result_buffer());
-
-
-
-            PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-            PxVehicleWheelQueryResult vehicleQueryResults[1] = { { wheelQueryResults, vehicles_[0]->mWheelsSimData.getNbWheels() } };
-            physx::PxVehicleUpdates(0.16f / SIM_STEPS, settings_.gravity, *surface_tire_pairs_, 1, vehicles_, vehicleQueryResults);
-
+        if (!num_vehicles_) {
+            g_scene_->simulate(0.16f / SIM_STEPS);
+            g_scene_->fetchResults(true);
+            continue;
         }
 
+        // Build vehicle input data
+        physx::PxVehicleDrive4WRawInputData gVehicleInputData;
+        gVehicleInputData.setDigitalAccel(true);
+        gVehicleInputData.setAnalogAccel(std::max(forward_drive_, 0.f));
+        gVehicleInputData.setAnalogBrake(backward_drive_);
+        gVehicleInputData.setAnalogHandbrake(hand_break_ * 1.0f);
+        hand_break_ = false;
+        gVehicleInputData.setAnalogSteer(horizontal_drive_);
+
+        PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(
+            settings_.g_pad_smoothing_data,
+            settings_.g_steer_vs_forward_speed_table,
+            gVehicleInputData,
+            0.16f / SIM_STEPS,
+            false,
+            (PxVehicleDrive4W&)*vehicles_[0]
+        );
+
+        if (NULL == sq_wheel_raycast_batch_query_) {
+            sq_wheel_raycast_batch_query_ = sq_data_->setup_batched_scene_query(g_scene_);
+        }
+
+        PxVehicleSuspensionRaycasts(
+            sq_wheel_raycast_batch_query_,
+            num_vehicles_,
+            vehicles_,
+            sq_data_->get_raycast_query_result_buffer_size(),
+            sq_data_->get_raycast_query_result_buffer()
+        );
+
+        PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
+        PxVehicleWheelQueryResult vehicleQueryResults[1] =
+            {
+                {
+                    wheelQueryResults,
+                    vehicles_[0]->mWheelsSimData.getNbWheels()
+                }
+            };
+
+        physx::PxVehicleUpdates(
+            0.16f / SIM_STEPS,
+            settings_.gravity,
+            *surface_tire_pairs_,
+            1,
+            vehicles_,
+            vehicleQueryResults
+        );
 
         g_scene_->simulate(0.16f / SIM_STEPS);
         g_scene_->fetchResults(true);
     }
 
+    // Inform rest of system of new object locations
     for (auto& object : dynamic_objects_) {
-        if (object.is_valid()) {
-            physx::PxTransform transform = object.get_actor()->getGlobalPose();
-
-            EventSystem::queue_event(
-                Event(
-                    EventType::OBJECT_TRANSFORM_EVENT,
-                    "object_id", static_cast<int>(object.get_id()),
-                    "pos_x", transform.p.x,
-                    "pos_y", transform.p.y,
-                    "pos_z", transform.p.z,
-                    "qua_w", transform.q.w,
-                    "qua_x", transform.q.x,
-                    "qua_y", transform.q.y,
-                    "qua_z", transform.q.z
-                )
-            );
+        if (!object.is_valid()) {
+            continue;
         }
 
+        physx::PxTransform transform = object.get_actor()->getGlobalPose();
+
+        EventSystem::queue_event(
+            Event(
+                EventType::OBJECT_TRANSFORM_EVENT,
+                "object_id", static_cast<int>(object.get_id()),
+                "pos_x", transform.p.x,
+                "pos_y", transform.p.y,
+                "pos_z", transform.p.z,
+                "qua_w", transform.q.w,
+                "qua_x", transform.q.x,
+                "qua_y", transform.q.y,
+                "qua_z", transform.q.z
+            )
+        );
     }
 }
-
 
 void SampleVehicleSetupDrivableShapeQueryFilterData(PxFilterData* qryFilterData) {
     if (0 != qryFilterData->word3) {
