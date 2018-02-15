@@ -29,11 +29,11 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     , backward_drive_(0.0f)
     , hand_break_(false)
     , num_vehicles_(0)
-    // Allocate simulation data so we can switch from 3-wheeled to 4-wheeled cars by switching simulation data.
+      // Allocate simulation data so we can switch from 3-wheeled to 4-wheeled cars by switching simulation data.
     , wheels_sim_data_4w_ (PxVehicleWheelsSimData::allocate(4))
-    // Scene query data for to allow raycasts for all suspensions of all vehicles.
+      // Scene query data for to allow raycasts for all suspensions of all vehicles.
     , sq_data_ (SampleVehicleSceneQueryData::allocate(MAX_NUM_4W_VEHICLES * 4))
-    // Data to store reports for each wheel.
+      // Data to store reports for each wheel.
     , wheel_query_results (SampleVehicleWheelQueryResults::allocate(MAX_NUM_4W_VEHICLES * 4))
     , settings_(physics_settings) {
 
@@ -125,13 +125,12 @@ void PhysicsSystem::update() {
         );
 
         PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-        PxVehicleWheelQueryResult vehicleQueryResults[1] =
+        PxVehicleWheelQueryResult vehicleQueryResults[1] = {
             {
-                {
-                    wheelQueryResults,
-                    vehicles_[0]->mWheelsSimData.getNbWheels()
-                }
-            };
+                wheelQueryResults,
+                vehicles_[0]->mWheelsSimData.getNbWheels()
+            }
+        };
 
         physx::PxVehicleUpdates(
             0.16f / SIM_STEPS,

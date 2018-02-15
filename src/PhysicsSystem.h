@@ -103,10 +103,10 @@ private:
 
         void init() {
             pre_filter_shader_ = [](
-                PxFilterData filterData0,
-                PxFilterData filterData1,
-                const void* constantBlock, PxU32 constantBlockSize,
-                PxHitFlags & queryFlags
+                                     PxFilterData filterData0,
+                                     PxFilterData filterData1,
+                                     const void* constantBlock, PxU32 constantBlockSize,
+                                     PxHitFlags & queryFlags
             )->PxQueryHitType::Enum {
                 // filterData0 is the vehicle suspension raycast.
                 // filterData1 is the shape potentially hit by the raycast.
