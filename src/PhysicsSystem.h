@@ -55,63 +55,61 @@ private:
     float forward_drive_, horizontal_drive_, backward_drive_;
     bool hand_break_;
 
-    //Array of all cars and report data for each car.
+    // Array of all cars and report data for each car.
     PxVehicleWheels* vehicles_[MAX_NUM_4W_VEHICLES];
     PxVehicleWheelQueryResult vehicle_wheel_query_results_[MAX_NUM_4W_VEHICLES];
     PxU32 num_vehicles_;
 
-    //sdk raycasts (for the suspension lines).
+    // sdk raycasts (for the suspension lines).
     class SampleVehicleSceneQueryData {
     public:
 
-        //Allocate scene query data for up to maxNumWheels suspension raycasts.
+        // Allocate scene query data for up to maxNumWheels suspension raycasts.
         static SampleVehicleSceneQueryData* allocate(const PxU32 maxNumWheels);
 
-        //Free allocated buffer for scene queries of suspension raycasts.
-        void free();
-
-        //Create a PxBatchQuery instance that will be used as a single batched raycast of multiple suspension lines of multiple vehicles
+        // Create a PxBatchQuery instance that will be used as a single batched raycast of multiple suspension lines of multiple vehicles
         PxBatchQuery* setup_batched_scene_query(PxScene* scene);
 
-        //Get the buffer of scene query results that will be used by PxVehicleNWSuspensionRaycasts
+        // Get the buffer of scene query results that will be used by PxVehicleNWSuspensionRaycasts
         PxRaycastQueryResult* get_raycast_query_result_buffer() {
             return sq_results_;
         }
 
-        //Get the number of scene query results that have been allocated for use by PxVehicleNWSuspensionRaycasts
+        // Get the number of scene query results that have been allocated for use by PxVehicleNWSuspensionRaycasts
         PxU32 get_raycast_query_result_buffer_size() const {
             return num_queries_;
         }
 
-        //Set the pre-filter shader
+        // Set the pre-filter shader
         void set_pre_filter_shader(PxBatchQueryPreFilterShader preFilterShader) {
             pre_filter_shader_ = preFilterShader;
         }
 
     private:
 
-        //One result for each wheel.
+        // One result for each wheel.
         PxRaycastQueryResult* sq_results_;
         PxU32 nb_sq_results_;
 
-        //One hit for each wheel.
+        // One hit for each wheel.
         PxRaycastHit* sq_hit_buffer_;
 
-        //Filter shader used to filter drivable and non-drivable surfaces
+        // Filter shader used to filter drivable and non-drivable surfaces
         PxBatchQueryPreFilterShader pre_filter_shader_;
 
-        //Maximum number of suspension raycasts that can be supported by the allocated buffers
-        //assuming a single query and hit per suspension line.
+        // Maximum number of suspension raycasts that can be supported by the allocated buffers
+        // assuming a single query and hit per suspension line.
         PxU32 num_queries_;
 
         void init() {
             pre_filter_shader_ = [](
-                                     PxFilterData filterData0,
-                                     PxFilterData filterData1,
-                                     const void* constantBlock, PxU32 constantBlockSize,
-            PxHitFlags & queryFlags)->PxQueryHitType::Enum {
-                //filterData0 is the vehicle suspension raycast.
-                //filterData1 is the shape potentially hit by the raycast.
+                PxFilterData filterData0,
+                PxFilterData filterData1,
+                const void* constantBlock, PxU32 constantBlockSize,
+                PxHitFlags & queryFlags
+            )->PxQueryHitType::Enum {
+                // filterData0 is the vehicle suspension raycast.
+                // filterData1 is the shape potentially hit by the raycast.
                 PX_UNUSED(queryFlags);
                 PX_UNUSED(constantBlockSize);
                 PX_UNUSED(constantBlock);
@@ -122,7 +120,6 @@ private:
                 } else {
                     return PxQueryHitType::eBLOCK;
                 }
-
             };
         }
 
@@ -133,31 +130,29 @@ private:
         ~SampleVehicleSceneQueryData() {
         }
     };
+
     SampleVehicleSceneQueryData* sq_data_;
 
     PxBatchQuery* sq_wheel_raycast_batch_query_;
 
-    //Reports for each wheel.
+    // Reports for each wheel.
     class SampleVehicleWheelQueryResults {
     public:
 
-        //Allocate a buffer of wheel query results for up to maxNumWheels.
+        // Allocate a buffer of wheel query results for up to maxNumWheels.
         static SampleVehicleWheelQueryResults* allocate(const PxU32 maxNumWheels);
-
-        //Free allocated buffer.
-        void free();
 
         PxWheelQueryResult* add_vehicle(const PxU32 numWheels);
 
     private:
 
-        //One result for each wheel.
+        // One result for each wheel.
         PxWheelQueryResult* wheel_query_results_;
 
-        //Maximum number of wheels.
+        // Maximum number of wheels.
         PxU32 max_num_wheels_;
 
-        //Number of wheels
+        // Number of wheels
         PxU32 num_wheels_;
 
 
@@ -179,11 +174,11 @@ private:
 
     SampleVehicleWheelQueryResults* wheel_query_results;
 
-    //Cached simulation data of focus vehicle in 4W mode.
+    // Cached simulation data of focus vehicle in 4W mode.
     PxVehicleWheelsSimData* wheels_sim_data_4w_;
     PxVehicleDriveSimData4W drive_sim_data_4w_;
     bool is_3w_mode_;
 
-    //Friction from combinations of tire and surface types.
+    // Friction from combinations of tire and surface types.
     PxVehicleDrivableSurfaceToTireFrictionPairs* surface_tire_pairs_;
 };
