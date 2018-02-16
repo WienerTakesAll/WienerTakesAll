@@ -31,11 +31,11 @@ void RenderingSystem::load(const Event& e) {
 }
 
 void RenderingSystem::handle_key_press(const Event& e) {
-    //function calls to get_value: param1= string:name, param2 = bool:crash_on_fail
-    //pair.first == the int, pair.second == bool
-    std::pair<int, bool> player_id = e.get_value<int>("player_id", true);
+    // function calls to get_value: param1= string:name, param2 = bool:crash_on_fail
+    // pair.first == the int, pair.second == bool
+    // std::pair<int, bool> player_id = e.get_value<int>("player_id", true);
     std::pair<int, bool> key = e.get_value<int>("key", true);
-    std::pair<int, bool> value = e.get_value<int>("value", true);
+    // std::pair<int, bool> value = e.get_value<int>("value", true);
 
     glm::mat4 transform;
 
@@ -167,7 +167,7 @@ bool RenderingSystem::init_window() {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-    SDL_GLContext glContext = SDL_GL_CreateContext(window_);
+    SDL_GL_CreateContext(window_);
 
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();

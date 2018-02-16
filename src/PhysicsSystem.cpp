@@ -234,7 +234,7 @@ void PhysicsSystem::handle_add_terrain(const Event& e) {
 }
 
 void PhysicsSystem::handle_key_press(const Event& e) {
-    int player_id = e.get_value<int>("player_id", true).first;
+    // int player_id = e.get_value<int>("player_id", true).first;
     int key = e.get_value<int>("key", true).first;
     int value = e.get_value<int>("value", true).first;
 

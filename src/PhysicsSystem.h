@@ -72,7 +72,6 @@ private:
     // Cached simulation data of focus vehicle in 4W mode.
     PxVehicleWheelsSimData* wheels_sim_data_4w_;
     PxVehicleDriveSimData4W drive_sim_data_4w_;
-    bool is_3w_mode_;
 
     // Friction from combinations of tire and surface types.
     PxVehicleDrivableSurfaceToTireFrictionPairs* surface_tire_pairs_;

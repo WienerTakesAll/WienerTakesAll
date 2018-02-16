@@ -96,8 +96,6 @@ void PhysicsComponent<static_actor>::set_mesh(
 
     physx::PxDefaultMemoryOutputStream writeBuffer;
 
-    physx::PxHullPolygon* meshPolygon = nullptr;
-
     bool status = cooking->cookConvexMesh(meshDesc, writeBuffer);
 
     if (!status) {
