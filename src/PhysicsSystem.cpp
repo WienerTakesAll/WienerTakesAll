@@ -12,6 +12,7 @@
 #include "PhysicsSettings.h"
 #include "MeshStuff.h"
 #include "PhysicsSystemUtils.h"
+#include "VehicleWheelQueryResults.h"
 
 using namespace physx;
 
@@ -34,7 +35,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
       // Scene query data for to allow raycasts for all suspensions of all vehicles.
     , sq_data_ (SampleVehicleSceneQueryData::allocate(MAX_NUM_4W_VEHICLES * 4))
       // Data to store reports for each wheel.
-    , wheel_query_results (SampleVehicleWheelQueryResults::allocate(MAX_NUM_4W_VEHICLES * 4))
+    , wheel_query_results (VehicleWheelQueryResults::allocate(MAX_NUM_4W_VEHICLES * 4))
     , settings_(physics_settings) {
 
     EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &PhysicsSystem::handle_add_example_ship, this);
@@ -417,44 +418,4 @@ void PhysicsSystem::SampleVehicleSceneQueryData::init() {
             return PxQueryHitType::eBLOCK;
         }
     };
-}
-
-/** SampleVehicleWheelQueryResults **/
-
-PhysicsSystem::SampleVehicleWheelQueryResults* PhysicsSystem::SampleVehicleWheelQueryResults::allocate(const PxU32 maxNumWheels) {
-    const PxU32 size = sizeof(SampleVehicleWheelQueryResults) + sizeof(PxWheelQueryResult) * maxNumWheels;
-    SampleVehicleWheelQueryResults* resData = (SampleVehicleWheelQueryResults*)malloc(size);
-    resData->init();
-    PxU8* ptr = (PxU8*)resData;
-    ptr += sizeof(SampleVehicleWheelQueryResults);
-    resData->wheel_query_results_ = (PxWheelQueryResult*)ptr;
-    ptr += sizeof(PxWheelQueryResult) * maxNumWheels;
-    resData->max_num_wheels_ = maxNumWheels;
-
-    for (PxU32 i = 0; i < maxNumWheels; i++) {
-        new(&resData->wheel_query_results_[i]) PxWheelQueryResult();
-    }
-
-    return resData;
-}
-
-PxWheelQueryResult* PhysicsSystem::SampleVehicleWheelQueryResults::add_vehicle(const PxU32 numWheels) {
-    PX_ASSERT((num_wheels_ + numWheels) <= max_num_wheels_);
-    PxWheelQueryResult* r = &wheel_query_results_[num_wheels_];
-    num_wheels_ += numWheels;
-    return r;
-}
-
-PhysicsSystem::SampleVehicleWheelQueryResults::SampleVehicleWheelQueryResults()
-    : wheel_query_results_(NULL), max_num_wheels_(0), num_wheels_(0) {
-    init();
-}
-
-PhysicsSystem::SampleVehicleWheelQueryResults::~SampleVehicleWheelQueryResults() {
-}
-
-void PhysicsSystem::SampleVehicleWheelQueryResults::init() {
-    wheel_query_results_ = NULL;
-    max_num_wheels_ = 0;
-    num_wheels_ = 0;
 }

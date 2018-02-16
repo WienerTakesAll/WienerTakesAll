@@ -9,6 +9,7 @@
 
 class AssetManager;
 class PhysicsSettings;
+class VehicleWheelQueryResults;
 
 #define MAX_NUM_4W_VEHICLES 10
 
@@ -102,31 +103,7 @@ private:
 
     PxBatchQuery* sq_wheel_raycast_batch_query_;
 
-    // Reports for each wheel.
-    class SampleVehicleWheelQueryResults {
-    public:
-        // Allocate a buffer of wheel query results for up to maxNumWheels.
-        static SampleVehicleWheelQueryResults* allocate(const PxU32 maxNumWheels);
-
-        PxWheelQueryResult* add_vehicle(const PxU32 numWheels);
-
-    private:
-        // One result for each wheel.
-        PxWheelQueryResult* wheel_query_results_;
-
-        // Maximum number of wheels.
-        PxU32 max_num_wheels_;
-
-        // Number of wheels
-        PxU32 num_wheels_;
-
-        SampleVehicleWheelQueryResults();
-        ~SampleVehicleWheelQueryResults();
-        void init();
-    };
-
-
-    SampleVehicleWheelQueryResults* wheel_query_results;
+    VehicleWheelQueryResults* wheel_query_results;
 
     // Cached simulation data of focus vehicle in 4W mode.
     PxVehicleWheelsSimData* wheels_sim_data_4w_;
