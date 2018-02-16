@@ -1,8 +1,10 @@
 #version 330 core
 
-varying vec2 texCoord;
+in vec2 texCoord;
+
+uniform sampler2D tex;
 
 out vec4 color;
 void main(){
-	color = vec4(1.0, 0.0, 1.0, 1.0);
+	color = texture2D(tex,texCoord);
 }

@@ -33,16 +33,6 @@ void RenderingComponent::render(glm::mat4x4 camera) const {
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
 
-    glVertexAttribPointer
-    (0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
-     , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, position_)));
-    glVertexAttribPointer
-    (1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
-     , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, normal_)));
-    glVertexAttribPointer
-    (2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
-     , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, uv_)));
-
 
     if (texture_ != nullptr && texture_->valid_) {
         glBindTexture(GL_TEXTURE_2D, texture_->texture_id_);
@@ -50,6 +40,8 @@ void RenderingComponent::render(glm::mat4x4 camera) const {
 
 
     GLuint uniformMVP = glGetUniformLocation(shader_->program_id_, "MVP");
+
+
 
     for (size_t i = 0; i < mesh_->meshes_.size(); i++) {
         glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffers_[i]);
@@ -59,6 +51,9 @@ void RenderingComponent::render(glm::mat4x4 camera) const {
         glVertexAttribPointer
         (1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
          , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, normal_)));
+        glVertexAttribPointer
+        (2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
+            , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, uv_)));
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffers_[i]);
 
