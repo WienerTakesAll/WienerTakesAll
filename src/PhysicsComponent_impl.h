@@ -1,5 +1,7 @@
 #pragma once
 
+#include <assert.h>
+
 using namespace physx;
 
 template <bool static_actor>
