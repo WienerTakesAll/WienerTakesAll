@@ -33,31 +33,41 @@ void RenderingComponent::render(glm::mat4x4 camera) const {
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
 
-    glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffer_);
     glVertexAttribPointer
-    (0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::VertexData)
-     , reinterpret_cast<void*>(offsetof(MeshAsset::VertexData, position_)));
+    (0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
+     , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, position_)));
     glVertexAttribPointer
-    (1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::VertexData)
-     , reinterpret_cast<void*>(offsetof(MeshAsset::VertexData, normal_)));
+    (1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
+     , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, normal_)));
     glVertexAttribPointer
-    (2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::VertexData)
-     , reinterpret_cast<void*>(offsetof(MeshAsset::VertexData, uv_)));
+    (2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
+     , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, uv_)));
 
 
     if (texture_ != nullptr && texture_->valid_) {
         glBindTexture(GL_TEXTURE_2D, texture_->texture_id_);
     }
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffer_);
 
     GLuint uniformMVP = glGetUniformLocation(shader_->program_id_, "MVP");
-    GLuint transform = glGetUniformLocation(shader_->program_id_, "transform");
 
-    glUniformMatrix4fv(transform, 1, GL_FALSE, glm::value_ptr(transform_matrix_));
+    for (size_t i = 0; i < mesh_->meshes_.size(); i++) {
+        glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffers_[i]);
+        glVertexAttribPointer
+        (0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
+         , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, position_)));
+        glVertexAttribPointer
+        (1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
+         , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, normal_)));
 
-    glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, glm::value_ptr(camera * transform_matrix_));
-    glDrawElements(GL_TRIANGLES, mesh_->indices_.size(), GL_UNSIGNED_INT, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffers_[i]);
+
+
+        glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, glm::value_ptr(camera*transform_matrix_));
+
+        glDrawElements(GL_TRIANGLES, mesh_->meshes_[i].indices_.size(), GL_UNSIGNED_INT, 0);
+    }
+
 }
 
 
@@ -70,6 +80,9 @@ void RenderingComponent::set_transform(glm::mat4x4 transform) {
     transform_matrix_ = transform;
 }
 
+const glm::mat4x4& RenderingComponent::get_transform() const {
+    return transform_matrix_;
+}
 
 
 void RenderingComponent::set_mesh(MeshAsset* mesh) {
@@ -87,14 +100,27 @@ void RenderingComponent::set_shader(ShaderAsset* shader) {
 
 void RenderingComponent::setupBuffer() {
 
-    if (mesh_ != nullptr && mesh_->valid_) {
-        glGenBuffers(1, &gl_vertex_buffer_);
-        glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffer_);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(MeshAsset::VertexData)*mesh_->vertices_.size(), &mesh_->vertices_.front(), GL_STATIC_DRAW);
 
-        glGenBuffers(1, &gl_index_buffer_);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffer_);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh_->indices_.size() * sizeof(GLuint), &mesh_->indices_.front(), GL_STATIC_DRAW);
+    size_t buffer_count = mesh_->meshes_.size();
+
+    if (!buffer_count) {
+        return;
     }
+
+    gl_vertex_buffers_.resize(buffer_count);
+    gl_index_buffers_.resize(buffer_count);
+
+    glGenBuffers(buffer_count, &gl_vertex_buffers_[0]);
+    glGenBuffers(buffer_count, &gl_index_buffers_[0]);
+
+    for (size_t i = 0; i < buffer_count; i++) {
+        glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffers_[i]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(MeshAsset::MeshData::VertexData)*mesh_->meshes_[i].vertices_.size(), &mesh_->meshes_[i].vertices_.front(), GL_STATIC_DRAW);
+
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffers_[i]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh_->meshes_[i].indices_.size() * sizeof(GLuint), &mesh_->meshes_[i].indices_.front(), GL_STATIC_DRAW);
+    }
+
 
 }

@@ -1,9 +1,8 @@
 #version 330 core
 
-uniform sampler2D tex;
-
-in vec2 texCoord;
+in vec3 vertexColor;
 out vec4 color;
 void main(){
-	color = texture(tex, texCoord);
+	color.rgb = vertexColor;
+	color.a = 1.0;
 }

@@ -12,30 +12,46 @@ UISystem::UISystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &UISystem::handle_load, this);
 
     // Hard-coded sample UI button mesh
-    MeshAsset::VertexData vert;
+    MeshAsset::MeshData::VertexData vert;
+   
 
-    vert.position_ = { 0.0f, 0.0f, 1.0f };
-    vert.uv_ = { 0.0f, 0.0f };
-    example_mesh_.vertices_.emplace_back(vert);
+    example_mesh_.meshes_.emplace_back();
+    auto& mesh_element = example_mesh_.meshes_.back();
 
-    vert.position_ = { 1.0f, 0.0f, 1.0f };
-    vert.uv_ = { 1.0f, 0.0f };
-    example_mesh_.vertices_.emplace_back(vert);
+    vert.position_[0] = 0.0f; 
+    vert.position_[1] = 0.0f;
+    vert.position_[2] = 1.0f;
+    vert.uv_[0] = 0.0f;
+    vert.uv_[1] = 0.0f;
+    mesh_element.vertices_.emplace_back(vert);
 
-    vert.position_ = { 1.0f, 1.0f, 1.0f };
-    vert.uv_ = { 1.0f, 1.0f };
-    example_mesh_.vertices_.emplace_back(vert);
+    vert.position_[0] = 1.0f;
+    vert.position_[1] = 0.0f;
+    vert.position_[2] = 1.0f;
+    vert.uv_[0] = 1.0f;
+    vert.uv_[1] = 0.0f;
+    mesh_element.vertices_.emplace_back(vert);
 
-    vert.position_ = { 0.0f, 1.0f, 1.0f };
-    vert.uv_ = { 0.0f, 1.0f };
-    example_mesh_.vertices_.emplace_back(vert);
+    vert.position_[0] = 1.0f;
+    vert.position_[1] = 1.0f;
+    vert.position_[2] = 1.0f;
+    vert.uv_[0] = 1.0f;
+    vert.uv_[1] = 1.0f;
+    mesh_element.vertices_.emplace_back(vert);
 
-    example_mesh_.indices_.push_back(0);
-    example_mesh_.indices_.push_back(1);
-    example_mesh_.indices_.push_back(2);
-    example_mesh_.indices_.push_back(2);
-    example_mesh_.indices_.push_back(3);
-    example_mesh_.indices_.push_back(0);
+    vert.position_[0] = 0.0f;
+    vert.position_[1] = 1.0f;
+    vert.position_[2] = 1.0f;
+    vert.uv_[0] = 0.0f;
+    vert.uv_[1] = 1.0f;
+    mesh_element.vertices_.emplace_back(vert);
+
+    mesh_element.indices_.push_back(0);
+    mesh_element.indices_.push_back(1);
+    mesh_element.indices_.push_back(2);
+    mesh_element.indices_.push_back(2);
+    mesh_element.indices_.push_back(3);
+    mesh_element.indices_.push_back(0);
 
     example_mesh_.valid_ = true;
 

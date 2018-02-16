@@ -7,7 +7,7 @@
 #include "SDL_opengl.h"
 #include "glm/glm.hpp"
 
-class MeshAsset;
+struct MeshAsset;
 class TextureAsset;
 class ShaderAsset;
 
@@ -19,6 +19,7 @@ public:
 
     void apply_transform(glm::mat4x4 transform);
     void set_transform(glm::mat4x4 transform);
+    const glm::mat4x4& get_transform() const;
 
     void set_mesh(MeshAsset* mesh);
     void set_texture(TextureAsset* texture);
@@ -27,8 +28,8 @@ public:
 private:
     void setupBuffer();
 
-    GLuint gl_vertex_buffer_;
-    GLuint gl_index_buffer_;
+    std::vector<GLuint> gl_vertex_buffers_;
+    std::vector<GLuint> gl_index_buffers_;
     glm::mat4 transform_matrix_;
     MeshAsset* mesh_;
     TextureAsset* texture_;

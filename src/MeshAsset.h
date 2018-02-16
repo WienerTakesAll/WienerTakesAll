@@ -6,15 +6,18 @@
 #include "SDL_opengl.h"
 #include "glm/glm.hpp"
 
-class MeshAsset {
-public:
-    struct VertexData {
-        glm::vec3 position_;
-        glm::vec3 normal_;
-        glm::vec3 colors_;
-        glm::vec2 uv_;
+
+struct MeshAsset {
+    struct MeshData {
+        struct VertexData {
+            float position_[3];
+            float normal_[3];
+            float colors_[3];
+            float uv_[2];
+        };
+        std::vector<VertexData> vertices_;
+        std::vector<GLuint> indices_;
     };
     bool valid_;
-    std::vector<VertexData> vertices_;
-    std::vector<GLuint> indices_;
+    std::vector<MeshData> meshes_;
 };
