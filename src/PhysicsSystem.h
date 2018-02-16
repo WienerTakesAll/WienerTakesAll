@@ -14,7 +14,6 @@ class VehicleSceneQueryData;
 
 #define MAX_NUM_4W_VEHICLES 10
 
-using namespace physx;
 class PhysicsSystem : public EventSystem<PhysicsSystem> {
 public:
     PhysicsSystem(AssetManager&, PhysicsSettings&);
@@ -28,51 +27,52 @@ private:
     void handle_key_press(const Event& e);
 
     void create_4w_vehicle(
-        PxScene& scene,
-        PxPhysics& physics,
-        PxCooking& cooking,
-        const PxMaterial& material,
-        const PxF32 chassisMass,
-        const PxVec3* wheelCentreOffsets4,
-        PxConvexMesh* chassisConvexMesh,
-        PxConvexMesh** wheelConvexMeshes4,
-        const PxTransform& startTransform,
+        physx::PxScene& scene,
+        physx::PxPhysics& physics,
+        physx::PxCooking& cooking,
+        const physx::PxMaterial& material,
+        const physx::PxF32 chassisMass,
+        const physx::PxVec3* wheelCentreOffsets4,
+        physx::PxConvexMesh* chassisConvexMesh,
+        physx::PxConvexMesh** wheelConvexMeshes4,
+        const physx::PxTransform& startTransform,
         const bool useAutoGearFlag);
+
+    std::vector<PhysicsComponent<false>> dynamic_objects_;
+    std::vector<PhysicsComponent<true>> static_objects_;
 
     physx::PxDefaultAllocator g_allocator_;
     physx::PxDefaultErrorCallback g_error_callback_;
-    physx::PxTolerancesScale g_scale_;
     physx::PxFoundation* g_foundation_;
     physx::PxPvd* g_pvd_;
     physx::PxPhysics* g_physics_;
     physx::PxCooking* g_cooking_;
     physx::PxScene* g_scene_;
+    physx::PxTolerancesScale g_scale_;
 
-    AssetManager& asset_manager_;
-    PhysicsSettings& settings_;
+    physx::PxBatchQuery* sq_wheel_raycast_batch_query_;
 
-    std::vector<PhysicsComponent<false>> dynamic_objects_;
-    std::vector<PhysicsComponent<true>> static_objects_;
-
-    float forward_drive_, horizontal_drive_, backward_drive_;
+    float forward_drive_;
+    float horizontal_drive_;
+    float backward_drive_;
     bool hand_break_;
 
     // Array of all cars and report data for each car.
-    PxVehicleWheels* vehicles_[MAX_NUM_4W_VEHICLES];
-    PxVehicleWheelQueryResult vehicle_wheel_query_results_[MAX_NUM_4W_VEHICLES];
-    PxU32 num_vehicles_;
+    physx::PxVehicleWheels* vehicles_[MAX_NUM_4W_VEHICLES];
+    physx::PxVehicleWheelQueryResult vehicle_wheel_query_results_[MAX_NUM_4W_VEHICLES];
+    physx::PxU32 num_vehicles_;
 
-    VehicleSceneQueryData* sq_data_;
-
-    PxBatchQuery* sq_wheel_raycast_batch_query_;
-
+    // Cached simulation data of focus vehicle in 4W mode.
+    physx::PxVehicleWheelsSimData* wheels_sim_data_4w_;
+    physx::PxVehicleDriveSimData4W drive_sim_data_4w_;
 
     VehicleWheelQueryResults* wheel_query_results;
 
-    // Cached simulation data of focus vehicle in 4W mode.
-    PxVehicleWheelsSimData* wheels_sim_data_4w_;
-    PxVehicleDriveSimData4W drive_sim_data_4w_;
+    VehicleSceneQueryData* sq_data_;
 
     // Friction from combinations of tire and surface types.
-    PxVehicleDrivableSurfaceToTireFrictionPairs* surface_tire_pairs_;
+    physx::PxVehicleDrivableSurfaceToTireFrictionPairs* surface_tire_pairs_;
+
+    AssetManager& asset_manager_;
+    PhysicsSettings& settings_;
 };

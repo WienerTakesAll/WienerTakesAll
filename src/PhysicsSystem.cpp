@@ -18,13 +18,11 @@ using namespace physx;
 
 PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physics_settings)
     : g_foundation_(PxCreateFoundation(PX_FOUNDATION_VERSION, g_allocator_, g_error_callback_))
-    , g_scale_()
     , g_pvd_(PxCreatePvd(*g_foundation_))
     , g_physics_(PxCreatePhysics(PX_PHYSICS_VERSION, *g_foundation_, g_scale_, false, g_pvd_))
     , g_cooking_(PxCreateCooking(PX_PHYSICS_VERSION, *g_foundation_, g_scale_))
     , g_scene_(NULL)
     , sq_wheel_raycast_batch_query_(NULL)
-    , asset_manager_(asset_manager)
     , forward_drive_(0.0f)
     , horizontal_drive_(0.0f)
     , backward_drive_(0.0f)
@@ -32,10 +30,11 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     , num_vehicles_(0)
       // Allocate simulation data so we can switch from 3-wheeled to 4-wheeled cars by switching simulation data.
     , wheels_sim_data_4w_ (PxVehicleWheelsSimData::allocate(4))
-      // Scene query data for to allow raycasts for all suspensions of all vehicles.
-    , sq_data_ (VehicleSceneQueryData::allocate(MAX_NUM_4W_VEHICLES * 4))
       // Data to store reports for each wheel.
     , wheel_query_results (VehicleWheelQueryResults::allocate(MAX_NUM_4W_VEHICLES * 4))
+      // Scene query data for to allow raycasts for all suspensions of all vehicles.
+    , sq_data_ (VehicleSceneQueryData::allocate(MAX_NUM_4W_VEHICLES * 4))
+    , asset_manager_(asset_manager)
     , settings_(physics_settings) {
 
     EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &PhysicsSystem::handle_add_example_ship, this);
