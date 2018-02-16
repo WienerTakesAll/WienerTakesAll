@@ -1,9 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "vehicle/PxVehicleTireFriction.h"
-#include "vehicle/PxVehicleWheels.h"
-
 #include "PhysicsComponent.h" // I have no idea why this is necessary, but it is
 #include "VehicleWheelQueryResults.h"
 

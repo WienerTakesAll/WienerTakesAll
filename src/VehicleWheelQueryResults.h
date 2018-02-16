@@ -4,6 +4,7 @@
 
 using namespace physx;
 
+// results for each wheel
 class VehicleWheelQueryResults {
 public:
     // Allocate a buffer of wheel query results for up to maxNumWheels.
