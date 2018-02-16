@@ -35,16 +35,14 @@ bool TextureAsset::load_texture(const std::string& file_path) {
 
     if (p_format.BytesPerPixel == 4) {
         gl_p_format = GL_RGBA;
-        gl_p_type = GL_UNSIGNED_INT;
+        gl_p_type = GL_UNSIGNED_BYTE;
     } else if (p_format.BytesPerPixel == 3) {
         gl_p_format = GL_RGB;
-        gl_p_type = GL_UNSIGNED_BYTE;
+        gl_p_type = GL_UNSIGNED_INT;
     } else {
         std::cout << "Unkown pixel storage type." << std::endl;
         return false;
     }
-
-
 
     glTexImage2D
     ( GL_TEXTURE_2D, 0, GL_RGB, p_width, p_height

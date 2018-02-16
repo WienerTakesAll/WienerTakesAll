@@ -16,3 +16,4 @@ Event::Event(EventType e_type, T... args)
     : event_type(e_type) {
     event_impl(args...);
 }
+

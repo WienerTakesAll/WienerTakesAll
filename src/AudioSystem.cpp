@@ -74,11 +74,15 @@ bool AudioSystem::load_audio_assets() {
 }
 
 void AudioSystem::handle_keypress_event(const Event& e) {
-    int player_id = e.get_value<int>("player_id", -1);
-    int key = e.get_value<int>("key", -1);
-    int value = e.get_value<int>("value", 0);
 
-    switch (key) {
+    //function calls to get_value: param1= string:name, param2 = bool:crash_on_fail
+    //pair.first == the int, pair.second == bool
+    std::pair<int, bool> player_id = e.get_value<int>("player_id", true);
+    std::pair<int, bool> key = e.get_value<int>("key", true);
+    std::pair<int, bool> value = e.get_value<int>("value", true);
+
+
+    switch (key.first) {
         case SDLK_LEFT:
             play_sound(SoundAsset::BEAT);
             break;

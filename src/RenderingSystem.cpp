@@ -4,50 +4,42 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+namespace {
+    const std::string SHIP_VERTEX_SHADER_PATH = "assets/shaders/SimpleVertexShader.vertexshader";
+    const std::string SHIP_FRAGMENT_SHADER_PATH = "assets/shaders/SimpleFragmentShader.fragmentshader";
+    const std::string SHIP_MESH_PATH = "assets/models/Ship.obj";
+}
+
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager) {
+    window_ = asset_manager.get_window();
+
+
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
 
-    window_ = asset_manager.get_window();
+    EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &RenderingSystem::handle_add_example_ship, this);
+    EventSystem::add_event_handler(EventType::EXAMPLE_SHIP_IDLE_EVENT, &RenderingSystem::handle_example_ship_idle, this);
 }
 
 void RenderingSystem::update() {
-    example_objects_[1].apply_transform(glm::rotate(glm::mat4x4(), 0.01f, glm::vec3(1, 1, 1)));
 }
 
 void RenderingSystem::load(const Event& e) {
     init_window();
-
-    MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/teapot.obj");
-    TextureAsset* texture = asset_manager_.get_texture_asset("assets/textures/default.png");
-    ShaderAsset* shader = asset_manager_.get_shader_asset("assets/shaders/SimpleShader");
-
-    example_objects_.emplace_back();
-    example_objects_[0].set_mesh(mesh);
-    example_objects_[0].set_texture(texture);
-    example_objects_[0].set_shader(shader);
-    example_objects_[0].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(0, -2, 0)));
-    example_objects_[0].apply_transform(glm::scale(glm::mat4x4(), glm::vec3(0.02f, 0.02f, 0.02f)));
-
-    example_objects_.emplace_back();
-    example_objects_[1].set_mesh(mesh);
-    example_objects_[1].set_texture(texture);
-    example_objects_[1].set_shader(shader);
-    example_objects_[1].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(1, 2, 1)));
-    example_objects_[1].apply_transform(glm::scale(glm::mat4x4(), glm::vec3(0.02f, 0.02f, 0.02f)));
-
     setup_cameras();
 }
 
 void RenderingSystem::handle_key_press(const Event& e) {
-    int player_id = e.get_value<int>("player_id", -1);
-    int key = e.get_value<int>("key", -1);
-    // int value = e.get_value<int>("value", 0);
+    //function calls to get_value: param1= string:name, param2 = bool:crash_on_fail
+    //pair.first == the int, pair.second == bool
+    std::pair<int, bool> player_id = e.get_value<int>("player_id", true);
+    std::pair<int, bool> key = e.get_value<int>("key", true);
+    std::pair<int, bool> value = e.get_value<int>("value", true);
 
     glm::mat4 transform;
 
-    switch (key) {
+    switch (key.first) {
         case SDLK_a:
             transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(0, 1, 0));
             break;
@@ -74,24 +66,58 @@ void RenderingSystem::handle_key_press(const Event& e) {
 
 }
 
+void RenderingSystem::handle_add_example_ship(const Event& e) {
+    // Load game object parameters
+    std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
+    assert(object_id.second);
+
+    std::pair<int, bool> x = e.get_value<int>("pos_x", true);
+    assert(x.second);
+
+    std::pair<int, bool> y = e.get_value<int>("pos_y", true);
+    assert(y.second);
+
+    std::pair<int, bool> z = e.get_value<int>("pos_z", true);
+    assert(z.second);
+
+    // Load ship assets
+    example_shader_.load_shader(
+        SHIP_VERTEX_SHADER_PATH,
+        SHIP_FRAGMENT_SHADER_PATH
+    );
+
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(SHIP_MESH_PATH);
+
+    // Store ship
+    example_objects_.emplace_back();
+    example_objects_[object_id.first].set_mesh(mesh);
+    example_objects_[object_id.first].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
+}
+
+void RenderingSystem::handle_example_ship_idle(const Event& e) {
+    // Load game object parameters
+    std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
+    assert(object_id.second && object_id.first < example_objects_.size());
+
+    std::pair<float, bool> rotation_rad = e.get_value<float>("rotation_rad", true);
+
+    example_objects_[object_id.first].apply_transform(glm::rotate(glm::mat4x4(), rotation_rad.first, glm::vec3(1, 1, 1)));
+}
+
 void RenderingSystem::render() {
     start_render();
 
-
-    for (size_t i = 0; i < cameras_.size(); i++) {
-        GLint x = 320 * (i % 2);
-        GLint y = 240 - 240 * (i / 2);
-
-        glViewport(x, y, 320, 240);
-
+    for (auto& camera : cameras_)
+    {
         for (auto& object : example_objects_) {
-            object.render(cameras_[i]);
+            object.render(camera);
         }
     }
 
 
     end_render();
 }
+
 
 bool RenderingSystem::init_window() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);

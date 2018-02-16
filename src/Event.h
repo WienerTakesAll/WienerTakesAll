@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <string>
 
-enum class EventType {LOAD_EVENT, DUMMY_EVENT, KEYPRESS_EVENT, EVENT_COUNT};
+enum class EventType {ADD_EXAMPLE_SHIP_EVENT, EXAMPLE_SHIP_IDLE_EVENT, LOAD_EVENT, DUMMY_EVENT, KEYPRESS_EVENT, EVENT_COUNT};
 
 //For how to handle events, please view EventSystem.h
 class Event {
@@ -31,7 +31,7 @@ public:
     void add_value(std::string name, void* arg);
 
     template<typename T>
-    T get_value(const std::string& name, T otherwise) const;
+    std::pair<T, bool> get_value(const std::string& name, bool crash_on_fail) const;
 
 private:
 

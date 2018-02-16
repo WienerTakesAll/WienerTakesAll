@@ -21,7 +21,7 @@ if [[ "$MACHINE" = "Linux" ]]; then
     fi
 fi
 
-DIR=`pwd`
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 function finish {
     echo "Cleaning up..."
@@ -31,15 +31,17 @@ function finish {
     rm -rf $DIR/SDL2-2.0.7 || true
     rm -rf $DIR/SDL2_mixer-2.0.2 || true
     rm -rf $DIR/SDL2_image-2.0.0 || true
+    rm physx.zip || true
 }
 
 trap finish EXIT
 
-#GLM, ASSIMP, GLEW, libpng
+
+#GLM, ASSIMP, GLEW
 if [[ "$MACHINE" = "Linux" ]]; then
-    apt-get install -y libglm-dev libglew-dev libassimp-dev libpng16-dev libjpeg-dev
+    apt-get install -y libglm-dev libglew-dev libassimp-dev unzip
 elif [[ "$MACHINE" = "Mac" ]]; then
-    brew install glm glew assimp cmake astyle libpng
+    brew install glm glew assimp cmake astyle
 fi
 
 #SDL2.0
@@ -69,4 +71,18 @@ cd SDL2_image-2.0.0
 make -j4
 make install -j4
 cd $DIR
+
+
+
+# Physx
+
+(cd $DIR && \
+    wget http://enochtsang.com:9000/physx.zip && \
+    unzip physx.zip )
+
+if [[ "$MACHINE" = "Linux" ]]; then
+    cp physx/linux64/*.so /usr/local/lib
+elif [[ "$MACHINE" = "Mac" ]]; then
+    cp physx/osx/*.so /usr/local/lib
+fi
 
