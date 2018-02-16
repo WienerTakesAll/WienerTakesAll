@@ -1,5 +1,6 @@
 #pragma once
 
+using namespace physx;
 
 template <bool static_actor>
 PhysicsComponent<static_actor>::PhysicsComponent(unsigned int id)
@@ -48,11 +49,12 @@ physx::PxVehicleDrive4W* PhysicsComponent<static_actor>::get_wheels() {
 }
 
 template <bool static_actor>
-void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::PxCooking* cooking, MeshAsset* mesh) {
-
-
+void PhysicsComponent<static_actor>::set_mesh(
+    physx::PxPhysics* physics,
+    physx::PxCooking* cooking,
+    MeshAsset* mesh
+) {
     physx::PxConvexMeshDesc meshDesc;
-
 
     std::vector<physx::PxVec3> physVerts;
     std::vector<physx::PxU32> physIndices;
@@ -88,7 +90,7 @@ void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::
 
     meshDesc.flags.set(physx::PxConvexFlag::eCOMPUTE_CONVEX);
 
-    bool valid = meshDesc.isValid();
+    assert(meshDesc.isValid());
 
     physx::PxDefaultMemoryOutputStream writeBuffer;
 
@@ -142,8 +144,10 @@ void PhysicsComponent<static_actor>::set_transform(physx::PxTransform& transform
 }
 
 template <bool static_actor>
-void PhysicsComponent<static_actor>::setup_drive_sim(physx::PxVehicleDriveSimData4W& driveSimData, physx::PxVehicleWheelsSimData* wheelsSimData) {
-    using namespace physx;
+void PhysicsComponent<static_actor>::setup_drive_sim(
+    physx::PxVehicleDriveSimData4W& driveSimData,
+    physx::PxVehicleWheelsSimData* wheelsSimData
+) {
     //Diff
     PxVehicleDifferential4WData diff;
     diff.mType = PxVehicleDifferential4WData::eDIFF_TYPE_LS_4WD;

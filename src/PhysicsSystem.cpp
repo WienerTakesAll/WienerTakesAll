@@ -10,7 +10,6 @@
 #include "AssetManager.h"
 #include "PhysicsSystem.h"
 #include "PhysicsSettings.h"
-#include "MeshStuff.h"
 #include "PhysicsSystemUtils.h"
 #include "VehicleWheelQueryResults.h"
 #include "VehicleSceneQueryData.h"
