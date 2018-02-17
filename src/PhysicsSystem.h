@@ -44,11 +44,11 @@ private:
     physx::PxDefaultAllocator g_allocator_;
     physx::PxDefaultErrorCallback g_error_callback_;
     physx::PxFoundation* g_foundation_;
+    physx::PxTolerancesScale g_scale_;
     physx::PxPvd* g_pvd_;
     physx::PxPhysics* g_physics_;
     physx::PxCooking* g_cooking_;
     physx::PxScene* g_scene_;
-    physx::PxTolerancesScale g_scale_;
 
     physx::PxBatchQuery* sq_wheel_raycast_batch_query_;
 
