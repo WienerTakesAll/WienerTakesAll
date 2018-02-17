@@ -2,6 +2,8 @@
 
 #include "EventSystem.h"
 
+class GameObjectCounter;
+
 class GameplaySystem : public EventSystem<GameplaySystem> {
 public:
     GameplaySystem();

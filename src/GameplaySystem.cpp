@@ -41,27 +41,51 @@ void GameplaySystem::handle_load(const Event& e) {
 
 void GameplaySystem::handle_key_press(const Event& e) {
     // Update gameplay during keypress
-    /* UNCOMMENT WHEN READY FOR USE
-    int player_id = e.get_value<int>("player_id", -1);
-    int key = e.get_value<int>("key", -1);
-    int value = e.get_value<int>("value", 0);
+    int key = e.get_value<int>("key", true).first;
+    int value = e.get_value<int>("value", true).first;
+
+    std::vector<Event> new_events;
 
     switch (key) {
-        case SDLK_LEFT:
+        case SDLK_w:
+            new_events.emplace_back(EventType::CAR_FORWARD_DRIVE, "value", 0.5f);
+            new_events.emplace_back(EventType::CAR_BRAKE, "value", 0.0f);
             break;
 
-        case SDLK_RIGHT:
+        case SDLK_s:
+            new_events.emplace_back(EventType::CAR_FORWARD_DRIVE, "value", 0.0f);
+            new_events.emplace_back(EventType::CAR_BRAKE, "value", 0.5f);
             break;
 
-        case SDLK_UP:
+        case SDLK_a:
+            new_events.emplace_back(EventType::CAR_STEER, "value", 0.5f);
             break;
 
-        case SDLK_DOWN:
+        case SDLK_d:
+            new_events.emplace_back(EventType::CAR_STEER, "value", -0.5f);
+            break;
+
+        case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
+            new_events.emplace_back(EventType::CAR_FORWARD_DRIVE, "value", (float)value / 32768);
+            break;
+
+        case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
+            new_events.emplace_back(EventType::CAR_BRAKE, "value", (float)value / 32768);
+            break;
+
+        case SDL_CONTROLLER_AXIS_LEFTX:
+            new_events.emplace_back(EventType::CAR_STEER, "value", (float)value / -32768);
+            break;
+
+        case SDL_CONTROLLER_BUTTON_B:
+            new_events.emplace_back(EventType::CAR_HAND_BRAKE, "value", true);
             break;
 
         default:
-            break;
+            return;
     }
-    */
-    // std::cout << "[Test] Gameplay handled keypress" << std::endl; // Remove when function is implemented
+
+    for(const auto& event : new_events) {
+        EventSystem::queue_event(Event(event));
+    }
 }

@@ -11,7 +11,13 @@ enum class EventType {
     DUMMY_EVENT,
     OBJECT_TRANSFORM_EVENT,
     KEYPRESS_EVENT,
-    EVENT_COUNT
+    EVENT_COUNT,
+
+    // Car control events
+    CAR_FORWARD_DRIVE,
+    CAR_BRAKE,
+    CAR_HAND_BRAKE,
+    CAR_STEER
 };
 
 //For how to handle events, please view EventSystem.h
@@ -28,6 +34,7 @@ public:
         union ValueType {
             int         int_type;
             float       float_type;
+            bool        bool_type;
             //void*       pointer_type; Perhaps?
         };
         ValueType value;

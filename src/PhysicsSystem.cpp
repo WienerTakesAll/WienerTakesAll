@@ -38,7 +38,10 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
 
     EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &PhysicsSystem::handle_add_example_ship, this);
     EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &PhysicsSystem::handle_add_terrain, this);
-    EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &PhysicsSystem::handle_key_press, this);
+    EventSystem::add_event_handler(EventType::CAR_FORWARD_DRIVE, &PhysicsSystem::handle_car_forward_drive, this);
+    EventSystem::add_event_handler(EventType::CAR_BRAKE, &PhysicsSystem::handle_car_brake, this);
+    EventSystem::add_event_handler(EventType::CAR_HAND_BRAKE, &PhysicsSystem::handle_car_hand_brake, this);
+    EventSystem::add_event_handler(EventType::CAR_STEER, &PhysicsSystem::handle_car_steer, this);
 
     // Setup Visual Debugger
     PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
@@ -239,48 +242,20 @@ void PhysicsSystem::handle_add_terrain(const Event& e) {
     g_scene_->addActor(*static_objects_.back().get_actor());
 }
 
-void PhysicsSystem::handle_key_press(const Event& e) {
-    // int player_id = e.get_value<int>("player_id", true).first;
-    int key = e.get_value<int>("key", true).first;
-    int value = e.get_value<int>("value", true).first;
+void PhysicsSystem::handle_car_forward_drive(const Event& e) {
+    forward_drive_ = e.get_value<float>("value", true).first;
+}
 
-    switch (key) {
-        case SDLK_w:
-            forward_drive_ = 0.5f;
-            braking_force_ = 0.0f;
-            break;
+void PhysicsSystem::handle_car_brake(const Event& e) {
+    braking_force_ = e.get_value<float>("value", true).first;
+}
 
-        case SDLK_s:
-            forward_drive_ = 0.0f;
-            braking_force_ = 0.5f;
-            break;
+void PhysicsSystem::handle_car_hand_brake(const Event& e) {
+    hand_break_ = e.get_value<bool>("value", true).first;
+}
 
-        case SDLK_a:
-            horizontal_drive_ = 0.5f;
-            break;
-
-        case SDLK_d:
-            horizontal_drive_ = -0.5f;
-            break;
-
-        case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-            forward_drive_ = (float)value / 32768;
-            break;
-
-        case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
-            braking_force_ = (float)value / 32768;
-            break;
-
-        case SDL_CONTROLLER_AXIS_LEFTX:
-            horizontal_drive_ = (float)value / -32768;
-            break;
-
-        case SDL_CONTROLLER_BUTTON_B:
-            hand_break_ = true;
-
-        default:
-            break;
-    }
+void PhysicsSystem::handle_car_steer(const Event& e) {
+    horizontal_drive_ = e.get_value<float>("value", true).first;
 }
 
 void PhysicsSystem::create_4w_vehicle (
