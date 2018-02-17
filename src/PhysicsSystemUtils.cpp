@@ -351,7 +351,7 @@ PxConvexMesh* create_convex_mesh(
 
     if (cooking.cookConvexMesh(convex_desc, buf)) {
         PxDefaultMemoryInputData id(buf.getData(), buf.getSize());
-        convex_mesh = physics.createConvexMesh(id);
+        convex_mesh = physics.create_convex_mesh(id);
     }
 
     return convex_mesh;

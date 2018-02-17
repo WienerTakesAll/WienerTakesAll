@@ -106,7 +106,7 @@ void PhysicsComponent<static_actor>::set_mesh(
 
 
     physx::PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
-    g_mesh_ = physics->createConvexMesh(readBuffer);
+    g_mesh_ = physics->create_convex_mesh(readBuffer);
 
     physx::PxTransform physTransform(0, 0, 0);
     g_material_ = physics->createMaterial(5.f, 5.f, 5.f);
