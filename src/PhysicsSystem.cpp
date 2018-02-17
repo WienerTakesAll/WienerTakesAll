@@ -229,7 +229,7 @@ void PhysicsSystem::handle_add_example_ship(const Event& e) {
 void PhysicsSystem::handle_add_terrain(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
 
-    MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/Terrain.obj");
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(settings_.arena_mesh);
 
     static_objects_.emplace_back(object_id);
     static_objects_.back().set_mesh(g_physics_, g_cooking_, mesh);

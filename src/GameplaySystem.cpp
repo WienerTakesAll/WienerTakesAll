@@ -12,13 +12,6 @@ GameplaySystem::GameplaySystem() {
 
 void GameplaySystem::update() {
     // Update game state here
-    EventSystem::queue_event (
-        Event (
-            EventType::EXAMPLE_SHIP_IDLE_EVENT,
-            "object_id", 1,
-            "rotation_rad", 0.01f
-        )
-    );
 }
 
 void GameplaySystem::handle_load(const Event& e) {

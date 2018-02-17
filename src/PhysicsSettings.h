@@ -15,4 +15,5 @@ public:
     physx::PxFixedSizeLookupTable<8> g_steer_vs_forward_speed_table;
     std::string ship_mesh_asset_path;
     float ship_mass;
+    std::string arena_mesh;
 };
