@@ -10,4 +10,5 @@ public:
 private:
     void handle_load(const Event& e);
     void handle_key_press(const Event& e);
+    GameObjectCounter* gameobject_counter_;
 };
