@@ -170,9 +170,6 @@ void PhysicsSystem::update() {
 }
 
 void PhysicsSystem::handle_add_example_ship(const Event& e) {
-    if (num_vehicles_) {
-        return;
-    }
 
     int object_id = e.get_value<int>("object_id", true).first;
     physx::PxTransform transform(0.f, 0.f, 0.f);

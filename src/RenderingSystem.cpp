@@ -18,7 +18,6 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
     EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &RenderingSystem::handle_add_example_ship, this);
     EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &RenderingSystem::handle_add_terrain, this);
-    EventSystem::add_event_handler(EventType::EXAMPLE_SHIP_IDLE_EVENT, &RenderingSystem::handle_example_ship_idle, this);
     EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
 }
 
@@ -103,16 +102,6 @@ void RenderingSystem::handle_add_terrain(const Event& e) {
     // Store terrain
     example_objects_.emplace_back();
     example_objects_[object_id].set_mesh(mesh);
-}
-
-void RenderingSystem::handle_example_ship_idle(const Event& e) {
-    // Load game object parameters
-    std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
-    assert(object_id.second && object_id.first < (int)example_objects_.size());
-
-    std::pair<float, bool> rotation_rad = e.get_value<float>("rotation_rad", true);
-
-    example_objects_[object_id.first].apply_transform(glm::rotate(glm::mat4x4(), rotation_rad.first, glm::vec3(1, 1, 1)));
 }
 
 void RenderingSystem::handle_object_transform(const Event& e) {
