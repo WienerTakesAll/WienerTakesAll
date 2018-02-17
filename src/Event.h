@@ -11,13 +11,15 @@ enum class EventType {
     DUMMY_EVENT,
     OBJECT_TRANSFORM_EVENT,
     KEYPRESS_EVENT,
-    EVENT_COUNT,
 
     // Car control events
     CAR_FORWARD_DRIVE,
     CAR_BRAKE,
     CAR_HAND_BRAKE,
-    CAR_STEER
+    CAR_STEER,
+
+    // Keep at end of list
+    EVENT_COUNT
 };
 
 //For how to handle events, please view EventSystem.h
