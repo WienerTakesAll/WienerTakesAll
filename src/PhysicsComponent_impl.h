@@ -1,11 +1,14 @@
 #pragma once
 
+#include <assert.h>
+
+using namespace physx;
 
 template <bool static_actor>
 PhysicsComponent<static_actor>::PhysicsComponent(unsigned int id)
     : valid_(false)
     , id_(id)
-    , gActor_(nullptr) {
+    , g_actor_(nullptr) {
 }
 
 template <bool static_actor>
@@ -24,35 +27,36 @@ unsigned int PhysicsComponent<static_actor>::get_id() {
 
 template <bool static_actor>
 auto PhysicsComponent<static_actor>::get_actor() {
-    return gActor_;
+    return g_actor_;
 }
 
 template <bool static_actor>
 void PhysicsComponent<static_actor>::set_actor(physx::PxRigidDynamic* actor) {
-    gActor_ = actor;
+    g_actor_ = actor;
 }
 
 template <bool static_actor>
 physx::PxMaterial* PhysicsComponent<static_actor>::get_material() {
-    return gMaterial_;
+    return g_material_;
 }
 
 template <bool static_actor>
 physx::PxConvexMesh* PhysicsComponent<static_actor>::get_mesh() {
-    return gMesh_;
+    return g_mesh_;
 }
 
 template <bool static_actor>
 physx::PxVehicleDrive4W* PhysicsComponent<static_actor>::get_wheels() {
-    return gDrive4W_;
+    return g_drive_4w_;
 }
 
 template <bool static_actor>
-void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::PxCooking* cooking, MeshAsset* mesh) {
-
-
+void PhysicsComponent<static_actor>::set_mesh(
+    physx::PxPhysics* physics,
+    physx::PxCooking* cooking,
+    MeshAsset* mesh
+) {
     physx::PxConvexMeshDesc meshDesc;
-
 
     std::vector<physx::PxVec3> physVerts;
     std::vector<physx::PxU32> physIndices;
@@ -88,11 +92,9 @@ void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::
 
     meshDesc.flags.set(physx::PxConvexFlag::eCOMPUTE_CONVEX);
 
-    bool valid = meshDesc.isValid();
+    assert(meshDesc.isValid());
 
     physx::PxDefaultMemoryOutputStream writeBuffer;
-
-    physx::PxHullPolygon* meshPolygon = nullptr;
 
     bool status = cooking->cookConvexMesh(meshDesc, writeBuffer);
 
@@ -102,33 +104,33 @@ void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::
 
 
     physx::PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
-    gMesh_ = physics->createConvexMesh(readBuffer);
+    g_mesh_ = physics->create_convex_mesh(readBuffer);
 
     physx::PxTransform physTransform(0, 0, 0);
-    gMaterial_ = physics->createMaterial(5.f, 5.f, 5.f);
+    g_material_ = physics->createMaterial(5.f, 5.f, 5.f);
 
-    gMeshGeometry_ = new physx::PxConvexMeshGeometry(gMesh_);
+    g_mesh_geometry_ = new physx::PxConvexMeshGeometry(g_mesh_);
 
-    gMeshShape_ = physics->createShape(*gMeshGeometry_, *gMaterial_, true);
-    createActor(physics, physTransform, gMeshShape_, 1.0f);
+    g_mesh_shape_ = physics->createShape(*g_mesh_geometry_, *g_material_, true);
+    createActor(physics, physTransform, g_mesh_shape_, 1.0f);
 
     if (static_actor) {
         physx::PxFilterData filterData;
         filterData.word3 = SAMPLEVEHICLE_DRIVABLE_SURFACE;
-        gMeshShape_->setQueryFilterData(filterData);
+        g_mesh_shape_->setQueryFilterData(filterData);
 
         filterData.word0 = COLLISION_FLAG_GROUND;
         filterData.word1 = COLLISION_FLAG_GROUND_AGAINST;
         filterData.word3 = 0;
 
-        gMeshShape_->setSimulationFilterData(filterData);
+        g_mesh_shape_->setSimulationFilterData(filterData);
     } else {
         physx::PxFilterData filterData;
         filterData.word0 = COLLISION_FLAG_WHEEL;
         filterData.word1 = COLLISION_FLAG_WHEEL_AGAINST;
         filterData.word3 = SAMPLEVEHICLE_UNDRIVABLE_SURFACE;
-        gMeshShape_->setQueryFilterData(filterData);
-        gMeshShape_->setSimulationFilterData(filterData);
+        g_mesh_shape_->setQueryFilterData(filterData);
+        g_mesh_shape_->setSimulationFilterData(filterData);
     }
 
 
@@ -138,12 +140,14 @@ void PhysicsComponent<static_actor>::set_mesh(physx::PxPhysics* physics, physx::
 template <bool static_actor>
 void PhysicsComponent<static_actor>::set_transform(physx::PxTransform& transform) {
     static_assert(!static_actor, "Cannot set transform of a static actor");
-    gActor_->setGlobalPose(transform);
+    g_actor_->setGlobalPose(transform);
 }
 
 template <bool static_actor>
-void PhysicsComponent<static_actor>::setup_drive_sim(physx::PxVehicleDriveSimData4W& driveSimData, physx::PxVehicleWheelsSimData* wheelsSimData) {
-    using namespace physx;
+void PhysicsComponent<static_actor>::setup_drive_sim(
+    physx::PxVehicleDriveSimData4W& driveSimData,
+    physx::PxVehicleWheelsSimData* wheelsSimData
+) {
     //Diff
     PxVehicleDifferential4WData diff;
     diff.mType = PxVehicleDifferential4WData::eDIFF_TYPE_LS_4WD;
