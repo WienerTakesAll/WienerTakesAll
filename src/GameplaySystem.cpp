@@ -6,7 +6,7 @@
 #include "SDL.h"
 
 GameplaySystem::GameplaySystem()
-: gameobject_counter_(GameObjectCounter::get_instance()) {
+    : gameobject_counter_(GameObjectCounter::get_instance()) {
     add_event_handler(EventType::LOAD_EVENT, &GameplaySystem::handle_load, this);
     add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
 }
@@ -85,7 +85,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
             return;
     }
 
-    for(const auto& event : new_events) {
+    for (const auto& event : new_events) {
         EventSystem::queue_event(Event(event));
     }
 }

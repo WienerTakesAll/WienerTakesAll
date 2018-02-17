@@ -89,20 +89,20 @@ PxRigidDynamic* create_4w_vehicle_actor(
 
     // Set up the physx rigid body actor with shapes, local poses, and filters.
     setup_actor(
-		vehicle_actor,
-		vehicle_qry_filter_data,
-		wheel_geometries,
+        vehicle_actor,
+        vehicle_qry_filter_data,
+        wheel_geometries,
         wheel_local_poses,
         4,
         &wheel_material,
         wheel_coll_filter_data,
-		chassis_geoms,
+        chassis_geoms,
         chassis_local_poses,
         1,
         &chassis_material,
         chassis_coll_filter_data,
-		chassis_data,
-		&physics);
+        chassis_data,
+        &physics);
 
     return vehicle_actor;
 }
@@ -155,7 +155,7 @@ PxVec3 compute_chassis_aabb_dimensions(const PxConvexMesh* chassis_convex_mesh) 
 
 void create_4w_vehicle_simulation_data(
     const PxF32 chassis_mass,
-	PxConvexMesh* chassis_convex_mesh,
+    PxConvexMesh* chassis_convex_mesh,
     const PxF32 wheel_mass,
     PxConvexMesh** wheel_convex_meshes,
     const PxVec3* wheel_centre_offsets,
@@ -351,7 +351,7 @@ PxConvexMesh* create_convex_mesh(
 
     if (cooking.cookConvexMesh(convex_desc, buf)) {
         PxDefaultMemoryInputData id(buf.getData(), buf.getSize());
-        convex_mesh = physics.create_convex_mesh(id);
+        convex_mesh = physics.createConvexMesh(id);
     }
 
     return convex_mesh;
