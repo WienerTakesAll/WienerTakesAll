@@ -4,7 +4,7 @@
 
 using namespace physx;
 
-// sdk raycasts (for the suspension lines).
+// sdk raycasts (for the suspension lines
 class VehicleSceneQueryData {
 public:
     // Allocate scene query data for up to maxNumWheels suspension raycasts.

@@ -110,14 +110,14 @@ private:
     bool valid_;
     unsigned int id_;
 
-    physx::PxMaterial* gMaterial_;
-    physx::PxConvexMesh* gMesh_;
-    physx::PxConvexMeshGeometry* gMeshGeometry_;
-    physx::PxShape* gMeshShape_;
-    PxActorType* gActor_;
+    physx::PxMaterial* g_material_;
+    physx::PxConvexMesh* g_mesh_;
+    physx::PxConvexMeshGeometry* g_mesh_geometry_;
+    physx::PxShape* g_mesh_shape_;
+    PxActorType* g_actor_;
 
     bool is_vehicle_;
-    physx::PxVehicleDrive4W* gDrive4W_;
+    physx::PxVehicleDrive4W* g_drive_4w_;
 };
 
 #include "PhysicsComponent_impl.h"

@@ -27,9 +27,6 @@ private:
     void handle_key_press(const Event& e);
 
     void create_4w_vehicle(
-        physx::PxScene& scene,
-        physx::PxPhysics& physics,
-        physx::PxCooking& cooking,
         const physx::PxMaterial& material,
         const physx::PxF32 chassisMass,
         const physx::PxVec3* wheelCentreOffsets4,
@@ -50,11 +47,10 @@ private:
     physx::PxCooking* g_cooking_;
     physx::PxScene* g_scene_;
 
-    physx::PxBatchQuery* sq_wheel_raycast_batch_query_;
 
     float forward_drive_;
     float horizontal_drive_;
-    float backward_drive_;
+    float braking_force_;
     bool hand_break_;
 
     // Array of all cars and report data for each car.
@@ -67,8 +63,8 @@ private:
     physx::PxVehicleDriveSimData4W drive_sim_data_4w_;
 
     VehicleWheelQueryResults* wheel_query_results;
-
     VehicleSceneQueryData* sq_data_;
+    physx::PxBatchQuery* sq_wheel_raycast_batch_query_;
 
     // Friction from combinations of tire and surface types.
     physx::PxVehicleDrivableSurfaceToTireFrictionPairs* surface_tire_pairs_;
