@@ -6,9 +6,9 @@
 #include <glm/gtx/quaternion.hpp>
 
 namespace {
-    const std::string SHIP_VERTEX_SHADER_PATH = "assets/shaders/SimpleVertexShader.vertexshader";
-    const std::string SHIP_FRAGMENT_SHADER_PATH = "assets/shaders/SimpleFragmentShader.fragmentshader";
-    const std::string SHIP_MESH_PATH = "assets/models/carBoxModel.obj";
+    const std::string CAR_VERTEX_SHADER_PATH = "assets/shaders/SimpleVertexShader.vertexshader";
+    const std::string CAR_FRAGMENT_SHADER_PATH = "assets/shaders/SimpleFragmentShader.fragmentshader";
+    const std::string CAR_MESH_PATH = "assets/models/carBoxModel.obj";
     const std::string TERRAIN_MESH_PATH = "assets/models/Terrain.obj";
 }
 
@@ -16,7 +16,7 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
-    EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &RenderingSystem::handle_add_example_ship, this);
+    EventSystem::add_event_handler(EventType::ADD_CAR, &RenderingSystem::handle_add_car, this);
     EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &RenderingSystem::handle_add_terrain, this);
     EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
 }
@@ -65,7 +65,7 @@ void RenderingSystem::handle_key_press(const Event& e) {
 
 }
 
-void RenderingSystem::handle_add_example_ship(const Event& e) {
+void RenderingSystem::handle_add_car(const Event& e) {
     // Load game object parameters
     std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
     assert(object_id.second);
@@ -79,15 +79,15 @@ void RenderingSystem::handle_add_example_ship(const Event& e) {
     std::pair<int, bool> z = e.get_value<int>("pos_z", true);
     assert(z.second);
 
-    // Load ship assets
+    // Load car assets
     example_shader_.load_shader(
-        SHIP_VERTEX_SHADER_PATH,
-        SHIP_FRAGMENT_SHADER_PATH
+        CAR_VERTEX_SHADER_PATH,
+        CAR_FRAGMENT_SHADER_PATH
     );
 
-    MeshAsset* mesh = asset_manager_.get_mesh_asset(SHIP_MESH_PATH);
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(CAR_MESH_PATH);
 
-    // Store ship
+    // Store car
     example_objects_.emplace_back();
     example_objects_[object_id.first].set_mesh(mesh);
     example_objects_[object_id.first].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));

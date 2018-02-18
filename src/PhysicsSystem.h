@@ -22,7 +22,7 @@ public:
     void update();
 
 private:
-    void handle_add_example_ship(const Event& e);
+    void handle_add_car(const Event& e);
     void handle_add_terrain(const Event& e);
     void handle_car_control(const Event& e);
 
@@ -33,7 +33,8 @@ private:
         physx::PxConvexMesh* chassisConvexMesh,
         physx::PxConvexMesh** wheelConvexMeshes4,
         const physx::PxTransform& startTransform,
-        const bool useAutoGearFlag);
+        const bool useAutoGearFlag
+    );
 
     std::vector<PhysicsComponent<false>> dynamic_objects_;
     std::vector<PhysicsComponent<true>> static_objects_;

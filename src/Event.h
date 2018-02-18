@@ -5,7 +5,7 @@
 #include <string>
 
 enum class EventType {
-    ADD_EXAMPLE_SHIP_EVENT,
+    ADD_CAR,
     ADD_TERRAIN_EVENT,
     LOAD_EVENT,
     DUMMY_EVENT,

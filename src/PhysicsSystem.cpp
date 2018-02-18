@@ -37,7 +37,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     , asset_manager_(asset_manager)
     , settings_(physics_settings) {
 
-    EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &PhysicsSystem::handle_add_example_ship, this);
+    EventSystem::add_event_handler(EventType::ADD_CAR, &PhysicsSystem::handle_add_car, this);
     EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &PhysicsSystem::handle_add_terrain, this);
     EventSystem::add_event_handler(EventType::CAR_CONTROL, &PhysicsSystem::handle_car_control, this);
 
@@ -170,7 +170,7 @@ void PhysicsSystem::update() {
     }
 }
 
-void PhysicsSystem::handle_add_example_ship(const Event& e) {
+void PhysicsSystem::handle_add_car(const Event& e) {
 
     int object_id = e.get_value<int>("object_id", true).first;
     physx::PxTransform transform(0.f, 0.f, 0.f);
@@ -178,7 +178,7 @@ void PhysicsSystem::handle_add_example_ship(const Event& e) {
     transform.p.x = e.get_value<int>("pos_x", true).first;
     transform.p.y = e.get_value<int>("pos_y", true).first;
     transform.p.z = e.get_value<int>("pos_z", true).first;
-    MeshAsset* mesh = asset_manager_.get_mesh_asset(settings_.ship_mesh_asset_path);
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(settings_.car_mesh_asset_path);
 
     // Construct new PhysicsComponent and add to list
     dynamic_objects_.emplace_back(object_id);
@@ -215,7 +215,7 @@ void PhysicsSystem::handle_add_example_ship(const Event& e) {
 
     create_4w_vehicle(
         *vehicle_material,
-        settings_.ship_mass,
+        settings_.car_mass,
         wheel_center_offsets,
         vehicle_mesh,
         wheel_mesh,

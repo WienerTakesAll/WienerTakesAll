@@ -20,8 +20,7 @@ public:
 private:
     void load(const Event& e);
     void handle_key_press(const Event& e);
-    void handle_add_example_ship(const Event& e);
-    void handle_example_ship_idle(const Event& e);
+    void handle_add_car(const Event& e);
     void handle_add_terrain(const Event& e);
     void handle_object_transform(const Event& e);
 
