@@ -326,9 +326,16 @@ void create_4w_vehicle_simulation_data(
     // Ackermann steer accuracy
     PxVehicleAckermannGeometryData ackermann;
     ackermann.mAccuracy = 1.0f;
-    ackermann.mAxleSeparation = wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].z - wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eREAR_LEFT].z;
-    ackermann.mFrontWidth = wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].x - wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].x;
-    ackermann.mRearWidth = wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].x - wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eREAR_LEFT].x;
+    ackermann.mAxleSeparation =
+        wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].z
+        - wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eREAR_LEFT].z;
+    ackermann.mFrontWidth =
+        wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].x
+        - wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].x;
+    ackermann.mRearWidth =
+        wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].x
+        - wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eREAR_LEFT].x;
+
     drive_data.setAckermannGeometryData(ackermann);
 }
 

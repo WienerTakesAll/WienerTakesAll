@@ -28,32 +28,6 @@ enum {
         COLLISION_FLAG_CHASSIS |
         COLLISION_FLAG_OBSTACLE |
         COLLISION_FLAG_DRIVABLE_OBSTACLE,
-
-    COLLISION_FLAG_OBSTACLE_AGAINST = COLLISION_FLAG_GROUND |
-                                      COLLISION_FLAG_WHEEL |
-                                      COLLISION_FLAG_CHASSIS |
-                                      COLLISION_FLAG_OBSTACLE |
-                                      COLLISION_FLAG_DRIVABLE_OBSTACLE,
-
-    COLLISION_FLAG_DRIVABLE_OBSTACLE_AGAINST =
-        COLLISION_FLAG_GROUND |
-        COLLISION_FLAG_CHASSIS |
-        COLLISION_FLAG_OBSTACLE |
-        COLLISION_FLAG_DRIVABLE_OBSTACLE,
-};
-
-//Id of drivable surface (used by suspension raycast filtering).
-enum {
-    DRIVABLE_SURFACE_ID = 0xffffffff
-};
-
-//Drivable surface types.
-enum {
-    SURFACE_TYPE_MUD = 0,
-    SURFACE_TYPE_TARMAC,
-    SURFACE_TYPE_SNOW,
-    SURFACE_TYPE_GRASS,
-    MAX_NUM_SURFACE_TYPES
 };
 
 //Tire types.

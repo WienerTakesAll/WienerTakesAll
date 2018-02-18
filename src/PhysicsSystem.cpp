@@ -262,7 +262,7 @@ void PhysicsSystem::handle_car_control(const Event& e) {
 }
 
 void PhysicsSystem::create_4w_vehicle (
-    const PxMaterial& vehicle_material,
+    const PxMaterial& material,
     const PxF32 chassis_mass,
     const PxVec3* wheel_centre_offsets4,
     PxConvexMesh* chassis_convex_mesh,
@@ -292,7 +292,7 @@ void PhysicsSystem::create_4w_vehicle (
             chassis_convex_mesh,
             *g_scene_,
             *g_physics_,
-            vehicle_material
+            material
         );
 
     // Create a car.
@@ -302,7 +302,7 @@ void PhysicsSystem::create_4w_vehicle (
     // Free the sim data because we don't need that any more.
     wheels_sim_data->free();
 
-    // Don't forget to add the actor to the scene.
+    // Don't forget to add the actor to the scenxe.
     {
         PxSceneWriteLock scoped_lock(*g_scene_);
         g_scene_->addActor(*vehicle_actor);
