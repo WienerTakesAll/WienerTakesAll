@@ -98,7 +98,7 @@ public:
         MeshAsset* mesh);
     void set_transform(physx::PxTransform& transform);
 private:
-    void createActor(
+    void create_actor(
         physx::PxPhysics* physics,
         physx::PxTransform& transform,
         physx::PxShape* shape,

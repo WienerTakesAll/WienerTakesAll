@@ -1,7 +1,7 @@
 #include "PhysicsComponent.h"
 
 template <>
-void PhysicsComponent<true>::createActor(
+void PhysicsComponent<true>::create_actor(
     physx::PxPhysics* physics,
     physx::PxTransform& transform,
     physx::PxShape* shape, physx::PxReal density
@@ -10,7 +10,7 @@ void PhysicsComponent<true>::createActor(
 }
 
 template <>
-void PhysicsComponent<false>::createActor(
+void PhysicsComponent<false>::create_actor(
     physx::PxPhysics* physics,
     physx::PxTransform& transform,
     physx::PxShape* shape,

@@ -58,10 +58,10 @@ void PhysicsComponent<static_actor>::set_mesh(
     physx::PxCooking* cooking,
     MeshAsset* mesh
 ) {
-    physx::PxConvexMeshDesc meshDesc;
+    physx::PxConvexMeshDesc mesh_desc;
 
-    std::vector<physx::PxVec3> physVerts;
-    std::vector<physx::PxU32> physIndices;
+    std::vector<physx::PxVec3> phys_verts;
+    std::vector<physx::PxU32> phys_indices;
 
     for (auto& mesh_data : mesh->meshes_) {
         for (auto& vert : mesh_data.vertices_) {
@@ -71,7 +71,7 @@ void PhysicsComponent<static_actor>::set_mesh(
             point.y = vert.position_[1];
             point.z = vert.position_[2];
 
-            physVerts.push_back(point);
+            phys_verts.push_back(point);
         }
     }
 
@@ -81,58 +81,54 @@ void PhysicsComponent<static_actor>::set_mesh(
 
             index = ind;
 
-            physIndices.push_back(index);
+            phys_indices.push_back(index);
         }
     }
 
+    mesh_desc.points.count = phys_verts.size();
+    mesh_desc.points.data = &phys_verts.front();
+    mesh_desc.points.stride = sizeof(physx::PxVec3);
 
+    mesh_desc.flags.set(physx::PxConvexFlag::eCOMPUTE_CONVEX);
 
+    assert(mesh_desc.isValid());
 
-    meshDesc.points.count = physVerts.size();
-    meshDesc.points.data = &physVerts.front();
-    meshDesc.points.stride = sizeof(physx::PxVec3);
+    physx::PxDefaultMemoryOutputStream write_buffer;
 
-    meshDesc.flags.set(physx::PxConvexFlag::eCOMPUTE_CONVEX);
-
-    assert(meshDesc.isValid());
-
-    physx::PxDefaultMemoryOutputStream writeBuffer;
-
-    bool status = cooking->cookConvexMesh(meshDesc, writeBuffer);
+    bool status = cooking->cookConvexMesh(mesh_desc, write_buffer);
 
     if (!status) {
         return;
     }
 
+    physx::PxDefaultMemoryInputData read_buffer(write_buffer.getData(), write_buffer.getSize());
+    g_mesh_ = physics->createConvexMesh(read_buffer);
 
-    physx::PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
-    g_mesh_ = physics->createConvexMesh(readBuffer);
-
-    physx::PxTransform physTransform(0, 0, 0);
+    physx::PxTransform phys_transform(0, 0, 0);
     g_material_ = physics->createMaterial(5.f, 5.f, 5.f);
 
     g_mesh_geometry_ = new physx::PxConvexMeshGeometry(g_mesh_);
 
     g_mesh_shape_ = physics->createShape(*g_mesh_geometry_, *g_material_, true);
-    createActor(physics, physTransform, g_mesh_shape_, 1.0f);
+    create_actor(physics, phys_transform, g_mesh_shape_, 1.0f);
 
     if (static_actor) {
-        physx::PxFilterData filterData;
-        filterData.word3 = SAMPLEVEHICLE_DRIVABLE_SURFACE;
-        g_mesh_shape_->setQueryFilterData(filterData);
+        physx::PxFilterData filter_data;
+        filter_data.word3 = SAMPLEVEHICLE_DRIVABLE_SURFACE;
+        g_mesh_shape_->setQueryFilterData(filter_data);
 
-        filterData.word0 = COLLISION_FLAG_GROUND;
-        filterData.word1 = COLLISION_FLAG_GROUND_AGAINST;
-        filterData.word3 = 0;
+        filter_data.word0 = COLLISION_FLAG_GROUND;
+        filter_data.word1 = COLLISION_FLAG_GROUND_AGAINST;
+        filter_data.word3 = 0;
 
-        g_mesh_shape_->setSimulationFilterData(filterData);
+        g_mesh_shape_->setSimulationFilterData(filter_data);
     } else {
-        physx::PxFilterData filterData;
-        filterData.word0 = COLLISION_FLAG_WHEEL;
-        filterData.word1 = COLLISION_FLAG_WHEEL_AGAINST;
-        filterData.word3 = SAMPLEVEHICLE_UNDRIVABLE_SURFACE;
-        g_mesh_shape_->setQueryFilterData(filterData);
-        g_mesh_shape_->setSimulationFilterData(filterData);
+        physx::PxFilterData filter_data;
+        filter_data.word0 = COLLISION_FLAG_WHEEL;
+        filter_data.word1 = COLLISION_FLAG_WHEEL_AGAINST;
+        filter_data.word3 = SAMPLEVEHICLE_UNDRIVABLE_SURFACE;
+        g_mesh_shape_->setQueryFilterData(filter_data);
+        g_mesh_shape_->setSimulationFilterData(filter_data);
     }
 
 
@@ -147,41 +143,41 @@ void PhysicsComponent<static_actor>::set_transform(physx::PxTransform& transform
 
 template <bool static_actor>
 void PhysicsComponent<static_actor>::setup_drive_sim(
-    physx::PxVehicleDriveSimData4W& driveSimData,
-    physx::PxVehicleWheelsSimData* wheelsSimData
+    physx::PxVehicleDriveSimData4W& drive_sim_data,
+    physx::PxVehicleWheelsSimData* wheels_sim_data
 ) {
     //Diff
     PxVehicleDifferential4WData diff;
     diff.mType = PxVehicleDifferential4WData::eDIFF_TYPE_LS_4WD;
-    driveSimData.setDiffData(diff);
+    drive_sim_data.setDiffData(diff);
 
     //Engine
     PxVehicleEngineData engine;
     engine.mPeakTorque = 500.0f;
     engine.mMaxOmega = 600.0f;//approx 6000 rpm
-    driveSimData.setEngineData(engine);
+    drive_sim_data.setEngineData(engine);
 
     //Gears
     PxVehicleGearsData gears;
     gears.mSwitchTime = 0.5f;
-    driveSimData.setGearsData(gears);
+    drive_sim_data.setGearsData(gears);
 
     //Clutch
     PxVehicleClutchData clutch;
     clutch.mStrength = 10.0f;
-    driveSimData.setClutchData(clutch);
+    drive_sim_data.setClutchData(clutch);
 
     //Ackermann steer accuracy
     PxVehicleAckermannGeometryData ackermann;
     ackermann.mAccuracy = 1.0f;
     ackermann.mAxleSeparation =
-        wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eREAR_LEFT).z -
-        wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_LEFT).z;
+        wheels_sim_data->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eREAR_LEFT).z -
+        wheels_sim_data->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_LEFT).z;
     ackermann.mFrontWidth =
-        wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_RIGHT).x -
-        wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_LEFT).x;
+        wheels_sim_data->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_RIGHT).x -
+        wheels_sim_data->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_LEFT).x;
     ackermann.mRearWidth =
-        wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eREAR_RIGHT).x -
-        wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eREAR_LEFT).x;
-    driveSimData.setAckermannGeometryData(ackermann);
+        wheels_sim_data->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eREAR_RIGHT).x -
+        wheels_sim_data->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eREAR_LEFT).x;
+    drive_sim_data.setAckermannGeometryData(ackermann);
 }

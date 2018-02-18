@@ -171,6 +171,7 @@ void PhysicsSystem::update() {
 }
 
 void PhysicsSystem::handle_add_car(const Event& e) {
+    PX_ASSERT(num_vehicles_ < MAX_NUM_4W_VEHICLES);
 
     int object_id = e.get_value<int>("object_id", true).first;
     physx::PxTransform transform(0.f, 0.f, 0.f);
@@ -182,7 +183,7 @@ void PhysicsSystem::handle_add_car(const Event& e) {
 
     // Construct new PhysicsComponent and add to list
     dynamic_objects_.emplace_back(object_id);
-    auto& vehicle = dynamic_objects_.back();
+    PhysicsComponent<false>& vehicle = dynamic_objects_.back();
     vehicle.set_mesh(g_physics_, g_cooking_, mesh);
 
     auto vehicle_material = vehicle.get_material();
@@ -261,7 +262,7 @@ void PhysicsSystem::handle_car_control(const Event& e) {
 }
 
 void PhysicsSystem::create_4w_vehicle (
-    const PxMaterial& material,
+    const PxMaterial& vehicle_material,
     const PxF32 chassis_mass,
     const PxVec3* wheel_centre_offsets4,
     PxConvexMesh* chassis_convex_mesh,
@@ -269,8 +270,6 @@ void PhysicsSystem::create_4w_vehicle (
     const PxTransform& start_transform,
     const bool use_auto_gear_flag
 ) {
-    PX_ASSERT(num_vehicles_ < MAX_NUM_4W_VEHICLES);
-
     PxVehicleWheelsSimData* wheels_sim_data = PxVehicleWheelsSimData::allocate(4);
     PxVehicleDriveSimData4W drive_sim_data;
     PxVehicleChassisData chassis_data;
@@ -282,7 +281,8 @@ void PhysicsSystem::create_4w_vehicle (
         wheel_centre_offsets4,
         *wheels_sim_data,
         drive_sim_data,
-        chassis_data);
+        chassis_data
+    );
 
     // Instantiate and finalize the vehicle using physx.
     PxRigidDynamic* vehicle_actor =
@@ -292,7 +292,7 @@ void PhysicsSystem::create_4w_vehicle (
             chassis_convex_mesh,
             *g_scene_,
             *g_physics_,
-            material
+            vehicle_material
         );
 
     // Create a car.
@@ -302,7 +302,7 @@ void PhysicsSystem::create_4w_vehicle (
     // Free the sim data because we don't need that any more.
     wheels_sim_data->free();
 
-    // Don't forget to add the actor to the scenxe.
+    // Don't forget to add the actor to the scene.
     {
         PxSceneWriteLock scoped_lock(*g_scene_);
         g_scene_->addActor(*vehicle_actor);
