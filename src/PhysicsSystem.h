@@ -24,11 +24,7 @@ public:
 private:
     void handle_add_example_ship(const Event& e);
     void handle_add_terrain(const Event& e);
-    void handle_car_forward_drive(const Event& e);
-    void handle_car_brake(const Event& e);
-    void handle_car_hand_brake(const Event& e);
-    void handle_car_steer(const Event& e);
-
+    void handle_car_control(const Event& e);
 
     void create_4w_vehicle(
         const physx::PxMaterial& material,

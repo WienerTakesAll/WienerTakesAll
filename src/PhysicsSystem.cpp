@@ -13,6 +13,7 @@
 #include "PhysicsSystemUtils.h"
 #include "VehicleWheelQueryResults.h"
 #include "VehicleSceneQueryData.h"
+#include "CarControlType.h"
 
 PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physics_settings)
     : g_foundation_(PxCreateFoundation(PX_FOUNDATION_VERSION, g_allocator_, g_error_callback_))
@@ -38,10 +39,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
 
     EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &PhysicsSystem::handle_add_example_ship, this);
     EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &PhysicsSystem::handle_add_terrain, this);
-    EventSystem::add_event_handler(EventType::CAR_FORWARD_DRIVE, &PhysicsSystem::handle_car_forward_drive, this);
-    EventSystem::add_event_handler(EventType::CAR_BRAKE, &PhysicsSystem::handle_car_brake, this);
-    EventSystem::add_event_handler(EventType::CAR_HAND_BRAKE, &PhysicsSystem::handle_car_hand_brake, this);
-    EventSystem::add_event_handler(EventType::CAR_STEER, &PhysicsSystem::handle_car_steer, this);
+    EventSystem::add_event_handler(EventType::CAR_CONTROL, &PhysicsSystem::handle_car_control, this);
 
     // Setup Visual Debugger
     PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
@@ -242,20 +240,24 @@ void PhysicsSystem::handle_add_terrain(const Event& e) {
     g_scene_->addActor(*static_objects_.back().get_actor());
 }
 
-void PhysicsSystem::handle_car_forward_drive(const Event& e) {
-    forward_drive_ = e.get_value<float>("value", true).first;
-}
+void PhysicsSystem::handle_car_control(const Event& e) {
+    switch (e.get_value<int>("type", true).first) {
+        case CarControlType::FORWARD_DRIVE:
+            forward_drive_ = e.get_value<float>("value", true).first;
+            break;
 
-void PhysicsSystem::handle_car_brake(const Event& e) {
-    braking_force_ = e.get_value<float>("value", true).first;
-}
+        case CarControlType::BRAKE:
+            braking_force_ = e.get_value<float>("value", true).first;
+            break;
 
-void PhysicsSystem::handle_car_hand_brake(const Event& e) {
-    hand_break_ = e.get_value<bool>("value", true).first;
-}
+        case CarControlType::STEER:
+            horizontal_drive_ = e.get_value<float>("value", true).first;
+            break;
 
-void PhysicsSystem::handle_car_steer(const Event& e) {
-    horizontal_drive_ = e.get_value<float>("value", true).first;
+        case CarControlType::HAND_BRAKE:
+            hand_break_ = e.get_value<float>("value", true).first;
+            break;
+    }
 }
 
 void PhysicsSystem::create_4w_vehicle (

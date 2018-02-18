@@ -1,9 +1,10 @@
 #include <iostream>
 
+#include "SDL.h"
+
 #include "GameObjectCounter.h"
 #include "GameplaySystem.h"
-
-#include "SDL.h"
+#include "CarControlType.h"
 
 GameplaySystem::GameplaySystem()
     : gameobject_counter_(GameObjectCounter::get_instance()) {
@@ -48,37 +49,57 @@ void GameplaySystem::handle_key_press(const Event& e) {
 
     switch (key) {
         case SDLK_w:
-            new_events.emplace_back(EventType::CAR_FORWARD_DRIVE, "value", 0.5f);
-            new_events.emplace_back(EventType::CAR_BRAKE, "value", 0.0f);
+            new_events.emplace_back(EventType::CAR_CONTROL,
+                                    "type", CarControlType::FORWARD_DRIVE,
+                                    "value", 0.5f);
+            new_events.emplace_back(EventType::CAR_CONTROL,
+                                    "type", CarControlType::BRAKE,
+                                    "value", 0.0f);
             break;
 
         case SDLK_s:
-            new_events.emplace_back(EventType::CAR_FORWARD_DRIVE, "value", 0.0f);
-            new_events.emplace_back(EventType::CAR_BRAKE, "value", 0.5f);
+            new_events.emplace_back(EventType::CAR_CONTROL,
+                                    "type", CarControlType::FORWARD_DRIVE,
+                                    "value", 0.0f);
+            new_events.emplace_back(EventType::CAR_CONTROL,
+                                    "type", CarControlType::BRAKE,
+                                    "value", 0.5f);
             break;
 
         case SDLK_a:
-            new_events.emplace_back(EventType::CAR_STEER, "value", 0.5f);
+            new_events.emplace_back(EventType::CAR_CONTROL,
+                                    "type", CarControlType::STEER,
+                                    "value", 0.5f);
             break;
 
         case SDLK_d:
-            new_events.emplace_back(EventType::CAR_STEER, "value", -0.5f);
+            new_events.emplace_back(EventType::CAR_CONTROL,
+                                    "type", CarControlType::STEER,
+                                    "value", -0.5f);
             break;
 
         case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-            new_events.emplace_back(EventType::CAR_FORWARD_DRIVE, "value", (float)value / 32768);
+            new_events.emplace_back(EventType::CAR_CONTROL,
+                                    "type", CarControlType::FORWARD_DRIVE,
+                                    "value", (float)value / 32768);
             break;
 
         case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
-            new_events.emplace_back(EventType::CAR_BRAKE, "value", (float)value / 32768);
+            new_events.emplace_back(EventType::CAR_CONTROL,
+                                    "type", CarControlType::BRAKE,
+                                    "value", (float)value / 32768);
             break;
 
         case SDL_CONTROLLER_AXIS_LEFTX:
-            new_events.emplace_back(EventType::CAR_STEER, "value", (float)value / -32768);
+            new_events.emplace_back(EventType::CAR_CONTROL,
+                                    "type", CarControlType::STEER,
+                                    "value", (float)value / -32768);
             break;
 
         case SDL_CONTROLLER_BUTTON_B:
-            new_events.emplace_back(EventType::CAR_HAND_BRAKE, "value", true);
+            new_events.emplace_back(EventType::CAR_CONTROL,
+                                    "type", CarControlType::HAND_BRAKE,
+                                    "value", true);
             break;
 
         default:

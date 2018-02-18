@@ -13,10 +13,7 @@ enum class EventType {
     KEYPRESS_EVENT,
 
     // Car control events
-    CAR_FORWARD_DRIVE,
-    CAR_BRAKE,
-    CAR_HAND_BRAKE,
-    CAR_STEER,
+    CAR_CONTROL,
 
     // Keep at end of list
     EVENT_COUNT
