@@ -40,6 +40,7 @@ std::pair<std::string, bool> Event::get_value(const std::string& name, bool cras
 
     return std::make_pair(val->second, true);
 }
+
 template<>
 std::pair<int, bool> Event::get_value(const std::string& name, bool crash_on_fail) const {
     const auto val = event_values_.find(name);
@@ -62,6 +63,7 @@ std::pair<int, bool> Event::get_value(const std::string& name, bool crash_on_fai
 
     return std::make_pair(val->second.value.int_type, true);
 }
+
 template<>
 std::pair<float, bool> Event::get_value(const std::string& name, bool crash_on_fail) const {
     const auto val = event_values_.find(name);
@@ -83,4 +85,27 @@ std::pair<float, bool> Event::get_value(const std::string& name, bool crash_on_f
     }
 
     return std::make_pair(val->second.value.float_type, true);
+}
+
+template<>
+std::pair<bool, bool> Event::get_value(const std::string& name, bool crash_on_fail) const {
+    const auto val = event_values_.find(name);
+
+    if (val == event_values_.end()) {    //the case when crash on fail is not true and value is not found
+        assert((!crash_on_fail));       //if the value is not found and crash_on_fail is true crash the program
+
+        std::cerr << "Value " << name << " not found in event " << static_cast<int>(event_type) << "!" << std::endl;
+        return std::make_pair(false, false);
+    }
+
+    if (val->second.type_name != typeid(bool).name()) {        //the case when crash on fail is not true and value is not found
+        assert((!crash_on_fail));       //if the value is not found and crash_on_fail is true crash the program
+
+        std::cerr
+                << "Wrong type int instead of " << val->second.type_name
+                << " in value " << name << " of event " << static_cast<int>(event_type) << "!" << std::endl;
+        return std::make_pair(false, false);
+    }
+
+    return std::make_pair(val->second.value.bool_type, true);
 }

@@ -113,9 +113,12 @@
     <ClCompile Include="src\PhysicsComponent.cpp" />
     <ClCompile Include="src\PhysicsSettings.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
+    <ClCompile Include="src\PhysicsSystemUtils.cpp" />
     <ClCompile Include="src\RenderingComponent.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\VehicleSceneQueryData.cpp" />
+    <ClCompile Include="src\VehicleWheelQueryResults.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\AssetManager.h" />
@@ -136,10 +139,13 @@
     <ClInclude Include="src\PhysicsComponent_impl.h" />
     <ClInclude Include="src\PhysicsSettings.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
+    <ClInclude Include="src\PhysicsSystemUtils.h" />
     <ClInclude Include="src\RenderingComponent.h" />
     <ClInclude Include="src\RenderingSystem.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\SoundAsset.h" />
+    <ClInclude Include="src\VehicleSceneQueryData.h" />
+    <ClInclude Include="src\VehicleWheelQueryResults.h" />
     <ClInclude Include="src\World.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

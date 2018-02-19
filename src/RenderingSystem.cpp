@@ -6,9 +6,9 @@
 #include <glm/gtx/quaternion.hpp>
 
 namespace {
-    const std::string SHIP_VERTEX_SHADER_PATH = "assets/shaders/SimpleVertexShader.vertexshader";
-    const std::string SHIP_FRAGMENT_SHADER_PATH = "assets/shaders/SimpleFragmentShader.fragmentshader";
-    const std::string SHIP_MESH_PATH = "assets/models/carBoxModel.obj";
+    const std::string CAR_VERTEX_SHADER_PATH = "assets/shaders/SimpleVertexShader.vertexshader";
+    const std::string CAR_FRAGMENT_SHADER_PATH = "assets/shaders/SimpleFragmentShader.fragmentshader";
+    const std::string CAR_MESH_PATH = "assets/models/carBoxModel.obj";
     const std::string TERRAIN_MESH_PATH = "assets/models/Terrain.obj";
 }
 
@@ -16,9 +16,8 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
-    EventSystem::add_event_handler(EventType::ADD_EXAMPLE_SHIP_EVENT, &RenderingSystem::handle_add_example_ship, this);
+    EventSystem::add_event_handler(EventType::ADD_CAR, &RenderingSystem::handle_add_car, this);
     EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &RenderingSystem::handle_add_terrain, this);
-    EventSystem::add_event_handler(EventType::EXAMPLE_SHIP_IDLE_EVENT, &RenderingSystem::handle_example_ship_idle, this);
     EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
 }
 
@@ -31,11 +30,11 @@ void RenderingSystem::load(const Event& e) {
 }
 
 void RenderingSystem::handle_key_press(const Event& e) {
-    //function calls to get_value: param1= string:name, param2 = bool:crash_on_fail
-    //pair.first == the int, pair.second == bool
-    std::pair<int, bool> player_id = e.get_value<int>("player_id", true);
+    // function calls to get_value: param1= string:name, param2 = bool:crash_on_fail
+    // pair.first == the int, pair.second == bool
+    // std::pair<int, bool> player_id = e.get_value<int>("player_id", true);
     std::pair<int, bool> key = e.get_value<int>("key", true);
-    std::pair<int, bool> value = e.get_value<int>("value", true);
+    // std::pair<int, bool> value = e.get_value<int>("value", true);
 
     glm::mat4 transform;
 
@@ -66,7 +65,7 @@ void RenderingSystem::handle_key_press(const Event& e) {
 
 }
 
-void RenderingSystem::handle_add_example_ship(const Event& e) {
+void RenderingSystem::handle_add_car(const Event& e) {
     // Load game object parameters
     std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
     assert(object_id.second);
@@ -80,15 +79,15 @@ void RenderingSystem::handle_add_example_ship(const Event& e) {
     std::pair<int, bool> z = e.get_value<int>("pos_z", true);
     assert(z.second);
 
-    // Load ship assets
+    // Load car assets
     example_shader_.load_shader(
-        SHIP_VERTEX_SHADER_PATH,
-        SHIP_FRAGMENT_SHADER_PATH
+        CAR_VERTEX_SHADER_PATH,
+        CAR_FRAGMENT_SHADER_PATH
     );
 
-    MeshAsset* mesh = asset_manager_.get_mesh_asset(SHIP_MESH_PATH);
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(CAR_MESH_PATH);
 
-    // Store ship
+    // Store car
     example_objects_.emplace_back();
     example_objects_[object_id.first].set_mesh(mesh);
     example_objects_[object_id.first].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
@@ -103,16 +102,6 @@ void RenderingSystem::handle_add_terrain(const Event& e) {
     // Store terrain
     example_objects_.emplace_back();
     example_objects_[object_id].set_mesh(mesh);
-}
-
-void RenderingSystem::handle_example_ship_idle(const Event& e) {
-    // Load game object parameters
-    std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
-    assert(object_id.second && object_id.first < (int)example_objects_.size());
-
-    std::pair<float, bool> rotation_rad = e.get_value<float>("rotation_rad", true);
-
-    example_objects_[object_id.first].apply_transform(glm::rotate(glm::mat4x4(), rotation_rad.first, glm::vec3(1, 1, 1)));
 }
 
 void RenderingSystem::handle_object_transform(const Event& e) {
@@ -167,7 +156,7 @@ bool RenderingSystem::init_window() {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-    SDL_GLContext glContext = SDL_GL_CreateContext(window_);
+    SDL_GL_CreateContext(window_);
 
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();

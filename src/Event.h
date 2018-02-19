@@ -5,8 +5,18 @@
 #include <string>
 
 enum class EventType {
-    ADD_EXAMPLE_SHIP_EVENT, ADD_TERRAIN_EVENT, EXAMPLE_SHIP_IDLE_EVENT, LOAD_EVENT, DUMMY_EVENT,
-    OBJECT_TRANSFORM_EVENT, KEYPRESS_EVENT, EVENT_COUNT
+    ADD_CAR,
+    ADD_TERRAIN_EVENT,
+    LOAD_EVENT,
+    DUMMY_EVENT,
+    OBJECT_TRANSFORM_EVENT,
+    KEYPRESS_EVENT,
+
+    // Car control events
+    CAR_CONTROL,
+
+    // Keep at end of list
+    EVENT_COUNT
 };
 
 //For how to handle events, please view EventSystem.h
@@ -23,6 +33,7 @@ public:
         union ValueType {
             int         int_type;
             float       float_type;
+            bool        bool_type;
             //void*       pointer_type; Perhaps?
         };
         ValueType value;

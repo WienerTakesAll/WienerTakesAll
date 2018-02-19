@@ -5,7 +5,6 @@
 #include "PxPhysicsAPI.h"
 #include "MeshAsset.h"
 
-
 enum {
     COLLISION_FLAG_GROUND = 1 << 0,
     COLLISION_FLAG_WHEEL = 1 << 1,
@@ -13,11 +12,34 @@ enum {
     COLLISION_FLAG_OBSTACLE = 1 << 3,
     COLLISION_FLAG_DRIVABLE_OBSTACLE = 1 << 4,
 
-    COLLISION_FLAG_GROUND_AGAINST = COLLISION_FLAG_CHASSIS | COLLISION_FLAG_OBSTACLE | COLLISION_FLAG_DRIVABLE_OBSTACLE,
-    COLLISION_FLAG_WHEEL_AGAINST = COLLISION_FLAG_WHEEL | COLLISION_FLAG_CHASSIS | COLLISION_FLAG_OBSTACLE,
-    COLLISION_FLAG_CHASSIS_AGAINST = COLLISION_FLAG_GROUND | COLLISION_FLAG_WHEEL | COLLISION_FLAG_CHASSIS | COLLISION_FLAG_OBSTACLE | COLLISION_FLAG_DRIVABLE_OBSTACLE,
-    COLLISION_FLAG_OBSTACLE_AGAINST = COLLISION_FLAG_GROUND | COLLISION_FLAG_WHEEL | COLLISION_FLAG_CHASSIS | COLLISION_FLAG_OBSTACLE | COLLISION_FLAG_DRIVABLE_OBSTACLE,
-    COLLISION_FLAG_DRIVABLE_OBSTACLE_AGAINST = COLLISION_FLAG_GROUND | COLLISION_FLAG_CHASSIS | COLLISION_FLAG_OBSTACLE | COLLISION_FLAG_DRIVABLE_OBSTACLE,
+    COLLISION_FLAG_GROUND_AGAINST =
+        COLLISION_FLAG_CHASSIS |
+        COLLISION_FLAG_OBSTACLE |
+        COLLISION_FLAG_DRIVABLE_OBSTACLE,
+
+    COLLISION_FLAG_WHEEL_AGAINST =
+        COLLISION_FLAG_WHEEL |
+        COLLISION_FLAG_CHASSIS |
+        COLLISION_FLAG_OBSTACLE,
+
+    COLLISION_FLAG_CHASSIS_AGAINST =
+        COLLISION_FLAG_GROUND |
+        COLLISION_FLAG_WHEEL |
+        COLLISION_FLAG_CHASSIS |
+        COLLISION_FLAG_OBSTACLE |
+        COLLISION_FLAG_DRIVABLE_OBSTACLE,
+
+    COLLISION_FLAG_OBSTACLE_AGAINST = COLLISION_FLAG_GROUND |
+                                      COLLISION_FLAG_WHEEL |
+                                      COLLISION_FLAG_CHASSIS |
+                                      COLLISION_FLAG_OBSTACLE |
+                                      COLLISION_FLAG_DRIVABLE_OBSTACLE,
+
+    COLLISION_FLAG_DRIVABLE_OBSTACLE_AGAINST =
+        COLLISION_FLAG_GROUND |
+        COLLISION_FLAG_CHASSIS |
+        COLLISION_FLAG_OBSTACLE |
+        COLLISION_FLAG_DRIVABLE_OBSTACLE,
 };
 
 //Id of drivable surface (used by suspension raycast filtering).
@@ -47,6 +69,7 @@ enum {
     SAMPLEVEHICLE_DRIVABLE_SURFACE = 0xffff0000,
     SAMPLEVEHICLE_UNDRIVABLE_SURFACE = 0x0000ffff
 };
+
 template <bool static_actor>
 class PhysicsComponent {
 public:
@@ -65,11 +88,21 @@ public:
 
     physx::PxVehicleDrive4W* get_wheels();
 
-    void set_mesh(physx::PxPhysics* physics, physx::PxCooking* cooking, MeshAsset* mesh);
-    void create_vehicle(physx::PxPhysics* physics, physx::PxCooking* cooking, MeshAsset* mesh);
+    void set_mesh(
+        physx::PxPhysics* physics,
+        physx::PxCooking* cooking,
+        MeshAsset* mesh);
+    void create_vehicle(
+        physx::PxPhysics* physics,
+        physx::PxCooking* cooking,
+        MeshAsset* mesh);
     void set_transform(physx::PxTransform& transform);
 private:
-    void createActor(physx::PxPhysics* physics, physx::PxTransform& transform, physx::PxShape* shape, physx::PxReal density);
+    void create_actor(
+        physx::PxPhysics* physics,
+        physx::PxTransform& transform,
+        physx::PxShape* shape,
+        physx::PxReal density);
 
     void setup_wheels(physx::PxVehicleWheelsSimData* wheelsSimData);
     void setup_drive_sim(physx::PxVehicleDriveSimData4W& driveSimData, physx::PxVehicleWheelsSimData* wheelsSimData);
@@ -77,15 +110,14 @@ private:
     bool valid_;
     unsigned int id_;
 
-    physx::PxMaterial* gMaterial_;
-    physx::PxConvexMesh* gMesh_;
-    physx::PxConvexMeshGeometry* gMeshGeometry_;
-    physx::PxShape* gMeshShape_;
-    PxActorType* gActor_;
+    physx::PxMaterial* g_material_;
+    physx::PxConvexMesh* g_mesh_;
+    physx::PxConvexMeshGeometry* g_mesh_geometry_;
+    physx::PxShape* g_mesh_shape_;
+    PxActorType* g_actor_;
 
     bool is_vehicle_;
-    physx::PxVehicleDrive4W* gDrive4W_;
+    physx::PxVehicleDrive4W* g_drive_4w_;
 };
-
 
 #include "PhysicsComponent_impl.h"
