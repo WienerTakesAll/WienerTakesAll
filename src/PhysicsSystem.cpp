@@ -303,7 +303,7 @@ void PhysicsSystem::create_4w_vehicle (
     // Free the sim data because we don't need that any more.
     wheels_sim_data->free();
 
-    // Don't forget to add the actor to the scenxe.
+    // Don't forget to add the actor to the scene.
     {
         PxSceneWriteLock scoped_lock(*g_scene_);
         g_scene_->addActor(*vehicle_actor);
