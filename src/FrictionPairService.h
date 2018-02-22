@@ -17,18 +17,15 @@ enum SurfaceTypes {
 // For use by PhysicsSystem
 class FrictionPairService {
 public:
-	FrictionPairService(
-		float standard_to_typical_friction,
-		const physx::PxMaterial& typical_material
-	);
+	FrictionPairService(float standard_to_typical_friction, physx::PxMaterial * typical_material);
 	~FrictionPairService();
 	const physx::PxVehicleDrivableSurfaceToTireFrictionPairs& get_friction_pairs() const;
-	void set_materials(const physx::PxMaterial& typical_material);
+	void set_materials(physx::PxMaterial* typical_material);
 	void set_friction_data(float standard_to_typical_friction);
 
 private:
 	void initialize_friction_pairs();
-	std::vector<physx::PxMaterial> surface_materials_;
+	std::vector<physx::PxMaterial*> surface_materials_;
 	std::vector<std::vector<float>> friction_data_;
 	physx::PxVehicleDrivableSurfaceToTireFrictionPairs* friction_pairs_;
 };
