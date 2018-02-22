@@ -33,4 +33,3 @@ PhysicsSettings::PhysicsSettings()
     };
     g_steer_vs_forward_speed_table = physx::PxFixedSizeLookupTable<8>(g_steer_vs_forward_speed_data, 4);
 }
-
