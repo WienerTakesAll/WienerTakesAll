@@ -36,10 +36,11 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     , sq_wheel_raycast_batch_query_(NULL)
     , asset_manager_(asset_manager)
     , settings_(physics_settings)
-    , friction_pair_service_(settings_.arena_tire_friction, g_physics_->createMaterial(5.f, 5.f, 5.f)) {
+    , arena_material_(g_physics_->createMaterial(5.f, 5.f, 5.f))
+    , friction_pair_service_(settings_.arena_tire_friction, arena_material_) {
 
     EventSystem::add_event_handler(EventType::ADD_CAR, &PhysicsSystem::handle_add_car, this);
-    EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &PhysicsSystem::handle_add_terrain, this);
+    EventSystem::add_event_handler(EventType::ADD_ARENA, &PhysicsSystem::handle_add_arena, this);
     EventSystem::add_event_handler(EventType::CAR_CONTROL, &PhysicsSystem::handle_car_control, this);
 
     // Setup Visual Debugger
@@ -229,13 +230,14 @@ void PhysicsSystem::handle_add_car(const Event& e) {
     vehicle.set_transform(transform);
 }
 
-void PhysicsSystem::handle_add_terrain(const Event& e) {
+void PhysicsSystem::handle_add_arena(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
 
     MeshAsset* mesh = asset_manager_.get_mesh_asset(settings_.arena_mesh);
 
     static_objects_.emplace_back(object_id);
     static_objects_.back().set_mesh(g_physics_, g_cooking_, mesh);
+    static_objects_.back().set_material(arena_material_);
 
     g_scene_->addActor(*static_objects_.back().get_actor());
 }

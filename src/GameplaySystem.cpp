@@ -32,7 +32,7 @@ void GameplaySystem::handle_load(const Event& e) {
     // Terrain
     EventSystem::queue_event(
         Event(
-            EventType::ADD_TERRAIN_EVENT,
+            EventType::ADD_ARENA,
             "object_id", gameobject_counter_->assign_id()
         )
     );

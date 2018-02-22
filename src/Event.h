@@ -6,7 +6,7 @@
 
 enum class EventType {
     ADD_CAR,
-    ADD_TERRAIN_EVENT,
+    ADD_ARENA,
     LOAD_EVENT,
     DUMMY_EVENT,
     OBJECT_TRANSFORM_EVENT,

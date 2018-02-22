@@ -24,7 +24,7 @@ public:
 
 private:
     void handle_add_car(const Event& e);
-    void handle_add_terrain(const Event& e);
+    void handle_add_arena(const Event& e);
     void handle_car_control(const Event& e);
 
     void create_4w_vehicle(
@@ -73,6 +73,8 @@ private:
 
     AssetManager& asset_manager_;
     PhysicsSettings& settings_;
+
+    physx::PxMaterial* arena_material_;
 
     FrictionPairService friction_pair_service_;
 };

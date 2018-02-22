@@ -105,6 +105,8 @@ void PhysicsComponent<static_actor>::set_mesh(
     g_mesh_ = physics->createConvexMesh(read_buffer);
 
     physx::PxTransform phys_transform(0, 0, 0);
+
+    // default material
     g_material_ = physics->createMaterial(5.f, 5.f, 5.f);
 
     g_mesh_geometry_ = new physx::PxConvexMeshGeometry(g_mesh_);
@@ -139,6 +141,11 @@ template <bool static_actor>
 void PhysicsComponent<static_actor>::set_transform(physx::PxTransform& transform) {
     static_assert(!static_actor, "Cannot set transform of a static actor");
     g_actor_->setGlobalPose(transform);
+}
+
+template <bool static_actor>
+void PhysicsComponent<static_actor>::set_material(physx::PxMaterial* material) {
+    g_material_ = material;
 }
 
 template <bool static_actor>

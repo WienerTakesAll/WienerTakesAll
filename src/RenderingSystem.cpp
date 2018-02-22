@@ -17,7 +17,7 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
     EventSystem::add_event_handler(EventType::ADD_CAR, &RenderingSystem::handle_add_car, this);
-    EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &RenderingSystem::handle_add_terrain, this);
+    EventSystem::add_event_handler(EventType::ADD_ARENA, &RenderingSystem::handle_add_terrain, this);
     EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
 }
 

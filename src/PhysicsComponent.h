@@ -71,6 +71,8 @@ public:
         physx::PxCooking* cooking,
         MeshAsset* mesh);
     void set_transform(physx::PxTransform& transform);
+
+    void set_material(physx::PxMaterial* material);
 private:
     void create_actor(
         physx::PxPhysics* physics,
