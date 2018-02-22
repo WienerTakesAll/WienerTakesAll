@@ -6,6 +6,7 @@
 
 #include "PhysicsComponent.h"
 #include "EventSystem.h"
+#include "FrictionPairService.h"
 
 class AssetManager;
 class PhysicsSettings;
@@ -72,4 +73,6 @@ private:
 
     AssetManager& asset_manager_;
     PhysicsSettings& settings_;
+
+    FrictionPairService friction_pair_service_;
 };

@@ -35,7 +35,8 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     , sq_data_ (VehicleSceneQueryData::allocate(MAX_NUM_4W_VEHICLES * 4))
     , sq_wheel_raycast_batch_query_(NULL)
     , asset_manager_(asset_manager)
-    , settings_(physics_settings) {
+    , settings_(physics_settings)
+    , friction_pair_service_(settings_.arena_tire_friction, g_physics_->createMaterial(5.f, 5.f, 5.f)) {
 
     EventSystem::add_event_handler(EventType::ADD_CAR, &PhysicsSystem::handle_add_car, this);
     EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &PhysicsSystem::handle_add_terrain, this);
@@ -136,7 +137,7 @@ void PhysicsSystem::update() {
         physx::PxVehicleUpdates(
             0.16f / SIM_STEPS,
             settings_.gravity,
-            *surface_tire_pairs_,
+            friction_pair_service_.get_friction_pairs(),
             num_vehicles_,
             vehicles_,
             vehicle_query_results
@@ -235,8 +236,6 @@ void PhysicsSystem::handle_add_terrain(const Event& e) {
 
     static_objects_.emplace_back(object_id);
     static_objects_.back().set_mesh(g_physics_, g_cooking_, mesh);
-
-    surface_tire_pairs_ = create_friction_pairs(static_objects_.back().get_material());
 
     g_scene_->addActor(*static_objects_.back().get_actor());
 }

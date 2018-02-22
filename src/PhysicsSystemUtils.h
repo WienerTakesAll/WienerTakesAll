@@ -69,6 +69,4 @@ PxConvexMesh* create_wheel_convex_mesh(
     PxCooking& cooking
 );
 
-PxVehicleDrivableSurfaceToTireFrictionPairs* create_friction_pairs(const PxMaterial* default_material);
-
 void vehicle_setup_vehicle_shape_query_filter_data(PxFilterData* qry_filter_data);

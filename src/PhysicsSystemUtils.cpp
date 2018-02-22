@@ -417,28 +417,6 @@ PxConvexMesh* create_wheel_convex_mesh(
     return create_cylinder_convex_mesh(wheel_width, wheel_radius, 8, physics, cooking);
 }
 
-PxVehicleDrivableSurfaceToTireFrictionPairs* create_friction_pairs(const PxMaterial* default_material) {
-    PxVehicleDrivableSurfaceType surface_types[1];
-    surface_types[0].mType = 0;
-
-    const PxMaterial* surface_materials[1];
-    surface_materials[0] = default_material;
-
-    PxVehicleDrivableSurfaceToTireFrictionPairs* surface_tire_pairs =
-        PxVehicleDrivableSurfaceToTireFrictionPairs::allocate(1, 1);
-
-    surface_tire_pairs->setup(1, 1, surface_materials, surface_types);
-
-    for (PxU32 i = 0; i < 1; i++) {
-        for (PxU32 j = 0; j < 1; j++) {
-            surface_tire_pairs->setTypePairFriction(i, j, 1.f);
-        }
-    }
-
-    return surface_tire_pairs;
-}
-
-
 void vehicle_setup_vehicle_shape_query_filter_data(PxFilterData* qry_filter_data) {
     if (0 != qry_filter_data->word3) {
         std::cerr << "word3 is reserved for filter data for vehicle raycast queries" << std::endl;
