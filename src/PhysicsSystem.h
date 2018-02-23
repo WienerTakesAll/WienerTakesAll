@@ -7,6 +7,7 @@
 #include "PhysicsComponent.h"
 #include "EventSystem.h"
 #include "FrictionPairService.h"
+#include "CarControls.h"
 
 class AssetManager;
 class PhysicsSettings;
@@ -50,15 +51,12 @@ private:
     physx::PxScene* g_scene_;
 
 
-    float forward_drive_;
-    float horizontal_drive_;
-    float braking_force_;
-    bool hand_break_;
 
-    // Array of all cars and report data for each car.
+    // Data structures to keep track of cars
     physx::PxVehicleWheels* vehicles_[MAX_NUM_4W_VEHICLES];
     physx::PxVehicleWheelQueryResult vehicle_wheel_query_results_[MAX_NUM_4W_VEHICLES];
     physx::PxU32 num_vehicles_;
+    std::vector<CarControls> car_controls_;
 
     // Cached simulation data of focus vehicle in 4W mode.
     physx::PxVehicleWheelsSimData* wheels_sim_data_4w_;

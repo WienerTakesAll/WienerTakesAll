@@ -13,7 +13,6 @@
 #include "PhysicsSystemUtils.h"
 #include "VehicleWheelQueryResults.h"
 #include "VehicleSceneQueryData.h"
-#include "CarControlType.h"
 
 PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physics_settings)
     : g_foundation_(PxCreateFoundation(PX_FOUNDATION_VERSION, g_allocator_, g_error_callback_))
@@ -22,10 +21,6 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     , g_physics_(PxCreatePhysics(PX_PHYSICS_VERSION, *g_foundation_, g_scale_, false, g_pvd_))
     , g_cooking_(PxCreateCooking(PX_PHYSICS_VERSION, *g_foundation_, g_scale_))
     , g_scene_(NULL)
-    , forward_drive_(0.0f)
-    , horizontal_drive_(0.0f)
-    , braking_force_(0.0f)
-    , hand_break_(false)
     , num_vehicles_(0)
       // Allocate simulation data so we can switch from 3-wheeled to 4-wheeled cars by switching simulation data.
     , wheels_sim_data_4w_(PxVehicleWheelsSimData::allocate(4))
@@ -96,11 +91,11 @@ void PhysicsSystem::update() {
             // Build vehicle input data
             physx::PxVehicleDrive4WRawInputData g_vehicle_input_data;
             g_vehicle_input_data.setDigitalAccel(true);
-            g_vehicle_input_data.setAnalogAccel(std::max(forward_drive_, 0.f));
-            g_vehicle_input_data.setAnalogBrake(braking_force_);
-            g_vehicle_input_data.setAnalogHandbrake(hand_break_ * 1.0f);
-            hand_break_ = false;
-            g_vehicle_input_data.setAnalogSteer(horizontal_drive_);
+            g_vehicle_input_data.setAnalogAccel(std::max(car_controls_[i].forward_drive, 0.f));
+            g_vehicle_input_data.setAnalogBrake(car_controls_[i].braking_force);
+            g_vehicle_input_data.setAnalogHandbrake(car_controls_[i].hand_break * 1.0f);
+            car_controls_[i].hand_break = false;
+            g_vehicle_input_data.setAnalogSteer(car_controls_[i].horizontal_drive);
 
             // smooth input data
             PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(
@@ -225,6 +220,7 @@ void PhysicsSystem::handle_add_car(const Event& e) {
 
     vehicle.set_actor(vehicles_[num_vehicles_ - 1]->getRigidDynamicActor());
     vehicle.set_transform(transform);
+    car_controls_.push_back(CarControls());
 }
 
 void PhysicsSystem::handle_add_arena(const Event& e) {
@@ -240,21 +236,23 @@ void PhysicsSystem::handle_add_arena(const Event& e) {
 }
 
 void PhysicsSystem::handle_car_control(const Event& e) {
+    int car_index = e.get_value<int>("index", true).first;
+
     switch (e.get_value<int>("type", true).first) {
         case CarControlType::FORWARD_DRIVE:
-            forward_drive_ = e.get_value<float>("value", true).first;
+            car_controls_[car_index].forward_drive = e.get_value<float>("value", true).first;
             break;
 
         case CarControlType::BRAKE:
-            braking_force_ = e.get_value<float>("value", true).first;
+            car_controls_[car_index].braking_force = e.get_value<float>("value", true).first;
             break;
 
         case CarControlType::STEER:
-            horizontal_drive_ = e.get_value<float>("value", true).first;
+            car_controls_[car_index].horizontal_drive = e.get_value<float>("value", true).first;
             break;
 
         case CarControlType::HAND_BRAKE:
-            hand_break_ = e.get_value<float>("value", true).first;
+            car_controls_[car_index].hand_break = e.get_value<float>("value", true).first;
             break;
     }
 }
