@@ -28,7 +28,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     , hand_break_(false)
     , num_vehicles_(0)
       // Allocate simulation data so we can switch from 3-wheeled to 4-wheeled cars by switching simulation data.
-    , wheels_sim_data_4w_ (PxVehicleWheelsSimData::allocate(4))
+    , wheels_sim_data_4w_(PxVehicleWheelsSimData::allocate(4))
       // Data to store reports for each wheel.
     , wheel_query_results (VehicleWheelQueryResults::allocate(MAX_NUM_4W_VEHICLES * 4))
       // Scene query data for to allow raycasts for all suspensions of all vehicles.
@@ -188,11 +188,9 @@ void PhysicsSystem::handle_add_car(const Event& e) {
     PhysicsComponent<false>& vehicle = dynamic_objects_.back();
     vehicle.set_mesh(g_physics_, g_cooking_, mesh);
 
-    auto vehicle_material = vehicle.get_material();
-    auto vehicle_mesh = vehicle.get_mesh();
-
+    // construct wheel meshes
     float s = 0.2f;
-    PxVec3 verts[] = {
+    std::vector<PxVec3> verts = {
         {s, s, s},
         { -s, s, s},
         { s, s, -s },
@@ -203,25 +201,27 @@ void PhysicsSystem::handle_add_car(const Event& e) {
         { -s, -s, -s }
     };
 
-    PxConvexMesh* wheel_mesh[] = {
-        create_wheel_convex_mesh(verts, 8, *g_physics_, *g_cooking_),
-        create_wheel_convex_mesh(verts, 8, *g_physics_, *g_cooking_),
-        create_wheel_convex_mesh(verts, 8, *g_physics_, *g_cooking_),
-        create_wheel_convex_mesh(verts, 8, *g_physics_, *g_cooking_)
+    PxConvexMesh* wheel_meshes[] = {
+        create_wheel_convex_mesh(&verts[0], verts.size(), *g_physics_, *g_cooking_),
+        create_wheel_convex_mesh(&verts[0], verts.size(), *g_physics_, *g_cooking_),
+        create_wheel_convex_mesh(&verts[0], verts.size(), *g_physics_, *g_cooking_),
+        create_wheel_convex_mesh(&verts[0], verts.size(), *g_physics_, *g_cooking_)
     };
 
+    // create wheel locations
     PxVec3 wheel_center_offsets[4];
     wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-1.5f, 0.5f, 1.f);
     wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = physx::PxVec3(1.5f, 0.5f, 1.f);
     wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-1.5f, 0.5f, -1.f);
     wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(1.5f, 0.5f, -1.f);
 
+    // create vehicle
     create_4w_vehicle(
-        *vehicle_material,
+        *vehicle.get_material(),
         settings_.car_mass,
         wheel_center_offsets,
-        vehicle_mesh,
-        wheel_mesh,
+        vehicle.get_mesh(),
+        wheel_meshes,
         transform,
         true
     );
@@ -323,8 +323,6 @@ void PhysicsSystem::create_4w_vehicle (
     car->mWheelsSimData.setSceneQueryFilterData(2, vehicle_qry_filter_data);
     car->mWheelsSimData.setSceneQueryFilterData(3, vehicle_qry_filter_data);
 
-    // Set the transform and the instantiated car and set it be to be at rest.
-    // resetNWCar(startTransform, car);
     // Set the autogear mode of the instantiate car.
     car->mDriveDynData.setUseAutoGears(use_auto_gear_flag);
 
