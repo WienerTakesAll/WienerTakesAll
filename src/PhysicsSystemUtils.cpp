@@ -5,7 +5,7 @@
 
 #include "PhysicsSystemUtils.h"
 #include "PhysicsComponent.h"
-
+#include "FrictionPairService.h"
 
 using namespace physx;
 
@@ -228,10 +228,10 @@ void create_4w_vehicle_simulation_data(
     // Let's set up the tire data structures now.
     // Put slicks on the front tires and wets on the rear tires.
     PxVehicleTireData tires[4];
-    tires[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mType = TIRE_TYPE_WETS;
-    tires[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mType = TIRE_TYPE_WETS;
-    tires[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mType = TIRE_TYPE_WETS;
-    tires[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mType = TIRE_TYPE_WETS;
+    tires[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mType = TireTypes::STANDARD;
+    tires[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mType = TireTypes::STANDARD;
+    tires[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mType = TireTypes::STANDARD;
+    tires[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mType = TireTypes::STANDARD;
 
     // Let's set up the suspension data structures now.
     PxVehicleSuspensionData susps[4];

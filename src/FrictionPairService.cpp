@@ -9,9 +9,9 @@ namespace {
 FrictionPairService::FrictionPairService(
     float standard_to_typical_friction,
     physx::PxMaterial* typical_material)
-: friction_data_(SurfaceTypes::NUM_SURFACE_TYPES) {
+    : friction_data_(SurfaceTypes::NUM_SURFACE_TYPES) {
     // initialize friction_data sub vectors
-    for(auto& surface_pair : friction_data_) {
+    for (auto& surface_pair : friction_data_) {
         surface_pair = std::vector<float>(TireTypes::NUM_TIRE_TYPES, GARBAGE_VALUE);
     }
 
@@ -44,7 +44,8 @@ void FrictionPairService::initialize_friction_pairs() {
     // must match, else if people use enum values not in array
     // will be bad times
     assert(friction_data_.size() == SurfaceTypes::NUM_SURFACE_TYPES);
-    for(auto& surface_pair : friction_data_) {
+
+    for (auto& surface_pair : friction_data_) {
         assert(surface_pair.size() == TireTypes::NUM_TIRE_TYPES);
     }
 
@@ -52,19 +53,21 @@ void FrictionPairService::initialize_friction_pairs() {
 
     // set actual pairs
     physx::PxVehicleDrivableSurfaceType surface_types[SurfaceTypes::NUM_SURFACE_TYPES];
-    for(int i = 0; i < SurfaceTypes::NUM_SURFACE_TYPES; i++) {
+
+    for (int i = 0; i < SurfaceTypes::NUM_SURFACE_TYPES; i++) {
         surface_types[i].mType = i;
     }
 
     const physx::PxMaterial* surface_materials_array[SurfaceTypes::NUM_SURFACE_TYPES];
-    for(int i = 0; i < surface_materials_.size(); i++) {
+
+    for (int i = 0; i < surface_materials_.size(); i++) {
         surface_materials_array[i] = surface_materials_[i];
     }
 
     friction_pairs_ = physx::PxVehicleDrivableSurfaceToTireFrictionPairs::allocate(
-        SurfaceTypes::NUM_SURFACE_TYPES,
-        TireTypes::NUM_TIRE_TYPES
-    );
+                          SurfaceTypes::NUM_SURFACE_TYPES,
+                          TireTypes::NUM_TIRE_TYPES
+                      );
 
     friction_pairs_->setup(
         TireTypes::NUM_TIRE_TYPES,
