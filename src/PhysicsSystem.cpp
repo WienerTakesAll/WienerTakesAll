@@ -22,7 +22,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     , g_cooking_(PxCreateCooking(PX_PHYSICS_VERSION, *g_foundation_, g_scale_))
     , g_scene_(NULL)
     , num_vehicles_(0)
-      // Allocate simulation data so we can switch from 3-wheeled to 4-wheeled cars by switching simulation data.
+      // Allocate simulation data so we can switch from 3-wheeled to 4-wheeled vehicles by switching simulation data.
     , wheels_sim_data_4w_(PxVehicleWheelsSimData::allocate(4))
       // Data to store reports for each wheel.
     , wheel_query_results (VehicleWheelQueryResults::allocate(MAX_NUM_4W_VEHICLES * 4))
@@ -34,9 +34,9 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     , arena_material_(g_physics_->createMaterial(5.f, 5.f, 5.f))
     , friction_pair_service_(settings_.arena_tire_friction, arena_material_) {
 
-    EventSystem::add_event_handler(EventType::ADD_CAR, &PhysicsSystem::handle_add_car, this);
+    EventSystem::add_event_handler(EventType::ADD_VEHICLE, &PhysicsSystem::handle_add_vehicle, this);
     EventSystem::add_event_handler(EventType::ADD_ARENA, &PhysicsSystem::handle_add_arena, this);
-    EventSystem::add_event_handler(EventType::CAR_CONTROL, &PhysicsSystem::handle_car_control, this);
+    EventSystem::add_event_handler(EventType::VEHICLE_CONTROL, &PhysicsSystem::handle_vehicle_control, this);
 
     // Setup Visual Debugger
     PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
@@ -91,11 +91,11 @@ void PhysicsSystem::update() {
             // Build vehicle input data
             physx::PxVehicleDrive4WRawInputData g_vehicle_input_data;
             g_vehicle_input_data.setDigitalAccel(true);
-            g_vehicle_input_data.setAnalogAccel(std::max(car_controls_[i].forward_drive, 0.f));
-            g_vehicle_input_data.setAnalogBrake(car_controls_[i].braking_force);
-            g_vehicle_input_data.setAnalogHandbrake(car_controls_[i].hand_break * 1.0f);
-            car_controls_[i].hand_break = false;
-            g_vehicle_input_data.setAnalogSteer(car_controls_[i].horizontal_drive);
+            g_vehicle_input_data.setAnalogAccel(std::max(vehicle_controls_[i].forward_drive, 0.f));
+            g_vehicle_input_data.setAnalogBrake(vehicle_controls_[i].braking_force);
+            g_vehicle_input_data.setAnalogHandbrake(vehicle_controls_[i].hand_break * 1.0f);
+            vehicle_controls_[i].hand_break = false;
+            g_vehicle_input_data.setAnalogSteer(vehicle_controls_[i].horizontal_drive);
 
             // smooth input data
             PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(
@@ -164,7 +164,7 @@ void PhysicsSystem::update() {
     }
 }
 
-void PhysicsSystem::handle_add_car(const Event& e) {
+void PhysicsSystem::handle_add_vehicle(const Event& e) {
     PX_ASSERT(num_vehicles_ < MAX_NUM_4W_VEHICLES);
 
     int object_id = e.get_value<int>("object_id", true).first;
@@ -173,7 +173,7 @@ void PhysicsSystem::handle_add_car(const Event& e) {
     transform.p.x = e.get_value<int>("pos_x", true).first;
     transform.p.y = e.get_value<int>("pos_y", true).first;
     transform.p.z = e.get_value<int>("pos_z", true).first;
-    MeshAsset* mesh = asset_manager_.get_mesh_asset(settings_.car_mesh_asset_path);
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(settings_.vehicle_mesh_asset_path);
 
     // Construct new PhysicsComponent and add to list
     dynamic_objects_.emplace_back(object_id);
@@ -210,7 +210,7 @@ void PhysicsSystem::handle_add_car(const Event& e) {
     // create vehicle
     create_4w_vehicle(
         *vehicle.get_material(),
-        settings_.car_mass,
+        settings_.vehicle_mass,
         wheel_center_offsets,
         vehicle.get_mesh(),
         wheel_meshes,
@@ -220,7 +220,7 @@ void PhysicsSystem::handle_add_car(const Event& e) {
 
     vehicle.set_actor(vehicles_[num_vehicles_ - 1]->getRigidDynamicActor());
     vehicle.set_transform(transform);
-    car_controls_.push_back(CarControls());
+    vehicle_controls_.push_back(VehicleControls());
 }
 
 void PhysicsSystem::handle_add_arena(const Event& e) {
@@ -235,24 +235,24 @@ void PhysicsSystem::handle_add_arena(const Event& e) {
     g_scene_->addActor(*static_objects_.back().get_actor());
 }
 
-void PhysicsSystem::handle_car_control(const Event& e) {
-    int car_index = e.get_value<int>("index", true).first;
+void PhysicsSystem::handle_vehicle_control(const Event& e) {
+    int vehicle_index = e.get_value<int>("index", true).first;
 
     switch (e.get_value<int>("type", true).first) {
-        case CarControlType::FORWARD_DRIVE:
-            car_controls_[car_index].forward_drive = e.get_value<float>("value", true).first;
+        case VehicleControlType::FORWARD_DRIVE:
+            vehicle_controls_[vehicle_index].forward_drive = e.get_value<float>("value", true).first;
             break;
 
-        case CarControlType::BRAKE:
-            car_controls_[car_index].braking_force = e.get_value<float>("value", true).first;
+        case VehicleControlType::BRAKE:
+            vehicle_controls_[vehicle_index].braking_force = e.get_value<float>("value", true).first;
             break;
 
-        case CarControlType::STEER:
-            car_controls_[car_index].horizontal_drive = e.get_value<float>("value", true).first;
+        case VehicleControlType::STEER:
+            vehicle_controls_[vehicle_index].horizontal_drive = e.get_value<float>("value", true).first;
             break;
 
-        case CarControlType::HAND_BRAKE:
-            car_controls_[car_index].hand_break = e.get_value<float>("value", true).first;
+        case VehicleControlType::HAND_BRAKE:
+            vehicle_controls_[vehicle_index].hand_break = e.get_value<float>("value", true).first;
             break;
     }
 }
@@ -291,9 +291,9 @@ void PhysicsSystem::create_4w_vehicle (
             material
         );
 
-    // Create a car.
-    PxVehicleDrive4W* car = PxVehicleDrive4W::allocate(4);
-    car->setup(g_physics_, vehicle_actor, *wheels_sim_data, drive_sim_data, 0);
+    // Create a vehicle.
+    PxVehicleDrive4W* vehicle = PxVehicleDrive4W::allocate(4);
+    vehicle->setup(g_physics_, vehicle_actor, *wheels_sim_data, drive_sim_data, 0);
 
     // Free the sim data because we don't need that any more.
     wheels_sim_data->free();
@@ -305,24 +305,24 @@ void PhysicsSystem::create_4w_vehicle (
     }
 
     // Set up the mapping between wheel and actor shape.
-    car->mWheelsSimData.setWheelShapeMapping(0, 0);
-    car->mWheelsSimData.setWheelShapeMapping(1, 1);
-    car->mWheelsSimData.setWheelShapeMapping(2, 2);
-    car->mWheelsSimData.setWheelShapeMapping(3, 3);
+    vehicle->mWheelsSimData.setWheelShapeMapping(0, 0);
+    vehicle->mWheelsSimData.setWheelShapeMapping(1, 1);
+    vehicle->mWheelsSimData.setWheelShapeMapping(2, 2);
+    vehicle->mWheelsSimData.setWheelShapeMapping(3, 3);
 
     // Set up the scene query filter data for each suspension line.
     PxFilterData vehicle_qry_filter_data;
     vehicle_setup_vehicle_shape_query_filter_data(&vehicle_qry_filter_data);
-    car->mWheelsSimData.setSceneQueryFilterData(0, vehicle_qry_filter_data);
-    car->mWheelsSimData.setSceneQueryFilterData(1, vehicle_qry_filter_data);
-    car->mWheelsSimData.setSceneQueryFilterData(2, vehicle_qry_filter_data);
-    car->mWheelsSimData.setSceneQueryFilterData(3, vehicle_qry_filter_data);
+    vehicle->mWheelsSimData.setSceneQueryFilterData(0, vehicle_qry_filter_data);
+    vehicle->mWheelsSimData.setSceneQueryFilterData(1, vehicle_qry_filter_data);
+    vehicle->mWheelsSimData.setSceneQueryFilterData(2, vehicle_qry_filter_data);
+    vehicle->mWheelsSimData.setSceneQueryFilterData(3, vehicle_qry_filter_data);
 
-    // Set the autogear mode of the instantiate car.
-    car->mDriveDynData.setUseAutoGears(use_auto_gear_flag);
+    // Set the autogear mode of the instantiate vehicle.
+    vehicle->mDriveDynData.setUseAutoGears(use_auto_gear_flag);
 
     // Increment the number of vehicles
-    vehicles_[num_vehicles_] = car;
+    vehicles_[num_vehicles_] = vehicle;
     vehicle_wheel_query_results_[num_vehicles_].nbWheelQueryResults = 4;
     vehicle_wheel_query_results_[num_vehicles_].wheelQueryResults = wheel_query_results->add_vehicle(4);
     num_vehicles_++;

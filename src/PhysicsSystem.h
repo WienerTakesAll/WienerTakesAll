@@ -7,7 +7,7 @@
 #include "PhysicsComponent.h"
 #include "EventSystem.h"
 #include "FrictionPairService.h"
-#include "CarControls.h"
+#include "VehicleControls.h"
 
 class AssetManager;
 class PhysicsSettings;
@@ -24,9 +24,9 @@ public:
     void update();
 
 private:
-    void handle_add_car(const Event& e);
+    void handle_add_vehicle(const Event& e);
     void handle_add_arena(const Event& e);
-    void handle_car_control(const Event& e);
+    void handle_vehicle_control(const Event& e);
 
     void create_4w_vehicle(
         const physx::PxMaterial& material,
@@ -50,13 +50,11 @@ private:
     physx::PxCooking* g_cooking_;
     physx::PxScene* g_scene_;
 
-
-
-    // Data structures to keep track of cars
+    // Data structures to keep track of vehicles
     physx::PxVehicleWheels* vehicles_[MAX_NUM_4W_VEHICLES];
     physx::PxVehicleWheelQueryResult vehicle_wheel_query_results_[MAX_NUM_4W_VEHICLES];
     physx::PxU32 num_vehicles_;
-    std::vector<CarControls> car_controls_;
+    std::vector<VehicleControls> vehicle_controls_;
 
     // Cached simulation data of focus vehicle in 4W mode.
     physx::PxVehicleWheelsSimData* wheels_sim_data_4w_;

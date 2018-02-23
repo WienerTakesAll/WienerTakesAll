@@ -1,13 +1,13 @@
 #pragma once
 
-enum CarControlType {
+enum VehicleControlType {
     FORWARD_DRIVE,
     BRAKE,
     STEER,
     HAND_BRAKE
 };
 
-struct CarControls {
+struct VehicleControls {
     float forward_drive;
     float horizontal_drive;
     float braking_force;
