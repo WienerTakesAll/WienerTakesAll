@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include "PhysicsSystemUtils.h"
+#include "CollisionFlags.h"
 
 using namespace physx;
 
@@ -116,19 +117,19 @@ void PhysicsComponent<static_actor>::set_mesh(
 
     if (static_actor) {
         physx::PxFilterData filter_data;
-        filter_data.word3 = SAMPLEVEHICLE_DRIVABLE_SURFACE;
+        filter_data.word3 = CollisionFlags::DRIVABLE_SURFACE;
         g_mesh_shape_->setQueryFilterData(filter_data);
 
-        filter_data.word0 = COLLISION_FLAG_GROUND;
-        filter_data.word1 = COLLISION_FLAG_GROUND_AGAINST;
+        filter_data.word0 = CollisionFlags::GROUND;
+        filter_data.word1 = CollisionFlags::GROUND_AGAINST;
         filter_data.word3 = 0;
 
         g_mesh_shape_->setSimulationFilterData(filter_data);
     } else {
         physx::PxFilterData filter_data;
-        filter_data.word0 = COLLISION_FLAG_WHEEL;
-        filter_data.word1 = COLLISION_FLAG_WHEEL_AGAINST;
-        filter_data.word3 = SAMPLEVEHICLE_UNDRIVABLE_SURFACE;
+        filter_data.word0 = CollisionFlags::WHEEL;
+        filter_data.word1 = CollisionFlags::WHEEL_AGAINST;
+        filter_data.word3 = CollisionFlags::UNDRIVABLE_SURFACE;
         g_mesh_shape_->setQueryFilterData(filter_data);
         g_mesh_shape_->setSimulationFilterData(filter_data);
     }

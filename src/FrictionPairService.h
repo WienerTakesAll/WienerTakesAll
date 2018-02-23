@@ -4,6 +4,8 @@
 
 #include "PxPhysicsAPI.h"
 
+// Gives the friction values between defined tire and surface types
+
 enum TireTypes {
     STANDARD = 0,
     NUM_TIRE_TYPES

@@ -68,9 +68,6 @@ private:
     VehicleSceneQueryData* sq_data_;
     physx::PxBatchQuery* sq_wheel_raycast_batch_query_;
 
-    // Friction from combinations of tire and surface types.
-    physx::PxVehicleDrivableSurfaceToTireFrictionPairs* surface_tire_pairs_;
-
     AssetManager& asset_manager_;
     PhysicsSettings& settings_;
 

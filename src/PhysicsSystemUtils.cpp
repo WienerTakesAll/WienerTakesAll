@@ -6,6 +6,7 @@
 #include "PhysicsSystemUtils.h"
 #include "PhysicsComponent.h"
 #include "FrictionPairService.h"
+#include "CollisionFlags.h"
 
 using namespace physx;
 
@@ -67,9 +68,9 @@ PxRigidDynamic* create_4w_vehicle_actor(
     const PxTransform wheel_local_poses[4] = { PxTransform(PxIdentity), PxTransform(PxIdentity), PxTransform(PxIdentity), PxTransform(PxIdentity) };
     const PxMaterial& wheel_material = material;
     PxFilterData wheel_coll_filter_data;
-    wheel_coll_filter_data.word0 = COLLISION_FLAG_WHEEL;
-    wheel_coll_filter_data.word1 = COLLISION_FLAG_WHEEL_AGAINST;
-    wheel_coll_filter_data.word3 = SAMPLEVEHICLE_UNDRIVABLE_SURFACE;
+    wheel_coll_filter_data.word0 = CollisionFlags::WHEEL;
+    wheel_coll_filter_data.word1 = CollisionFlags::WHEEL_AGAINST;
+    wheel_coll_filter_data.word3 = CollisionFlags::UNDRIVABLE_SURFACE;
 
     // We need to add chassis collision shapes, their local poses, a material for the chassis, and a simulation filter for the chassis.
     PxConvexMeshGeometry chassis_convex_geom(chassis_convex_mesh);
@@ -77,9 +78,9 @@ PxRigidDynamic* create_4w_vehicle_actor(
     const PxTransform chassis_local_poses[1] = { PxTransform(PxIdentity) };
     const PxMaterial& chassis_material = material;
     PxFilterData chassis_coll_filter_data;
-    chassis_coll_filter_data.word0 = COLLISION_FLAG_CHASSIS;
-    chassis_coll_filter_data.word1 = COLLISION_FLAG_CHASSIS_AGAINST;
-    chassis_coll_filter_data.word3 = SAMPLEVEHICLE_UNDRIVABLE_SURFACE;
+    chassis_coll_filter_data.word0 = CollisionFlags::CHASSIS;
+    chassis_coll_filter_data.word1 = CollisionFlags::CHASSIS_AGAINST;
+    chassis_coll_filter_data.word3 = CollisionFlags::UNDRIVABLE_SURFACE;
 
 
     // Create a query filter data for the car to ensure that cars
@@ -423,5 +424,5 @@ void vehicle_setup_vehicle_shape_query_filter_data(PxFilterData* qry_filter_data
         assert(0 == qry_filter_data->word3);
     }
 
-    qry_filter_data->word3 = (PxU32)SAMPLEVEHICLE_UNDRIVABLE_SURFACE;
+    qry_filter_data->word3 = (PxU32)CollisionFlags::UNDRIVABLE_SURFACE;
 }
