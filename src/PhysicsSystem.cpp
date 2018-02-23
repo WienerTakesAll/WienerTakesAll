@@ -193,12 +193,18 @@ void PhysicsSystem::handle_add_vehicle(const Event& e) {
         { -s, -s, -s }
     };
 
-    PxConvexMesh* wheel_meshes[] = {
-        create_wheel_convex_mesh(&verts[0], verts.size(), *g_physics_, *g_cooking_),
-        create_wheel_convex_mesh(&verts[0], verts.size(), *g_physics_, *g_cooking_),
-        create_wheel_convex_mesh(&verts[0], verts.size(), *g_physics_, *g_cooking_),
-        create_wheel_convex_mesh(&verts[0], verts.size(), *g_physics_, *g_cooking_)
-    };
+    std::vector<PxConvexMesh*> wheel_meshes;
+
+    for (int i = 0; i < 4; i++) { // 4 wheels in a car
+        wheel_meshes.push_back(
+            wheel_mesh_generator_.create_wheel_convex_mesh(
+                &verts[0],
+                verts.size(),
+                *g_physics_,
+                *g_cooking_
+            )
+        );
+    }
 
     // create wheel locations
     PxVec3 wheel_center_offsets[4];
@@ -213,7 +219,7 @@ void PhysicsSystem::handle_add_vehicle(const Event& e) {
         settings_.vehicle_mass,
         wheel_center_offsets,
         vehicle.get_mesh(),
-        wheel_meshes,
+        &wheel_meshes[0],
         transform,
         true
     );

@@ -47,26 +47,4 @@ void create_4w_vehicle_simulation_data(
     PxVehicleChassisData& chassis_data
 );
 
-PxConvexMesh* create_convex_mesh(
-    const PxVec3* verts,
-    const PxU32 numVerts,
-    PxPhysics& physics,
-    PxCooking& cooking
-);
-
-PxConvexMesh* create_cylinder_convex_mesh(
-    const PxF32 width,
-    const PxF32 radius,
-    const PxU32 num_circle_points,
-    PxPhysics& physics,
-    PxCooking& cooking
-);
-
-PxConvexMesh* create_wheel_convex_mesh(
-    const PxVec3* verts,
-    const PxU32 numVerts,
-    PxPhysics& physics,
-    PxCooking& cooking
-);
-
 void vehicle_setup_vehicle_shape_query_filter_data(PxFilterData* qry_filter_data);

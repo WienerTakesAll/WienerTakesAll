@@ -8,6 +8,7 @@
 #include "EventSystem.h"
 #include "FrictionPairService.h"
 #include "VehicleControls.h"
+#include "WheelMeshGenerator.h"
 
 class AssetManager;
 class PhysicsSettings;
@@ -70,4 +71,5 @@ private:
     physx::PxMaterial* arena_material_;
 
     FrictionPairService friction_pair_service_;
+    WheelMeshGenerator wheel_mesh_generator_;
 };

@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include <glm/gtx/quaternion.hpp>
 #include "PxPhysicsAPI.h"
 
 #include "PhysicsSystemUtils.h"
@@ -338,84 +337,6 @@ void create_4w_vehicle_simulation_data(
         - wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eREAR_LEFT].x;
 
     drive_data.setAckermannGeometryData(ackermann);
-}
-
-PxConvexMesh* create_convex_mesh(
-    const PxVec3* verts,
-    const PxU32 num_verts,
-    PxPhysics& physics,
-    PxCooking& cooking
-) {
-
-    // Create descriptor for convex mesh
-    PxConvexMeshDesc convex_desc;
-    convex_desc.points.count = num_verts;
-    convex_desc.points.stride = sizeof(PxVec3);
-    convex_desc.points.data = verts;
-    convex_desc.flags = PxConvexFlag::eCOMPUTE_CONVEX;
-
-    PxConvexMesh* convex_mesh = NULL;
-    PxDefaultMemoryOutputStream buf;
-
-    if (cooking.cookConvexMesh(convex_desc, buf)) {
-        PxDefaultMemoryInputData id(buf.getData(), buf.getSize());
-        convex_mesh = physics.createConvexMesh(id);
-    }
-
-    return convex_mesh;
-}
-
-PxConvexMesh* create_cylinder_convex_mesh(
-    const PxF32 width,
-    const PxF32 radius,
-    const PxU32 num_circle_points,
-    PxPhysics& physics,
-    PxCooking& cooking
-) {
-#define  MAX_NUM_VERTS_IN_CIRCLE 16
-    PX_ASSERT(num_circle_points < MAX_NUM_VERTS_IN_CIRCLE);
-    PxVec3 verts[2 * MAX_NUM_VERTS_IN_CIRCLE];
-    PxU32 numVerts = 2 * num_circle_points;
-    const PxF32 dtheta = 2 * PxPi / (1.0f * num_circle_points);
-
-    for (PxU32 i = 0; i < MAX_NUM_VERTS_IN_CIRCLE; i++) {
-        const PxF32 theta = dtheta * i;
-        const PxF32 cosTheta = radius * PxCos(theta);
-        const PxF32 sinTheta = radius * PxSin(theta);
-        verts[2 * i + 0] = PxVec3(-0.5f * width, cosTheta, sinTheta);
-        verts[2 * i + 1] = PxVec3(+0.5f * width, cosTheta, sinTheta);
-    }
-
-    return create_convex_mesh(verts, numVerts, physics, cooking);
-
-#undef MAX_NUM_VERTS_IN_CIRCLE
-
-}
-
-PxConvexMesh* create_wheel_convex_mesh(
-    const PxVec3* verts,
-    const PxU32 num_verts,
-    PxPhysics& physics,
-    PxCooking& cooking
-) {
-
-    //Extract the wheel radius and width from the aabb of the wheel convex mesh.
-    PxVec3 wheel_min(PX_MAX_F32, PX_MAX_F32, PX_MAX_F32);
-    PxVec3 wheel_max(-PX_MAX_F32, -PX_MAX_F32, -PX_MAX_F32);
-
-    for (PxU32 i = 0; i < num_verts; i++) {
-        wheel_min.x = PxMin(wheel_min.x, verts[i].x);
-        wheel_min.y = PxMin(wheel_min.y, verts[i].y);
-        wheel_min.z = PxMin(wheel_min.z, verts[i].z);
-        wheel_max.x = PxMax(wheel_max.x, verts[i].x);
-        wheel_max.y = PxMax(wheel_max.y, verts[i].y);
-        wheel_max.z = PxMax(wheel_max.z, verts[i].z);
-    }
-
-    const PxF32 wheel_width = wheel_max.x - wheel_min.x;
-    const PxF32 wheel_radius = PxMax(wheel_max.y, wheel_max.z);
-
-    return create_cylinder_convex_mesh(wheel_width, wheel_radius, 8, physics, cooking);
 }
 
 void vehicle_setup_vehicle_shape_query_filter_data(PxFilterData* qry_filter_data) {
