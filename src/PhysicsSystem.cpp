@@ -90,30 +90,34 @@ void PhysicsSystem::update() {
     const int SIM_STEPS = 4;
 
     for (int i = 0; i < SIM_STEPS; i++) {
-        if (!num_vehicles_) {
-            g_scene_->simulate(0.16f / SIM_STEPS);
-            g_scene_->fetchResults(true);
-            continue;
+        std::vector<PxVehicleWheelQueryResult> vehicle_query_results;
+
+        for (int i = 0; i < num_vehicles_; i++) {
+            // Build vehicle input data
+            physx::PxVehicleDrive4WRawInputData g_vehicle_input_data;
+            g_vehicle_input_data.setDigitalAccel(true);
+            g_vehicle_input_data.setAnalogAccel(std::max(forward_drive_, 0.f));
+            g_vehicle_input_data.setAnalogBrake(braking_force_);
+            g_vehicle_input_data.setAnalogHandbrake(hand_break_ * 1.0f);
+            hand_break_ = false;
+            g_vehicle_input_data.setAnalogSteer(horizontal_drive_);
+
+            // smooth input data
+            PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(
+                settings_.g_pad_smoothing_data, // padSmoothing
+                settings_.g_steer_vs_forward_speed_table, // steerVsForwardSpeedTable
+                g_vehicle_input_data, // rawInputData
+                0.16f / SIM_STEPS, // timestep
+                false, // isVehicleInAir
+                (PxVehicleDrive4W&)*vehicles_[i] // focusVehicle
+            );
+
+            PxWheelQueryResult wheel_query_results[PX_MAX_NB_WHEELS];
+            vehicle_query_results.push_back({
+                wheel_query_results,
+                vehicles_[i]->mWheelsSimData.getNbWheels()
+            });
         }
-
-        // Build vehicle input data
-        physx::PxVehicleDrive4WRawInputData g_vehicle_input_data;
-        g_vehicle_input_data.setDigitalAccel(true);
-        g_vehicle_input_data.setAnalogAccel(std::max(forward_drive_, 0.f));
-        g_vehicle_input_data.setAnalogBrake(braking_force_);
-        g_vehicle_input_data.setAnalogHandbrake(hand_break_ * 1.0f);
-        hand_break_ = false;
-        g_vehicle_input_data.setAnalogSteer(horizontal_drive_);
-
-        // smooth input data
-        PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(
-            settings_.g_pad_smoothing_data, // padSmoothing
-            settings_.g_steer_vs_forward_speed_table, // steerVsForwardSpeedTable
-            g_vehicle_input_data, // rawInputData
-            0.16f / SIM_STEPS, // timestep
-            false, // isVehicleInAir
-            (PxVehicleDrive4W&)*vehicles_[0] // focusVehicle
-        );
 
         if (NULL == sq_wheel_raycast_batch_query_) {
             sq_wheel_raycast_batch_query_ = sq_data_->setup_batched_scene_query(g_scene_);
@@ -127,13 +131,6 @@ void PhysicsSystem::update() {
             sq_data_->get_raycast_query_result_buffer()
         );
 
-        PxWheelQueryResult wheel_query_results[PX_MAX_NB_WHEELS];
-        PxVehicleWheelQueryResult vehicle_query_results[] = {
-            {
-                wheel_query_results,
-                vehicles_[0]->mWheelsSimData.getNbWheels()
-            }
-        };
 
         physx::PxVehicleUpdates(
             0.16f / SIM_STEPS,
@@ -141,7 +138,7 @@ void PhysicsSystem::update() {
             friction_pair_service_.get_friction_pairs(),
             num_vehicles_,
             vehicles_,
-            vehicle_query_results
+            &vehicle_query_results[0]
         );
 
         g_scene_->simulate(0.16f / SIM_STEPS);
