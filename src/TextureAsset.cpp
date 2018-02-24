@@ -11,12 +11,12 @@ TextureAsset::TextureAsset() {
 TextureAsset::~TextureAsset() {
 }
 
-bool TextureAsset::load_texture(const std::string& file_path) {
+void TextureAsset::load_texture(const std::string& file_path) {
     SDL_Surface* surface = IMG_Load(file_path.c_str());
 
     if (!surface) {
         std::cerr << "Unable to load texture " << file_path << std::endl;
-        return false;
+        valid_ = false;
     }
 
     //Load the texture into opengl here!
@@ -41,7 +41,7 @@ bool TextureAsset::load_texture(const std::string& file_path) {
         gl_p_type = GL_UNSIGNED_INT;
     } else {
         std::cout << "Unkown pixel storage type." << std::endl;
-        return false;
+        valid_ = false;
     }
 
     glTexImage2D
@@ -51,5 +51,13 @@ bool TextureAsset::load_texture(const std::string& file_path) {
 
     SDL_FreeSurface(surface);
 
-    return true;
+    valid_ = true;
+}
+
+const bool TextureAsset::is_valid() const {
+    return valid_;
+}
+
+const GLuint TextureAsset::get_texture_id() const {
+    return texture_id_;
 }

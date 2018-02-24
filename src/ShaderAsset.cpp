@@ -21,6 +21,7 @@ void ShaderAsset::load_shader(const std::string& vertex_path, const std::string&
         vertex_shader_code = vertex_shader_string_stream.str();
     } else {
         std::cerr << "Failed to open " << vertex_path << std::endl;
+        valid_ = false;
     }
 
     // Read the Fragment Shader code from the file
@@ -34,6 +35,7 @@ void ShaderAsset::load_shader(const std::string& vertex_path, const std::string&
         fragment_shader_code = fragment_shader_string_stream.str();
     } else {
         std::cerr << "Failed to open " << fragment_path << std::endl;
+        valid_ = false;
     }
 
     // Compile Vertex Shader for GPU

@@ -34,8 +34,8 @@ void RenderingComponent::render(glm::mat4x4 camera) const {
     glEnableVertexAttribArray(2);
 
 
-    if (texture_ != nullptr && texture_->valid_) {
-        glBindTexture(GL_TEXTURE_2D, texture_->texture_id_);
+    if (texture_ != nullptr && texture_->is_valid()) {
+        glBindTexture(GL_TEXTURE_2D, texture_->get_texture_id());
     }
 
 

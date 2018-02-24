@@ -9,8 +9,11 @@ class TextureAsset {
 public:
     TextureAsset();
     ~TextureAsset();
-    bool load_texture(const std::string& file_path);
+    void load_texture(const std::string& file_path);
+    const bool is_valid() const;
+    const GLuint get_texture_id() const;
 
+private:
     bool valid_;
     GLuint texture_id_;
 };

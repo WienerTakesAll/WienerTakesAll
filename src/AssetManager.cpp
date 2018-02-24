@@ -164,11 +164,7 @@ void AssetManager::load_texture_from_file(const std::string& file_path) {
     }
 
     TextureAsset& texture_data = texture_map.first->second;
-    texture_data.valid_ = texture_data.load_texture(file_path);
-
-    if (!texture_data.valid_) {
-        std::cout << "Could not load texture " << file_path << std::endl;
-    }
+    texture_data.load_texture(file_path);
 }
 
 void AssetManager::load_shader_from_file(const std::string& file_path) {
