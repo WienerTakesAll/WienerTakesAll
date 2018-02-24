@@ -201,10 +201,10 @@ void PhysicsSystem::handle_add_vehicle(const Event& e) {
 
     // create wheel locations
     PxVec3 wheel_center_offsets[4];
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-1.5f, 0.5f, 1.f);
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = physx::PxVec3(1.5f, 0.5f, 1.f);
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-1.5f, 0.5f, -1.f);
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(1.5f, 0.5f, -1.f);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-1.f, 0.2f, 2.1f);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = physx::PxVec3(1.f, 0.2f, 2.1f);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-1.f, 0.2f, -.1f);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(1.f, 0.2f, -.1f);
 
     // create vehicle
     create_4w_vehicle(

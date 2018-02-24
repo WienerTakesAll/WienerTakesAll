@@ -1,7 +1,7 @@
 #include "PhysicsSettings.h"
 
 PhysicsSettings::PhysicsSettings()
-    : gravity(physx::PxVec3 (0.0f, -0.01f, 0.0f))
+    : gravity(physx::PxVec3 (0.0f, -0.1f, 0.0f))
     , g_pad_smoothing_data( {
     {
         6.0f,    //rise rate eANALOG_INPUT_ACCEL
