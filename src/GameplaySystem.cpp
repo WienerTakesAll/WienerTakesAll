@@ -41,6 +41,32 @@ void GameplaySystem::handle_load(const Event& e) {
         )
     );
 
+    EventSystem::queue_event(
+        Event(
+            EventType::ADD_VEHICLE,
+            "object_id", gameobject_counter_->assign_id(),
+            // TODO: Pass glm::vec3 in events
+            "pos_x", -4,
+            "pos_y", 2,
+            "pos_z", 0//,
+                      // "name", "Vehicle 1"
+        )
+    );
+
+    EventSystem::queue_event(
+        Event(
+            EventType::ADD_VEHICLE,
+            "object_id", gameobject_counter_->assign_id(),
+            // TODO: Pass glm::vec3 in events
+            "pos_x", -10,
+            "pos_y", 2,
+            "pos_z", 0//,
+                      // "name", "Vehicle 1"
+        )
+    );
+
+
+
     // Terrain
     EventSystem::queue_event(
         Event(

@@ -89,6 +89,8 @@ void RenderingSystem::handle_add_vehicle(const Event& e) {
     example_objects_[object_id.first].set_mesh(mesh);
     example_objects_[object_id.first].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
     example_objects_[object_id.first].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
+
+    car_indices_.push_back(object_id.first);
 }
 
 void RenderingSystem::handle_add_terrain(const Event& e) {
@@ -176,23 +178,14 @@ void RenderingSystem::setup_cameras() {
 
     glm::mat4x4 transform;
 
-    if (example_objects_.size()) {
-        transform = example_objects_[0].get_transform();
+    for (size_t i = 0; i < car_indices_.size(); i++)
+    {
+        transform = example_objects_[car_indices_[i]].get_transform();
+        glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
+
+        cameras_[i] = glm::translate(transform, glm::vec3(0, 3, -5));
+        cameras_[i] = P * glm::lookAt(glm::vec3(cameras_[i][3]), car_pos, glm::vec3(0, 1, 0));
     }
-
-    glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
-
-    cameras_[0] = glm::translate(transform, glm::vec3(0, 3, -5));
-    cameras_[0] = P * glm::lookAt(glm::vec3(cameras_[0][3]), car_pos, glm::vec3(0, 1, 0));
-
-    cameras_[1] = glm::translate(glm::mat4(), glm::vec3(5.f, 5.f, 0.f));
-    cameras_[1] = P * glm::lookAt(glm::vec3(cameras_[1][3]), car_pos, glm::vec3(0, 1, 0));
-
-    cameras_[2] = glm::translate(transform, glm::vec3(5, 3, 0));
-    cameras_[2] = P * glm::lookAt(glm::vec3(cameras_[2][3]), car_pos, glm::vec3(0, 1, 0));
-
-    cameras_[3] = glm::translate(glm::mat4(), glm::vec3(-1.5f, 2.f, -1.5f));
-    cameras_[3] = P * glm::lookAt(glm::vec3(cameras_[3][3]), car_pos, glm::vec3(0, 1, 0));
 }
 
 void RenderingSystem::end_render() const {
