@@ -180,10 +180,5 @@ void AssetManager::load_shader_from_file(const std::string& file_path) {
     }
 
     ShaderAsset& shader_data = shader_map.first->second;
-    shader_data.valid_ = shader_data.load_shader(file_path + ".vert", file_path + ".frag");
-
-    if (!shader_data.valid_) {
-        std::cout << "Could not load shader " << file_path << std::endl;
-    }
-
+    shader_data.load_shader(file_path + ".vert", file_path + ".frag");
 }

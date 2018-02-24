@@ -5,7 +5,7 @@
 #include <vector>
 #include <sstream>
 
-bool ShaderAsset::load_shader(const std::string& vertex_path, const std::string& fragment_path) {
+void ShaderAsset::load_shader(const std::string& vertex_path, const std::string& fragment_path) {
     // Create the shaders
     GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
     GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
@@ -21,7 +21,6 @@ bool ShaderAsset::load_shader(const std::string& vertex_path, const std::string&
         vertex_shader_code = vertex_shader_string_stream.str();
     } else {
         std::cerr << "Failed to open " << vertex_path << std::endl;
-        return false;
     }
 
     // Read the Fragment Shader code from the file
@@ -35,17 +34,17 @@ bool ShaderAsset::load_shader(const std::string& vertex_path, const std::string&
         fragment_shader_code = fragment_shader_string_stream.str();
     } else {
         std::cerr << "Failed to open " << fragment_path << std::endl;
-        return false;
     }
 
-
-
+    // Compile Vertex Shader for GPU
     char const* vertex_source_pointer = vertex_shader_code.c_str();
     glShaderSource(vertex_shader_id, 1, &vertex_source_pointer, NULL);
     glCompileShader(vertex_shader_id);
 
+    // Check Vertex Shader
     check_error(vertex_shader_id);
 
+    // Compile Fragment Shader for GPU
     char const* fragment_source_pointer = fragment_shader_code.c_str();
     glShaderSource(fragment_shader_id, 1, &fragment_source_pointer, NULL);
     glCompileShader(fragment_shader_id);
@@ -59,7 +58,6 @@ bool ShaderAsset::load_shader(const std::string& vertex_path, const std::string&
     glAttachShader(program_id_, fragment_shader_id);
     glLinkProgram(program_id_);
 
-
     check_error(program_id_);
 
     glDetachShader(program_id_, vertex_shader_id);
@@ -68,8 +66,15 @@ bool ShaderAsset::load_shader(const std::string& vertex_path, const std::string&
     glDeleteShader(vertex_shader_id);
     glDeleteShader(fragment_shader_id);
 
+    valid_ = true;
+}
 
-    return true;
+const bool ShaderAsset::is_valid() const {
+    return valid_;
+}
+
+const GLuint ShaderAsset::get_program_id() const {
+    return program_id_;
 }
 
 void ShaderAsset::check_error(GLuint id) {

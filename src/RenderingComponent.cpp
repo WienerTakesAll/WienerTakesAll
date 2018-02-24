@@ -16,7 +16,7 @@ RenderingComponent::RenderingComponent()
 
 void RenderingComponent::render(glm::mat4x4 camera) const {
 
-    if (shader_ == nullptr || !shader_->valid_) {
+    if (shader_ == nullptr || !shader_->is_valid()) {
         std::cerr << "Trying to render with invalid shader!" << std::endl;
         return;
     }
@@ -27,7 +27,7 @@ void RenderingComponent::render(glm::mat4x4 camera) const {
         return;
     }
 
-    glUseProgram(shader_->program_id_);
+    glUseProgram(shader_->get_program_id());
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
@@ -39,7 +39,7 @@ void RenderingComponent::render(glm::mat4x4 camera) const {
     }
 
 
-    GLuint uniformMVP = glGetUniformLocation(shader_->program_id_, "MVP");
+    GLuint uniformMVP = glGetUniformLocation(shader_->get_program_id(), "MVP");
 
 
 

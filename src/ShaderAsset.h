@@ -7,11 +7,14 @@
 
 class ShaderAsset {
 public:
-    bool load_shader(const std::string& vertex_path, const std::string& fragment_path);
+    void load_shader(const std::string& vertex_path, const std::string& fragment_path);
 
-    bool valid_;
-    GLuint program_id_;
+    const bool is_valid() const;
+    const GLuint get_program_id() const;
 
 private:
     void check_error(GLuint id);
+
+    bool valid_;
+    GLuint program_id_;
 };
