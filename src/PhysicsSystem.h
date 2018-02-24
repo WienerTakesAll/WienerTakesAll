@@ -6,6 +6,9 @@
 
 #include "PhysicsComponent.h"
 #include "EventSystem.h"
+#include "FrictionPairService.h"
+#include "VehicleControls.h"
+#include "WheelMeshGenerator.h"
 
 class AssetManager;
 class PhysicsSettings;
@@ -22,9 +25,9 @@ public:
     void update();
 
 private:
-    void handle_add_car(const Event& e);
-    void handle_add_terrain(const Event& e);
-    void handle_car_control(const Event& e);
+    void handle_add_vehicle(const Event& e);
+    void handle_add_arena(const Event& e);
+    void handle_vehicle_control(const Event& e);
 
     void create_4w_vehicle(
         const physx::PxMaterial& material,
@@ -32,8 +35,7 @@ private:
         const physx::PxVec3* wheelCentreOffsets4,
         physx::PxConvexMesh* chassisConvexMesh,
         physx::PxConvexMesh** wheelConvexMeshes4,
-        const physx::PxTransform& startTransform,
-        const bool useAutoGearFlag
+        bool useAutoGearFlag
     );
 
     std::vector<PhysicsComponent<false>> dynamic_objects_;
@@ -42,34 +44,23 @@ private:
     physx::PxDefaultAllocator g_allocator_;
     physx::PxDefaultErrorCallback g_error_callback_;
     physx::PxFoundation* g_foundation_;
-    physx::PxTolerancesScale g_scale_;
     physx::PxPvd* g_pvd_;
     physx::PxPhysics* g_physics_;
     physx::PxCooking* g_cooking_;
     physx::PxScene* g_scene_;
 
+    // Data structures to keep track of vehicles
+    std::vector<physx::PxVehicleWheels*> vehicles_;
+    std::vector<VehicleControls> vehicle_controls_;
 
-    float forward_drive_;
-    float horizontal_drive_;
-    float braking_force_;
-    bool hand_break_;
-
-    // Array of all cars and report data for each car.
-    physx::PxVehicleWheels* vehicles_[MAX_NUM_4W_VEHICLES];
-    physx::PxVehicleWheelQueryResult vehicle_wheel_query_results_[MAX_NUM_4W_VEHICLES];
-    physx::PxU32 num_vehicles_;
-
-    // Cached simulation data of focus vehicle in 4W mode.
-    physx::PxVehicleWheelsSimData* wheels_sim_data_4w_;
-    physx::PxVehicleDriveSimData4W drive_sim_data_4w_;
-
-    VehicleWheelQueryResults* wheel_query_results;
     VehicleSceneQueryData* sq_data_;
-    physx::PxBatchQuery* sq_wheel_raycast_batch_query_;
 
-    // Friction from combinations of tire and surface types.
-    physx::PxVehicleDrivableSurfaceToTireFrictionPairs* surface_tire_pairs_;
-
+    // internal helpers
     AssetManager& asset_manager_;
     PhysicsSettings& settings_;
+
+    physx::PxMaterial* arena_material_;
+
+    FrictionPairService friction_pair_service_;
+    WheelMeshGenerator wheel_mesh_generator_;
 };

@@ -1,5 +1,7 @@
-#include "PhysicsComponent.h"
 #include "VehicleSceneQueryData.h"
+
+#include "PhysicsComponent.h"
+#include "CollisionFlags.h"
 
 using namespace physx;
 
@@ -70,7 +72,7 @@ void VehicleSceneQueryData::init() {
         PX_UNUSED(constantBlock);
         PX_UNUSED(filterData0);
 
-        if ((0 == (filterData1.word3 & SAMPLEVEHICLE_DRIVABLE_SURFACE))) {
+        if ((0 == (filterData1.word3 & CollisionFlags::DRIVABLE_SURFACE))) {
             return PxQueryHitType::eNONE;
         } else {
             return PxQueryHitType::eBLOCK;
