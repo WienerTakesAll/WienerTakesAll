@@ -13,12 +13,12 @@ UISystem::UISystem(AssetManager& asset_manager)
 
     // Hard-coded sample UI button mesh
     MeshAsset::MeshData::VertexData vert;
-   
+
 
     example_mesh_.meshes_.emplace_back();
     auto& mesh_element = example_mesh_.meshes_.back();
 
-    vert.position_[0] = 0.0f; 
+    vert.position_[0] = 0.0f;
     vert.position_[1] = 0.0f;
     vert.position_[2] = 1.0f;
     vert.uv_[0] = 0.0f;

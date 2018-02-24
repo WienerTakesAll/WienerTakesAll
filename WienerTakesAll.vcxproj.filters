@@ -57,16 +57,16 @@
     <ClCompile Include="src\PhysicsSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderAsset.cpp">
+    <ClCompile Include="src\PhysicsSystemUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\TextureAsset.cpp">
+    <ClCompile Include="src\VehicleSceneQueryData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\UIObject.cpp">
+    <ClCompile Include="src\VehicleWheelQueryResults.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\UISystem.cpp">
+    <ClCompile Include="src\FrictionPairService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -140,16 +140,19 @@
     <ClInclude Include="src\PhysicsComponent_impl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ShaderAsset.h">
+    <ClInclude Include="src\PhysicsSystemUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\TextureAsset.h">
+    <ClInclude Include="src\VehicleSceneQueryData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\UIObject.h">
+    <ClInclude Include="src\VehicleWheelQueryResults.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\UISystem.h">
+    <ClInclude Include="src\CarControlType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FrictionPairService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

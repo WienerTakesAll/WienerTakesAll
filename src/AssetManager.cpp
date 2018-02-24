@@ -29,7 +29,6 @@ AssetManager::AssetManager() {
 
 }
 
-
 AssetManager::~AssetManager() {
 }
 

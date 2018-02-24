@@ -53,12 +53,12 @@ void RenderingComponent::render(glm::mat4x4 camera) const {
          , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, normal_)));
         glVertexAttribPointer
         (2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
-            , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, uv_)));
+         , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, uv_)));
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffers_[i]);
 
 
-        glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, glm::value_ptr(camera*transform_matrix_));
+        glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, glm::value_ptr(camera * transform_matrix_));
 
         glDrawElements(GL_TRIANGLES, mesh_->meshes_[i].indices_.size(), GL_UNSIGNED_INT, 0);
     }

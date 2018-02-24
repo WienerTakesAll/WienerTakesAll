@@ -16,7 +16,11 @@ PhysicsSettings::PhysicsSettings()
         5.0f,    //fall rate eANALOG_INPUT_STEER_LEFT
         5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
     }
-}) {
+})
+, vehicle_mesh_asset_path("assets/models/carBoxModel.obj")
+, vehicle_mass(1500.f)
+, arena_mesh("assets/models/Terrain.obj")
+, arena_tire_friction(1.f) {
     physx::PxF32 g_steer_vs_forward_speed_data[2 * 8] = {
         0.0f,        0.75f,
         5.0f,        0.75f,
