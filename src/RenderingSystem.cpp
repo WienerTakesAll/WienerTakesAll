@@ -123,7 +123,6 @@ void RenderingSystem::render() {
     start_render();
     setup_cameras();
 
-
     for (size_t i = 0; i < cameras_.size(); i++) {
         int vx = 320 * (i % 2);
         int vy = 240 * (i < 2);

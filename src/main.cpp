@@ -78,17 +78,17 @@ int main(int argc, char* args[]) {
 
         // Events
         input_manager.send_events(events);
-        ui_system.send_events(events);
         gameplay_system.send_events(events);
         physics_system.send_events(events);
         rendering_system.send_events(events);
+        ui_system.send_events(events);
 
         input_manager.handle_events(events);
         gameplay_system.handle_events(events);
         physics_system.handle_events(events);
         rendering_system.handle_events(events);
-        audio_system.handle_events(events);
         ui_system.handle_events(events);
+        audio_system.handle_events(events);
         events.clear();
 
 

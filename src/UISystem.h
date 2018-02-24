@@ -32,7 +32,7 @@ private:
 
     MeshAsset example_mesh_;
     ShaderAsset* example_shader_;
-    std::vector<UIObject> ui_objects_;
+    UIObject example_ui_object_;
 
     SDL_Window* window_;
 };

@@ -64,9 +64,7 @@ void UISystem::update() {
 void UISystem::render() const {
     start_render();
 
-    for (auto ui_object : ui_objects_) {
-        ui_object.render(glm::mat4());
-    }
+    example_ui_object_.render(glm::mat4());
 
     SDL_GL_SwapWindow(window_);
 
@@ -86,7 +84,7 @@ void UISystem::handle_load(const Event& e) {
     example_shader_ = asset_manager_.get_shader_asset("assets/shaders/UIShader");
     TextureAsset* tex = asset_manager_.get_texture_asset("assets/textures/default.png");
 
-    ui_objects_.push_back(UIObject(glm::vec2(-0.25f), glm::vec3(1.0f), glm::vec2(0.5f), &example_mesh_, tex, example_shader_));
+    example_ui_object_ = UIObject(glm::vec2(-0.25f), glm::vec3(1.0f), glm::vec2(0.5f), &example_mesh_, tex, example_shader_);
 }
 
 void UISystem::handle_key_press(const Event& e) {
