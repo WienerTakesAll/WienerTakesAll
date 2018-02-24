@@ -12,6 +12,7 @@ find_package(GLM REQUIRED)
 find_package(ASSIMP REQUIRED)
 find_package(OpenGL REQUIRED)
 
+
 include_directories(
 	${SDL2_INCLUDE_DIRS}
 	${SDL2_MIXER_INCLUDE_DIRS}
@@ -21,12 +22,14 @@ include_directories(
 	${ASSIMP_INCLUDE_DIRS}
 )
 
+
 file(GLOB wienertakesall_src
     "src/*.cpp"
 )
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++1z -g")
 add_executable(${PROJECT_NAME} ${wienertakesall_src})
+
 
 target_include_directories(
 	${PROJECT_NAME} PUBLIC

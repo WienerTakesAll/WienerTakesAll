@@ -25,8 +25,18 @@ void Event::add_value(std::string name, std::string&& arg) {
     string_values_.emplace(name, arg);
 }
 
+
+void Event::add_value(std::string name, void* arg) {
+    EventValue v;
+    v.type_name = typeid(void*).name();
+    v.value.pointer_type = arg;
+    event_values_.emplace(name, v);
+}
+
+
 //get_value
 //Params: name of event, address to store result at, bool for error checking. if true and an error occurs then exit program
+
 template<>
 std::pair<std::string, bool> Event::get_value(const std::string& name, bool crash_on_fail) const {
     const auto val = string_values_.find(name);                 //val - pointer to the event "name"
@@ -85,6 +95,28 @@ std::pair<float, bool> Event::get_value(const std::string& name, bool crash_on_f
     }
 
     return std::make_pair(val->second.value.float_type, true);
+}
+
+template<>
+std::pair<void*, bool> Event::get_value(const std::string& name, bool crash_on_fail) const {
+    const auto val = event_values_.find(name);
+
+    if (val == event_values_.end()) {
+        std::cerr << "Value " << name << " not found in event" << static_cast<int>(event_type) << "!" << std::endl;
+        return std::make_pair(nullptr, false);
+    }
+
+
+    if (val->second.type_name != typeid(void*).name()) {        //the case when crash on fail is not true and value is not found
+        assert((!crash_on_fail));       //if the value is not found and crash_on_fail is true crash the program
+
+        std::cerr
+                << "Wrong type int instead of " << val->second.type_name
+                << " in value " << name << " of event " << static_cast<int>(event_type) << "!" << std::endl;
+        return std::make_pair(nullptr, false);
+    }
+
+    return std::make_pair(val->second.value.pointer_type, true);
 }
 
 template<>

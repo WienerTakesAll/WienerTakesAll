@@ -7,19 +7,24 @@
 #include "SDL_opengl.h"
 #include "glm/glm.hpp"
 
-#include "MeshAsset.h"
+struct MeshAsset;
+class TextureAsset;
+class ShaderAsset;
 
 class RenderingComponent {
 public:
-    //Takes a list of camera matrices and renders up to 4 views
-    //Does not set the shader
-    void render_views(std::array<glm::mat4x4, 4>& cameras, size_t count, GLuint program_id);
-
+    RenderingComponent();
+    //Renders the object from the camera perspective.
+    void render(glm::mat4x4 camera) const;
+    // Multiplies current transform with new transform
     void apply_transform(glm::mat4x4 transform);
+    // Sets current transform to new transform
     void set_transform(glm::mat4x4 transform);
     const glm::mat4x4& get_transform() const;
 
     void set_mesh(MeshAsset* mesh);
+    void set_texture(TextureAsset* texture);
+    void set_shader(ShaderAsset* shader);
 
 private:
     void setupBuffer();
@@ -28,4 +33,6 @@ private:
     std::vector<GLuint> gl_index_buffers_;
     glm::mat4 transform_matrix_;
     MeshAsset* mesh_;
+    TextureAsset* texture_;
+    ShaderAsset* shader_;
 };

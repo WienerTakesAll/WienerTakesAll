@@ -3,7 +3,14 @@
 #include <stdlib.h>
 #include <thread>
 
-#include <SDL.h>
+
+#include "AssetManager.h"
+#include "EventSystem.h"
+#include "PhysicsSystem.h"
+
+#include "SDL.h"
+#include "SDL_image.h"
+
 
 #include "AssetManager.h"
 #include "AudioSystem.h"
@@ -14,6 +21,8 @@
 #include "PhysicsSystem.h"
 #include "PhysicsSettings.h"
 #include "RenderingSystem.h"
+#include "UISystem.h"
+
 
 
 namespace {
@@ -27,14 +36,18 @@ int main(int argc, char* args[]) {
     std::vector<Event> events;
     events.emplace_back(EventType::LOAD_EVENT);
 
+
     PhysicsSettings physics_settings;
 
     AudioSystem audio_system;
     AssetManager asset_manager;
     GameplaySystem gameplay_system;
     InputManager input_manager;
+    UISystem ui_system(asset_manager);
     PhysicsSystem physics_system(asset_manager, physics_settings);
+
     RenderingSystem rendering_system(asset_manager);
+
 
     if (!audio_system.init()) {
         std::cerr << "Audio system failed to initialize, continuing without audio " << std::endl;
@@ -68,11 +81,13 @@ int main(int argc, char* args[]) {
         gameplay_system.send_events(events);
         physics_system.send_events(events);
         rendering_system.send_events(events);
+        ui_system.send_events(events);
 
         input_manager.handle_events(events);
         gameplay_system.handle_events(events);
         physics_system.handle_events(events);
         rendering_system.handle_events(events);
+        ui_system.handle_events(events);
         audio_system.handle_events(events);
         events.clear();
 
@@ -88,6 +103,8 @@ int main(int argc, char* args[]) {
         rendering_system.render();
 
         // UI
+        ui_system.update();
+        ui_system.render();
 
         // Maintain a maximum frame rate of 60fps
         if ( game_is_running ) {

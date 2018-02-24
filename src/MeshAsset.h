@@ -4,6 +4,8 @@
 
 #include "GL/glew.h"
 #include "SDL_opengl.h"
+#include "glm/glm.hpp"
+
 
 struct MeshAsset {
     struct MeshData {
@@ -16,6 +18,6 @@ struct MeshAsset {
         std::vector<VertexData> vertices_;
         std::vector<GLuint> indices_;
     };
-
+    bool valid_;
     std::vector<MeshData> meshes_;
 };

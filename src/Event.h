@@ -33,8 +33,8 @@ public:
         union ValueType {
             int         int_type;
             float       float_type;
+            void*       pointer_type;
             bool        bool_type;
-            //void*       pointer_type; Perhaps?
         };
         ValueType value;
     };
@@ -42,6 +42,7 @@ public:
     void add_value(std::string name, int arg);
     void add_value(std::string name, float arg);
     void add_value(std::string name, std::string&& arg);
+    void add_value(std::string name, void* arg);
 
     template<typename T>
     std::pair<T, bool> get_value(const std::string& name, bool crash_on_fail) const;

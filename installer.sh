@@ -36,6 +36,7 @@ function finish {
 
 trap finish EXIT
 
+
 #GLM, ASSIMP, GLEW
 if [[ "$MACHINE" = "Linux" ]]; then
     apt-get install -y libglm-dev libglew-dev libassimp-dev unzip
@@ -72,6 +73,7 @@ make install -j4
 cd $DIR
 
 
+
 # Physx
 
 (cd $DIR && \
@@ -83,3 +85,4 @@ if [[ "$MACHINE" = "Linux" ]]; then
 elif [[ "$MACHINE" = "Mac" ]]; then
     cp physx/osx/*.so /usr/local/lib
 fi
+
