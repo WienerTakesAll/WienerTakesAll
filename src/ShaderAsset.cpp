@@ -20,7 +20,7 @@ bool ShaderAsset::load_shader(const std::string& vertex_path, const std::string&
         vertex_shader_stream.close();
         vertex_shader_code = vertex_shader_string_stream.str();
     } else {
-        std::cout << "Failed to open " << vertex_path << std::endl;
+        std::cerr << "Failed to open " << vertex_path << std::endl;
         return false;
     }
 
@@ -34,7 +34,7 @@ bool ShaderAsset::load_shader(const std::string& vertex_path, const std::string&
         fragment_shader_stream.close();
         fragment_shader_code = fragment_shader_string_stream.str();
     } else {
-        std::cout << "Failed to open " << fragment_path << std::endl;
+        std::cerr << "Failed to open " << fragment_path << std::endl;
         return false;
     }
 
@@ -81,6 +81,6 @@ void ShaderAsset::check_error(GLuint id) {
     if (length > 0) {
         std::vector<char> errorMessage(length + 1);
         glGetShaderInfoLog(id, length, NULL, &errorMessage[0]);
-        std::cout << &errorMessage.front();
+        std::cerr << &errorMessage.front();
     }
 }
