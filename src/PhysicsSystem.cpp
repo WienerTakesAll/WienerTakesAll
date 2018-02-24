@@ -22,10 +22,8 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     , g_cooking_(PxCreateCooking(PX_PHYSICS_VERSION, *g_foundation_, g_scale_))
     , g_scene_(NULL)
     , num_vehicles_(0)
-      // Allocate simulation data so we can switch from 3-wheeled to 4-wheeled vehicles by switching simulation data.
-    , wheels_sim_data_4w_(PxVehicleWheelsSimData::allocate(4))
       // Data to store reports for each wheel.
-    , wheel_query_results (VehicleWheelQueryResults::allocate(MAX_NUM_4W_VEHICLES * 4))
+    , wheel_query_results_(VehicleWheelQueryResults::allocate(MAX_NUM_4W_VEHICLES * 4))
       // Scene query data for to allow raycasts for all suspensions of all vehicles.
     , sq_data_ (VehicleSceneQueryData::allocate(MAX_NUM_4W_VEHICLES * 4))
     , sq_wheel_raycast_batch_query_(NULL)
@@ -107,9 +105,9 @@ void PhysicsSystem::update() {
                 (PxVehicleDrive4W&)*vehicles_[i] // focusVehicle
             );
 
-            PxWheelQueryResult wheel_query_results[PX_MAX_NB_WHEELS];
+            PxWheelQueryResult wheel_query_results_[PX_MAX_NB_WHEELS];
             vehicle_query_results.push_back({
-                wheel_query_results,
+                wheel_query_results_,
                 vehicles_[i]->mWheelsSimData.getNbWheels()
             });
         }
@@ -330,9 +328,7 @@ void PhysicsSystem::create_4w_vehicle (
     // Increment the number of vehicles
     vehicles_[num_vehicles_] = vehicle;
     vehicle_wheel_query_results_[num_vehicles_].nbWheelQueryResults = 4;
-    vehicle_wheel_query_results_[num_vehicles_].wheelQueryResults = wheel_query_results->add_vehicle(4);
+    vehicle_wheel_query_results_[num_vehicles_].wheelQueryResults = wheel_query_results_->add_vehicle(4);
     num_vehicles_++;
-
-    drive_sim_data_4w_ = drive_sim_data;
 }
 

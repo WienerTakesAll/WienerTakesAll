@@ -2,6 +2,10 @@
 
 #include "WheelMeshGenerator.h"
 
+namespace {
+    const int MAX_NUM_VERTS_IN_CIRCLE = 16;
+}
+
 physx::PxConvexMesh* WheelMeshGenerator::create_wheel_convex_mesh(
     const physx::PxVec3* verts,
     const physx::PxU32 num_verts,
@@ -61,7 +65,6 @@ physx::PxConvexMesh* WheelMeshGenerator::create_cylinder_convex_mesh(
     physx::PxPhysics& physics,
     physx::PxCooking& cooking
 ) {
-#define  MAX_NUM_VERTS_IN_CIRCLE 16
     PX_ASSERT(num_circle_points < MAX_NUM_VERTS_IN_CIRCLE);
     physx::PxVec3 verts[2 * MAX_NUM_VERTS_IN_CIRCLE];
     physx::PxU32 numVerts = 2 * num_circle_points;
@@ -76,7 +79,4 @@ physx::PxConvexMesh* WheelMeshGenerator::create_cylinder_convex_mesh(
     }
 
     return create_convex_mesh(verts, numVerts, physics, cooking);
-
-#undef MAX_NUM_VERTS_IN_CIRCLE
-
 }

@@ -57,14 +57,11 @@ private:
     physx::PxU32 num_vehicles_;
     std::vector<VehicleControls> vehicle_controls_;
 
-    // Cached simulation data of focus vehicle in 4W mode.
-    physx::PxVehicleWheelsSimData* wheels_sim_data_4w_;
-    physx::PxVehicleDriveSimData4W drive_sim_data_4w_;
-
-    VehicleWheelQueryResults* wheel_query_results;
+    VehicleWheelQueryResults* wheel_query_results_;
     VehicleSceneQueryData* sq_data_;
     physx::PxBatchQuery* sq_wheel_raycast_batch_query_;
 
+    // internal helpers
     AssetManager& asset_manager_;
     PhysicsSettings& settings_;
 
