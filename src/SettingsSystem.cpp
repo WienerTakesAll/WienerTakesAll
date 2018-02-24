@@ -134,9 +134,9 @@ std::string SettingsSystem::vec_to_str(const std::vector<std::string>& vec) cons
 }
 
 void SettingsSystem::handle_keypress_event(const Event& e) {
-    int key = e.get_value<int>("key", -1);
+    auto key = e.get_value<int>("key", true);
 
-    switch (key) {
+    switch (key.first) {
         case SDLK_F5:
             if (reload_settings()) {
                 EventSystem::queue_event( Event( EventType::RELOAD_SETTINGS_EVENT ) );

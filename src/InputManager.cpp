@@ -7,35 +7,8 @@
 
 InputManager::InputManager(std::shared_ptr<InputSettings> settings)
     : settings_(settings) {
-    int num_controllers_player = SDL_NumJoysticks();
-
-    // Link player controllers_
-    SDL_GameControllerEventState(SDL_ENABLE);
-    SDL_GameController* controller = nullptr;
-
-    for (int player_id = 0; player_id < num_controllers_player; ++player_id) {
-        if (SDL_IsGameController(player_id)) {
-            controller = SDL_GameControllerOpen(player_id);
-
-            if (controller) {
-                controllers_.push_back(controller);
-                std::cout << "Controller for player " << player_id << " linked" << std::endl;
-            } else {
-                std::cerr << "Could not open GameController " << player_id << ": " << SDL_GetError() << std::endl;
-            }
-
-        }
-    }
-
-    // Create AI controllers_
-    if (num_controllers_player < settings_->max_players) {
-        for (int player_id = num_controllers_player; player_id < settings_->max_players; ++player_id) {
-            // Create AI controller
-            std::cout << "Create AI Controller for player " << player_id << " here" << std::endl;
-        }
-    }
-
-    add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &InputManager::handle_update_settings_event, this);
+    EventSystem::add_event_handler(EventType::LOAD_EVENT, &InputManager::handle_load_event, this);
+    EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &InputManager::handle_reload_settings_event, this);
 }
 
 void InputManager::process_input(SDL_Event* event) {
@@ -190,11 +163,11 @@ void InputManager::process_input(SDL_Event* event) {
         }
 
         case SDL_CONTROLLERAXISMOTION: {
-            int key = event->caxis.axis;
-            int value = event->caxis.value; // Current displacement of joystick
+            key = event->caxis.axis;
+            value = event->caxis.value; // Current displacement of joystick
 
             if ((value > -settings_->deadzone) && (value < settings_->deadzone)) {
-                break;
+                //break;
             }
 
             player_id = event->caxis.which; // Joystick ID of event sender
@@ -270,6 +243,36 @@ void InputManager::quit() {
     std::cout << "All controllers_ closed" << std::endl;
 }
 
-void InputManager::handle_update_settings_event(const Event& event) {
+void InputManager::handle_reload_settings_event(const Event& event) {
     // Add any necessary updates here
+}
+
+void InputManager::handle_load_event(const Event& e) {
+    int num_controllers_player = SDL_NumJoysticks();
+
+    // Link player controllers_
+    SDL_GameControllerEventState(SDL_ENABLE);
+    SDL_GameController* controller = nullptr;
+
+    for (int player_id = 0; player_id < num_controllers_player; ++player_id) {
+        if (SDL_IsGameController(player_id)) {
+            controller = SDL_GameControllerOpen(player_id);
+
+            if (controller) {
+                controllers_.push_back(controller);
+                std::cout << "Controller for player " << player_id << " linked" << std::endl;
+            } else {
+                std::cerr << "Could not open GameController " << player_id << ": " << SDL_GetError() << std::endl;
+            }
+
+        }
+    }
+
+    // Create AI controllers_
+    if (num_controllers_player < settings_->max_players) {
+        for (int player_id = num_controllers_player; player_id < settings_->max_players; ++player_id) {
+            // Create AI controller
+            std::cout << "Create AI Controller for player " << player_id << " here" << std::endl;
+        }
+    }
 }

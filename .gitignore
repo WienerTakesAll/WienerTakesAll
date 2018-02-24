@@ -1,6 +1,10 @@
 # Project
 build/
 WienerTakesAll
+lib
+lib.zip
+physx
+physx.zip
 
 # User-specific files
 *.suo
@@ -191,6 +195,7 @@ _pkginfo.txt
 
 # Others
 ClientBin/
+.DS_Store
 ~$*
 *~
 *.dbmdl

@@ -3,59 +3,56 @@
 #include "AssetManager.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+
+namespace {
+    const std::string CAR_VERTEX_SHADER_PATH = "assets/shaders/SimpleVertexShader.vertexshader";
+    const std::string CAR_FRAGMENT_SHADER_PATH = "assets/shaders/SimpleFragmentShader.fragmentshader";
+    const std::string CAR_MESH_PATH = "assets/models/carBoxModel.obj";
+    const std::string TERRAIN_MESH_PATH = "assets/models/Terrain.obj";
+}
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
+    EventSystem::add_event_handler(EventType::ADD_VEHICLE, &RenderingSystem::handle_add_vehicle, this);
+    EventSystem::add_event_handler(EventType::ADD_ARENA, &RenderingSystem::handle_add_terrain, this);
+    EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
 }
 
 void RenderingSystem::update() {
-    example_objects_[1].apply_transform(glm::rotate(glm::mat4x4(), 0.01f, glm::vec3(1, 1, 1)));
 }
 
 void RenderingSystem::load(const Event& e) {
     init_window();
-
-    example_shader_.load_shader(
-        "assets/shaders/SimpleVertexShader.vertexshader",
-        "assets/shaders/SimpleFragmentShader.fragmentshader");
-
-    MeshAsset* mesh = asset_manager_.get_mesh_asset("assets/models/Ship.obj");
-
-    example_objects_.emplace_back();
-    example_objects_[0].set_mesh(mesh);
-    example_objects_[0].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(0, -2, 0)));
-
-    example_objects_.emplace_back();
-    example_objects_[1].set_mesh(mesh);
-    example_objects_[1].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(1, 2, 1)));
-
     setup_cameras();
 }
 
 void RenderingSystem::handle_key_press(const Event& e) {
-    int player_id = e.get_value<int>("player_id", -1);
-    int key = e.get_value<int>("key", -1);
-    // int value = e.get_value<int>("value", 0);
+    // function calls to get_value: param1= string:name, param2 = bool:crash_on_fail
+    // pair.first == the int, pair.second == bool
+    // std::pair<int, bool> player_id = e.get_value<int>("player_id", true);
+    std::pair<int, bool> key = e.get_value<int>("key", true);
+    // std::pair<int, bool> value = e.get_value<int>("value", true);
 
     glm::mat4 transform;
 
-    switch (key) {
+    switch (key.first) {
         case SDLK_a:
-            transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(0, 1, 0));
+            //transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(0, 1, 0));
             break;
 
         case SDLK_d:
-            transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(0, 1, 0));
+            //transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(0, 1, 0));
             break;
 
         case SDLK_w:
-            transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(1, 0, 0));
+            //transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(1, 0, 0));
             break;
 
         case SDLK_s:
-            transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(1, 0, 0));
+            //transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(1, 0, 0));
             break;
 
         default:
@@ -68,8 +65,66 @@ void RenderingSystem::handle_key_press(const Event& e) {
 
 }
 
+void RenderingSystem::handle_add_vehicle(const Event& e) {
+    // Load game object parameters
+    std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
+    assert(object_id.second);
+
+    std::pair<int, bool> x = e.get_value<int>("pos_x", true);
+    assert(x.second);
+
+    std::pair<int, bool> y = e.get_value<int>("pos_y", true);
+    assert(y.second);
+
+    std::pair<int, bool> z = e.get_value<int>("pos_z", true);
+    assert(z.second);
+
+    // Load car assets
+    example_shader_.load_shader(
+        CAR_VERTEX_SHADER_PATH,
+        CAR_FRAGMENT_SHADER_PATH
+    );
+
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(CAR_MESH_PATH);
+
+    // Store car
+    example_objects_.emplace_back();
+    example_objects_[object_id.first].set_mesh(mesh);
+    example_objects_[object_id.first].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
+
+    car_indices_.push_back(object_id.first);
+}
+
+void RenderingSystem::handle_add_terrain(const Event& e) {
+    // Load game object parameters
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(TERRAIN_MESH_PATH);
+
+    // Store terrain
+    example_objects_.emplace_back();
+    example_objects_[object_id].set_mesh(mesh);
+}
+
+void RenderingSystem::handle_object_transform(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    float x = e.get_value<float>("pos_x", true).first;
+    float y = e.get_value<float>("pos_y", true).first;
+    float z = e.get_value<float>("pos_z", true).first;
+
+    float qw = e.get_value<float>("qua_w", true).first;
+    float qx = e.get_value<float>("qua_x", true).first;
+    float qy = e.get_value<float>("qua_y", true).first;
+    float qz = e.get_value<float>("qua_z", true).first;
+
+    example_objects_[object_id].set_transform(glm::translate(glm::mat4(), glm::vec3(x, y, z)));
+    example_objects_[object_id].apply_transform(glm::toMat4(glm::quat(qw, qx, qy, qz)));
+}
+
 void RenderingSystem::render() {
     start_render();
+    setup_cameras();
 
     for (auto& object : example_objects_) {
         object.render_views(cameras_, 4, example_shader_.program_id_);
@@ -79,8 +134,6 @@ void RenderingSystem::render() {
 }
 
 bool RenderingSystem::init_window() {
-    SDL_Init(SDL_INIT_EVERYTHING);
-
     const int sdl_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
     const int screen_width = 640;
@@ -102,7 +155,7 @@ bool RenderingSystem::init_window() {
     }
 
 
-    SDL_GLContext glContext = SDL_GL_CreateContext(window_);
+    SDL_GL_CreateContext(window_);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
@@ -138,17 +191,16 @@ void RenderingSystem::start_render() const {
 void RenderingSystem::setup_cameras() {
     glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 100.0f);
 
-    cameras_[0] = glm::translate(glm::mat4(), glm::vec3(5.f * std::sin(0), 5.f * std::sin(0), 5.f * std::cos(0)));
-    cameras_[0] = P * glm::lookAt(glm::vec3(cameras_[0][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    glm::mat4x4 transform;
 
-    cameras_[1] = glm::translate(glm::mat4(), glm::vec3(5.f * std::cos(0), 5.f * std::cos(0), 5.f * std::sin(0)));
-    cameras_[1] = P * glm::lookAt(glm::vec3(cameras_[1][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    for (size_t i = 0; i < car_indices_.size(); i++)
+    {
+        transform = example_objects_[car_indices_[i]].get_transform();
+        glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
 
-    cameras_[2] = glm::translate(glm::mat4(), glm::vec3(5.f * std::cos(std::sqrt(0)), 5.f * std::cos(0), 5.f * std::sin(0)));
-    cameras_[2] = P * glm::lookAt(glm::vec3(cameras_[2][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-
-    cameras_[3] = glm::translate(glm::mat4(), glm::vec3(15.f * std::sin(0), 15.f * std::sin(0), 15.f * std::cos(0)));
-    cameras_[3] = P * glm::lookAt(glm::vec3(cameras_[3][3]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+        cameras_[i] = glm::translate(transform, glm::vec3(0, 3, -5));
+        cameras_[i] = P * glm::lookAt(glm::vec3(cameras_[i][3]), car_pos, glm::vec3(0, 1, 0));
+    }
 }
 
 void RenderingSystem::end_render() const {
