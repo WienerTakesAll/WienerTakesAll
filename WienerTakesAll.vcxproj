@@ -105,6 +105,7 @@
     <ClCompile Include="src\AssetManager.cpp" />
     <ClCompile Include="src\AudioSystem.cpp" />
     <ClCompile Include="src\Event.cpp" />
+    <ClCompile Include="src\FrictionPairService.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
     <ClCompile Include="src\GameObjectCounter.cpp" />
     <ClCompile Include="src\GameplaySystem.cpp" />
@@ -123,11 +124,13 @@
   <ItemGroup>
     <ClInclude Include="src\AssetManager.h" />
     <ClInclude Include="src\AudioSystem.h" />
+    <ClInclude Include="src\CarControlType.h" />
     <ClInclude Include="src\Event.h" />
     <ClInclude Include="src\EventSystem.h" />
     <ClInclude Include="src\EventSystem_impl.h" />
     <ClInclude Include="src\Event_impl.h" />
     <ClInclude Include="src\ExampleClass.h" />
+    <ClInclude Include="src\FrictionPairService.h" />
     <ClInclude Include="src\GameObject.h" />
     <ClInclude Include="src\GameObjectCounter.h" />
     <ClInclude Include="src\GameplaySystem.h" />

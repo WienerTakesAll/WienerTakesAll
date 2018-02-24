@@ -16,8 +16,8 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
-    EventSystem::add_event_handler(EventType::ADD_CAR, &RenderingSystem::handle_add_car, this);
-    EventSystem::add_event_handler(EventType::ADD_TERRAIN_EVENT, &RenderingSystem::handle_add_terrain, this);
+    EventSystem::add_event_handler(EventType::ADD_VEHICLE, &RenderingSystem::handle_add_vehicle, this);
+    EventSystem::add_event_handler(EventType::ADD_ARENA, &RenderingSystem::handle_add_terrain, this);
     EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
 }
 
@@ -65,7 +65,7 @@ void RenderingSystem::handle_key_press(const Event& e) {
 
 }
 
-void RenderingSystem::handle_add_car(const Event& e) {
+void RenderingSystem::handle_add_vehicle(const Event& e) {
     // Load game object parameters
     std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
     assert(object_id.second);

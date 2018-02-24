@@ -5,15 +5,15 @@
 #include <string>
 
 enum class EventType {
-    ADD_CAR,
-    ADD_TERRAIN_EVENT,
+    ADD_VEHICLE,
+    ADD_ARENA,
     LOAD_EVENT,
     DUMMY_EVENT,
     OBJECT_TRANSFORM_EVENT,
     KEYPRESS_EVENT,
 
-    // Car control events
-    CAR_CONTROL,
+    // Vehicle control events
+    VEHICLE_CONTROL,
 
     // Keep at end of list
     EVENT_COUNT

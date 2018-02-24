@@ -1,5 +1,7 @@
 #pragma once
 
+#include "PxPhysicsAPI.h"
+
 using namespace physx;
 
 void setup_actor (
@@ -34,41 +36,20 @@ void compute_wheel_widths_and_radii(
     PxF32* wheel_radii
 );
 
-PxVec3 compute_chassis_aabb_dimensions(const PxConvexMesh* chassis_convex_mesh);
+void vehicle_setup_vehicle_shape_query_filter_data(PxFilterData* qry_filter_data);
 
-void create_4w_vehicle_simulation_data(
+PxVehicleChassisData create_chassis_data(
     const PxF32 chassis_mass,
-    PxConvexMesh* chassis_convex_mesh,
+    PxConvexMesh* chassis_convex_mesh
+);
+
+PxVehicleDriveSimData4W create_drive_sim_data(
+    const PxVec3 wheel_centre_offsets[4]
+);
+
+PxVehicleWheelsSimData* create_wheels_sim_data(
+    const PxVehicleChassisData& chassis_data,
     const PxF32 wheel_mass,
     PxConvexMesh** wheel_convex_meshes,
-    const PxVec3* wheel_centre_offsets,
-    PxVehicleWheelsSimData& wheels_data,
-    PxVehicleDriveSimData4W& drive_data,
-    PxVehicleChassisData& chassis_data
+    const PxVec3* wheel_centre_offsets
 );
-
-PxConvexMesh* create_convex_mesh(
-    const PxVec3* verts,
-    const PxU32 numVerts,
-    PxPhysics& physics,
-    PxCooking& cooking
-);
-
-PxConvexMesh* create_cylinder_convex_mesh(
-    const PxF32 width,
-    const PxF32 radius,
-    const PxU32 num_circle_points,
-    PxPhysics& physics,
-    PxCooking& cooking
-);
-
-PxConvexMesh* create_wheel_convex_mesh(
-    const PxVec3* verts,
-    const PxU32 numVerts,
-    PxPhysics& physics,
-    PxCooking& cooking
-);
-
-PxVehicleDrivableSurfaceToTireFrictionPairs* create_friction_pairs(const PxMaterial* default_material);
-
-void vehicle_setup_vehicle_shape_query_filter_data(PxFilterData* qry_filter_data);
