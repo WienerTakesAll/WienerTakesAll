@@ -16,8 +16,9 @@ public:
     RenderingComponent();
     //Renders the object from the camera perspective.
     void render(glm::mat4x4 camera) const;
-
+    // Multiplies current transform with new transform
     void apply_transform(glm::mat4x4 transform);
+    // Sets current transform to new transform
     void set_transform(glm::mat4x4 transform);
     const glm::mat4x4& get_transform() const;
 
