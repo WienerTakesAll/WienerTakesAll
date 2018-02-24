@@ -85,7 +85,7 @@ void PhysicsSystem::update() {
     for (int i = 0; i < SIM_STEPS; i++) {
         std::vector<PxVehicleWheelQueryResult> vehicle_query_results;
 
-        for (int i = 0; i < num_vehicles_; i++) {
+        for (unsigned int i = 0; i < num_vehicles_; i++) {
             // Build vehicle input data
             physx::PxVehicleDrive4WRawInputData g_vehicle_input_data;
             g_vehicle_input_data.setDigitalAccel(true);
@@ -218,7 +218,6 @@ void PhysicsSystem::handle_add_vehicle(const Event& e) {
         wheel_center_offsets,
         vehicle.get_mesh(),
         &wheel_meshes[0],
-        transform,
         true
     );
 
@@ -264,31 +263,35 @@ void PhysicsSystem::handle_vehicle_control(const Event& e) {
 void PhysicsSystem::create_4w_vehicle (
     const PxMaterial& material,
     const PxF32 chassis_mass,
-    const PxVec3* wheel_centre_offsets4,
+    const PxVec3 wheel_centre_offsets[4],
     PxConvexMesh* chassis_convex_mesh,
-    PxConvexMesh** wheel_convex_meshes4,
-    const PxTransform& start_transform,
-    const bool use_auto_gear_flag
+    PxConvexMesh* wheel_convex_meshes[4],
+    bool use_auto_gear_flag
 ) {
-    PxVehicleWheelsSimData* wheels_sim_data = PxVehicleWheelsSimData::allocate(4);
-    PxVehicleDriveSimData4W drive_sim_data;
-    PxVehicleChassisData chassis_data;
-    create_4w_vehicle_simulation_data(
-        chassis_mass,
-        chassis_convex_mesh,
-        20.0f,
-        wheel_convex_meshes4,
-        wheel_centre_offsets4,
-        *wheels_sim_data,
-        drive_sim_data,
-        chassis_data
-    );
+    PxVehicleChassisData chassis_data =
+        create_chassis_data(
+            chassis_mass,
+            chassis_convex_mesh
+        );
+
+    PxVehicleDriveSimData4W drive_sim_data =
+        create_drive_sim_data(
+            wheel_centre_offsets
+        );
+
+    PxVehicleWheelsSimData* wheels_sim_data =
+        create_wheels_sim_data(
+            chassis_data,
+            20.0f,
+            wheel_convex_meshes,
+            wheel_centre_offsets
+        );
 
     // Instantiate and finalize the vehicle using physx.
     PxRigidDynamic* vehicle_actor =
         create_4w_vehicle_actor(
             chassis_data,
-            wheel_convex_meshes4,
+            wheel_convex_meshes,
             chassis_convex_mesh,
             *g_scene_,
             *g_physics_,
@@ -301,12 +304,6 @@ void PhysicsSystem::create_4w_vehicle (
 
     // Free the sim data because we don't need that any more.
     wheels_sim_data->free();
-
-    // Don't forget to add the actor to the scene.
-    {
-        PxSceneWriteLock scoped_lock(*g_scene_);
-        g_scene_->addActor(*vehicle_actor);
-    }
 
     // Set up the mapping between wheel and actor shape.
     vehicle->mWheelsSimData.setWheelShapeMapping(0, 0);
@@ -324,6 +321,12 @@ void PhysicsSystem::create_4w_vehicle (
 
     // Set the autogear mode of the instantiate vehicle.
     vehicle->mDriveDynData.setUseAutoGears(use_auto_gear_flag);
+
+    // Don't forget to add the actor to the scene.
+    {
+        PxSceneWriteLock scoped_lock(*g_scene_);
+        g_scene_->addActor(*vehicle_actor);
+    }
 
     // Increment the number of vehicles
     vehicles_[num_vehicles_] = vehicle;

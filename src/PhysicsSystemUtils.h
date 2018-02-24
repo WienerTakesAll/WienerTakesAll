@@ -1,5 +1,7 @@
 #pragma once
 
+#include "PxPhysicsAPI.h"
+
 using namespace physx;
 
 void setup_actor (
@@ -34,17 +36,20 @@ void compute_wheel_widths_and_radii(
     PxF32* wheel_radii
 );
 
-PxVec3 compute_chassis_aabb_dimensions(const PxConvexMesh* chassis_convex_mesh);
+void vehicle_setup_vehicle_shape_query_filter_data(PxFilterData* qry_filter_data);
 
-void create_4w_vehicle_simulation_data(
+PxVehicleChassisData create_chassis_data(
     const PxF32 chassis_mass,
-    PxConvexMesh* chassis_convex_mesh,
-    const PxF32 wheel_mass,
-    PxConvexMesh** wheel_convex_meshes,
-    const PxVec3* wheel_centre_offsets,
-    PxVehicleWheelsSimData& wheels_data,
-    PxVehicleDriveSimData4W& drive_data,
-    PxVehicleChassisData& chassis_data
+    PxConvexMesh* chassis_convex_mesh
 );
 
-void vehicle_setup_vehicle_shape_query_filter_data(PxFilterData* qry_filter_data);
+PxVehicleDriveSimData4W create_drive_sim_data(
+    const PxVec3 wheel_centre_offsets[4]
+);
+
+PxVehicleWheelsSimData* create_wheels_sim_data(
+    const PxVehicleChassisData& chassis_data,
+    const PxF32 wheel_mass,
+    PxConvexMesh** wheel_convex_meshes,
+    const PxVec3* wheel_centre_offsets
+);

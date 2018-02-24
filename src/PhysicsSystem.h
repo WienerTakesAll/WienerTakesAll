@@ -35,8 +35,7 @@ private:
         const physx::PxVec3* wheelCentreOffsets4,
         physx::PxConvexMesh* chassisConvexMesh,
         physx::PxConvexMesh** wheelConvexMeshes4,
-        const physx::PxTransform& startTransform,
-        const bool useAutoGearFlag
+        bool useAutoGearFlag
     );
 
     std::vector<PhysicsComponent<false>> dynamic_objects_;

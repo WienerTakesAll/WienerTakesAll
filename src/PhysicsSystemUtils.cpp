@@ -1,8 +1,7 @@
 #include <iostream>
 
-#include "PxPhysicsAPI.h"
-
 #include "PhysicsSystemUtils.h"
+
 #include "PhysicsComponent.h"
 #include "FrictionPairService.h"
 #include "CollisionFlags.h"
@@ -132,50 +131,45 @@ void compute_wheel_widths_and_radii(
     }
 }
 
-PxVec3 compute_chassis_aabb_dimensions(const PxConvexMesh* chassis_convex_mesh) {
-    const PxU32 num_chassis_verts = chassis_convex_mesh->getNbVertices();
-    const PxVec3* chassis_verts = chassis_convex_mesh->getVertices();
+void vehicle_setup_vehicle_shape_query_filter_data(PxFilterData* qry_filter_data) {
+    if (0 != qry_filter_data->word3) {
+        std::cerr << "word3 is reserved for filter data for vehicle raycast queries" << std::endl;
+        assert(0 == qry_filter_data->word3);
+    }
+
+    qry_filter_data->word3 = (PxU32)CollisionFlags::UNDRIVABLE_SURFACE;
+}
+
+PxVehicleChassisData create_chassis_data(
+    const PxF32 chassis_mass,
+    PxConvexMesh* chassis_convex_mesh
+) {
+    PxVehicleChassisData chassis_data;
+    // Extract the chassis AABB dimensions from the chassis convex mesh.
     PxVec3 chassis_min(PX_MAX_F32, PX_MAX_F32, PX_MAX_F32);
     PxVec3 chassis_max(-PX_MAX_F32, -PX_MAX_F32, -PX_MAX_F32);
 
-    for (PxU32 i = 0; i < num_chassis_verts; i++) {
-        chassis_min.x = PxMin(chassis_min.x, chassis_verts[i].x);
-        chassis_min.y = PxMin(chassis_min.y, chassis_verts[i].y);
-        chassis_min.z = PxMin(chassis_min.z, chassis_verts[i].z);
-        chassis_max.x = PxMax(chassis_max.x, chassis_verts[i].x);
-        chassis_max.y = PxMax(chassis_max.y, chassis_verts[i].y);
-        chassis_max.z = PxMax(chassis_max.z, chassis_verts[i].z);
+    for (PxU32 i = 0; i < chassis_convex_mesh->getNbVertices(); i++) {
+        chassis_min.x = PxMin(chassis_min.x, chassis_convex_mesh->getVertices()[i].x);
+        chassis_min.y = PxMin(chassis_min.y, chassis_convex_mesh->getVertices()[i].y);
+        chassis_min.z = PxMin(chassis_min.z, chassis_convex_mesh->getVertices()[i].z);
+        chassis_max.x = PxMax(chassis_max.x, chassis_convex_mesh->getVertices()[i].x);
+        chassis_max.y = PxMax(chassis_max.y, chassis_convex_mesh->getVertices()[i].y);
+        chassis_max.z = PxMax(chassis_max.z, chassis_convex_mesh->getVertices()[i].z);
     }
 
-    const PxVec3 chassis_dims = chassis_max - chassis_min;
-    return chassis_dims;
-}
-
-
-
-void create_4w_vehicle_simulation_data(
-    const PxF32 chassis_mass,
-    PxConvexMesh* chassis_convex_mesh,
-    const PxF32 wheel_mass,
-    PxConvexMesh** wheel_convex_meshes,
-    const PxVec3* wheel_centre_offsets,
-    PxVehicleWheelsSimData& wheels_data,
-    PxVehicleDriveSimData4W& drive_data,
-    PxVehicleChassisData& chassis_data
-) {
-    // Extract the chassis AABB dimensions from the chassis convex mesh.
-    const PxVec3 chassis_dims = compute_chassis_aabb_dimensions(chassis_convex_mesh);
+    const PxVec3 CHASSIS_DIMS = chassis_max - chassis_min;
 
     // The origin is at the center of the chassis mesh.
     // Set the center of mass to be below this point and a little towards the front.
-    const PxVec3 chassis_cm_offset = PxVec3(0.0f, -chassis_dims.y * 0.5f + .65f, 0.25f);
+    const PxVec3 CHASSIS_CM_OFFSET = PxVec3(0.0f, -CHASSIS_DIMS.y * 0.5f + .65f, 0.25f);
 
     // Now compute the chassis mass and moment of inertia.
     // Use the moment of inertia of a cuboid as an approximate value for the chassis moi.
     PxVec3 chassis_moi(
-        (chassis_dims.y * chassis_dims.y + chassis_dims.z * chassis_dims.z)*chassis_mass / 12.0f,
-        (chassis_dims.x * chassis_dims.x + chassis_dims.z * chassis_dims.z)*chassis_mass / 12.0f,
-        (chassis_dims.x * chassis_dims.x + chassis_dims.y * chassis_dims.y)*chassis_mass / 12.0f
+        (CHASSIS_DIMS.y * CHASSIS_DIMS.y + CHASSIS_DIMS.z * CHASSIS_DIMS.z)*chassis_mass / 12.0f,
+        (CHASSIS_DIMS.x * CHASSIS_DIMS.x + CHASSIS_DIMS.z * CHASSIS_DIMS.z)*chassis_mass / 12.0f,
+        (CHASSIS_DIMS.x * CHASSIS_DIMS.x + CHASSIS_DIMS.y * CHASSIS_DIMS.y)*chassis_mass / 12.0f
     );
     // A bit of tweaking here.  The car will have more responsive turning if we reduce the
     // y-component of the chassis moment of inertia.
@@ -184,12 +178,73 @@ void create_4w_vehicle_simulation_data(
     // Let's set up the chassis data structure now.
     chassis_data.mMass = chassis_mass;
     chassis_data.mMOI = chassis_moi;
-    chassis_data.mCMOffset = chassis_cm_offset;
+    chassis_data.mCMOffset = CHASSIS_CM_OFFSET;
+
+    return chassis_data;
+}
+
+PxVehicleDriveSimData4W create_drive_sim_data(
+    const PxVec3 wheel_centre_offsets[4]
+) {
+    // Set up the differential, engine, gears, clutch, and ackermann steering.
+    PxVehicleDriveSimData4W drive_sim_data;
+
+    // Diff
+    PxVehicleDifferential4WData diff;
+    diff.mType = PxVehicleDifferential4WData::eDIFF_TYPE_LS_4WD;
+    drive_sim_data.setDiffData(diff);
+
+    // Engine
+    PxVehicleEngineData engine;
+    engine.mPeakTorque = 50.0f;
+    engine.mMaxOmega = 60.0f; // approx 6000 rpm
+    drive_sim_data.setEngineData(engine);
+
+    // Gears
+    PxVehicleGearsData gears;
+    gears.mSwitchTime = 0.5f;
+    drive_sim_data.setGearsData(gears);
+
+    // Clutch
+    PxVehicleClutchData clutch;
+    clutch.mStrength = 10.0f;
+    drive_sim_data.setClutchData(clutch);
+
+    // Ackermann steer accuracy
+    PxVehicleAckermannGeometryData ackermann;
+    ackermann.mAccuracy = 1.0f;
+    ackermann.mAxleSeparation =
+        wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].z
+        - wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eREAR_LEFT].z;
+    ackermann.mFrontWidth =
+        wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].x
+        - wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].x;
+    ackermann.mRearWidth =
+        wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].x
+        - wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eREAR_LEFT].x;
+
+    drive_sim_data.setAckermannGeometryData(ackermann);
+
+    return drive_sim_data;
+}
+
+PxVehicleWheelsSimData* create_wheels_sim_data(
+    const PxVehicleChassisData& chassis_data,
+    const PxF32 wheel_mass,
+    PxConvexMesh** wheel_convex_meshes,
+    const PxVec3* wheel_centre_offsets
+) {
+    PxVehicleWheelsSimData* wheels_sim_data = PxVehicleWheelsSimData::allocate(4);
 
     // Compute the sprung masses of each suspension spring using a helper function.
     PxF32 suspension_sprung_masses[4];
-    PxVehicleComputeSprungMasses(4, wheel_centre_offsets, chassis_cm_offset, chassis_mass, 1, suspension_sprung_masses);
-
+    PxVehicleComputeSprungMasses(
+        4,
+        wheel_centre_offsets,
+        chassis_data.mCMOffset,
+        chassis_data.mMass,
+        1,
+        suspension_sprung_masses);
 
     // Extract the wheel radius and width from the wheel convex meshes.
     PxF32 wheel_widths[4];
@@ -280,70 +335,25 @@ void create_4w_vehicle_simulation_data(
     PxVec3 tire_force_app_cm_offsets[4];
 
     for (PxU32 i = 0; i < 4; i++) {
-        wheel_centre_cm_offsets[i] = wheel_centre_offsets[i] - chassis_cm_offset;
+        wheel_centre_cm_offsets[i] = wheel_centre_offsets[i] - chassis_data.mCMOffset;
         susp_force_app_cm_offsets[i] = PxVec3(wheel_centre_cm_offsets[i].x, 1.3f, wheel_centre_cm_offsets[i].z);
         tire_force_app_cm_offsets[i] = PxVec3(wheel_centre_cm_offsets[i].x, 1.3f, wheel_centre_cm_offsets[i].z);
     }
 
     // Now add the wheel, tire and suspension data.
     for (PxU32 i = 0; i < 4; i++) {
-        wheels_data.setWheelData(i, wheels[i]);
-        wheels_data.setTireData(i, tires[i]);
-        wheels_data.setSuspensionData(i, susps[i]);
-        wheels_data.setSuspTravelDirection(i, susp_travel_directions[i]);
-        wheels_data.setWheelCentreOffset(i, wheel_centre_cm_offsets[i]);
-        wheels_data.setSuspForceAppPointOffset(i, susp_force_app_cm_offsets[i]);
-        wheels_data.setTireForceAppPointOffset(i, tire_force_app_cm_offsets[i]);
+        wheels_sim_data->setWheelData(i, wheels[i]);
+        wheels_sim_data->setTireData(i, tires[i]);
+        wheels_sim_data->setSuspensionData(i, susps[i]);
+        wheels_sim_data->setSuspTravelDirection(i, susp_travel_directions[i]);
+        wheels_sim_data->setWheelCentreOffset(i, wheel_centre_cm_offsets[i]);
+        wheels_sim_data->setSuspForceAppPointOffset(i, susp_force_app_cm_offsets[i]);
+        wheels_sim_data->setTireForceAppPointOffset(i, tire_force_app_cm_offsets[i]);
     }
 
     // Set the car to perform 3 sub-steps when it moves with a forwards speed of less than 5.0
     // and with a single step when it moves at speed greater than or equal to 5.0.
-    wheels_data.setSubStepCount(5.0f, 3, 1);
+    wheels_sim_data->setSubStepCount(5.0f, 3, 1);
 
-    // Now set up the differential, engine, gears, clutch, and ackermann steering.
-
-    // Diff
-    PxVehicleDifferential4WData diff;
-    diff.mType = PxVehicleDifferential4WData::eDIFF_TYPE_LS_4WD;
-    drive_data.setDiffData(diff);
-
-    // Engine
-    PxVehicleEngineData engine;
-    engine.mPeakTorque = 50.0f;
-    engine.mMaxOmega = 60.0f; // approx 6000 rpm
-    drive_data.setEngineData(engine);
-
-    // Gears
-    PxVehicleGearsData gears;
-    gears.mSwitchTime = 0.5f;
-    drive_data.setGearsData(gears);
-
-    // Clutch
-    PxVehicleClutchData clutch;
-    clutch.mStrength = 10.0f;
-    drive_data.setClutchData(clutch);
-
-    // Ackermann steer accuracy
-    PxVehicleAckermannGeometryData ackermann;
-    ackermann.mAccuracy = 1.0f;
-    ackermann.mAxleSeparation =
-        wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].z
-        - wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eREAR_LEFT].z;
-    ackermann.mFrontWidth =
-        wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].x
-        - wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].x;
-    ackermann.mRearWidth =
-        wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].x
-        - wheel_centre_offsets[PxVehicleDrive4WWheelOrder::eREAR_LEFT].x;
-
-    drive_data.setAckermannGeometryData(ackermann);
-}
-
-void vehicle_setup_vehicle_shape_query_filter_data(PxFilterData* qry_filter_data) {
-    if (0 != qry_filter_data->word3) {
-        std::cerr << "word3 is reserved for filter data for vehicle raycast queries" << std::endl;
-        assert(0 == qry_filter_data->word3);
-    }
-
-    qry_filter_data->word3 = (PxU32)CollisionFlags::UNDRIVABLE_SURFACE;
+    return wheels_sim_data;
 }
