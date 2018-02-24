@@ -28,8 +28,8 @@ InputManager::InputManager(std::shared_ptr<InputSettings> settings)
     }
 
     // Create AI controllers_
-    if (num_controllers_player < settings_->MAX_PLAYERS) {
-        for (int player_id = num_controllers_player; player_id < settings_->MAX_PLAYERS; ++player_id) {
+    if (num_controllers_player < settings_->max_players) {
+        for (int player_id = num_controllers_player; player_id < settings_->max_players; ++player_id) {
             // Create AI controller
             std::cout << "Create AI Controller for player " << player_id << " here" << std::endl;
         }

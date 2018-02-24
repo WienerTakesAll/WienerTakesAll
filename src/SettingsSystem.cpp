@@ -7,8 +7,19 @@ namespace {
     typedef const std::string Key; // Convenience typedef
     Key KEY_INPUT = "input";
     Key KEY_INPUT_DEADZONE = "deadzone";
+    Key KEY_INPUT_MAXPLAYERS = "max_players";
 
     Key KEY_AUDIO = "audio";
+    Key KEY_AUDIO_FREQ = "freq";
+    Key KEY_AUDIO_CHANNELS = "channels";
+    Key KEY_AUDIO_CHUNKSIZE = "chunk_size";
+
+    typedef const std::vector<std::string> Keys;
+    Keys KEYS_DEADZONE = {KEY_INPUT, KEY_INPUT_DEADZONE};
+    Keys KEYS_MAX_PLAYERS = {KEY_INPUT, KEY_INPUT_MAXPLAYERS};
+    Keys KEYS_FREQ = {KEY_AUDIO, KEY_AUDIO_FREQ};
+    Keys KEYS_CHANNELS = {KEY_AUDIO, KEY_AUDIO_CHANNELS};
+    Keys KEYS_CHUNKSIZE = {KEY_AUDIO, KEY_AUDIO_CHUNKSIZE};
 }
 
 SettingsSystem::SettingsSystem(std::string config_file)
@@ -18,7 +29,7 @@ SettingsSystem::SettingsSystem(std::string config_file)
     audio_settings_ = std::make_shared<AudioSettings>();
 
     if (!reload_settings()) {
-        std::cerr << "Unable to load settings" << std::endl;
+        std::cerr << "Unable to load settings. Using defaults..." << std::endl;
     }
 }
 
@@ -32,21 +43,32 @@ bool SettingsSystem::reload_settings() {
         return false;
     }
 
-    if (head_node_[KEY_INPUT]) {
+    bool success = true;
+    std::shared_ptr<InputSettings> backup_input_settings(new InputSettings(*input_settings_));
+    std::shared_ptr<AudioSettings> backup_audio_settings(new AudioSettings(*audio_settings_));
+
+    if (success && head_node_[KEY_INPUT]) {
         if (!reload_input_settings()) {
             std::cerr << "Failed to reload input settings" << std::endl;
-            return false;
+            success = false;
         }
     }
 
-    if (head_node_[KEY_AUDIO]) {
+    if (success && head_node_[KEY_AUDIO]) {
         if (!reload_audio_settings()) {
             std::cerr << "Failed to reload audio settings" << std::endl;
-            return false;
+            success = false;
         }
     }
 
-    return true;
+    if (!success) {
+        // restore backups
+        std::cerr << "Error reloading settings. Restoring previous config..." << std::endl;
+        *input_settings_ = std::move(*backup_input_settings);
+        *audio_settings_ = std::move(*backup_audio_settings);
+    }
+
+    return success;
 }
 
 std::shared_ptr<InputSettings> SettingsSystem::get_input_settings() {
@@ -58,22 +80,30 @@ std::shared_ptr<AudioSettings> SettingsSystem::get_audio_settings() {
 }
 
 bool SettingsSystem::reload_input_settings() {
-    auto deadzone_node = load_node({KEY_INPUT, KEY_INPUT_DEADZONE});
+    if (!load_key<int>(KEYS_DEADZONE, input_settings_->deadzone)) {
+        return false;
+    }
 
-    if (deadzone_node) {
-        try {
-            input_settings_->deadzone = deadzone_node.as<int>();
-        } catch (YAML::TypedBadConversion<int> e) {
-            std::cerr << "Error: failed to read setting {input, deadzone} as the value was not an int" << std::endl;
-            return false;
-        }
+    if (!load_key<int>(KEYS_MAX_PLAYERS, input_settings_->max_players)) {
+        return false;
     }
 
     return true;
 }
 
 bool SettingsSystem::reload_audio_settings() {
-    // Add hot-reloadable audio settings here
+    if (!load_key<int>(KEYS_FREQ, audio_settings_->mix_freq_hz)) {
+        return false;
+    }
+
+    if (!load_key<int>(KEYS_CHANNELS, audio_settings_->mix_num_channels)) {
+        return false;
+    }
+
+    if (!load_key<int>(KEYS_CHUNKSIZE, audio_settings_->mix_chunk_size)) {
+        return false;
+    }
+
     return true;
 }
 
