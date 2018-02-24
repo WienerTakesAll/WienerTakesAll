@@ -44,7 +44,6 @@ private:
     physx::PxDefaultAllocator g_allocator_;
     physx::PxDefaultErrorCallback g_error_callback_;
     physx::PxFoundation* g_foundation_;
-    physx::PxTolerancesScale g_scale_;
     physx::PxPvd* g_pvd_;
     physx::PxPhysics* g_physics_;
     physx::PxCooking* g_cooking_;
@@ -52,12 +51,9 @@ private:
 
     // Data structures to keep track of vehicles
     std::vector<physx::PxVehicleWheels*> vehicles_;
-    physx::PxVehicleWheelQueryResult vehicle_wheel_query_results_[MAX_NUM_4W_VEHICLES];
     std::vector<VehicleControls> vehicle_controls_;
 
-    VehicleWheelQueryResults* wheel_query_results_;
     VehicleSceneQueryData* sq_data_;
-    physx::PxBatchQuery* sq_wheel_raycast_batch_query_;
 
     // internal helpers
     AssetManager& asset_manager_;

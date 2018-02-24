@@ -16,16 +16,12 @@
 
 PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physics_settings)
     : g_foundation_(PxCreateFoundation(PX_FOUNDATION_VERSION, g_allocator_, g_error_callback_))
-    , g_scale_()
     , g_pvd_(PxCreatePvd(*g_foundation_))
-    , g_physics_(PxCreatePhysics(PX_PHYSICS_VERSION, *g_foundation_, g_scale_, false, g_pvd_))
-    , g_cooking_(PxCreateCooking(PX_PHYSICS_VERSION, *g_foundation_, g_scale_))
+    , g_physics_(PxCreatePhysics(PX_PHYSICS_VERSION, *g_foundation_, physx::PxTolerancesScale(), false, g_pvd_))
+    , g_cooking_(PxCreateCooking(PX_PHYSICS_VERSION, *g_foundation_, physx::PxTolerancesScale()))
     , g_scene_(NULL)
-      // Data to store reports for each wheel.
-    , wheel_query_results_(VehicleWheelQueryResults::allocate(MAX_NUM_4W_VEHICLES * 4))
       // Scene query data for to allow raycasts for all suspensions of all vehicles.
-    , sq_data_ (VehicleSceneQueryData::allocate(MAX_NUM_4W_VEHICLES * 4))
-    , sq_wheel_raycast_batch_query_(NULL)
+    , sq_data_(VehicleSceneQueryData::allocate(MAX_NUM_4W_VEHICLES * 4))
     , asset_manager_(asset_manager)
     , settings_(physics_settings)
     , arena_material_(g_physics_->createMaterial(5.f, 5.f, 5.f))
@@ -99,19 +95,17 @@ void PhysicsSystem::update() {
                 (PxVehicleDrive4W&)*vehicles_[i] // focusVehicle
             );
 
-            PxWheelQueryResult wheel_query_results_[PX_MAX_NB_WHEELS];
+            PxWheelQueryResult wheel_query_results[PX_MAX_NB_WHEELS];
             vehicle_query_results.push_back({
-                wheel_query_results_,
+                wheel_query_results,
                 vehicles_[i]->mWheelsSimData.getNbWheels()
             });
         }
 
-        if (NULL == sq_wheel_raycast_batch_query_) {
-            sq_wheel_raycast_batch_query_ = sq_data_->setup_batched_scene_query(g_scene_);
-        }
+        physx::PxBatchQuery* sq_wheel_raycast_batch_query = sq_data_->setup_batched_scene_query(g_scene_);
 
         PxVehicleSuspensionRaycasts(
-            sq_wheel_raycast_batch_query_,
+            sq_wheel_raycast_batch_query,
             vehicles_.size(),
             &vehicles_[0],
             sq_data_->get_raycast_query_result_buffer_size(),
@@ -323,8 +317,6 @@ void PhysicsSystem::create_4w_vehicle (
     }
 
     // Increment the number of vehicles
-    vehicle_wheel_query_results_[vehicles_.size()].nbWheelQueryResults = 4;
-    vehicle_wheel_query_results_[vehicles_.size()].wheelQueryResults = wheel_query_results_->add_vehicle(4);
     vehicles_.push_back(vehicle);
 }
 
