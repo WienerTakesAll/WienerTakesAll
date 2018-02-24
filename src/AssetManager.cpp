@@ -164,7 +164,7 @@ void AssetManager::load_texture_from_file(const std::string& file_path) {
     }
 
     TextureAsset& texture_data = texture_map.first->second;
-    texture_data.load_texture(file_path);
+    texture_data.load(file_path);
 }
 
 void AssetManager::load_shader_from_file(const std::string& file_path) {
@@ -176,5 +176,5 @@ void AssetManager::load_shader_from_file(const std::string& file_path) {
     }
 
     ShaderAsset& shader_data = shader_map.first->second;
-    shader_data.load_shader(file_path + ".vert", file_path + ".frag");
+    shader_data.load(file_path + ".vert", file_path + ".frag");
 }

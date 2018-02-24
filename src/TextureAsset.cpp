@@ -11,7 +11,7 @@ TextureAsset::TextureAsset() {
 TextureAsset::~TextureAsset() {
 }
 
-void TextureAsset::load_texture(const std::string& file_path) {
+void TextureAsset::load(const std::string& file_path) {
     SDL_Surface* surface = IMG_Load(file_path.c_str());
 
     if (!surface) {

@@ -5,7 +5,7 @@
 #include <vector>
 #include <sstream>
 
-void ShaderAsset::load_shader(const std::string& vertex_path, const std::string& fragment_path) {
+void ShaderAsset::load(const std::string& vertex_path, const std::string& fragment_path) {
     // Create the shaders
     GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
     GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
