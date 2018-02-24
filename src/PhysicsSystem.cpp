@@ -20,6 +20,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     , g_physics_(PxCreatePhysics(PX_PHYSICS_VERSION, *g_foundation_, physx::PxTolerancesScale(), false, g_pvd_))
     , g_cooking_(PxCreateCooking(PX_PHYSICS_VERSION, *g_foundation_, physx::PxTolerancesScale()))
     , g_scene_(NULL)
+    , vehicle_controls_(4) // 4 players
       // Scene query data for to allow raycasts for all suspensions of all vehicles.
     , sq_data_(VehicleSceneQueryData::allocate(MAX_NUM_4W_VEHICLES * 4))
     , asset_manager_(asset_manager)

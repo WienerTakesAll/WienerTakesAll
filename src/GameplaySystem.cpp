@@ -29,6 +29,18 @@ void GameplaySystem::handle_load(const Event& e) {
         )
     );
 
+    EventSystem::queue_event(
+        Event(
+            EventType::ADD_VEHICLE,
+            "object_id", gameobject_counter_->assign_id(),
+            // TODO: Pass glm::vec3 in events
+            "pos_x", 10,
+            "pos_y", 2,
+            "pos_z", 0//,
+            // "name", "Vehicle 1"
+        )
+    );
+
     // Terrain
     EventSystem::queue_event(
         Event(
@@ -79,6 +91,42 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_d:
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", 0,
+                                    "type", VehicleControlType::STEER,
+                                    "value", -0.5f);
+            break;
+
+        case SDLK_UP:
+            new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                    "index", 1,
+                                    "type", VehicleControlType::FORWARD_DRIVE,
+                                    "value", 0.5f);
+            new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                    "index", 1,
+                                    "type", VehicleControlType::BRAKE,
+                                    "value", 0.0f);
+            break;
+
+        case SDLK_DOWN:
+            new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                    "index", 1,
+                                    "type", VehicleControlType::FORWARD_DRIVE,
+                                    "value", 0.0f);
+            new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                    "index", 1,
+                                    "type", VehicleControlType::BRAKE,
+                                    "value", 0.5f);
+            break;
+
+        case SDLK_LEFT:
+            new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                    "index", 1,
+                                    "type", VehicleControlType::STEER,
+                                    "value", 0.5f);
+            break;
+
+        case SDLK_RIGHT:
+            new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                    "index", 1,
                                     "type", VehicleControlType::STEER,
                                     "value", -0.5f);
             break;
