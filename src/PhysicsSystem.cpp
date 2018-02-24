@@ -106,23 +106,28 @@ void PhysicsSystem::update() {
 
         physx::PxBatchQuery* sq_wheel_raycast_batch_query = sq_data_->setup_batched_scene_query(g_scene_);
 
-        PxVehicleSuspensionRaycasts(
-            sq_wheel_raycast_batch_query,
-            vehicles_.size(),
-            &vehicles_[0],
-            sq_data_->get_raycast_query_result_buffer_size(),
-            sq_data_->get_raycast_query_result_buffer()
-        );
+		if (vehicles_.size())
+		{
+			PxVehicleSuspensionRaycasts(
+				sq_wheel_raycast_batch_query,
+				vehicles_.size(),
+				&vehicles_[0],
+				sq_data_->get_raycast_query_result_buffer_size(),
+				sq_data_->get_raycast_query_result_buffer()
+			);
 
 
-        physx::PxVehicleUpdates(
-            TIME_PER_UPDATE / SIM_STEPS,
-            settings_.gravity,
-            friction_pair_service_.get_friction_pairs(),
-            vehicles_.size(),
-            &vehicles_[0],
-            &vehicle_query_results[0]
-        );
+			physx::PxVehicleUpdates(
+				TIME_PER_UPDATE / SIM_STEPS,
+				settings_.gravity,
+				friction_pair_service_.get_friction_pairs(),
+				vehicles_.size(),
+				&vehicles_[0],
+				&vehicle_query_results[0]
+			);
+		}
+
+
 
         g_scene_->simulate(TIME_PER_UPDATE / SIM_STEPS);
         g_scene_->fetchResults(true);
@@ -196,10 +201,10 @@ void PhysicsSystem::handle_add_vehicle(const Event& e) {
 
     // create wheel locations
     PxVec3 wheel_center_offsets[4];
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-1.5f, 0.5f, 1.f);
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = physx::PxVec3(1.5f, 0.5f, 1.f);
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-1.5f, 0.5f, -1.f);
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(1.5f, 0.5f, -1.f);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-1.f, 0.2f, 2.1f);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = physx::PxVec3(1.f, 0.2f, 2.1f);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-1.f, 0.2f, -.1f);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(1.f, 0.2f, -.1f);
 
     // create vehicle
     create_4w_vehicle(
