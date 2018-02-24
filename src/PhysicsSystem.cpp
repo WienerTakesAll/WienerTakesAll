@@ -71,6 +71,7 @@ void PhysicsSystem::update() {
     assert(g_scene_);
 
     const int SIM_STEPS = 4;
+    const float TIME_PER_UPDATE = 0.16f;
 
     for (int i = 0; i < SIM_STEPS; i++) {
         std::vector<PxVehicleWheelQueryResult> vehicle_query_results;
@@ -90,7 +91,7 @@ void PhysicsSystem::update() {
                 settings_.g_pad_smoothing_data, // padSmoothing
                 settings_.g_steer_vs_forward_speed_table, // steerVsForwardSpeedTable
                 g_vehicle_input_data, // rawInputData
-                0.16f / SIM_STEPS, // timestep
+                TIME_PER_UPDATE / SIM_STEPS, // timestep
                 false, // isVehicleInAir
                 (PxVehicleDrive4W&)*vehicles_[i] // focusVehicle
             );
@@ -114,7 +115,7 @@ void PhysicsSystem::update() {
 
 
         physx::PxVehicleUpdates(
-            0.16f / SIM_STEPS,
+            TIME_PER_UPDATE / SIM_STEPS,
             settings_.gravity,
             friction_pair_service_.get_friction_pairs(),
             vehicles_.size(),
@@ -122,7 +123,7 @@ void PhysicsSystem::update() {
             &vehicle_query_results[0]
         );
 
-        g_scene_->simulate(0.16f / SIM_STEPS);
+        g_scene_->simulate(TIME_PER_UPDATE / SIM_STEPS);
         g_scene_->fetchResults(true);
     }
 
