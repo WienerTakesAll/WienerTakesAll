@@ -3,53 +3,51 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 bool ShaderAsset::load_shader(const std::string& vertex_path, const std::string& fragment_path) {
     // Create the shaders
     GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
     GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
 
-    std::string VertexShaderCode;
+    // Read the Vertex Shader code from the file
+    std::string vertex_shader_code;
+    std::ifstream vertex_shader_stream(vertex_path, std::ios::in);
 
-    std::ifstream VertexShaderStream(vertex_path, std::ios::in);
-
-    if (VertexShaderStream.is_open()) {
-        std::string Line = "";
-
-        while (getline(VertexShaderStream, Line)) {
-            VertexShaderCode += "\n" + Line;
-        }
-
-        VertexShaderStream.close();
+    if (vertex_shader_stream.is_open()) {
+        std::stringstream vertex_shader_string_stream;
+        vertex_shader_string_stream << vertex_shader_stream.rdbuf();
+        vertex_shader_stream.close();
+        vertex_shader_code = vertex_shader_string_stream.str();
     } else {
         std::cout << "Failed to open " << vertex_path << std::endl;
         return false;
     }
 
     // Read the Fragment Shader code from the file
-    std::string FragmentShaderCode;
-    std::ifstream FragmentShaderStream(fragment_path, std::ios::in);
+    std::string fragment_shader_code;
+    std::ifstream fragment_shader_stream(fragment_path, std::ios::in);
 
-    if (FragmentShaderStream.is_open()) {
-        std::string Line = "";
-
-        while (getline(FragmentShaderStream, Line)) {
-            FragmentShaderCode += "\n" + Line;
-        }
-
-        FragmentShaderStream.close();
+    if (fragment_shader_stream.is_open()) {
+        std::stringstream fragment_shader_string_stream;
+        fragment_shader_string_stream << fragment_shader_stream.rdbuf();
+        fragment_shader_stream.close();
+        fragment_shader_code = fragment_shader_string_stream.str();
+    } else {
+        std::cout << "Failed to open " << fragment_path << std::endl;
+        return false;
     }
 
 
 
-    char const* VertexSourcePointer = VertexShaderCode.c_str();
-    glShaderSource(vertex_shader_id, 1, &VertexSourcePointer, NULL);
+    char const* vertex_source_pointer = vertex_shader_code.c_str();
+    glShaderSource(vertex_shader_id, 1, &vertex_source_pointer, NULL);
     glCompileShader(vertex_shader_id);
 
     check_error(vertex_shader_id);
 
-    char const* FragmentSourcePointer = FragmentShaderCode.c_str();
-    glShaderSource(fragment_shader_id, 1, &FragmentSourcePointer, NULL);
+    char const* fragment_source_pointer = fragment_shader_code.c_str();
+    glShaderSource(fragment_shader_id, 1, &fragment_source_pointer, NULL);
     glCompileShader(fragment_shader_id);
 
     // Check Fragment Shader
