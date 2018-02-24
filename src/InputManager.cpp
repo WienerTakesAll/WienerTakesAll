@@ -34,6 +34,8 @@ InputManager::InputManager(std::shared_ptr<InputSettings> settings)
             std::cout << "Create AI Controller for player " << player_id << " here" << std::endl;
         }
     }
+
+    add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &InputManager::handle_update_settings_event, this);
 }
 
 void InputManager::process_input(SDL_Event* event) {
@@ -266,4 +268,8 @@ void InputManager::quit() {
 
     controllers_.clear();
     std::cout << "All controllers_ closed" << std::endl;
+}
+
+void InputManager::handle_update_settings_event(const Event& event) {
+    // Add any necessary updates here
 }

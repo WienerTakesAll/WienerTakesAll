@@ -27,6 +27,7 @@ bool AudioSystem::init(std::shared_ptr<AudioSettings> settings) {
     }
 
     add_event_handler(EventType::KEYPRESS_EVENT, &AudioSystem::handle_keypress_event, this);
+    add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &AudioSystem::handle_update_settings_event, this);
     init_successful_ = true;
     return init_successful_;
 }
@@ -84,6 +85,10 @@ void AudioSystem::handle_keypress_event(const Event& e) {
         default:
             break;
     }
+}
+
+void AudioSystem::handle_update_settings_event(const Event& event) {
+    // Apply any changes
 }
 
 void AudioSystem::play_sound(const SoundAsset sound_type, const int loops /*= 0*/) const {

@@ -25,7 +25,7 @@ public:
                 value = node.as<T>();
             } catch (YAML::TypedBadConversion<T> e) {
                 std::cerr << "Could not load setting " << vec_to_str(keys)
-                          << "\nyaml-cpp failed with: " << e.msg;
+                          << "\nyaml-cpp failed with: " << e.msg << std::endl;
                 return false;
             }
         } else {

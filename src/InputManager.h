@@ -18,4 +18,6 @@ public:
 private:
     std::shared_ptr<InputSettings> settings_;
     std::vector<SDL_GameController*> controllers_;
+
+    void handle_update_settings_event(const Event& event);
 };

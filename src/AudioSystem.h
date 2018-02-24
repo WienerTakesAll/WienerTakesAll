@@ -32,4 +32,5 @@ private:
 
     bool load_audio_assets();
     void handle_keypress_event(const Event& e);
+    void handle_update_settings_event(const Event& e);
 };
