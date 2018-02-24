@@ -51,9 +51,8 @@ private:
     physx::PxScene* g_scene_;
 
     // Data structures to keep track of vehicles
-    physx::PxVehicleWheels* vehicles_[MAX_NUM_4W_VEHICLES];
+    std::vector<physx::PxVehicleWheels*> vehicles_;
     physx::PxVehicleWheelQueryResult vehicle_wheel_query_results_[MAX_NUM_4W_VEHICLES];
-    physx::PxU32 num_vehicles_;
     std::vector<VehicleControls> vehicle_controls_;
 
     VehicleWheelQueryResults* wheel_query_results_;

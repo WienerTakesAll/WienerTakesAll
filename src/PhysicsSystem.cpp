@@ -21,7 +21,6 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     , g_physics_(PxCreatePhysics(PX_PHYSICS_VERSION, *g_foundation_, g_scale_, false, g_pvd_))
     , g_cooking_(PxCreateCooking(PX_PHYSICS_VERSION, *g_foundation_, g_scale_))
     , g_scene_(NULL)
-    , num_vehicles_(0)
       // Data to store reports for each wheel.
     , wheel_query_results_(VehicleWheelQueryResults::allocate(MAX_NUM_4W_VEHICLES * 4))
       // Scene query data for to allow raycasts for all suspensions of all vehicles.
@@ -61,11 +60,6 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     scene_desc.filterShader = &physx::PxDefaultSimulationFilterShader;
     assert(scene_desc.isValid());
     g_scene_ = g_physics_->createScene(scene_desc);
-
-    // Initialise all vehicle ptrs to null.
-    for (PxU32 i = 0; i < MAX_NUM_4W_VEHICLES; i++) {
-        vehicles_[i] = NULL;
-    }
 }
 
 PhysicsSystem::~PhysicsSystem() {
@@ -85,7 +79,7 @@ void PhysicsSystem::update() {
     for (int i = 0; i < SIM_STEPS; i++) {
         std::vector<PxVehicleWheelQueryResult> vehicle_query_results;
 
-        for (unsigned int i = 0; i < num_vehicles_; i++) {
+        for (unsigned int i = 0; i < vehicles_.size(); i++) {
             // Build vehicle input data
             physx::PxVehicleDrive4WRawInputData g_vehicle_input_data;
             g_vehicle_input_data.setDigitalAccel(true);
@@ -118,8 +112,8 @@ void PhysicsSystem::update() {
 
         PxVehicleSuspensionRaycasts(
             sq_wheel_raycast_batch_query_,
-            num_vehicles_,
-            vehicles_,
+            vehicles_.size(),
+            &vehicles_[0],
             sq_data_->get_raycast_query_result_buffer_size(),
             sq_data_->get_raycast_query_result_buffer()
         );
@@ -129,8 +123,8 @@ void PhysicsSystem::update() {
             0.16f / SIM_STEPS,
             settings_.gravity,
             friction_pair_service_.get_friction_pairs(),
-            num_vehicles_,
-            vehicles_,
+            vehicles_.size(),
+            &vehicles_[0],
             &vehicle_query_results[0]
         );
 
@@ -163,7 +157,7 @@ void PhysicsSystem::update() {
 }
 
 void PhysicsSystem::handle_add_vehicle(const Event& e) {
-    PX_ASSERT(num_vehicles_ < MAX_NUM_4W_VEHICLES);
+    PX_ASSERT(vehicles_.size() < MAX_NUM_4W_VEHICLES);
 
     int object_id = e.get_value<int>("object_id", true).first;
     physx::PxTransform transform(0.f, 0.f, 0.f);
@@ -221,7 +215,7 @@ void PhysicsSystem::handle_add_vehicle(const Event& e) {
         true
     );
 
-    vehicle.set_actor(vehicles_[num_vehicles_ - 1]->getRigidDynamicActor());
+    vehicle.set_actor(vehicles_.back()->getRigidDynamicActor());
     vehicle.set_transform(transform);
     vehicle_controls_.push_back(VehicleControls());
 }
@@ -329,9 +323,8 @@ void PhysicsSystem::create_4w_vehicle (
     }
 
     // Increment the number of vehicles
-    vehicles_[num_vehicles_] = vehicle;
-    vehicle_wheel_query_results_[num_vehicles_].nbWheelQueryResults = 4;
-    vehicle_wheel_query_results_[num_vehicles_].wheelQueryResults = wheel_query_results_->add_vehicle(4);
-    num_vehicles_++;
+    vehicle_wheel_query_results_[vehicles_.size()].nbWheelQueryResults = 4;
+    vehicle_wheel_query_results_[vehicles_.size()].wheelQueryResults = wheel_query_results_->add_vehicle(4);
+    vehicles_.push_back(vehicle);
 }
 
