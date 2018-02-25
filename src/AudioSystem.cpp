@@ -7,14 +7,13 @@
 
 #include "SDL.h"
 
-AudioSystem::AudioSystem()
-    : init_successful_(false) {
+AudioSystem::AudioSystem(const AudioSettings& settings)
+    : init_successful_(false)
+    , settings_(settings) {
 }
 
-bool AudioSystem::init(std::shared_ptr<AudioSettings> settings) {
-    settings_ = settings;
-
-    if (Mix_OpenAudio(settings_->mix_freq_hz, MIX_DEFAULT_FORMAT, settings_->mix_num_channels, settings_->mix_chunk_size) != 0) {
+bool AudioSystem::init() {
+    if (Mix_OpenAudio(settings_.mix_freq_hz, MIX_DEFAULT_FORMAT, settings_.mix_num_channels, settings_.mix_chunk_size) != 0) {
         std::cerr << "Could not initialize SDL Mixer" << std::endl;
         init_successful_ = false;
         return false;
@@ -34,7 +33,7 @@ bool AudioSystem::init(std::shared_ptr<AudioSettings> settings) {
 
 bool AudioSystem::load_audio_assets() {
     // Load all sound assets
-    for (auto& sound_asset_info : settings_->sound_assets_info) {
+    for (auto& sound_asset_info : settings_.sound_assets_info) {
         const int key = (int) sound_asset_info.first;
         const std::string path = sound_asset_info.second;
         sound_assets_[key] = Mix_LoadWAV(path.c_str());
@@ -46,7 +45,7 @@ bool AudioSystem::load_audio_assets() {
     }
 
     // Load all music assets
-    for (auto& music_asset_info : settings_->music_assets_info) {
+    for (auto& music_asset_info : settings_.music_assets_info) {
         const int key = (int) music_asset_info.first;
         const std::string path = music_asset_info.second;
         music_assets_[key] = Mix_LoadMUS(path.c_str());

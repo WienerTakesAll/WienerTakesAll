@@ -4,17 +4,17 @@
 #include <yaml-cpp/yaml.h>
 
 #include "EventSystem.h"
+#include "AudioSettings.h"
+#include "InputSettings.h"
 
-struct InputSettings;
-struct AudioSettings;
 
 class SettingsSystem : public EventSystem<SettingsSystem> {
 public:
     SettingsSystem(std::string config_file);
     bool reload_settings();
 
-    std::shared_ptr<InputSettings> get_input_settings();
-    std::shared_ptr<AudioSettings> get_audio_settings();
+    const InputSettings& get_input_settings() const;
+    const AudioSettings& get_audio_settings() const;
 
     template<typename T>
     bool load_key(std::vector<std::string> keys, T& value);
@@ -22,8 +22,8 @@ public:
 private:
     std::string config_file_;
     YAML::Node head_node_;
-    std::shared_ptr<InputSettings> input_settings_;
-    std::shared_ptr<AudioSettings> audio_settings_;
+    InputSettings input_settings_;
+    AudioSettings audio_settings_;
 
     bool reload_input_settings();
     bool reload_audio_settings();

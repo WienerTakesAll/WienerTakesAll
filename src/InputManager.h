@@ -10,13 +10,13 @@ struct InputSettings;
 
 class InputManager : public EventSystem<InputManager> {
 public:
-    InputManager(std::shared_ptr<InputSettings> settings);
+    InputManager(const InputSettings& settings);
 
     void process_input(SDL_Event* event);
     void quit();
 
 private:
-    std::shared_ptr<InputSettings> settings_;
+    const InputSettings& settings_;
     std::vector<SDL_GameController*> controllers_;
 
     void handle_load_event(const Event& e);

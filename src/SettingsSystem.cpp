@@ -23,10 +23,10 @@ namespace {
 }
 
 SettingsSystem::SettingsSystem(std::string config_file)
-    : config_file_(config_file) {
+    : config_file_(config_file)
+    , input_settings_()
+    , audio_settings_() {
     add_event_handler(EventType::KEYPRESS_EVENT, &SettingsSystem::handle_keypress_event, this);
-    input_settings_ = std::make_shared<InputSettings>();
-    audio_settings_ = std::make_shared<AudioSettings>();
 
     if (!reload_settings()) {
         std::cerr << "Unable to load settings. Using defaults..." << std::endl;
@@ -44,8 +44,8 @@ bool SettingsSystem::reload_settings() {
     }
 
     bool success = true;
-    std::shared_ptr<InputSettings> backup_input_settings(new InputSettings(*input_settings_));
-    std::shared_ptr<AudioSettings> backup_audio_settings(new AudioSettings(*audio_settings_));
+    InputSettings backup_input_settings{input_settings_};
+    AudioSettings backup_audio_settings{audio_settings_};
 
     if (success && head_node_[KEY_INPUT]) {
         if (!reload_input_settings()) {
@@ -64,47 +64,36 @@ bool SettingsSystem::reload_settings() {
     if (!success) {
         // restore backups
         std::cerr << "Error reloading settings. Restoring previous config..." << std::endl;
-        *input_settings_ = std::move(*backup_input_settings);
-        *audio_settings_ = std::move(*backup_audio_settings);
+        input_settings_ = std::move(backup_input_settings);
+        audio_settings_ = std::move(backup_audio_settings);
     }
 
     return success;
 }
 
-std::shared_ptr<InputSettings> SettingsSystem::get_input_settings() {
+const InputSettings& SettingsSystem::get_input_settings() const {
     return input_settings_;
 }
 
-std::shared_ptr<AudioSettings> SettingsSystem::get_audio_settings() {
+const AudioSettings& SettingsSystem::get_audio_settings() const {
     return audio_settings_;
 }
 
 bool SettingsSystem::reload_input_settings() {
-    if (!load_key<int>(KEYS_DEADZONE, input_settings_->deadzone)) {
-        return false;
-    }
+    bool success = true;
+    success &= load_key<int>(KEYS_DEADZONE, input_settings_.deadzone);
+    success &= load_key<int>(KEYS_MAX_PLAYERS, input_settings_.max_players);
 
-    if (!load_key<int>(KEYS_MAX_PLAYERS, input_settings_->max_players)) {
-        return false;
-    }
-
-    return true;
+    return success;
 }
 
 bool SettingsSystem::reload_audio_settings() {
-    if (!load_key<int>(KEYS_FREQ, audio_settings_->mix_freq_hz)) {
-        return false;
-    }
+    bool success = true;
+    success &= load_key<int>(KEYS_FREQ, audio_settings_.mix_freq_hz);
+    success &= load_key<int>(KEYS_CHANNELS, audio_settings_.mix_num_channels);
+    success &= load_key<int>(KEYS_CHUNKSIZE, audio_settings_.mix_chunk_size);
 
-    if (!load_key<int>(KEYS_CHANNELS, audio_settings_->mix_num_channels)) {
-        return false;
-    }
-
-    if (!load_key<int>(KEYS_CHUNKSIZE, audio_settings_->mix_chunk_size)) {
-        return false;
-    }
-
-    return true;
+    return success;
 }
 
 YAML::Node SettingsSystem::load_node(const std::vector<std::string>& keys) const {
