@@ -28,8 +28,8 @@ void TextureAsset::load(const std::string& file_path) {
 
     SDL_PixelFormat& p_format = *surface->format;
 
-    GLint gl_p_format;
-    GLint gl_p_type;
+    GLint gl_p_format = GL_RGBA;
+    GLint gl_p_type = GL_UNSIGNED_BYTE;
     GLsizei p_width = surface->w;
     GLsizei p_height = surface->h;
 
@@ -44,9 +44,17 @@ void TextureAsset::load(const std::string& file_path) {
         valid_ = false;
     }
 
-    glTexImage2D
-    ( GL_TEXTURE_2D, 0, GL_RGB, p_width, p_height
-      , 0, gl_p_format, gl_p_type, surface->pixels);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_RGB,
+        p_width,
+        p_height,
+        0,
+        gl_p_format,
+        gl_p_type,
+        surface->pixels
+    );
     glGenerateMipmap(GL_TEXTURE_2D);
 
     SDL_FreeSurface(surface);
