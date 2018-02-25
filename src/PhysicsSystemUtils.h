@@ -53,3 +53,13 @@ PxVehicleWheelsSimData* create_wheels_sim_data(
     PxConvexMesh** wheel_convex_meshes,
     const PxVec3* wheel_centre_offsets
 );
+
+PxFilterFlags wienerTakesAllFilterShader(
+    PxFilterObjectAttributes attributes0,
+    PxFilterData filterData0,
+    PxFilterObjectAttributes attributes1,
+    PxFilterData filterData1,
+    PxPairFlags& pairFlags,
+    const void* constantBlock,
+    PxU32 constantBlockSize
+);

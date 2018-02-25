@@ -48,13 +48,16 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     physx::PxDefaultCpuDispatcher* dispatcher = physx::PxDefaultCpuDispatcherCreate(3);
     scene_desc.cpuDispatcher = dispatcher;
 
+    scene_desc.simulationEventCallback = &collision_events_subsystem_;
+    scene_desc.filterShader = wienerTakesAllFilterShader;
+    // scene_desc.filterShader = &physx::PxDefaultSimulationFilterShader;
+
 #if PX_WINDOWS
     physx::PxCudaContextManagerDesc cudaContextManagerDesc;
     auto cuda_context_manager = PxCreateCudaContextManager(*g_foundation_, cudaContextManagerDesc);
     scene_desc.gpuDispatcher = cuda_context_manager->getGpuDispatcher();
 #endif
 
-    scene_desc.filterShader = &physx::PxDefaultSimulationFilterShader;
     assert(scene_desc.isValid());
     g_scene_ = g_physics_->createScene(scene_desc);
 }
@@ -106,26 +109,25 @@ void PhysicsSystem::update() {
 
         physx::PxBatchQuery* sq_wheel_raycast_batch_query = sq_data_->setup_batched_scene_query(g_scene_);
 
-		if (vehicles_.size())
-		{
-			PxVehicleSuspensionRaycasts(
-				sq_wheel_raycast_batch_query,
-				vehicles_.size(),
-				&vehicles_[0],
-				sq_data_->get_raycast_query_result_buffer_size(),
-				sq_data_->get_raycast_query_result_buffer()
-			);
+        if (vehicles_.size()) {
+            PxVehicleSuspensionRaycasts(
+                sq_wheel_raycast_batch_query,
+                vehicles_.size(),
+                &vehicles_[0],
+                sq_data_->get_raycast_query_result_buffer_size(),
+                sq_data_->get_raycast_query_result_buffer()
+            );
 
 
-			physx::PxVehicleUpdates(
-				TIME_PER_UPDATE / SIM_STEPS,
-				settings_.gravity,
-				friction_pair_service_.get_friction_pairs(),
-				vehicles_.size(),
-				&vehicles_[0],
-				&vehicle_query_results[0]
-			);
-		}
+            physx::PxVehicleUpdates(
+                TIME_PER_UPDATE / SIM_STEPS,
+                settings_.gravity,
+                friction_pair_service_.get_friction_pairs(),
+                vehicles_.size(),
+                &vehicles_[0],
+                &vehicle_query_results[0]
+            );
+        }
 
 
 
