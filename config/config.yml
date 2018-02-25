@@ -1,0 +1,9 @@
+input:
+    max_players: 4
+    deadzone: 8000
+
+audio:
+    freq: 44100
+    channels: 2
+    chunk_size: 4096
+

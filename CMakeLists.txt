@@ -11,6 +11,7 @@ find_package(GLEW REQUIRED)
 find_package(GLM REQUIRED)
 find_package(ASSIMP REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 
 include_directories(
@@ -55,4 +56,5 @@ target_link_libraries(${PROJECT_NAME}
 	${ASSIMP_LIBRARIES}
 	${OPENGL_LIBRARIES}
 	${physx_libs}
+  yaml-cpp
 )

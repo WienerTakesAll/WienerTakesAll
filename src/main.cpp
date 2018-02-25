@@ -24,8 +24,11 @@
 #include "UISystem.h"
 
 
+#include "SettingsSystem.h"
 
 namespace {
+    const std::string SETTINGS_FILE = "config/config.yml";
+
     // Length of one frame (60fps ~= 16.66 milliseconds per frame)
     const auto FRAME_DURATION_MS = std::chrono::milliseconds( 16 );
 }
@@ -37,17 +40,17 @@ int main(int argc, char* args[]) {
     events.emplace_back(EventType::LOAD_EVENT);
 
 
+    SettingsSystem settings_system(SETTINGS_FILE);
     PhysicsSettings physics_settings;
 
-    AudioSystem audio_system;
+    AudioSystem audio_system(settings_system.get_audio_settings());
     AssetManager asset_manager;
     GameplaySystem gameplay_system;
-    InputManager input_manager;
+    InputManager input_manager(settings_system.get_input_settings());
     UISystem ui_system(asset_manager);
     PhysicsSystem physics_system(asset_manager, physics_settings);
 
     RenderingSystem rendering_system(asset_manager);
-
 
     if (!audio_system.init()) {
         std::cerr << "Audio system failed to initialize, continuing without audio " << std::endl;
@@ -81,6 +84,7 @@ int main(int argc, char* args[]) {
         gameplay_system.send_events(events);
         physics_system.send_events(events);
         rendering_system.send_events(events);
+        settings_system.send_events(events);
         ui_system.send_events(events);
 
         input_manager.handle_events(events);
@@ -89,6 +93,7 @@ int main(int argc, char* args[]) {
         rendering_system.handle_events(events);
         ui_system.handle_events(events);
         audio_system.handle_events(events);
+        settings_system.handle_events(events);
         events.clear();
 
 

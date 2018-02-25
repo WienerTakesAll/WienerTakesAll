@@ -31,6 +31,7 @@ function finish {
     rm -rf $DIR/SDL2-2.0.7 || true
     rm -rf $DIR/SDL2_mixer-2.0.2 || true
     rm -rf $DIR/SDL2_image-2.0.0 || true
+    rm -rf $DIR/yaml-cpp || true
     rm physx.zip || true
 }
 
@@ -86,3 +87,12 @@ elif [[ "$MACHINE" = "Mac" ]]; then
     cp physx/osx/*.so /usr/local/lib
 fi
 
+# yaml-cpp
+git clone https://github.com/jbeder/yaml-cpp.git
+cd yaml-cpp
+mkdir build
+cd build
+cmake ..
+make -j4
+make install -j4
+cd $DIR

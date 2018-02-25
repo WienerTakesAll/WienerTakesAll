@@ -2,15 +2,13 @@
 #include <vector>
 #include "EventSystem.h"
 #include "InputManager.h"
+#include "InputSettings.h"
 #include "SDL.h"
 
-namespace {
-    const int MAX_PLAYERS = 4; // Maximum number of players in a game
-    const int DEADZONE = 8000; // Minimum range of displacement for joystick before reading event
-}
-
-InputManager::InputManager() {
+InputManager::InputManager(const InputSettings& settings)
+    : settings_(settings) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &InputManager::handle_load_event, this);
+    EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &InputManager::handle_reload_settings_event, this);
 }
 
 void InputManager::process_input(SDL_Event* event) {
@@ -62,6 +60,10 @@ void InputManager::process_input(SDL_Event* event) {
 
                 case SDLK_RIGHT:
                     std::cout << "Right was pressed" << std::endl;
+                    break;
+
+                case SDLK_F5:
+                    std::cout << "F5 was pressed" << std::endl;
                     break;
 
                 default:
@@ -164,7 +166,7 @@ void InputManager::process_input(SDL_Event* event) {
             key = event->caxis.axis;
             value = event->caxis.value; // Current displacement of joystick
 
-            if ((value > -DEADZONE) && (value < DEADZONE)) {
+            if ((value > -settings_.deadzone) && (value < settings_.deadzone)) {
                 //break;
             }
 
@@ -241,6 +243,10 @@ void InputManager::quit() {
     std::cout << "All controllers_ closed" << std::endl;
 }
 
+void InputManager::handle_reload_settings_event(const Event& event) {
+    // Add any necessary updates here
+}
+
 void InputManager::handle_load_event(const Event& e) {
     int num_controllers_player = SDL_NumJoysticks();
 
@@ -263,8 +269,8 @@ void InputManager::handle_load_event(const Event& e) {
     }
 
     // Create AI controllers_
-    if (num_controllers_player < MAX_PLAYERS) {
-        for (int player_id = num_controllers_player; player_id < MAX_PLAYERS; ++player_id) {
+    if (num_controllers_player < settings_.max_players) {
+        for (int player_id = num_controllers_player; player_id < settings_.max_players; ++player_id) {
             // Create AI controller
             std::cout << "Create AI Controller for player " << player_id << " here" << std::endl;
         }
