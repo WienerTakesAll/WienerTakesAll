@@ -49,7 +49,7 @@ void GameplaySystem::handle_load(const Event& e) {
             "pos_x", -4,
             "pos_y", 2,
             "pos_z", 0//,
-                      // "name", "Vehicle 1"
+            // "name", "Vehicle 1"
         )
     );
 
@@ -61,7 +61,7 @@ void GameplaySystem::handle_load(const Event& e) {
             "pos_x", -10,
             "pos_y", 2,
             "pos_z", 0//,
-                      // "name", "Vehicle 1"
+            // "name", "Vehicle 1"
         )
     );
 
