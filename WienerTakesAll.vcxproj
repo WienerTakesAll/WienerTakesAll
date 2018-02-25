@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{038B5A43-42E7-4335-8F57-B1C789618B53}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -83,7 +83,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>PsFastXmlDEBUG_x86.lib;PxFoundationDEBUG_x86.lib;PxPvdSDKDEBUG_x86.lib;PxTaskDEBUG_x86.lib;LowLevelAABBDEBUG.lib;LowLevelParticlesDEBUG.lib;PhysX3DEBUG_x86.lib;SimulationControllerDEBUG.lib;LowLevelClothDEBUG.lib;PhysX3CharacterKinematicDEBUG_x86.lib;PhysX3ExtensionsDEBUG.lib;LowLevelDEBUG.lib;PhysX3CommonDEBUG_x86.lib;PhysX3VehicleDEBUG.lib;LowLevelDynamicsDEBUG.lib;PhysX3CookingDEBUG_x86.lib;SceneQueryDEBUG.lib;assimp-vc140-mt.lib;glew32.lib;glew32s.lib;opengl32.lib;SDL2.lib;SDL2_mixer.lib;SDL2main.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>PsFastXmlDEBUG_x86.lib;PxFoundationDEBUG_x86.lib;PxPvdSDKDEBUG_x86.lib;PxTaskDEBUG_x86.lib;LowLevelAABBDEBUG.lib;LowLevelParticlesDEBUG.lib;PhysX3DEBUG_x86.lib;SimulationControllerDEBUG.lib;LowLevelClothDEBUG.lib;PhysX3CharacterKinematicDEBUG_x86.lib;PhysX3ExtensionsDEBUG.lib;LowLevelDEBUG.lib;PhysX3CommonDEBUG_x86.lib;PhysX3VehicleDEBUG.lib;LowLevelDynamicsDEBUG.lib;PhysX3CookingDEBUG_x86.lib;SceneQueryDEBUG.lib;assimp-vc140-mt.lib;glew32.lib;glew32s.lib;opengl32.lib;SDL2.lib;SDL2_mixer.lib;SDL2main.lib;SDL2test.lib;libyaml-cppmdd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -117,6 +117,7 @@
     <ClCompile Include="src\PhysicsSystemUtils.cpp" />
     <ClCompile Include="src\RenderingComponent.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
+    <ClCompile Include="src\SettingsSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\VehicleSceneQueryData.cpp" />
     <ClCompile Include="src\VehicleWheelQueryResults.cpp" />
@@ -124,6 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\AssetManager.h" />
+    <ClInclude Include="src\AudioSettings.h" />
     <ClInclude Include="src\AudioSystem.h" />
     <ClInclude Include="src\CarControlType.h" />
     <ClInclude Include="src\CollisionFlags.h" />
@@ -137,6 +139,7 @@
     <ClInclude Include="src\GameObjectCounter.h" />
     <ClInclude Include="src\GameplaySystem.h" />
     <ClInclude Include="src\InputManager.h" />
+    <ClInclude Include="src\InputSettings.h" />
     <ClInclude Include="src\MeshAsset.h" />
     <ClInclude Include="src\MeshStuff.h" />
     <ClInclude Include="src\MusicAsset.h" />
@@ -147,6 +150,7 @@
     <ClInclude Include="src\PhysicsSystemUtils.h" />
     <ClInclude Include="src\RenderingComponent.h" />
     <ClInclude Include="src\RenderingSystem.h" />
+    <ClInclude Include="src\SettingsSystem.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\SoundAsset.h" />
     <ClInclude Include="src\VehicleControls.h" />
