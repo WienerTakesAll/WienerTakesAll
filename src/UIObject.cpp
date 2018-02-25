@@ -3,10 +3,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 UIObject::UIObject(glm::vec2 origin, glm::vec3 colour, glm::vec2 size, MeshAsset* mesh, TextureAsset* tex, ShaderAsset* shader)
-    : origin_(origin)
-    , colour_(colour)
+    : visible_(true)
     , size_(size)
-    , visible_(true)
+    , origin_(origin)
+    , colour_(colour)
     , render_component_() {
     render_component_.set_mesh(mesh);
     render_component_.set_texture(tex);
