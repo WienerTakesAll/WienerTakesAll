@@ -4,22 +4,22 @@
 #include <SDL.h>
 
 namespace {
-    typedef const std::string Key; // Convenience typedef
-    Key KEY_INPUT = "input";
-    Key KEY_INPUT_DEADZONE = "deadzone";
-    Key KEY_INPUT_MAXPLAYERS = "max_players";
+    typedef std::string Key; // Convenience typedef
+    const Key KEY_INPUT = "input";
+    const Key KEY_INPUT_DEADZONE = "deadzone";
+    const Key KEY_INPUT_MAXPLAYERS = "max_players";
 
-    Key KEY_AUDIO = "audio";
-    Key KEY_AUDIO_FREQ = "freq";
-    Key KEY_AUDIO_CHANNELS = "channels";
-    Key KEY_AUDIO_CHUNKSIZE = "chunk_size";
+    const Key KEY_AUDIO = "audio";
+    const Key KEY_AUDIO_FREQ = "freq";
+    const Key KEY_AUDIO_CHANNELS = "channels";
+    const Key KEY_AUDIO_CHUNKSIZE = "chunk_size";
 
-    typedef const std::vector<std::string> Keys;
-    Keys KEYS_DEADZONE = {KEY_INPUT, KEY_INPUT_DEADZONE};
-    Keys KEYS_MAX_PLAYERS = {KEY_INPUT, KEY_INPUT_MAXPLAYERS};
-    Keys KEYS_FREQ = {KEY_AUDIO, KEY_AUDIO_FREQ};
-    Keys KEYS_CHANNELS = {KEY_AUDIO, KEY_AUDIO_CHANNELS};
-    Keys KEYS_CHUNKSIZE = {KEY_AUDIO, KEY_AUDIO_CHUNKSIZE};
+    typedef std::vector<Key> Keys;
+    const Keys KEYS_DEADZONE = {KEY_INPUT, KEY_INPUT_DEADZONE};
+    const Keys KEYS_MAX_PLAYERS = {KEY_INPUT, KEY_INPUT_MAXPLAYERS};
+    const Keys KEYS_FREQ = {KEY_AUDIO, KEY_AUDIO_FREQ};
+    const Keys KEYS_CHANNELS = {KEY_AUDIO, KEY_AUDIO_CHANNELS};
+    const Keys KEYS_CHUNKSIZE = {KEY_AUDIO, KEY_AUDIO_CHUNKSIZE};
 }
 
 SettingsSystem::SettingsSystem(std::string config_file)
