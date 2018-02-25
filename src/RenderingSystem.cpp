@@ -6,14 +6,16 @@
 #include <glm/gtx/quaternion.hpp>
 
 namespace {
-    const std::string CAR_VERTEX_SHADER_PATH = "assets/shaders/SimpleVertexShader.vertexshader";
-    const std::string CAR_FRAGMENT_SHADER_PATH = "assets/shaders/SimpleFragmentShader.fragmentshader";
+    const std::string STANDARD_SHADER_PATH = "assets/shaders/SimpleShader";
     const std::string CAR_MESH_PATH = "assets/models/carBoxModel.obj";
     const std::string TERRAIN_MESH_PATH = "assets/models/Terrain.obj";
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager) {
+    window_ = asset_manager.get_window();
+
+
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
     EventSystem::add_event_handler(EventType::ADD_VEHICLE, &RenderingSystem::handle_add_vehicle, this);
@@ -79,17 +81,13 @@ void RenderingSystem::handle_add_vehicle(const Event& e) {
     std::pair<int, bool> z = e.get_value<int>("pos_z", true);
     assert(z.second);
 
-    // Load car assets
-    example_shader_.load_shader(
-        CAR_VERTEX_SHADER_PATH,
-        CAR_FRAGMENT_SHADER_PATH
-    );
 
     MeshAsset* mesh = asset_manager_.get_mesh_asset(CAR_MESH_PATH);
 
     // Store car
     example_objects_.emplace_back();
     example_objects_[object_id.first].set_mesh(mesh);
+    example_objects_[object_id.first].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
     example_objects_[object_id.first].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
 
     car_indices_.push_back(object_id.first);
@@ -104,6 +102,7 @@ void RenderingSystem::handle_add_terrain(const Event& e) {
     // Store terrain
     example_objects_.emplace_back();
     example_objects_[object_id].set_mesh(mesh);
+    example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
 }
 
 void RenderingSystem::handle_object_transform(const Event& e) {
@@ -126,35 +125,25 @@ void RenderingSystem::render() {
     start_render();
     setup_cameras();
 
-    for (auto& object : example_objects_) {
-        object.render_views(cameras_, 4, example_shader_.program_id_);
+    for (size_t i = 0; i < cameras_.size(); i++) {
+        int vx = 320 * (i % 2);
+        int vy = 240 * (i < 2);
+
+        glViewport(vx, vy, 320, 240);
+
+        for (auto& object : example_objects_) {
+            object.render(cameras_[i]);
+        }
     }
 
     end_render();
 }
 
+
 bool RenderingSystem::init_window() {
-    const int sdl_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
-
-    const int screen_width = 640;
-    const int screen_height = 480;
-
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    window_ = SDL_CreateWindow("WienerTakesAll",
-                               SDL_WINDOWPOS_UNDEFINED,
-                               SDL_WINDOWPOS_UNDEFINED,
-                               screen_width,
-                               screen_height,
-                               sdl_flags);
-
-    if (window_ == NULL) {
-        std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
-        return false;
-    }
-
-
     SDL_GL_CreateContext(window_);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
@@ -168,7 +157,6 @@ bool RenderingSystem::init_window() {
         return false;
     }
 
-
     glGenVertexArrays(1, &vertex_array_id_);
     glBindVertexArray(vertex_array_id_);
 
@@ -179,10 +167,6 @@ void RenderingSystem::start_render() const {
     //Clear the buffers and setup the opengl requirements
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glUseProgram(example_shader_.program_id_);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
@@ -204,5 +188,5 @@ void RenderingSystem::setup_cameras() {
 }
 
 void RenderingSystem::end_render() const {
-    SDL_GL_SwapWindow(window_);
+    //SDL_GL_SwapWindow(window_);
 }

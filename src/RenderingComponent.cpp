@@ -4,10 +4,44 @@
 
 #include "glm/gtc/type_ptr.hpp"
 
-void RenderingComponent::render_views
-(std::array<glm::mat4x4, 4>& cameras, size_t count, GLuint program_id) {
+#include "MeshAsset.h"
+#include "TextureAsset.h"
+#include "ShaderAsset.h"
+
+RenderingComponent::RenderingComponent()
+    : mesh_(nullptr),
+      texture_(nullptr),
+      shader_(nullptr) {
+}
+
+void RenderingComponent::render(glm::mat4x4 camera) const {
+
+    if (shader_ == nullptr || !shader_->is_valid()) {
+        std::cerr << "Trying to render with invalid shader!" << std::endl;
+        return;
+    }
+
+
+    if (mesh_ == nullptr || !mesh_->valid_) {
+        std::cerr << "Trying to render with invalid mesh!" << std::endl;
+        return;
+    }
+
+    glUseProgram(shader_->get_program_id());
+
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+
+
+    if (texture_ != nullptr && texture_->is_valid()) {
+        glBindTexture(GL_TEXTURE_2D, texture_->get_texture_id());
+    }
+
+
+    GLuint uniformMVP = glGetUniformLocation(shader_->get_program_id(), "MVP");
+
+
 
     for (size_t i = 0; i < mesh_->meshes_.size(); i++) {
         glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffers_[i]);
@@ -17,19 +51,16 @@ void RenderingComponent::render_views
         glVertexAttribPointer
         (1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
          , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, normal_)));
+        glVertexAttribPointer
+        (2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
+         , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, uv_)));
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffers_[i]);
 
-        GLuint uniformMVP = glGetUniformLocation(program_id, "MVP");
-        GLuint transform = glGetUniformLocation(program_id, "transform");
 
-        glUniformMatrix4fv(transform, 1, GL_FALSE, glm::value_ptr(transform_matrix_));
+        glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, glm::value_ptr(camera * transform_matrix_));
 
-        for (unsigned int j = 0; j < count; j++) {
-            glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, glm::value_ptr(cameras[j] * transform_matrix_));
-            glViewport(320 * (j % 2), 240 * ((j % 4) / 2), 320, 240);
-            glDrawElements(GL_TRIANGLES, mesh_->meshes_[i].indices_.size(), GL_UNSIGNED_INT, 0);
-        }
+        glDrawElements(GL_TRIANGLES, mesh_->meshes_[i].indices_.size(), GL_UNSIGNED_INT, 0);
     }
 
 }
@@ -54,7 +85,16 @@ void RenderingComponent::set_mesh(MeshAsset* mesh) {
     setupBuffer();
 }
 
+void RenderingComponent::set_texture(TextureAsset* texture) {
+    texture_ = texture;
+}
+
+void RenderingComponent::set_shader(ShaderAsset* shader) {
+    shader_ = shader;
+}
+
 void RenderingComponent::setupBuffer() {
+
 
     size_t buffer_count = mesh_->meshes_.size();
 
@@ -76,7 +116,6 @@ void RenderingComponent::setupBuffer() {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffers_[i]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh_->meshes_[i].indices_.size() * sizeof(GLuint), &mesh_->meshes_[i].indices_.front(), GL_STATIC_DRAW);
     }
-
 
 
 }
