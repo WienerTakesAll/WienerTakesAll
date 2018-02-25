@@ -1,11 +1,16 @@
 #pragma once
 
+#include <vector>
+
 #include "PxPhysicsAPI.h"
 
 class CollisionEventsSubsystem : public physx::PxSimulationEventCallback {
-public:
-    CollisionEventsSubsystem();
 
+public:
+    // clears all collisions after calling
+    std::vector<std::pair<int, int>> consume_collisions();
+
+    /* PxSimulationEventCallback */
     void onConstraintBreak(
         physx::PxConstraintInfo* constraints,
         physx::PxU32 count
@@ -32,4 +37,7 @@ public:
         const physx::PxTransform* poseBuffer,
         const physx::PxU32 count
     );
+
+private:
+    std::vector<std::pair<int, int>> collisions_;
 };

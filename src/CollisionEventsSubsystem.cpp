@@ -2,45 +2,52 @@
 
 #include "CollisionEventsSubsystem.h"
 
-CollisionEventsSubsystem::CollisionEventsSubsystem() {
-    std::cout << "CollisionEventsSubsystem" << std::endl;
+std::vector<std::pair<int, int>> CollisionEventsSubsystem::consume_collisions() {
+    auto ret = collisions_;
+    collisions_.clear();
+    return ret;
 }
 
 void CollisionEventsSubsystem::onConstraintBreak(
     physx::PxConstraintInfo* constraints,
     physx::PxU32 count
 ) {
-    std::cout << "onConstraintBreak" << std::endl;
+    // do nothing
 }
+
 void CollisionEventsSubsystem::onWake(
     physx::PxActor** actors,
     physx::PxU32 count
 ) {
-    std::cout << "onWake" << std::endl;
+    // do nothing
 }
+
 void CollisionEventsSubsystem::onSleep(
     physx::PxActor** actors,
     physx::PxU32 count
 ) {
-    std::cout << "onSleep" << std::endl;
+    // do nothing
 }
+
 void CollisionEventsSubsystem::onContact(
     const physx::PxContactPairHeader& pairHeader,
     const physx::PxContactPair* pairs,
     physx::PxU32 nbPairs
 ) {
-    std::cout << "onContact" << std::endl;
+    collisions_.emplace_back(0, 0);
 }
+
 void CollisionEventsSubsystem::onTrigger(
     physx::PxTriggerPair* pairs,
     physx::PxU32 count
 ) {
-    std::cout << "onTrigger" << std::endl;
+    // do nothing
 }
+
 void CollisionEventsSubsystem::onAdvance(
     const physx::PxRigidBody* const* bodyBuffer,
     const physx::PxTransform* poseBuffer,
     const physx::PxU32 count
 ) {
-    std::cout << "onAdvance" << std::endl;
+    // do nothing
 }

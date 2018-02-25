@@ -74,6 +74,16 @@ PhysicsSystem::~PhysicsSystem() {
 void PhysicsSystem::update() {
     assert(g_scene_);
 
+    for (std::pair<int, int> collision : collision_events_subsystem_.consume_collisions()) {
+        EventSystem::queue_event(
+            Event(
+                EventType::VEHICLE_COLLISION,
+                "vehicle_a", collision.first,
+                "vehicle_b", collision.second
+            )
+        );
+    }
+
     const int SIM_STEPS = 4;
     const float TIME_PER_UPDATE = 0.16f;
 
