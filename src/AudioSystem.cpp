@@ -25,8 +25,8 @@ bool AudioSystem::init() {
         return false;
     }
 
-    add_event_handler(EventType::KEYPRESS_EVENT, &AudioSystem::handle_keypress_event, this);
     add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &AudioSystem::handle_update_settings_event, this);
+    add_event_handler(EventType::VEHICLE_COLLISION, &AudioSystem::handle_vehicle_collision_event, this);
     init_successful_ = true;
     return init_successful_;
 }
@@ -59,39 +59,12 @@ bool AudioSystem::load_audio_assets() {
     return true;
 }
 
-void AudioSystem::handle_keypress_event(const Event& e) {
-
-    //function calls to get_value: param1= string:name, param2 = bool:crash_on_fail
-    //pair.first == the int, pair.second == bool
-    std::pair<int, bool> player_id = e.get_value<int>("player_id", true);
-    std::pair<int, bool> key = e.get_value<int>("key", true);
-    std::pair<int, bool> value = e.get_value<int>("value", true);
-
-
-    switch (key.first) {
-        case SDLK_LEFT:
-            play_sound(SoundAsset::BEAT);
-            break;
-
-        case SDLK_RIGHT:
-            play_music(MusicAsset::BEAT);
-            break;
-
-        case SDLK_UP:
-            resume_music();
-            break;
-
-        case SDLK_DOWN:
-            pause_music();
-            break;
-
-        default:
-            break;
-    }
-}
-
 void AudioSystem::handle_update_settings_event(const Event& event) {
     // Apply any changes
+}
+
+void AudioSystem::handle_vehicle_collision_event(const Event& e) {
+    play_sound(SoundAsset::BEAT);
 }
 
 void AudioSystem::play_sound(const SoundAsset sound_type, const int loops /*= 0*/) const {

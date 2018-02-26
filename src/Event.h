@@ -12,9 +12,8 @@ enum class EventType {
     OBJECT_TRANSFORM_EVENT,
     KEYPRESS_EVENT,
     RELOAD_SETTINGS_EVENT,
-
-    // Vehicle control events
     VEHICLE_CONTROL,
+    VEHICLE_COLLISION,
 
     // Keep at end of list
     EVENT_COUNT
