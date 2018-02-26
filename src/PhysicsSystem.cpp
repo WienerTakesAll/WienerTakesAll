@@ -48,13 +48,16 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     physx::PxDefaultCpuDispatcher* dispatcher = physx::PxDefaultCpuDispatcherCreate(3);
     scene_desc.cpuDispatcher = dispatcher;
 
+    scene_desc.simulationEventCallback = &collision_events_subsystem_;
+    scene_desc.filterShader = wienerTakesAllFilterShader;
+    // scene_desc.filterShader = &physx::PxDefaultSimulationFilterShader;
+
 #if PX_WINDOWS
     physx::PxCudaContextManagerDesc cudaContextManagerDesc;
     auto cuda_context_manager = PxCreateCudaContextManager(*g_foundation_, cudaContextManagerDesc);
     scene_desc.gpuDispatcher = cuda_context_manager->getGpuDispatcher();
 #endif
 
-    scene_desc.filterShader = &physx::PxDefaultSimulationFilterShader;
     assert(scene_desc.isValid());
     g_scene_ = g_physics_->createScene(scene_desc);
 }
@@ -70,6 +73,16 @@ PhysicsSystem::~PhysicsSystem() {
 
 void PhysicsSystem::update() {
     assert(g_scene_);
+
+    for (std::pair<int, int> collision : collision_events_subsystem_.consume_collisions()) {
+        EventSystem::queue_event(
+            Event(
+                EventType::VEHICLE_COLLISION,
+                "vehicle_a", collision.first,
+                "vehicle_b", collision.second
+            )
+        );
+    }
 
     const int SIM_STEPS = 4;
     const float TIME_PER_UPDATE = 0.16f;

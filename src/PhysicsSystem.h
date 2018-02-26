@@ -9,6 +9,7 @@
 #include "FrictionPairService.h"
 #include "VehicleControls.h"
 #include "WheelMeshGenerator.h"
+#include "CollisionEventsSubsystem.h"
 
 class AssetManager;
 class PhysicsSettings;
@@ -63,4 +64,5 @@ private:
 
     FrictionPairService friction_pair_service_;
     WheelMeshGenerator wheel_mesh_generator_;
+    CollisionEventsSubsystem collision_events_subsystem_;
 };
