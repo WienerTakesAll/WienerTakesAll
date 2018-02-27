@@ -11,18 +11,21 @@ public:
     using PxActorType = typename std::conditional<static_actor, physx::PxRigidStatic, physx::PxRigidDynamic>::type;
 
     PhysicsComponent(unsigned int id);
+    PhysicsComponent(const PhysicsComponent& that);
+    PhysicsComponent& operator=(const PhysicsComponent& that);
     ~PhysicsComponent();
 
-    bool is_valid();
-    unsigned int get_id();
-    auto get_actor();
+    bool is_valid() const;
+    unsigned int get_id() const;
+    physx::PxMaterial* get_material() const;
+    physx::PxConvexMesh* get_mesh() const;
+    physx::PxConvexMeshGeometry* get_mesh_geometry() const;
+    physx::PxShape* get_mesh_shape() const;
+    auto get_actor() const;
+    bool is_vehicle() const;
+    physx::PxVehicleDrive4W* get_wheels() const;
+
     void set_actor(physx::PxRigidDynamic* actor);
-
-    physx::PxMaterial* get_material();
-    physx::PxConvexMesh* get_mesh();
-
-    physx::PxVehicleDrive4W* get_wheels();
-
     void set_mesh(
         physx::PxPhysics* physics,
         physx::PxCooking* cooking,
