@@ -30,8 +30,8 @@ private:
     AssetManager& asset_manager_;
     UIObject active_button_;
 
-    MeshAsset example_mesh_;
-    ShaderAsset* example_shader_;
+    MeshAsset* square_mesh_;
+    ShaderAsset* ui_shader_;
     UIObject example_ui_object_;
 
     SDL_Window* window_;
