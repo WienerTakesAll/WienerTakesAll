@@ -31,8 +31,6 @@ NOTE: On VS2017 the Windows 8.1 SDK and the UCRT SD must be installed since this
 Also the target must be retargeted for the newest platform tools.
 To do so, right click the solution file in Visual Studio and click _Retarget Project_.
 
-image::vs2015-2017.png
-
 Overall the required folder structure for dependencies (with version implied) is:
 ```
 WienerTakesAll
