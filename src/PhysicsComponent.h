@@ -9,6 +9,8 @@ template <bool static_actor>
 class PhysicsComponent {
 public:
     using PxActorType = typename std::conditional<static_actor, physx::PxRigidStatic, physx::PxRigidDynamic>::type;
+    using PxMeshType = typename std::conditional<static_actor, physx::PxTriangleMesh, physx::PxConvexMesh>::type;
+    using PxMeshGeometryType = typename std::conditional<static_actor, physx::PxTriangleMeshGeometry, physx::PxConvexMeshGeometry>::type;
 
     PhysicsComponent(unsigned int id);
     ~PhysicsComponent();
@@ -41,6 +43,12 @@ private:
         physx::PxShape* shape,
         physx::PxReal density);
 
+    void create_geometry(
+        physx::PxPhysics* physics,
+        physx::PxCooking* cooking,
+        MeshAsset* mesh
+    );
+
     void setup_wheels(physx::PxVehicleWheelsSimData* wheelsSimData);
     void setup_drive_sim(physx::PxVehicleDriveSimData4W& driveSimData, physx::PxVehicleWheelsSimData* wheelsSimData);
 
@@ -48,8 +56,8 @@ private:
     unsigned int id_;
 
     physx::PxMaterial* g_material_;
-    physx::PxConvexMesh* g_mesh_;
-    physx::PxConvexMeshGeometry* g_mesh_geometry_;
+    PxMeshType* g_mesh_;
+    PxMeshGeometryType* g_mesh_geometry_;
     physx::PxShape* g_mesh_shape_;
     PxActorType* g_actor_;
 

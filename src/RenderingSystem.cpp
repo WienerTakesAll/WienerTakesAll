@@ -178,8 +178,7 @@ void RenderingSystem::setup_cameras() {
 
     glm::mat4x4 transform;
 
-    for (size_t i = 0; i < car_indices_.size(); i++)
-    {
+    for (size_t i = 0; i < car_indices_.size(); i++) {
         transform = example_objects_[car_indices_[i]].get_transform();
         glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
 
