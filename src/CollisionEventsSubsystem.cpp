@@ -34,7 +34,9 @@ void CollisionEventsSubsystem::onContact(
     const physx::PxContactPair* pairs,
     physx::PxU32 nbPairs
 ) {
-    collisions_.emplace_back(0, 0);
+    int a_id = *(int*)pairHeader.actors[0]->userData;
+    int b_id = *(int*)pairHeader.actors[1]->userData;
+    collisions_.emplace_back(a_id, b_id);
 }
 
 void CollisionEventsSubsystem::onTrigger(
