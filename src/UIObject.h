@@ -17,7 +17,7 @@ public:
     glm::vec2 size_;
 
 private:
-    RenderingComponent render_component_;
     glm::vec2 origin_;
     glm::vec3 colour_;
+    RenderingComponent render_component_;
 };
