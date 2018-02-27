@@ -49,7 +49,7 @@ void GameplaySystem::handle_load(const Event& e) {
             "pos_x", -4,
             "pos_y", 2,
             "pos_z", 0//,
-                      // "name", "Vehicle 1"
+            // "name", "Vehicle 1"
         )
     );
 
@@ -61,7 +61,7 @@ void GameplaySystem::handle_load(const Event& e) {
             "pos_x", -10,
             "pos_y", 2,
             "pos_z", 0//,
-                      // "name", "Vehicle 1"
+            // "name", "Vehicle 1"
         )
     );
 
@@ -80,110 +80,119 @@ void GameplaySystem::handle_load(const Event& e) {
 void GameplaySystem::handle_key_press(const Event& e) {
     // Update gameplay during keypress
     int key = e.get_value<int>("key", true).first;
+    int player_id = e.get_value<int>("player_id", true).first;
     int value = e.get_value<int>("value", true).first;
 
     std::vector<Event> new_events;
 
     switch (key) {
-        case SDLK_w:
-            new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 0,
-                                    "type", VehicleControlType::FORWARD_DRIVE,
-                                    "value", 0.5f);
-            new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 0,
-                                    "type", VehicleControlType::BRAKE,
-                                    "value", 0.0f);
-            break;
+        // Keyboard acceleration
+        case SDLK_w: // fall through
+        case SDLK_t:
+        case SDLK_i:
+        case SDLK_UP: {
+            if (value == SDL_KEYDOWN) {
+                new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                        "index", player_id,
+                                        "type", VehicleControlType::FORWARD_DRIVE,
+                                        "value", 0.5f);
+                new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                        "index", player_id,
+                                        "type", VehicleControlType::BRAKE,
+                                        "value", 0.0f);
+            } else if (value == SDL_KEYUP) {
+                new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                        "index", player_id,
+                                        "type", VehicleControlType::FORWARD_DRIVE,
+                                        "value", 0.0f);
+            }
 
-        case SDLK_s:
-            new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 0,
-                                    "type", VehicleControlType::FORWARD_DRIVE,
-                                    "value", 0.0f);
-            new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 0,
-                                    "type", VehicleControlType::BRAKE,
-                                    "value", 0.5f);
             break;
+        }
 
-        case SDLK_a:
+        // keyboard braking
+        case SDLK_s: // fall through
+        case SDLK_g:
+        case SDLK_k:
+        case SDLK_DOWN: {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 0,
-                                    "type", VehicleControlType::STEER,
-                                    "value", 0.5f);
-            break;
-
-        case SDLK_d:
-            new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 0,
-                                    "type", VehicleControlType::STEER,
-                                    "value", -0.5f);
-            break;
-
-        case SDLK_UP:
-            new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 1,
-                                    "type", VehicleControlType::FORWARD_DRIVE,
-                                    "value", 0.5f);
-            new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 1,
-                                    "type", VehicleControlType::BRAKE,
-                                    "value", 0.0f);
-            break;
-
-        case SDLK_DOWN:
-            new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 1,
+                                    "index", player_id,
                                     "type", VehicleControlType::FORWARD_DRIVE,
                                     "value", 0.0f);
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 1,
+                                    "index", player_id,
                                     "type", VehicleControlType::BRAKE,
                                     "value", 0.5f);
             break;
+        }
 
-        case SDLK_LEFT:
+        // keyboard left steer
+        case SDLK_a: // fall through
+        case SDLK_f:
+        case SDLK_j:
+        case SDLK_LEFT: {
+            float steer_amount_left = 0.5f;
+
+            if (value == SDL_KEYUP) {
+                steer_amount_left = 0.0f;
+            }
+
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 1,
+                                    "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", 0.5f);
+                                    "value", steer_amount_left);
             break;
+        }
 
-        case SDLK_RIGHT:
+        // keyboard right steer
+        case SDLK_d: // fall through
+        case SDLK_h:
+        case SDLK_l:
+        case SDLK_RIGHT: {
+            float steer_amount_right = -0.5f;
+
+            if (value == SDL_KEYUP) {
+                steer_amount_right = 0.0f;
+            }
+
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 1,
+                                    "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", -0.5f);
+                                    "value", steer_amount_right);
             break;
+        }
 
-        case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
+        case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 0,
+                                    "index", player_id,
                                     "type", VehicleControlType::FORWARD_DRIVE,
                                     "value", (float)value / 32768);
             break;
+        }
 
-        case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
+        case SDL_CONTROLLER_AXIS_TRIGGERLEFT: {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 0,
+                                    "index", player_id,
                                     "type", VehicleControlType::BRAKE,
                                     "value", (float)value / 32768);
             break;
+        }
 
-        case SDL_CONTROLLER_AXIS_LEFTX:
+        case SDL_CONTROLLER_AXIS_LEFTX: {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 0,
+                                    "index", player_id,
                                     "type", VehicleControlType::STEER,
                                     "value", (float)value / -32768);
             break;
+        }
 
-        case SDL_CONTROLLER_BUTTON_B:
+        case SDL_CONTROLLER_BUTTON_B: {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", 0,
+                                    "index", player_id,
                                     "type", VehicleControlType::HAND_BRAKE,
                                     "value", true);
             break;
+        }
 
         default:
             return;
