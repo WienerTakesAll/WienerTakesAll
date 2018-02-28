@@ -28,11 +28,12 @@ private:
     void handle_key_press(const Event& e);
 
     AssetManager& asset_manager_;
-    UIObject active_button_;
 
     MeshAsset* square_mesh_;
     ShaderAsset* ui_shader_;
+
     UIObject start_bg_;
+    UIObject logo_;
 
     SDL_Window* window_;
 };

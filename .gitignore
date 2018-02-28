@@ -5,6 +5,8 @@ lib
 lib.zip
 physx
 physx.zip
+*.jpg
+*.jpeg
 
 # User-specific files
 *.suo

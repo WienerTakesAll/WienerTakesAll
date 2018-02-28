@@ -24,6 +24,7 @@ void UISystem::render() const {
     start_render();
 
     start_bg_.render(glm::mat4());
+    logo_.render(glm::mat4());
 
     SDL_GL_SwapWindow(window_);
 
@@ -41,16 +42,27 @@ void UISystem::end_render() const {
 
 void UISystem::handle_load(const Event& e) {
     ui_shader_ = asset_manager_.get_shader_asset("assets/shaders/UIShader");
-    TextureAsset* tex = asset_manager_.get_texture_asset("assets/textures/backyard_bbq.png");
-
+    TextureAsset* start_bg_tex =
+        asset_manager_.get_texture_asset("assets/textures/backyard_bbq.png");
     start_bg_ = UIObject(
                     glm::vec2(-1.f),
                     glm::vec3(1.0f),
                     glm::vec2(2.0f),
                     square_mesh_,
-                    tex,
+                    start_bg_tex,
                     ui_shader_
                 );
+
+    TextureAsset* logo_tex =
+        asset_manager_.get_texture_asset("assets/textures/logo.png");
+    logo_ = UIObject(
+                glm::vec2(-0.4f, -0.8f),
+                glm::vec3(1.0f),
+                glm::vec2(0.8f),
+                square_mesh_,
+                logo_tex,
+                ui_shader_
+            );
 }
 
 void UISystem::handle_key_press(const Event& e) {
@@ -58,5 +70,6 @@ void UISystem::handle_key_press(const Event& e) {
 
     if (key == SDLK_RETURN) {
         start_bg_.toggle();
+        logo_.toggle();
     }
 }
