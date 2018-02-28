@@ -25,7 +25,7 @@ void InputManager::process_input(SDL_Event* event) {
             std::cout << "[Player " << player_id << "] ";
 
             /* Check the SDLKey values and move change the coords */
-            switch ( event->key.keysym.sym ) {
+            switch ( key ) {
                 case SDLK_w:
                     std::cout << "W was pressed" << std::endl;
                     break;
@@ -44,6 +44,10 @@ void InputManager::process_input(SDL_Event* event) {
 
                 case SDLK_SPACE:
                     std::cout << "SPACE was pressed" << std::endl;
+                    break;
+
+                case SDLK_RETURN:
+                    std::cout << "RETURN was pressed" << std::endl;
                     break;
 
                 case SDLK_LEFT:

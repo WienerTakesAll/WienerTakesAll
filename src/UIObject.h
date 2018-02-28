@@ -11,6 +11,7 @@ class UIObject {
 public:
     UIObject() = default;
     UIObject(glm::vec2 origin, glm::vec3 colour, glm::vec2 size, MeshAsset* mesh, TextureAsset* tex, ShaderAsset* shader);
+    void toggle(); // toggle visibility
     void render(glm::mat4 camera) const;
 
     bool visible_;

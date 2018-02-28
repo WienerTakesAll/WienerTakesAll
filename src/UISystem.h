@@ -32,7 +32,7 @@ private:
 
     MeshAsset* square_mesh_;
     ShaderAsset* ui_shader_;
-    UIObject example_ui_object_;
+    UIObject start_bg_;
 
     SDL_Window* window_;
 };

@@ -15,6 +15,12 @@ UIObject::UIObject(glm::vec2 origin, glm::vec3 colour, glm::vec2 size, MeshAsset
     render_component_.apply_transform(glm::scale(glm::mat4(), glm::vec3(size, 1)));
 }
 
+void UIObject::toggle() {
+    visible_ = !visible_;
+}
+
 void UIObject::render(glm::mat4 camera) const {
-    render_component_.render(camera);
+    if (visible_) {
+        render_component_.render(camera);
+    }
 }
