@@ -45,16 +45,7 @@ void TextureAsset::load(const std::string& file_path) {
         valid_ = false;
     }
 
-    std::cout << "file_path: " << file_path << std::endl;
-    std::cout << "GL_RGBA: " << GL_RGBA << std::endl;
-    std::cout << "GL_UNSIGNED_BYTE: " << GL_UNSIGNED_BYTE << std::endl;
-    std::cout << "GL_RGB: " << GL_RGB << std::endl;
-    std::cout << "GL_UNSIGNED_INT: " << GL_UNSIGNED_INT << std::endl;
-    std::cout << "gl_p_format: " << gl_p_format << std::endl;
-    std::cout << "gl_p_type: " << gl_p_type << std::endl;
-    std::cout << "p_width: " << p_width << std::endl;
-    std::cout << "p_height: " << p_height << std::endl;
-    std::cout << "surface->pixels: " << surface->pixels << std::endl;
+    std::cout << "loading texture: " << file_path << std::endl;
     glTexImage2D(
         GL_TEXTURE_2D,
         0,

@@ -25,6 +25,7 @@ void UISystem::render() const {
 
     start_bg_.render(glm::mat4());
     logo_.render(glm::mat4());
+    hit_enter_or_start_.render(glm::mat4());
 
     SDL_GL_SwapWindow(window_);
 
@@ -63,6 +64,17 @@ void UISystem::handle_load(const Event& e) {
                 logo_tex,
                 ui_shader_
             );
+
+    TextureAsset* hit_enter_or_start_tex =
+        asset_manager_.get_texture_asset("assets/textures/hit_enter_or_start.png");
+    hit_enter_or_start_ = UIObject( // top middle
+                              glm::vec2(-.9f, -1.3f),
+                              glm::vec3(1.0f),
+                              glm::vec2(1.8f),
+                              square_mesh_,
+                              hit_enter_or_start_tex,
+                              ui_shader_
+                          );
 }
 
 void UISystem::handle_key_press(const Event& e) {

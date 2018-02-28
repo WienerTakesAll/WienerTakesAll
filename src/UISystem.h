@@ -34,6 +34,7 @@ private:
 
     UIObject start_bg_;
     UIObject logo_;
+    UIObject hit_enter_or_start_;
 
     SDL_Window* window_;
 };
