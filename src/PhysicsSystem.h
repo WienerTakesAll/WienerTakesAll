@@ -20,7 +20,7 @@ class VehicleSceneQueryData;
 
 class PhysicsSystem : public EventSystem<PhysicsSystem> {
 public:
-    PhysicsSystem(AssetManager&, PhysicsSettings&);
+    PhysicsSystem(AssetManager&, const PhysicsSettings&);
     ~PhysicsSystem();
 
     void update();
@@ -29,6 +29,7 @@ private:
     void handle_add_vehicle(const Event& e);
     void handle_add_arena(const Event& e);
     void handle_vehicle_control(const Event& e);
+    void handle_reload_settings(const Event& e);
 
     void create_4w_vehicle(
         const physx::PxMaterial& material,
@@ -58,7 +59,7 @@ private:
 
     // internal helpers
     AssetManager& asset_manager_;
-    PhysicsSettings& settings_;
+    const PhysicsSettings& settings_;
 
     physx::PxMaterial* arena_material_;
 

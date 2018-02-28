@@ -41,14 +41,13 @@ int main(int argc, char* args[]) {
 
 
     SettingsSystem settings_system(SETTINGS_FILE);
-    PhysicsSettings physics_settings;
 
     AudioSystem audio_system(settings_system.get_audio_settings());
     AssetManager asset_manager;
     GameplaySystem gameplay_system;
     InputManager input_manager(settings_system.get_input_settings());
     UISystem ui_system(asset_manager);
-    PhysicsSystem physics_system(asset_manager, physics_settings);
+    PhysicsSystem physics_system(asset_manager, settings_system.get_physics_settings());
 
     RenderingSystem rendering_system(asset_manager);
 

@@ -14,7 +14,7 @@
 #include "VehicleWheelQueryResults.h"
 #include "VehicleSceneQueryData.h"
 
-PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physics_settings)
+PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, const PhysicsSettings& physics_settings)
     : g_foundation_(PxCreateFoundation(PX_FOUNDATION_VERSION, g_allocator_, g_error_callback_))
     , g_pvd_(PxCreatePvd(*g_foundation_))
     , g_physics_(PxCreatePhysics(PX_PHYSICS_VERSION, *g_foundation_, physx::PxTolerancesScale(), false, g_pvd_))
@@ -31,6 +31,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     EventSystem::add_event_handler(EventType::ADD_VEHICLE, &PhysicsSystem::handle_add_vehicle, this);
     EventSystem::add_event_handler(EventType::ADD_ARENA, &PhysicsSystem::handle_add_arena, this);
     EventSystem::add_event_handler(EventType::VEHICLE_CONTROL, &PhysicsSystem::handle_vehicle_control, this);
+    EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &PhysicsSystem::handle_reload_settings, this);
 
     // Setup Visual Debugger
     PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
@@ -265,6 +266,43 @@ void PhysicsSystem::handle_vehicle_control(const Event& e) {
             vehicle_controls_[vehicle_index].hand_break = e.get_value<float>("value", true).first;
             break;
     }
+}
+
+void PhysicsSystem::handle_reload_settings(const Event& e) {
+    std::cout << "Setting scene gravity" << std::endl;
+    g_scene_->setGravity(settings_.gravity);
+
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(settings_.vehicle_mesh_asset_path);
+
+    /*
+    for (auto& dyn : dynamic_objects_) {
+        if (dyn.is_vehicle()) {
+            // FIXME: When changing meshes, the vehicle appears to detach
+            // from the rendering one and visually we stop updating them
+            // although collision events may still occur
+            std::cout << "Setting vehicle mesh" << std::endl;
+            auto transform = dyn.get_actor()->getGlobalPose();
+            dyn.set_mesh(g_physics_, g_cooking_, mesh);
+            dyn.get_actor()->setGlobalPose(transform);
+        }
+    }
+    */
+
+    for (auto& vehicle : vehicles_) {
+        std::cout << "Setting vehicle mass" << std::endl;
+        vehicle->mWheelsSimData.setChassisMass(settings_.vehicle_mass);
+    }
+
+    /*
+    // Experimental
+    MeshAsset* arena_mesh = asset_manager_.get_mesh_asset(settings_.arena_mesh);
+    std::cout << "Setting arena mesh" << std::endl;
+    static_objects_.back().set_mesh(g_physics_, g_cooking_, arena_mesh);
+    */
+
+
+    std::cout << "Setting friction data" << std::endl;
+    friction_pair_service_.set_friction_data(settings_.arena_tire_friction);
 }
 
 void PhysicsSystem::create_4w_vehicle (
