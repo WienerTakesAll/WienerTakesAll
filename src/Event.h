@@ -5,6 +5,7 @@
 #include <string>
 
 enum class EventType {
+    START_GAME,
     ADD_VEHICLE,
     ADD_ARENA,
     LOAD_EVENT,

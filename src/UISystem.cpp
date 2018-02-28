@@ -83,5 +83,8 @@ void UISystem::handle_key_press(const Event& e) {
     if (key == SDLK_RETURN) {
         start_bg_.toggle();
         logo_.toggle();
+        hit_enter_or_start_.toggle();
+        EventSystem::queue_event(Event(EventType::START_GAME));
+        EventSystem::remove_event_handler(EventType::KEYPRESS_EVENT);
     }
 }

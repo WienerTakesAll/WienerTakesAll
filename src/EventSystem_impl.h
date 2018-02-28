@@ -1,7 +1,13 @@
 #pragma once
+
 template<typename T>
 void EventSystem<T>::add_event_handler(EventType eventType, std::function<void(T*, Event)> handle_function, T* this_pointer) {
     function_handlers_[static_cast<int>(eventType)] = std::bind(handle_function, this_pointer, std::placeholders::_1);
+}
+
+template<typename T>
+void EventSystem<T>::remove_event_handler(EventType eventType) {
+    function_handlers_[static_cast<int>(eventType)] = nullptr;
 }
 
 template<typename T>

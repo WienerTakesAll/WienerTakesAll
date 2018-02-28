@@ -9,7 +9,7 @@
 GameplaySystem::GameplaySystem()
     : gameobject_counter_(GameObjectCounter::get_instance()) {
     add_event_handler(EventType::LOAD_EVENT, &GameplaySystem::handle_load, this);
-    add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
+    add_event_handler(EventType::START_GAME, &GameplaySystem::handle_start_game, this);
 }
 
 void GameplaySystem::update() {
@@ -75,6 +75,10 @@ void GameplaySystem::handle_load(const Event& e) {
         )
     );
 
+}
+
+void GameplaySystem::handle_start_game(const Event& e) {
+    add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
 }
 
 void GameplaySystem::handle_key_press(const Event& e) {
