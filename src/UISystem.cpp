@@ -44,7 +44,7 @@ void UISystem::handle_load(const Event& e) {
     ui_shader_ = asset_manager_.get_shader_asset("assets/shaders/UIShader");
     TextureAsset* start_bg_tex =
         asset_manager_.get_texture_asset("assets/textures/backyard_bbq.png");
-    start_bg_ = UIObject(
+    start_bg_ = UIObject( // cover screen
                     glm::vec2(-1.f),
                     glm::vec3(1.0f),
                     glm::vec2(2.0f),
@@ -55,10 +55,10 @@ void UISystem::handle_load(const Event& e) {
 
     TextureAsset* logo_tex =
         asset_manager_.get_texture_asset("assets/textures/logo.png");
-    logo_ = UIObject(
-                glm::vec2(-0.4f, -0.8f),
+    logo_ = UIObject( // top middle
+                glm::vec2(-0.5f, -.1f),
                 glm::vec3(1.0f),
-                glm::vec2(0.8f),
+                glm::vec2(1.0f),
                 square_mesh_,
                 logo_tex,
                 ui_shader_

@@ -20,9 +20,10 @@ void TextureAsset::load(const std::string& file_path) {
     }
 
     //Load the texture into opengl here!
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glGenTextures(1, &texture_id_);
     glBindTexture(GL_TEXTURE_2D, texture_id_);
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -38,16 +39,26 @@ void TextureAsset::load(const std::string& file_path) {
         gl_p_type = GL_UNSIGNED_BYTE;
     } else if (p_format.BytesPerPixel == 3) {
         gl_p_format = GL_RGB;
-        gl_p_type = GL_UNSIGNED_INT;
+        gl_p_type = GL_UNSIGNED_BYTE;
     } else {
         std::cout << "Unkown pixel storage type." << std::endl;
         valid_ = false;
     }
 
+    std::cout << "file_path: " << file_path << std::endl;
+    std::cout << "GL_RGBA: " << GL_RGBA << std::endl;
+    std::cout << "GL_UNSIGNED_BYTE: " << GL_UNSIGNED_BYTE << std::endl;
+    std::cout << "GL_RGB: " << GL_RGB << std::endl;
+    std::cout << "GL_UNSIGNED_INT: " << GL_UNSIGNED_INT << std::endl;
+    std::cout << "gl_p_format: " << gl_p_format << std::endl;
+    std::cout << "gl_p_type: " << gl_p_type << std::endl;
+    std::cout << "p_width: " << p_width << std::endl;
+    std::cout << "p_height: " << p_height << std::endl;
+    std::cout << "surface->pixels: " << surface->pixels << std::endl;
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
-        GL_RGB,
+        gl_p_format,
         p_width,
         p_height,
         0,

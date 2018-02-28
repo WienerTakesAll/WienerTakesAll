@@ -7,6 +7,7 @@ physx
 physx.zip
 *.jpg
 *.jpeg
+.fuse_hidden*
 
 # User-specific files
 *.suo
