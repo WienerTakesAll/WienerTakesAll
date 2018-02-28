@@ -5,11 +5,19 @@
 #include "GameObjectCounter.h"
 #include "GameplaySystem.h"
 #include "VehicleControls.h"
+#include "GameState.h"
 
 GameplaySystem::GameplaySystem()
     : gameobject_counter_(GameObjectCounter::get_instance()) {
     add_event_handler(EventType::LOAD_EVENT, &GameplaySystem::handle_load, this);
-    add_event_handler(EventType::START_GAME, &GameplaySystem::handle_start_game, this);
+    add_event_handler(EventType::NEW_GAME_STATE, &GameplaySystem::handle_new_game_state, this);
+
+	EventSystem::queue_event(
+		Event(
+			EventType::NEW_GAME_STATE,
+			"state", GameState::START_MENU
+        )
+    );
 }
 
 void GameplaySystem::update() {
@@ -77,8 +85,16 @@ void GameplaySystem::handle_load(const Event& e) {
 
 }
 
-void GameplaySystem::handle_start_game(const Event& e) {
-    add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
+void GameplaySystem::handle_new_game_state(const Event& e) {
+    int new_state = e.get_value<int>("state", true).first;
+    switch (new_state) {
+        case GameState::START_MENU:
+            remove_event_handler(EventType::KEYPRESS_EVENT);
+            break;
+        case GameState::IN_GAME:
+            add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
+            break;
+    }
 }
 
 void GameplaySystem::handle_key_press(const Event& e) {
