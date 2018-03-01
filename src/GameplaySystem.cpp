@@ -26,63 +26,6 @@ void GameplaySystem::update() {
 }
 
 void GameplaySystem::handle_load(const Event& e) {
-    EventSystem::queue_event(
-        Event(
-            EventType::ADD_VEHICLE,
-            "object_id", gameobject_counter_->assign_id(),
-            // TODO: Pass glm::vec3 in events
-            "pos_x", 4,
-            "pos_y", 2,
-            "pos_z", 0//,
-            // "name", "Vehicle 1"
-        )
-    );
-
-    EventSystem::queue_event(
-        Event(
-            EventType::ADD_VEHICLE,
-            "object_id", gameobject_counter_->assign_id(),
-            // TODO: Pass glm::vec3 in events
-            "pos_x", 10,
-            "pos_y", 2,
-            "pos_z", 0//,
-            // "name", "Vehicle 1"
-        )
-    );
-
-    EventSystem::queue_event(
-        Event(
-            EventType::ADD_VEHICLE,
-            "object_id", gameobject_counter_->assign_id(),
-            // TODO: Pass glm::vec3 in events
-            "pos_x", -4,
-            "pos_y", 2,
-            "pos_z", 0//,
-            // "name", "Vehicle 1"
-        )
-    );
-
-    EventSystem::queue_event(
-        Event(
-            EventType::ADD_VEHICLE,
-            "object_id", gameobject_counter_->assign_id(),
-            // TODO: Pass glm::vec3 in events
-            "pos_x", -10,
-            "pos_y", 2,
-            "pos_z", 0//,
-            // "name", "Vehicle 1"
-        )
-    );
-
-
-
-    // Terrain
-    EventSystem::queue_event(
-        Event(
-            EventType::ADD_ARENA,
-            "object_id", gameobject_counter_->assign_id()
-        )
-    );
 
 }
 
@@ -92,6 +35,63 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
     if (new_game_state == GameState::IN_GAME) {
         int num_humans = e.get_value<int>("num_players", true).first;
         std::cout << "starting game with " << num_humans << " human players" << std::endl;
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_VEHICLE,
+                "object_id", gameobject_counter_->assign_id(),
+                // TODO: Pass glm::vec3 in events
+                "pos_x", 4,
+                "pos_y", 2,
+                "pos_z", 0//,
+                // "name", "Vehicle 1"
+            )
+        );
+
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_VEHICLE,
+                "object_id", gameobject_counter_->assign_id(),
+                // TODO: Pass glm::vec3 in events
+                "pos_x", 10,
+                "pos_y", 2,
+                "pos_z", 0//,
+                // "name", "Vehicle 1"
+            )
+        );
+
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_VEHICLE,
+                "object_id", gameobject_counter_->assign_id(),
+                // TODO: Pass glm::vec3 in events
+                "pos_x", -4,
+                "pos_y", 2,
+                "pos_z", 0//,
+                // "name", "Vehicle 1"
+            )
+        );
+
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_VEHICLE,
+                "object_id", gameobject_counter_->assign_id(),
+                // TODO: Pass glm::vec3 in events
+                "pos_x", -10,
+                "pos_y", 2,
+                "pos_z", 0//,
+                // "name", "Vehicle 1"
+            )
+        );
+
+
+
+        // Terrain
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_ARENA,
+                "object_id", gameobject_counter_->assign_id()
+            )
+        );
     }
 
     current_game_state_ = new_game_state;
