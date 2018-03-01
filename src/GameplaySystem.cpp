@@ -91,7 +91,6 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
 }
 
 void GameplaySystem::handle_key_press(const Event& e) {
-    std::cout << "current_game_state_ is " << std::endl;
     if(current_game_state_ != GameState::IN_GAME) {
         return;
     }
