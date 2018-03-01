@@ -6,11 +6,6 @@ void EventSystem<T>::add_event_handler(EventType eventType, std::function<void(T
 }
 
 template<typename T>
-void EventSystem<T>::remove_event_handler(EventType eventType) {
-    function_handlers_[static_cast<int>(eventType)] = nullptr;
-}
-
-template<typename T>
 void EventSystem<T>::handle_events(const std::vector<Event>& events) {
     for (const auto& some_event : events) {
         const auto& handler = function_handlers_[static_cast<int>(some_event.event_type)];

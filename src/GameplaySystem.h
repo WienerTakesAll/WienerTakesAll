@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EventSystem.h"
+#include "GameState.h"
 
 class GameObjectCounter;
 
@@ -14,4 +15,5 @@ private:
     void handle_new_game_state(const Event& e);
     void handle_key_press(const Event& e);
     GameObjectCounter* gameobject_counter_;
+    GameState current_game_state_;
 };

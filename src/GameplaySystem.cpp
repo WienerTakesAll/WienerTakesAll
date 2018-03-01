@@ -5,11 +5,12 @@
 #include "GameObjectCounter.h"
 #include "GameplaySystem.h"
 #include "VehicleControls.h"
-#include "GameState.h"
 
 GameplaySystem::GameplaySystem()
-    : gameobject_counter_(GameObjectCounter::get_instance()) {
+    : gameobject_counter_(GameObjectCounter::get_instance())
+    , current_game_state_(GameState::START_MENU) {
     add_event_handler(EventType::LOAD_EVENT, &GameplaySystem::handle_load, this);
+    add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
     add_event_handler(EventType::NEW_GAME_STATE, &GameplaySystem::handle_new_game_state, this);
 
 	EventSystem::queue_event(
@@ -86,18 +87,15 @@ void GameplaySystem::handle_load(const Event& e) {
 }
 
 void GameplaySystem::handle_new_game_state(const Event& e) {
-    int new_state = e.get_value<int>("state", true).first;
-    switch (new_state) {
-        case GameState::START_MENU:
-            remove_event_handler(EventType::KEYPRESS_EVENT);
-            break;
-        case GameState::IN_GAME:
-            add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
-            break;
-    }
+    current_game_state_ = (GameState)e.get_value<int>("state", true).first;
 }
 
 void GameplaySystem::handle_key_press(const Event& e) {
+    std::cout << "current_game_state_ is " << std::endl;
+    if(current_game_state_ != GameState::IN_GAME) {
+        return;
+    }
+
     // Update gameplay during keypress
     int key = e.get_value<int>("key", true).first;
     int value = e.get_value<int>("value", true).first;

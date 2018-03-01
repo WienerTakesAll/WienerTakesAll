@@ -1,7 +1,6 @@
 #include "UISystem.h"
 
 #include "AssetManager.h"
-#include "GameState.h"
 
 namespace {
     const int UI_VIEW_PORT_WIDTH = 640;
@@ -9,7 +8,8 @@ namespace {
 }
 
 UISystem::UISystem(AssetManager& asset_manager)
-    : asset_manager_(asset_manager) {
+    : asset_manager_(asset_manager)
+    , current_game_state_(GameState::START_MENU) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &UISystem::handle_load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &UISystem::handle_key_press, this);
 
@@ -79,19 +79,22 @@ void UISystem::handle_load(const Event& e) {
 }
 
 void UISystem::handle_key_press(const Event& e) {
+    if(current_game_state_ != GameState::START_MENU) {
+        return;
+    }
     int key = e.get_value<int>("key", true).first;
 
     if (key == SDLK_RETURN) {
-        start_bg_.toggle();
-        logo_.toggle();
-        hit_enter_or_start_.toggle();
+        start_bg_.visible_ = false;
+        logo_.visible_ = false;
+        hit_enter_or_start_.visible_ = false;
         EventSystem::queue_event(
             Event(
                 EventType::NEW_GAME_STATE,
                 "state", GameState::IN_GAME
             )
         );
-        EventSystem::remove_event_handler(EventType::KEYPRESS_EVENT);
+        current_game_state_ = GameState::IN_GAME;
     }
 }
 
