@@ -212,5 +212,8 @@
     <ClInclude Include="src\UISystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\GameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

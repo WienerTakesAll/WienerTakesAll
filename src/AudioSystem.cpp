@@ -2,10 +2,11 @@
 #include <utility>
 #include <vector>
 
+#include "SDL.h"
+
 #include "AudioSystem.h"
 #include "AudioSettings.h"
-
-#include "SDL.h"
+#include "GameState.h"
 
 AudioSystem::AudioSystem(const AudioSettings& settings)
     : init_successful_(false)
@@ -27,6 +28,7 @@ bool AudioSystem::init() {
 
     add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &AudioSystem::handle_update_settings_event, this);
     add_event_handler(EventType::VEHICLE_COLLISION, &AudioSystem::handle_vehicle_collision_event, this);
+    add_event_handler(EventType::NEW_GAME_STATE, &AudioSystem::handle_new_game_state, this);
     init_successful_ = true;
     return init_successful_;
 }
@@ -38,6 +40,7 @@ bool AudioSystem::load_audio_assets() {
         const std::string path = sound_asset_info.second;
         sound_assets_[key] = Mix_LoadWAV(path.c_str());
 
+        std::cout << "Loading sound: " << path << std::endl;
         if (sound_assets_.at(key) == nullptr) {
             std::cerr << "Failed to load sound: " << key << std::endl;
             return false;
@@ -50,6 +53,7 @@ bool AudioSystem::load_audio_assets() {
         const std::string path = music_asset_info.second;
         music_assets_[key] = Mix_LoadMUS(path.c_str());
 
+        std::cout << "Loading music: " << path << std::endl;
         if (music_assets_.at(key) == nullptr) {
             std::cerr << "Failed to load music: " << key << std::endl;
             return false;
@@ -152,4 +156,16 @@ void AudioSystem::quit() {
     std::cout << "All sound assets cleared" << std::endl;
 
     Mix_Quit();
+}
+
+void AudioSystem::handle_new_game_state(const Event& e) {
+    int new_state = e.get_value<int>("state", true).first;
+    switch (new_state) {
+        case GameState::START_MENU:
+            play_music(MusicAsset::START_MENU, true);
+            break;
+        case GameState::IN_GAME:
+            play_music(MusicAsset::IN_GAME, true);
+            break;
+    }
 }

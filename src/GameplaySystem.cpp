@@ -7,9 +7,18 @@
 #include "VehicleControls.h"
 
 GameplaySystem::GameplaySystem()
-    : gameobject_counter_(GameObjectCounter::get_instance()) {
+    : gameobject_counter_(GameObjectCounter::get_instance())
+    , current_game_state_(GameState::START_MENU) {
     add_event_handler(EventType::LOAD_EVENT, &GameplaySystem::handle_load, this);
     add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
+    add_event_handler(EventType::NEW_GAME_STATE, &GameplaySystem::handle_new_game_state, this);
+
+	EventSystem::queue_event(
+		Event(
+			EventType::NEW_GAME_STATE,
+			"state", GameState::START_MENU
+        )
+    );
 }
 
 void GameplaySystem::update() {
@@ -77,7 +86,15 @@ void GameplaySystem::handle_load(const Event& e) {
 
 }
 
+void GameplaySystem::handle_new_game_state(const Event& e) {
+    current_game_state_ = (GameState)e.get_value<int>("state", true).first;
+}
+
 void GameplaySystem::handle_key_press(const Event& e) {
+    if(current_game_state_ != GameState::IN_GAME) {
+        return;
+    }
+
     // Update gameplay during keypress
     int key = e.get_value<int>("key", true).first;
     int value = e.get_value<int>("value", true).first;

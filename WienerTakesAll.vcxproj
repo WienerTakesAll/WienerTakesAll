@@ -144,6 +144,7 @@
     <ClInclude Include="src\GameObject.h" />
     <ClInclude Include="src\GameObjectCounter.h" />
     <ClInclude Include="src\GameplaySystem.h" />
+    <ClInclude Include="src\GameState.h" />
     <ClInclude Include="src\InputManager.h" />
     <ClInclude Include="src\InputSettings.h" />
     <ClInclude Include="src\MeshAsset.h" />

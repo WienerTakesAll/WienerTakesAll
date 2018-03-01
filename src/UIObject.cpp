@@ -16,5 +16,7 @@ UIObject::UIObject(glm::vec2 origin, glm::vec3 colour, glm::vec2 size, MeshAsset
 }
 
 void UIObject::render(glm::mat4 camera) const {
-    render_component_.render(camera);
+    if (visible_) {
+        render_component_.render(camera);
+    }
 }
