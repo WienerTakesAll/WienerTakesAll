@@ -5,9 +5,12 @@
 
 class StartMenu {
 public:
-	StartMenu(AssetManager& asset_manager);
-	void load();
-	void render() const;
+    StartMenu(AssetManager& asset_manager);
+    void load();
+    void move_selection_up();
+    void move_selection_down();
+    int selected_num_of_players();
+    void render() const;
 
 private:
     AssetManager& asset_manager_;
@@ -17,5 +20,10 @@ private:
 
     UIObject background_;
     UIObject logo_;
-    UIObject hit_enter_or_start_;
+    UIObject one_players_;
+    UIObject two_players_;
+    UIObject three_players_;
+    UIObject four_players_;
+    std::vector<UIObject> selection_indicators_;
+    unsigned int active_selection;
 };

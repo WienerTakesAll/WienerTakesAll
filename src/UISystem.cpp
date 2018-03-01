@@ -23,7 +23,7 @@ void UISystem::update() {
 void UISystem::render() const {
     start_render();
 
-    if(current_game_state_ == GameState::START_MENU) {
+    if (current_game_state_ == GameState::START_MENU) {
         start_menu_.render();
     }
 
@@ -47,15 +47,27 @@ void UISystem::handle_load(const Event& e) {
 
 void UISystem::handle_key_press(const Event& e) {
     int key = e.get_value<int>("key", true).first;
-    if(current_game_state_ == GameState::START_MENU) {
-        if (key == SDLK_RETURN) {
-            EventSystem::queue_event(
-                Event(
-                    EventType::NEW_GAME_STATE,
-                    "state", GameState::IN_GAME
-                )
-            );
-            current_game_state_ = GameState::IN_GAME;
+
+    if (current_game_state_ == GameState::START_MENU) {
+        switch (key) {
+            case SDLK_RETURN:
+                EventSystem::queue_event(
+                    Event(
+                        EventType::NEW_GAME_STATE,
+                        "state", GameState::IN_GAME,
+                        "num_players", start_menu_.selected_num_of_players()
+                    )
+                );
+                current_game_state_ = GameState::IN_GAME;
+                break;
+
+            case SDLK_UP:
+                start_menu_.move_selection_up();
+                break;
+
+            case SDLK_DOWN:
+                start_menu_.move_selection_down();
+                break;
         }
     }
 }

@@ -13,10 +13,10 @@ GameplaySystem::GameplaySystem()
     add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
     add_event_handler(EventType::NEW_GAME_STATE, &GameplaySystem::handle_new_game_state, this);
 
-	EventSystem::queue_event(
-		Event(
-			EventType::NEW_GAME_STATE,
-			"state", GameState::START_MENU
+    EventSystem::queue_event(
+        Event(
+            EventType::NEW_GAME_STATE,
+            "state", GameState::START_MENU
         )
     );
 }
@@ -87,11 +87,18 @@ void GameplaySystem::handle_load(const Event& e) {
 }
 
 void GameplaySystem::handle_new_game_state(const Event& e) {
-    current_game_state_ = (GameState)e.get_value<int>("state", true).first;
+    GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
+
+    if (new_game_state == GameState::IN_GAME) {
+        int num_humans = e.get_value<int>("num_players", true).first;
+        std::cout << "starting game with " << num_humans << " human players" << std::endl;
+    }
+
+    current_game_state_ = new_game_state;
 }
 
 void GameplaySystem::handle_key_press(const Event& e) {
-    if(current_game_state_ != GameState::IN_GAME) {
+    if (current_game_state_ != GameState::IN_GAME) {
         return;
     }
 
