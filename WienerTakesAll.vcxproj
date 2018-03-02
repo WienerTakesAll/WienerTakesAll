@@ -102,6 +102,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\AiSystem.cpp" />
     <ClCompile Include="src\AssetManager.cpp" />
     <ClCompile Include="src\AudioSystem.cpp" />
     <ClCompile Include="src\CollisionEventsSubsystem.cpp" />
@@ -130,6 +131,7 @@
     <ClCompile Include="src\WheelMeshGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\AiSystem.h" />
     <ClInclude Include="src\AssetManager.h" />
     <ClInclude Include="src\AudioSettings.h" />
     <ClInclude Include="src\AudioSystem.h" />
