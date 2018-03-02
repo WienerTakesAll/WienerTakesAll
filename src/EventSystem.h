@@ -16,6 +16,7 @@ public:
     //Add a function to handle an event of name eventName. Also requires "this" pointer of object.
     //Example Usage: add_event_handler("someEvent", &ExampleClass::ExampleFunction, this)
     void add_event_handler(EventType event_type, std::function<void(T*, Event)> handle_function, T* this_pointer);
+    void remove_event_handler(EventType event_type);
 
     //Takes a list of events and runs the specified function handlers
     void handle_events(const std::vector<Event>& events);
