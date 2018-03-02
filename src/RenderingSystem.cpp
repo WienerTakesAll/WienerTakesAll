@@ -7,8 +7,9 @@
 
 namespace {
     const std::string STANDARD_SHADER_PATH = "assets/shaders/SimpleShader";
+    const std::string SHADOW_SHADER_PATH = "assets/shaders/ShadowShader";
     const std::string CAR_MESH_PATH = "assets/models/carBoxModel.obj";
-    const std::string TERRAIN_MESH_PATH = "assets/models/Terrain.obj";
+    const std::string TERRAIN_MESH_PATH = "assets/models/Arena.obj";
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
@@ -21,14 +22,17 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::ADD_VEHICLE, &RenderingSystem::handle_add_vehicle, this);
     EventSystem::add_event_handler(EventType::ADD_ARENA, &RenderingSystem::handle_add_terrain, this);
     EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
+
+    init_window();
 }
 
 void RenderingSystem::update() {
 }
 
 void RenderingSystem::load(const Event& e) {
-    init_window();
     setup_cameras();
+
+    shadow_shader_ = asset_manager_.get_shader_asset(SHADOW_SHADER_PATH);
 }
 
 void RenderingSystem::handle_key_press(const Event& e) {
@@ -131,9 +135,43 @@ void RenderingSystem::render() {
 
         glViewport(vx, vy, 320, 240);
 
+
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_MULTISAMPLE);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+
         for (auto& object : example_objects_) {
-            object.render(cameras_[i]);
+            object.render(cameras_[i], 0.3f);
         }
+
+        for (auto& object : example_objects_) {
+            object.render_lighting(cameras_[i], glm::vec3(-1.f, -1.f, 0.f), shadow_shader_);
+        }
+
+
+        glEnable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
+        glDepthFunc(GL_EQUAL);
+        glBlendFunc(GL_SRC_COLOR, GL_DST_COLOR);
+        glBlendEquation(GL_FUNC_ADD);
+
+        glEnable(GL_STENCIL_TEST);
+        glStencilFunc(GL_EQUAL, 0, ~0);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        glStencilMask(0);
+
+        glDepthMask(GL_FALSE);
+
+        for (auto& object : example_objects_) {
+           object.render(cameras_[i], 0.f);
+        }
+    
+        glDepthFunc(GL_LESS);
+        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
+        glDisable(GL_STENCIL_TEST);
+
     }
 
     end_render();
@@ -141,13 +179,14 @@ void RenderingSystem::render() {
 
 
 bool RenderingSystem::init_window() {
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-    SDL_GL_CreateContext(window_);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+
+
+    SDL_GLContext context = SDL_GL_CreateContext(window_);
+
+    if (!context) {
+        fprintf(stderr, "Couldn't create context: %s\n", SDL_GetError());
+        return false;
+    }
 
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
@@ -166,10 +205,8 @@ bool RenderingSystem::init_window() {
 void RenderingSystem::start_render() const {
     //Clear the buffers and setup the opengl requirements
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_MULTISAMPLE);
+    glStencilMask(~0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void RenderingSystem::setup_cameras() {

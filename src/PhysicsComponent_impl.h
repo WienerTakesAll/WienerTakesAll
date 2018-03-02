@@ -108,7 +108,7 @@ void PhysicsComponent<static_actor>::set_mesh(
     physx::PxTransform phys_transform(0, 0, 0);
 
     // default material
-    g_material_ = physics->createMaterial(5.f, 5.f, 5.f);
+    g_material_ = physics->createMaterial(0.5f, 0.5f, 0.5f);
 
     g_mesh_geometry_ = new physx::PxConvexMeshGeometry(g_mesh_);
 

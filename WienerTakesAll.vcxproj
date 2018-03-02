@@ -75,15 +75,16 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <AdditionalIncludeDirectories>lib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>PsFastXmlDEBUG_x86.lib;PxFoundationDEBUG_x86.lib;PxPvdSDKDEBUG_x86.lib;PxTaskDEBUG_x86.lib;LowLevelAABBDEBUG.lib;LowLevelParticlesDEBUG.lib;PhysX3DEBUG_x86.lib;SimulationControllerDEBUG.lib;LowLevelClothDEBUG.lib;PhysX3CharacterKinematicDEBUG_x86.lib;PhysX3ExtensionsDEBUG.lib;LowLevelDEBUG.lib;PhysX3CommonDEBUG_x86.lib;PhysX3VehicleDEBUG.lib;LowLevelDynamicsDEBUG.lib;PhysX3CookingDEBUG_x86.lib;SceneQueryDEBUG.lib;assimp-vc140-mt.lib;glew32.lib;glew32s.lib;opengl32.lib;SDL2.lib;SDL2_mixer.lib;SDL2main.lib;SDL2test.lib;libyaml-cppmdd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>PsFastXmlDEBUG_x86.lib;PxFoundationDEBUG_x86.lib;PxPvdSDKDEBUG_x86.lib;PxTaskDEBUG_x86.lib;LowLevelAABBDEBUG.lib;LowLevelParticlesDEBUG.lib;PhysX3DEBUG_x86.lib;SimulationControllerDEBUG.lib;LowLevelClothDEBUG.lib;PhysX3CharacterKinematicDEBUG_x86.lib;PhysX3ExtensionsDEBUG.lib;LowLevelDEBUG.lib;PhysX3CommonDEBUG_x86.lib;PhysX3VehicleDEBUG.lib;LowLevelDynamicsDEBUG.lib;PhysX3CookingDEBUG_x86.lib;SceneQueryDEBUG.lib;assimp-vc140-mt.lib;glew32.lib;glew32s.lib;opengl32.lib;SDL2.lib;SDL2_mixer.lib;SDL2_image.lib;SDL2main.lib;SDL2test.lib;libyaml-cppmdd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -104,6 +105,7 @@
   <ItemGroup>
     <ClCompile Include="src\AssetManager.cpp" />
     <ClCompile Include="src\AudioSystem.cpp" />
+    <ClCompile Include="src\CollisionEventsSubsystem.cpp" />
     <ClCompile Include="src\Event.cpp" />
     <ClCompile Include="src\FrictionPairService.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
@@ -119,6 +121,10 @@
     <ClCompile Include="src\RenderingSystem.cpp" />
     <ClCompile Include="src\SettingsSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\ShaderAsset.cpp" />
+    <ClCompile Include="src\TextureAsset.cpp" />
+    <ClCompile Include="src\UIObject.cpp" />
+    <ClCompile Include="src\UISystem.cpp" />
     <ClCompile Include="src\VehicleSceneQueryData.cpp" />
     <ClCompile Include="src\VehicleWheelQueryResults.cpp" />
     <ClCompile Include="src\WheelMeshGenerator.cpp" />
@@ -128,6 +134,7 @@
     <ClInclude Include="src\AudioSettings.h" />
     <ClInclude Include="src\AudioSystem.h" />
     <ClInclude Include="src\CarControlType.h" />
+    <ClInclude Include="src\CollisionEventsSubsystem.h" />
     <ClInclude Include="src\CollisionFlags.h" />
     <ClInclude Include="src\Event.h" />
     <ClInclude Include="src\EventSystem.h" />
@@ -151,8 +158,13 @@
     <ClInclude Include="src\RenderingComponent.h" />
     <ClInclude Include="src\RenderingSystem.h" />
     <ClInclude Include="src\SettingsSystem.h" />
+    <ClInclude Include="src\SettingsSystem_impl.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\ShaderAsset.h" />
     <ClInclude Include="src\SoundAsset.h" />
+    <ClInclude Include="src\TextureAsset.h" />
+    <ClInclude Include="src\UIObject.h" />
+    <ClInclude Include="src\UISystem.h" />
     <ClInclude Include="src\VehicleControls.h" />
     <ClInclude Include="src\VehicleSceneQueryData.h" />
     <ClInclude Include="src\VehicleWheelQueryResults.h" />

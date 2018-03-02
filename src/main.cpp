@@ -43,14 +43,15 @@ int main(int argc, char* args[]) {
     SettingsSystem settings_system(SETTINGS_FILE);
     PhysicsSettings physics_settings;
 
+
     AudioSystem audio_system(settings_system.get_audio_settings());
     AssetManager asset_manager;
+    RenderingSystem rendering_system(asset_manager);
     GameplaySystem gameplay_system;
     InputManager input_manager(settings_system.get_input_settings());
     UISystem ui_system(asset_manager);
     PhysicsSystem physics_system(asset_manager, physics_settings);
 
-    RenderingSystem rendering_system(asset_manager);
 
     if (!audio_system.init()) {
         std::cerr << "Audio system failed to initialize, continuing without audio " << std::endl;
@@ -79,6 +80,8 @@ int main(int argc, char* args[]) {
             input_manager.process_input(&event);
         }
 
+
+
         // Events
         input_manager.send_events(events);
         gameplay_system.send_events(events);
@@ -92,9 +95,12 @@ int main(int argc, char* args[]) {
         physics_system.handle_events(events);
         rendering_system.handle_events(events);
         ui_system.handle_events(events);
+
+
         audio_system.handle_events(events);
         settings_system.handle_events(events);
         events.clear();
+
 
 
         // Gameplay
@@ -102,6 +108,7 @@ int main(int argc, char* args[]) {
 
         // Physics
         physics_system.update();
+
 
         // Rendering
         rendering_system.update();
@@ -112,9 +119,10 @@ int main(int argc, char* args[]) {
         ui_system.render();
 
         // Maintain a maximum frame rate of 60fps
-        if ( game_is_running ) {
+        if ( game_is_running ) {           
             std::this_thread::sleep_until( frame_end_time );
         }
+
     }
 
     return 0;

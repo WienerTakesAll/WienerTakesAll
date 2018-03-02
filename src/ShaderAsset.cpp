@@ -10,6 +10,7 @@ void ShaderAsset::load(const std::string& vertex_path, const std::string& fragme
     GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
     GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
 
+
     // Read the Vertex Shader code from the file
     std::string vertex_shader_code;
     std::ifstream vertex_shader_stream(vertex_path, std::ios::in);
@@ -38,6 +39,7 @@ void ShaderAsset::load(const std::string& vertex_path, const std::string& fragme
         valid_ = false;
     }
 
+
     // Compile Vertex Shader for GPU
     char const* vertex_source_pointer = vertex_shader_code.c_str();
     glShaderSource(vertex_shader_id, 1, &vertex_source_pointer, NULL);
@@ -54,16 +56,19 @@ void ShaderAsset::load(const std::string& vertex_path, const std::string& fragme
     // Check Fragment Shader
     check_error(fragment_shader_id);
 
+
+
     // Link the program
     program_id_ = glCreateProgram();
     glAttachShader(program_id_, vertex_shader_id);
     glAttachShader(program_id_, fragment_shader_id);
     glLinkProgram(program_id_);
 
-    check_error(program_id_);
 
-    glDetachShader(program_id_, vertex_shader_id);
+    glDetachShader(program_id_, vertex_shader_id);	
     glDetachShader(program_id_, fragment_shader_id);
+
+
 
     glDeleteShader(vertex_shader_id);
     glDeleteShader(fragment_shader_id);
@@ -82,8 +87,11 @@ const GLuint ShaderAsset::get_program_id() const {
 void ShaderAsset::check_error(GLuint id) {
     GLint result = GL_FALSE;
     int length;
+
+
     glGetShaderiv(id, GL_COMPILE_STATUS, &result);
     glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+
 
     if (length > 0) {
         std::vector<char> errorMessage(length + 1);

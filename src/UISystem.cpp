@@ -81,7 +81,9 @@ void UISystem::end_render() const {
 }
 
 void UISystem::handle_load(const Event& e) {
+
     example_shader_ = asset_manager_.get_shader_asset("assets/shaders/UIShader");
+
     TextureAsset* tex = asset_manager_.get_texture_asset("assets/textures/default.png");
 
     example_ui_object_ = UIObject(glm::vec2(-0.25f), glm::vec3(1.0f), glm::vec2(0.5f), &example_mesh_, tex, example_shader_);

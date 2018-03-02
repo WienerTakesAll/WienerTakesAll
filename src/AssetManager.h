@@ -27,6 +27,7 @@ private:
     void load_mesh_from_file(const std::string& file_path);
     void load_texture_from_file(const std::string& file_path);
     void load_shader_from_file(const std::string& file_path);
+    void construct_shadow_volume(MeshAsset::MeshData& mesh);
     std::unordered_map<std::string, MeshAsset> mesh_assets_;
     std::unordered_map<std::string, TextureAsset> texture_assets_;
     std::unordered_map<std::string, ShaderAsset> shader_assets_;

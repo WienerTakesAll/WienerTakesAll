@@ -15,7 +15,8 @@ class RenderingComponent {
 public:
     RenderingComponent();
     //Renders the object from the camera perspective.
-    void render(glm::mat4x4 camera) const;
+    void render(glm::mat4x4 camera, float ambient = 0.f) const;
+    void render_lighting(glm::mat4x4 camera, glm::vec3 light_direction, ShaderAsset* shadow_shader) const;
     // Multiplies current transform with new transform
     void apply_transform(glm::mat4x4 transform);
     // Sets current transform to new transform
@@ -31,6 +32,11 @@ private:
 
     std::vector<GLuint> gl_vertex_buffers_;
     std::vector<GLuint> gl_index_buffers_;
+
+
+    std::vector<GLuint> gl_shadow_vertex_buffers_;
+    std::vector<GLuint> gl_shadow_index_buffers_;
+
     glm::mat4 transform_matrix_;
     MeshAsset* mesh_;
     TextureAsset* texture_;
