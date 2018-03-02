@@ -41,6 +41,7 @@ bool AudioSystem::load_audio_assets() {
         sound_assets_[key] = Mix_LoadWAV(path.c_str());
 
         std::cout << "Loading sound: " << path << std::endl;
+
         if (sound_assets_.at(key) == nullptr) {
             std::cerr << "Failed to load sound: " << key << std::endl;
             return false;
@@ -54,6 +55,7 @@ bool AudioSystem::load_audio_assets() {
         music_assets_[key] = Mix_LoadMUS(path.c_str());
 
         std::cout << "Loading music: " << path << std::endl;
+
         if (music_assets_.at(key) == nullptr) {
             std::cerr << "Failed to load music: " << key << std::endl;
             return false;
@@ -160,10 +162,12 @@ void AudioSystem::quit() {
 
 void AudioSystem::handle_new_game_state(const Event& e) {
     int new_state = e.get_value<int>("state", true).first;
+
     switch (new_state) {
         case GameState::START_MENU:
             play_music(MusicAsset::START_MENU, true);
             break;
+
         case GameState::IN_GAME:
             play_music(MusicAsset::IN_GAME, true);
             break;

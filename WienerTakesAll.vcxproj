@@ -121,6 +121,7 @@
     <ClCompile Include="src\SettingsSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderAsset.cpp" />
+    <ClCompile Include="src\StartMenu.cpp" />
     <ClCompile Include="src\TextureAsset.cpp" />
     <ClCompile Include="src\UIObject.cpp" />
     <ClCompile Include="src\UISystem.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderAsset.h" />
     <ClInclude Include="src\SoundAsset.h" />
+    <ClInclude Include="src\StartMenu.h" />
     <ClInclude Include="src\TextureAsset.h" />
     <ClInclude Include="src\UIObject.h" />
     <ClInclude Include="src\UISystem.h" />
