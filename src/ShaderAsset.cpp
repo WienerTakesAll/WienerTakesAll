@@ -65,7 +65,7 @@ void ShaderAsset::load(const std::string& vertex_path, const std::string& fragme
     glLinkProgram(program_id_);
 
 
-    glDetachShader(program_id_, vertex_shader_id);	
+    glDetachShader(program_id_, vertex_shader_id);
     glDetachShader(program_id_, fragment_shader_id);
 
 

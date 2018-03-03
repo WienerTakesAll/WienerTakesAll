@@ -78,8 +78,8 @@ void PhysicsSystem::update() {
         EventSystem::queue_event(
             Event(
                 EventType::VEHICLE_COLLISION,
-                "vehicle_a", collision.first,
-                "vehicle_b", collision.second
+                "a_id", collision.first,
+                "b_id", collision.second
             )
         );
     }

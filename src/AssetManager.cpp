@@ -157,8 +157,7 @@ void AssetManager::load_mesh_from_file(const std::string& file_path) {
         mesh_data.valid_ = true;
     }
 
-    for (auto& mesh_asset_data : mesh_data.meshes_)
-    {
+    for (auto& mesh_asset_data : mesh_data.meshes_) {
         construct_shadow_volume(mesh_asset_data);
     }
 
@@ -193,21 +192,17 @@ void AssetManager::load_shader_from_file(const std::string& file_path) {
 
 
 void AssetManager::construct_shadow_volume(MeshAsset::MeshData& mesh) {
-    
-    struct Edge 
-    {
+
+    struct Edge {
         GLuint v1, v2;
 
-        bool operator==(const Edge &other) const
-        {
+        bool operator==(const Edge& other) const {
             return (v1 == other.v1 && v2 == other.v2) || (v2 == other.v1 && v1 == other.v2);
         }
     };
 
-    struct EdgeHash
-    {
-        std::size_t operator()(const Edge& k) const
-        {
+    struct EdgeHash {
+        std::size_t operator()(const Edge& k) const {
             using std::size_t;
             using std::hash;
             using std::string;
@@ -220,30 +215,29 @@ void AssetManager::construct_shadow_volume(MeshAsset::MeshData& mesh) {
 
 
 
-    for(auto& vert : mesh.vertices_)
-    {
-        MeshAsset::MeshData::VolumeVertexData v = { glm::vec4(vert.position_, 0),vert.normal_ };
+    for (auto& vert : mesh.vertices_) {
+        MeshAsset::MeshData::VolumeVertexData v = { glm::vec4(vert.position_, 0), vert.normal_ };
         mesh.shadow_volume_vertices_.emplace_back(v);
     }
+
     GLuint infVert = mesh.shadow_volume_vertices_.size();
 
-    MeshAsset::MeshData::VolumeVertexData v = { glm::vec4(0, 0, 0, 1),glm::vec3(0,0,0) };
+    MeshAsset::MeshData::VolumeVertexData v = { glm::vec4(0, 0, 0, 1), glm::vec3(0, 0, 0) };
     mesh.shadow_volume_vertices_.emplace_back(v);
 
 
 
     std::unordered_map<Edge, int, EdgeHash> edgeSet;
 
-    
+
     for (GLuint i = 0; i + 2 < mesh.indices_.size(); i += 3) {
 
 
-        auto make_face = [&mesh,&edgeSet](GLuint v1, GLuint v2, GLuint v3) {
-            
-            if (edgeSet.count({ v1,v3 }) == 0)
-            {
+        auto make_face = [&mesh, &edgeSet](GLuint v1, GLuint v2, GLuint v3) {
+
+            if (edgeSet.count({ v1, v3 }) == 0) {
                 Edge e = { v1, v3 };
-                edgeSet.emplace(e,0);
+                edgeSet.emplace(e, 0);
 
                 mesh.shadow_volume_indices_.emplace_back(v1);
                 mesh.shadow_volume_indices_.emplace_back(v2);
@@ -251,9 +245,9 @@ void AssetManager::construct_shadow_volume(MeshAsset::MeshData& mesh) {
             }
         };
 
-        make_face(mesh.indices_[i], infVert, mesh.indices_[i+1]);
-        make_face(mesh.indices_[i+1], infVert, mesh.indices_[i+2]);
-        make_face(mesh.indices_[i+2], infVert, mesh.indices_[i]);
+        make_face(mesh.indices_[i], infVert, mesh.indices_[i + 1]);
+        make_face(mesh.indices_[i + 1], infVert, mesh.indices_[i + 2]);
+        make_face(mesh.indices_[i + 2], infVert, mesh.indices_[i]);
     }
 
 }

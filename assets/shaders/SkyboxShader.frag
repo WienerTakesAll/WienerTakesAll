@@ -7,5 +7,5 @@ uniform float Ambient;
 uniform sampler2D albedo;
 
 void main(){
-	color.rgba = texture2D(albedo,textureCoord);
+	color.rgba = texture(albedo,textureCoord);
 }

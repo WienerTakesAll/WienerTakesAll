@@ -119,7 +119,7 @@ int main(int argc, char* args[]) {
         ui_system.render();
 
         // Maintain a maximum frame rate of 60fps
-        if ( game_is_running ) {           
+        if ( game_is_running ) {
             std::this_thread::sleep_until( frame_end_time );
         }
 

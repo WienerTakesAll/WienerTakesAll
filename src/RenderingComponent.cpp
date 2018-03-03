@@ -37,9 +37,7 @@ void RenderingComponent::render(glm::mat4x4 camera, float ambient) const {
     if (texture_ != nullptr && texture_->is_valid()) {
         glBindTexture(GL_TEXTURE_2D, texture_->get_texture_id());
         glEnable(GL_TEXTURE_2D);
-    }
-    else
-    {
+    } else {
         glDisable(GL_TEXTURE_2D);
     }
 
@@ -105,7 +103,7 @@ void RenderingComponent::render_lighting(glm::mat4x4 camera, glm::vec3 light_dir
 
     glDepthMask(GL_FALSE);
     glDepthFunc(GL_LESS);
- 
+
     glStencilFunc(GL_ALWAYS, 0, ~0);
     glStencilMask(~0);
 
@@ -122,11 +120,11 @@ void RenderingComponent::render_lighting(glm::mat4x4 camera, glm::vec3 light_dir
     for (size_t i = 0; i < mesh_->meshes_.size(); i++) {
         glBindBuffer(GL_ARRAY_BUFFER, gl_shadow_vertex_buffers_[i]);
         glVertexAttribPointer
-            ( 0, 4, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VolumeVertexData)
-            , reinterpret_cast<void*>offsetof(MeshAsset::MeshData::VolumeVertexData, position_));
+        ( 0, 4, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VolumeVertexData)
+          , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VolumeVertexData, position_)));
         glVertexAttribPointer
-            ( 1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VolumeVertexData)
-            , reinterpret_cast<void*>offsetof(MeshAsset::MeshData::VolumeVertexData, normal_));
+        ( 1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VolumeVertexData)
+          , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VolumeVertexData, normal_)));
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_shadow_index_buffers_[i]);
 
@@ -238,8 +236,8 @@ void RenderingComponent::setupBuffer() {
         if (mesh_->meshes_[i].shadow_volume_vertices_.size() && mesh_->meshes_[i].shadow_volume_indices_.size()) {
             glBindBuffer(GL_ARRAY_BUFFER, gl_shadow_vertex_buffers_[i]);
             glBufferData
-                ( GL_ARRAY_BUFFER, sizeof(MeshAsset::MeshData::VolumeVertexData)*mesh_->meshes_[i].shadow_volume_vertices_.size()
-                , &mesh_->meshes_[i].shadow_volume_vertices_.front(), GL_STATIC_DRAW);
+            ( GL_ARRAY_BUFFER, sizeof(MeshAsset::MeshData::VolumeVertexData)*mesh_->meshes_[i].shadow_volume_vertices_.size()
+              , &mesh_->meshes_[i].shadow_volume_vertices_.front(), GL_STATIC_DRAW);
 
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_shadow_index_buffers_[i]);

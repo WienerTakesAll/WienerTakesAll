@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <assert.h>
 
 #include "PhysicsSystemUtils.h"
@@ -15,42 +16,95 @@ PhysicsComponent<static_actor>::PhysicsComponent(unsigned int id)
 }
 
 template <bool static_actor>
+PhysicsComponent<static_actor>::PhysicsComponent(const PhysicsComponent& that)
+    : valid_(that.is_valid())
+    , id_(that.get_id())
+    , g_material_(that.get_material())
+    , g_mesh_(that.get_mesh())
+    , g_mesh_geometry_(that.get_mesh_geometry())
+    , g_mesh_shape_(that.get_mesh_shape())
+    , g_actor_(that.get_actor())
+    , is_vehicle_(that.is_vehicle())
+    , g_drive_4w_(that.get_wheels()) {
+    if (g_actor_) {
+        g_actor_->userData = &id_;
+    }
+}
+
+template <bool static_actor>
+PhysicsComponent<static_actor>& PhysicsComponent<static_actor>::operator=(const PhysicsComponent& that) {
+    valid_ = that.is_valid();
+    id_ = that.get_id();
+    g_material_ = that.get_material();
+    g_mesh_ = that.get_mesh();
+    g_mesh_geometry_ = that.get_mesh_geometry();
+    g_mesh_shape_ = that.get_mesh_shape();
+    g_actor_ = that.get_actor();
+    is_vehicle_ = that.is_vehicle();
+    g_drive_4w_ = that.get_wheels();
+
+    if (g_actor_) {
+        g_actor_->userData = &id_;
+    }
+
+    return *this;
+}
+
+template <bool static_actor>
 PhysicsComponent<static_actor>::~PhysicsComponent() {
 }
 
 template <bool static_actor>
-bool PhysicsComponent<static_actor>::is_valid() {
+bool PhysicsComponent<static_actor>::is_valid() const {
     return valid_;
 }
 
 template <bool static_actor>
-unsigned int PhysicsComponent<static_actor>::get_id() {
+unsigned int PhysicsComponent<static_actor>::get_id() const {
     return id_;
 }
 
 template <bool static_actor>
-auto PhysicsComponent<static_actor>::get_actor() {
-    return g_actor_;
-}
-
-template <bool static_actor>
-void PhysicsComponent<static_actor>::set_actor(physx::PxRigidDynamic* actor) {
-    g_actor_ = actor;
-}
-
-template <bool static_actor>
-physx::PxMaterial* PhysicsComponent<static_actor>::get_material() {
+physx::PxMaterial* PhysicsComponent<static_actor>::get_material() const {
     return g_material_;
 }
 
 template <bool static_actor>
-physx::PxConvexMesh* PhysicsComponent<static_actor>::get_mesh() {
+physx::PxConvexMesh* PhysicsComponent<static_actor>::get_mesh() const {
     return g_mesh_;
 }
 
 template <bool static_actor>
-physx::PxVehicleDrive4W* PhysicsComponent<static_actor>::get_wheels() {
+physx::PxConvexMeshGeometry* PhysicsComponent<static_actor>::get_mesh_geometry() const {
+    return g_mesh_geometry_;
+}
+
+template <bool static_actor>
+physx::PxShape* PhysicsComponent<static_actor>::get_mesh_shape() const {
+    return g_mesh_shape_;
+}
+
+template <bool static_actor>
+auto PhysicsComponent<static_actor>::get_actor() const {
+    return g_actor_;
+}
+
+template <bool static_actor>
+bool PhysicsComponent<static_actor>::is_vehicle() const {
+    return is_vehicle_;
+}
+
+template <bool static_actor>
+physx::PxVehicleDrive4W* PhysicsComponent<static_actor>::get_wheels() const {
     return g_drive_4w_;
+}
+
+template <bool static_actor>
+void PhysicsComponent<static_actor>::set_actor(physx::PxRigidDynamic* actor) {
+    std::cout << "set_actor id: " << id_ << std::endl;
+    g_actor_ = actor;
+    g_actor_->userData = &id_;
+    std::cout << "set_actor g_actor_->userData: " << *(int*)g_actor_->userData << std::endl;
 }
 
 template <bool static_actor>

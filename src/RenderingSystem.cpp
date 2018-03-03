@@ -114,7 +114,7 @@ void RenderingSystem::handle_add_terrain(const Event& e) {
 
     MeshAsset* skybox_mesh = asset_manager_.get_mesh_asset(SKYBOX_MESH_PATH);
     ShaderAsset* skybox_shader = asset_manager_.get_shader_asset(SKYBOX_SHADER_PATH);
-    TextureAsset * skybox_texture = asset_manager_.get_texture_asset(SKYBOX_TEXTURE_PATH);
+    TextureAsset* skybox_texture = asset_manager_.get_texture_asset(SKYBOX_TEXTURE_PATH);
     example_objects_.emplace_back();
     example_objects_.back().set_mesh(skybox_mesh);
     example_objects_.back().set_shader(skybox_shader);
@@ -176,9 +176,9 @@ void RenderingSystem::render() {
         glDepthMask(GL_FALSE);
 
         for (auto& object : example_objects_) {
-           object.render(cameras_[i], 0.f);
+            object.render(cameras_[i], 0.f);
         }
-    
+
         glDepthFunc(GL_LESS);
         glDepthMask(GL_TRUE);
         glDisable(GL_BLEND);
