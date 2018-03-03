@@ -220,6 +220,10 @@ bool InputManager::process_keyboard(const int& key, int& player_id) {
             std::cout << "F5 was pressed" << std::endl;
             break;
 
+        case SDLK_RETURN:
+            std::cout << "Return was pressed" << std::endl;
+            break;
+
         default:
             is_key_mapped = false;
             std::cout << "UNMAPPED was pressed" << std::endl;
