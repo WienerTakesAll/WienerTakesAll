@@ -70,9 +70,6 @@ void AudioSystem::handle_update_settings_event(const Event& event) {
 }
 
 void AudioSystem::handle_vehicle_collision_event(const Event& e) {
-    int a_id = e.get_value<int>("a_id", true).first;
-    int b_id = e.get_value<int>("b_id", true).first;
-    std::cout << a_id << " collided with " << b_id << std::endl;
     play_sound(SoundAsset::BEAT);
 }
 

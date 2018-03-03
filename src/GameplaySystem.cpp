@@ -12,6 +12,8 @@ GameplaySystem::GameplaySystem()
     add_event_handler(EventType::LOAD_EVENT, &GameplaySystem::handle_load, this);
     add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
     add_event_handler(EventType::NEW_GAME_STATE, &GameplaySystem::handle_new_game_state, this);
+    add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &GameplaySystem::handle_object_transform_event, this);
+    add_event_handler(EventType::VEHICLE_COLLISION, &GameplaySystem::handle_vehicle_collision, this);
 
     EventSystem::queue_event(
         Event(
@@ -231,4 +233,19 @@ void GameplaySystem::handle_key_press(const Event& e) {
     for (const auto& event : new_events) {
         EventSystem::queue_event(Event(event));
     }
+}
+
+void GameplaySystem::handle_object_transform_event(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+    float x = e.get_value<float>("pos_x", true).first;
+    float y = e.get_value<float>("pos_y", true).first;
+    float z = e.get_value<float>("pos_z", true).first;
+
+    object_locations_[object_id] = {x, y, z};
+}
+
+void GameplaySystem::handle_vehicle_collision(const Event& e) {
+    int a_id = e.get_value<int>("a_id", true).first;
+    int b_id = e.get_value<int>("b_id", true).first;
+    std::cout << a_id << " collided with " << b_id << std::endl;
 }
