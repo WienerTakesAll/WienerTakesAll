@@ -117,14 +117,6 @@ void InputManager::handle_load_event(const Event& e) {
 
         }
     }
-
-    // Create AI controllers_
-    if (num_controllers_player < settings_.max_players) {
-        for (int player_id = num_controllers_player; player_id < settings_.max_players; ++player_id) {
-            // Create AI controller
-            std::cout << "Create AI Controller for player " << player_id << " here" << std::endl;
-        }
-    }
 }
 
 bool InputManager::process_keyboard(const int& key, int& player_id) {
