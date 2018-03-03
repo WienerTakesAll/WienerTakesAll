@@ -103,6 +103,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\AiSystem.cpp" />
     <ClCompile Include="src\AssetManager.cpp" />
     <ClCompile Include="src\AudioSystem.cpp" />
     <ClCompile Include="src\CollisionEventsSubsystem.cpp" />
@@ -122,6 +123,7 @@
     <ClCompile Include="src\SettingsSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderAsset.cpp" />
+    <ClCompile Include="src\StartMenu.cpp" />
     <ClCompile Include="src\TextureAsset.cpp" />
     <ClCompile Include="src\UIObject.cpp" />
     <ClCompile Include="src\UISystem.cpp" />
@@ -130,6 +132,7 @@
     <ClCompile Include="src\WheelMeshGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\AiSystem.h" />
     <ClInclude Include="src\AssetManager.h" />
     <ClInclude Include="src\AudioSettings.h" />
     <ClInclude Include="src\AudioSystem.h" />
@@ -145,6 +148,7 @@
     <ClInclude Include="src\GameObject.h" />
     <ClInclude Include="src\GameObjectCounter.h" />
     <ClInclude Include="src\GameplaySystem.h" />
+    <ClInclude Include="src\GameState.h" />
     <ClInclude Include="src\InputManager.h" />
     <ClInclude Include="src\InputSettings.h" />
     <ClInclude Include="src\MeshAsset.h" />
@@ -162,6 +166,7 @@
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderAsset.h" />
     <ClInclude Include="src\SoundAsset.h" />
+    <ClInclude Include="src\StartMenu.h" />
     <ClInclude Include="src\TextureAsset.h" />
     <ClInclude Include="src\UIObject.h" />
     <ClInclude Include="src\UISystem.h" />

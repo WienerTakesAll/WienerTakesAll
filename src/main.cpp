@@ -22,7 +22,7 @@
 #include "PhysicsSettings.h"
 #include "RenderingSystem.h"
 #include "UISystem.h"
-
+#include "AiSystem.h"
 
 #include "SettingsSystem.h"
 
@@ -51,6 +51,7 @@ int main(int argc, char* args[]) {
     InputManager input_manager(settings_system.get_input_settings());
     UISystem ui_system(asset_manager);
     PhysicsSystem physics_system(asset_manager, physics_settings);
+    AiSystem ai_system;
 
 
     if (!audio_system.init()) {
@@ -89,6 +90,7 @@ int main(int argc, char* args[]) {
         rendering_system.send_events(events);
         settings_system.send_events(events);
         ui_system.send_events(events);
+        ai_system.send_events(events);
 
         input_manager.handle_events(events);
         gameplay_system.handle_events(events);
@@ -99,11 +101,13 @@ int main(int argc, char* args[]) {
 
         audio_system.handle_events(events);
         settings_system.handle_events(events);
+        ai_system.handle_events(events);
         events.clear();
 
 
 
         // Gameplay
+        ai_system.update();
         gameplay_system.update();
 
         // Physics

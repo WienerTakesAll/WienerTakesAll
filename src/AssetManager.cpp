@@ -92,7 +92,6 @@ void AssetManager::load_mesh_from_file(const std::string& file_path) {
 
     MeshAsset& mesh_data = mesh_map.first->second;
     mesh_data.valid_ = false;
-
     const aiScene* scene = importer.ReadFile
                            ( file_path,
                              aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
@@ -105,6 +104,7 @@ void AssetManager::load_mesh_from_file(const std::string& file_path) {
     if (!scene->HasMeshes()) {
         std::cout << "No mesh found in model " << file_path << std::endl;
     }
+
 
     for (size_t i = 0; i < scene->mNumMeshes; i++) {
         mesh_data.meshes_.emplace_back();
@@ -135,6 +135,7 @@ void AssetManager::load_mesh_from_file(const std::string& file_path) {
                 vertex.normal_[2] = mesh->mNormals[i].z;
             }
 
+
             //Load colors
             if (mesh->GetNumColorChannels()) {
                 vertex.colors_[0] = mesh->mColors[i][0].r;
@@ -148,6 +149,7 @@ void AssetManager::load_mesh_from_file(const std::string& file_path) {
                 vertex.uv_[1] = mesh->mTextureCoords[0][i].y;
             }
 
+
             meshRef.vertices_.push_back(vertex);
         }
 
@@ -160,7 +162,6 @@ void AssetManager::load_mesh_from_file(const std::string& file_path) {
     for (auto& mesh_asset_data : mesh_data.meshes_) {
         construct_shadow_volume(mesh_asset_data);
     }
-
 }
 
 void AssetManager::load_texture_from_file(const std::string& file_path) {

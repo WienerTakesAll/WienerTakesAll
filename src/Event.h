@@ -5,6 +5,7 @@
 #include <string>
 
 enum class EventType {
+    NEW_GAME_STATE,
     ADD_VEHICLE,
     ADD_ARENA,
     LOAD_EVENT,
@@ -14,6 +15,7 @@ enum class EventType {
     RELOAD_SETTINGS_EVENT,
     VEHICLE_CONTROL,
     VEHICLE_COLLISION,
+    ACTIVATE_AI,
 
     // Keep at end of list
     EVENT_COUNT

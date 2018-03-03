@@ -2,21 +2,22 @@
 
 #include <vector>
 
-#include "EventSystem.h"
-#include "Shader.h"
-#include "UIObject.h"
-
 #include "GL/glew.h"
 #include "SDL.h"
 #include "SDL_opengl.h"
 
+#include "EventSystem.h"
+#include "Shader.h"
+#include "UIObject.h"
 #include "MeshAsset.h"
+#include "GameState.h"
+#include "StartMenu.h"
 
 class AssetManager;
 
 class UISystem : public EventSystem<UISystem> {
 public:
-    UISystem(AssetManager&);
+    UISystem(AssetManager& asset_manager);
     void update();
     void render() const;
 
@@ -27,12 +28,7 @@ private:
     void handle_load(const Event& e);
     void handle_key_press(const Event& e);
 
-    AssetManager& asset_manager_;
-    UIObject active_button_;
-
-    MeshAsset example_mesh_;
-    ShaderAsset* example_shader_;
-    UIObject example_ui_object_;
-
+    StartMenu start_menu_;
     SDL_Window* window_;
+    GameState current_game_state_;
 };

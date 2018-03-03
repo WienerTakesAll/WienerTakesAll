@@ -1,3 +1,6 @@
 #pragma once
 
-enum class MusicAsset {BEAT};
+enum class MusicAsset {
+    START_MENU,
+    IN_GAME,
+};

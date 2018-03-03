@@ -23,7 +23,6 @@ void TextureAsset::load(const std::string& file_path) {
     //Load the texture into opengl here!
     glGenTextures(1, &texture_id_);
     glBindTexture(GL_TEXTURE_2D, texture_id_);
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -35,6 +34,8 @@ void TextureAsset::load(const std::string& file_path) {
     GLsizei p_height = surface->h;
 
     if (p_format.BytesPerPixel == 4) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         gl_p_format = GL_RGBA;
         gl_p_type = GL_UNSIGNED_BYTE;
     } else if (p_format.BytesPerPixel == 3) {
@@ -45,10 +46,11 @@ void TextureAsset::load(const std::string& file_path) {
         valid_ = false;
     }
 
+    std::cout << "loading texture: " << file_path << std::endl;
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
-        GL_RGB,
+        gl_p_format,
         p_width,
         p_height,
         0,
