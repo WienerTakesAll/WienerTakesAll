@@ -31,6 +31,8 @@ void PhysicsComponent<true>::create_geometry(    physx::PxPhysics* physics,
     std::vector<physx::PxU32> phys_indices;
 
     for (auto& mesh_data : mesh->meshes_) {
+        int index_offset = phys_verts.size();
+
         for (auto& vert : mesh_data.vertices_) {
             physx::PxVec3 point;
 
@@ -40,15 +42,13 @@ void PhysicsComponent<true>::create_geometry(    physx::PxPhysics* physics,
 
             phys_verts.push_back(point);
         }
-    }
 
-    for (auto& mesh_data : mesh->meshes_) {
         for (auto& ind : mesh_data.indices_) {
             physx::PxU32 index;
 
             index = ind;
 
-            phys_indices.push_back(index);
+            phys_indices.push_back(index + index_offset);
         }
     }
 
@@ -56,7 +56,7 @@ void PhysicsComponent<true>::create_geometry(    physx::PxPhysics* physics,
     mesh_desc.points.data = &phys_verts.front();
     mesh_desc.points.stride = sizeof(physx::PxVec3);
 
-    mesh_desc.triangles.count = phys_indices.size();
+    mesh_desc.triangles.count = phys_indices.size() / 3;
     mesh_desc.triangles.data = &phys_indices.front();
     mesh_desc.triangles.stride = 3 * sizeof(physx::PxU32);
 
