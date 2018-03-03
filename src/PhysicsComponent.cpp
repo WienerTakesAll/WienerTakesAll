@@ -26,7 +26,6 @@ void PhysicsComponent<true>::create_geometry(    physx::PxPhysics* physics,
         physx::PxCooking* cooking,
         MeshAsset* mesh) {
 
-
     physx::PxTriangleMeshDesc mesh_desc;
 
     std::vector<physx::PxVec3> phys_verts;
@@ -58,7 +57,7 @@ void PhysicsComponent<true>::create_geometry(    physx::PxPhysics* physics,
     mesh_desc.points.data = &phys_verts.front();
     mesh_desc.points.stride = sizeof(physx::PxVec3);
 
-    mesh_desc.triangles.count = phys_indices.size();
+    mesh_desc.triangles.count = phys_indices.size() / 3;
     mesh_desc.triangles.data = &phys_indices.front();
     mesh_desc.triangles.stride = 3 * sizeof(physx::PxU32);
 

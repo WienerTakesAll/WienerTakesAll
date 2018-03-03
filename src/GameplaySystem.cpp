@@ -41,7 +41,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "object_id", gameobject_counter_->assign_id(),
                 // TODO: Pass glm::vec3 in events
                 "pos_x", 4,
-                "pos_y", 20,
+                "pos_y", 2,
                 "pos_z", 0//,
                 // "name", "Vehicle 1"
             )
