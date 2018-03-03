@@ -5,9 +5,10 @@ layout(location = 2) in vec2 uv;
 
 out vec2 texCoord;
 
-uniform mat4 MVP;
+uniform mat4 Model;
+uniform mat4 View;
 
 void main(){
-  gl_Position = MVP * vec4(vertexPosition_modelspace,1.0);
+  gl_Position = View * Model * vec4(vertexPosition_modelspace,1.0);
   texCoord = uv;
 }

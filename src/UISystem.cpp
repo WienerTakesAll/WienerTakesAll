@@ -8,8 +8,7 @@ namespace {
 }
 
 UISystem::UISystem(AssetManager& asset_manager)
-    : asset_manager_(asset_manager)
-    , start_menu_(asset_manager)
+    : start_menu_(asset_manager)
     , current_game_state_(GameState::START_MENU) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &UISystem::handle_load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &UISystem::handle_key_press, this);
@@ -35,6 +34,8 @@ void UISystem::render() const {
 void UISystem::start_render() const {
     glViewport(0, 0, UI_VIEW_PORT_WIDTH, UI_VIEW_PORT_HEIGHT);
     glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void UISystem::end_render() const {
@@ -47,6 +48,11 @@ void UISystem::handle_load(const Event& e) {
 
 void UISystem::handle_key_press(const Event& e) {
     int key = e.get_value<int>("key", true).first;
+    int value = e.get_value<int>("value", true).first;
+
+    if (value != SDL_KEYDOWN) {
+        return;
+    }
 
     if (current_game_state_ == GameState::START_MENU) {
         switch (key) {

@@ -37,6 +37,9 @@ private:
     std::vector<RenderingComponent> example_objects_;
     std::vector<size_t> car_indices_;
     std::array<glm::mat4x4, 4> cameras_;
+
+
     AssetManager& asset_manager_;
+    ShaderAsset* shadow_shader_;
 };
 

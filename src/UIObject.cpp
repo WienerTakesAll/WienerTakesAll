@@ -1,6 +1,8 @@
-#include "UIObject.h"
+#include <iostream>
 
 #include <glm/gtc/matrix_transform.hpp>
+
+#include "UIObject.h"
 
 UIObject::UIObject(glm::vec2 origin, glm::vec3 colour, glm::vec2 size, MeshAsset* mesh, TextureAsset* tex, ShaderAsset* shader)
     : visible_(true)

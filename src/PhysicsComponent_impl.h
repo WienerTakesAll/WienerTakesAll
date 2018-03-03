@@ -117,6 +117,11 @@ void PhysicsComponent<static_actor>::set_mesh(
 
     physx::PxTransform phys_transform(0, 0, 0);
 
+    // default material
+    g_material_ = physics->createMaterial(0.5f, 0.5f, 0.5f);
+
+    g_mesh_geometry_ = new PxMeshGeometryType(g_mesh_);
+
     g_mesh_shape_ = physics->createShape(*g_mesh_geometry_, *g_material_, true);
     create_actor(physics, phys_transform, g_mesh_shape_, 1.0f);
 
