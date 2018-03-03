@@ -8,7 +8,7 @@
 namespace {
     const std::string STANDARD_SHADER_PATH = "assets/shaders/SimpleShader";
     const std::string CAR_MESH_PATH = "assets/models/carBoxModel.obj";
-    const std::string TERRAIN_MESH_PATH = "assets/models/Terrain.obj";
+    const std::string TERRAIN_MESH_PATH = "assets/models/Arena.obj";
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
