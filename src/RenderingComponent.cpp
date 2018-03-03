@@ -36,7 +36,13 @@ void RenderingComponent::render(glm::mat4x4 camera, float ambient) const {
 
     if (texture_ != nullptr && texture_->is_valid()) {
         glBindTexture(GL_TEXTURE_2D, texture_->get_texture_id());
+        glEnable(GL_TEXTURE_2D);
     }
+    else
+    {
+        glDisable(GL_TEXTURE_2D);
+    }
+
 
 
     GLuint uniform_model = glGetUniformLocation(shader_->get_program_id(), "Model");
@@ -106,9 +112,12 @@ void RenderingComponent::render_lighting(glm::mat4x4 camera, glm::vec3 light_dir
 
     //Draw the front stencil shadow mask
     glCullFace(GL_BACK);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_INCR_WRAP);
+    //glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
+    glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR_WRAP);
+    glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_DECR_WRAP);
 
-    glEnable(GL_CULL_FACE);
+
+    glDisable(GL_CULL_FACE);
 
     for (size_t i = 0; i < mesh_->meshes_.size(); i++) {
         glBindBuffer(GL_ARRAY_BUFFER, gl_shadow_vertex_buffers_[i]);
@@ -128,9 +137,10 @@ void RenderingComponent::render_lighting(glm::mat4x4 camera, glm::vec3 light_dir
         glDrawElements(GL_TRIANGLES, mesh_->meshes_[i].shadow_volume_indices_.size(), GL_UNSIGNED_INT, 0);
     }
 
+    /*
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_DECR_WRAP);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
 
     for (size_t i = 0; i < mesh_->meshes_.size(); i++) {
         glBindBuffer(GL_ARRAY_BUFFER, gl_shadow_vertex_buffers_[i]);
@@ -149,7 +159,7 @@ void RenderingComponent::render_lighting(glm::mat4x4 camera, glm::vec3 light_dir
         glUniform3f(uniform_light, light_direction.x, light_direction.y, light_direction.z);
 
         glDrawElements(GL_TRIANGLES, mesh_->meshes_[i].shadow_volume_indices_.size(), GL_UNSIGNED_INT, 0);
-    }
+    }*/
 
     glFrontFace(GL_CCW);
     glCullFace(GL_BACK);

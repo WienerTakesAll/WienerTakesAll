@@ -7,9 +7,12 @@
 
 namespace {
     const std::string STANDARD_SHADER_PATH = "assets/shaders/SimpleShader";
+    const std::string SKYBOX_SHADER_PATH = "assets/shaders/SkyboxShader";
     const std::string SHADOW_SHADER_PATH = "assets/shaders/ShadowShader";
     const std::string CAR_MESH_PATH = "assets/models/carBoxModel.obj";
-    const std::string TERRAIN_MESH_PATH = "assets/models/Arena.obj";
+    const std::string TERRAIN_MESH_PATH = "assets/models/Terrain.obj";
+    const std::string SKYBOX_MESH_PATH = "assets/models/Skybox.obj";
+    const std::string SKYBOX_TEXTURE_PATH = "assets/textures/Sky.png";
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
@@ -107,6 +110,15 @@ void RenderingSystem::handle_add_terrain(const Event& e) {
     example_objects_.emplace_back();
     example_objects_[object_id].set_mesh(mesh);
     example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
+
+
+    MeshAsset* skybox_mesh = asset_manager_.get_mesh_asset(SKYBOX_MESH_PATH);
+    ShaderAsset* skybox_shader = asset_manager_.get_shader_asset(SKYBOX_SHADER_PATH);
+    TextureAsset * skybox_texture = asset_manager_.get_texture_asset(SKYBOX_TEXTURE_PATH);
+    example_objects_.emplace_back();
+    example_objects_.back().set_mesh(skybox_mesh);
+    example_objects_.back().set_shader(skybox_shader);
+    example_objects_.back().set_texture(skybox_texture);
 }
 
 void RenderingSystem::handle_object_transform(const Event& e) {
@@ -146,14 +158,14 @@ void RenderingSystem::render() {
         }
 
         for (auto& object : example_objects_) {
-            object.render_lighting(cameras_[i], glm::vec3(-1.f, -1.f, 0.f), shadow_shader_);
+            object.render_lighting(cameras_[i], glm::vec3(-0.1f, -1.0f, 0.f), shadow_shader_);
         }
 
 
         glEnable(GL_BLEND);
         glEnable(GL_CULL_FACE);
         glDepthFunc(GL_EQUAL);
-        glBlendFunc(GL_SRC_COLOR, GL_DST_COLOR);
+        glBlendFunc(GL_ONE, GL_ONE);
         glBlendEquation(GL_FUNC_ADD);
 
         glEnable(GL_STENCIL_TEST);
@@ -210,7 +222,7 @@ void RenderingSystem::start_render() const {
 }
 
 void RenderingSystem::setup_cameras() {
-    glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 100.0f);
+    glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 200.0f);
 
     glm::mat4x4 transform;
 

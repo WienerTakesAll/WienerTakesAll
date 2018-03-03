@@ -17,6 +17,7 @@ void TextureAsset::load(const std::string& file_path) {
     if (!surface) {
         std::cerr << "Unable to load texture " << file_path << std::endl;
         valid_ = false;
+        return;
     }
 
     //Load the texture into opengl here!
@@ -38,7 +39,7 @@ void TextureAsset::load(const std::string& file_path) {
         gl_p_type = GL_UNSIGNED_BYTE;
     } else if (p_format.BytesPerPixel == 3) {
         gl_p_format = GL_RGB;
-        gl_p_type = GL_UNSIGNED_INT;
+        gl_p_type = GL_UNSIGNED_BYTE;
     } else {
         std::cout << "Unkown pixel storage type." << std::endl;
         valid_ = false;

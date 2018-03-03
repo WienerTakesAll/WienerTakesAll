@@ -7,6 +7,6 @@ uniform float Ambient;
 
 void main(){
 	float angle = dot(normalize(vec3(1,1,0)),normalize(normal));
-	color.rgb = vec3((0.3-Ambient)/0.3)*max(0,angle) + vec3(Ambient);
+	color.rgb = vec3((0.3-Ambient))*max(0,angle) + vec3(Ambient);
 	color.a = 1.0;
 }
