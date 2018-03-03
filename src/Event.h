@@ -15,6 +15,7 @@ enum class EventType {
     RELOAD_SETTINGS_EVENT,
     VEHICLE_CONTROL,
     VEHICLE_COLLISION,
+    ACTIVATE_AI,
 
     // Keep at end of list
     EVENT_COUNT

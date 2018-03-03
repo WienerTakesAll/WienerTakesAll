@@ -83,13 +83,19 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
             )
         );
 
-
-
         // Terrain
         EventSystem::queue_event(
             Event(
                 EventType::ADD_ARENA,
                 "object_id", gameobject_counter_->assign_id()
+            )
+        );
+
+        // Terrain
+        EventSystem::queue_event(
+            Event(
+                EventType::ACTIVATE_AI,
+                "num_ai", 4 - num_humans
             )
         );
     }
