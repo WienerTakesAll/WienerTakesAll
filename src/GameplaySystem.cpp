@@ -7,9 +7,18 @@
 #include "VehicleControls.h"
 
 GameplaySystem::GameplaySystem()
-    : gameobject_counter_(GameObjectCounter::get_instance()) {
+    : gameobject_counter_(GameObjectCounter::get_instance())
+    , current_game_state_(GameState::START_MENU) {
     add_event_handler(EventType::LOAD_EVENT, &GameplaySystem::handle_load, this);
     add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
+    add_event_handler(EventType::NEW_GAME_STATE, &GameplaySystem::handle_new_game_state, this);
+
+    EventSystem::queue_event(
+        Event(
+            EventType::NEW_GAME_STATE,
+            "state", GameState::START_MENU
+        )
+    );
 }
 
 void GameplaySystem::update() {
@@ -17,67 +26,82 @@ void GameplaySystem::update() {
 }
 
 void GameplaySystem::handle_load(const Event& e) {
-    EventSystem::queue_event(
-        Event(
-            EventType::ADD_VEHICLE,
-            "object_id", gameobject_counter_->assign_id(),
-            // TODO: Pass glm::vec3 in events
-            "pos_x", 4,
-            "pos_y", 2,
-            "pos_z", 0//,
-            // "name", "Vehicle 1"
-        )
-    );
-
-    EventSystem::queue_event(
-        Event(
-            EventType::ADD_VEHICLE,
-            "object_id", gameobject_counter_->assign_id(),
-            // TODO: Pass glm::vec3 in events
-            "pos_x", 10,
-            "pos_y", 2,
-            "pos_z", 0//,
-            // "name", "Vehicle 1"
-        )
-    );
-
-    EventSystem::queue_event(
-        Event(
-            EventType::ADD_VEHICLE,
-            "object_id", gameobject_counter_->assign_id(),
-            // TODO: Pass glm::vec3 in events
-            "pos_x", -4,
-            "pos_y", 2,
-            "pos_z", 0//,
-            // "name", "Vehicle 1"
-        )
-    );
-
-    EventSystem::queue_event(
-        Event(
-            EventType::ADD_VEHICLE,
-            "object_id", gameobject_counter_->assign_id(),
-            // TODO: Pass glm::vec3 in events
-            "pos_x", -10,
-            "pos_y", 2,
-            "pos_z", 0//,
-            // "name", "Vehicle 1"
-        )
-    );
-
-
-
-    // Terrain
-    EventSystem::queue_event(
-        Event(
-            EventType::ADD_ARENA,
-            "object_id", gameobject_counter_->assign_id()
-        )
-    );
 
 }
 
+void GameplaySystem::handle_new_game_state(const Event& e) {
+    GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
+
+    if (new_game_state == GameState::IN_GAME) {
+        int num_humans = e.get_value<int>("num_players", true).first;
+        std::cout << "starting game with " << num_humans << " human players" << std::endl;
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_VEHICLE,
+                "object_id", gameobject_counter_->assign_id(),
+                // TODO: Pass glm::vec3 in events
+                "pos_x", 4,
+                "pos_y", 2,
+                "pos_z", 0//,
+                // "name", "Vehicle 1"
+            )
+        );
+
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_VEHICLE,
+                "object_id", gameobject_counter_->assign_id(),
+                // TODO: Pass glm::vec3 in events
+                "pos_x", 10,
+                "pos_y", 2,
+                "pos_z", 0//,
+                // "name", "Vehicle 1"
+            )
+        );
+
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_VEHICLE,
+                "object_id", gameobject_counter_->assign_id(),
+                // TODO: Pass glm::vec3 in events
+                "pos_x", -4,
+                "pos_y", 2,
+                "pos_z", 0//,
+                // "name", "Vehicle 1"
+            )
+        );
+
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_VEHICLE,
+                "object_id", gameobject_counter_->assign_id(),
+                // TODO: Pass glm::vec3 in events
+                "pos_x", -10,
+                "pos_y", 2,
+                "pos_z", 0//,
+                // "name", "Vehicle 1"
+            )
+        );
+
+
+
+        // Terrain
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_ARENA,
+                "object_id", gameobject_counter_->assign_id()
+            )
+        );
+    }
+
+    current_game_state_ = new_game_state;
+}
+
 void GameplaySystem::handle_key_press(const Event& e) {
+    if (current_game_state_ != GameState::IN_GAME) {
+        return;
+    }
+
     // Update gameplay during keypress
     int key = e.get_value<int>("key", true).first;
     int value = e.get_value<int>("value", true).first;
