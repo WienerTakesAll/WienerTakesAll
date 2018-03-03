@@ -4,10 +4,11 @@
 
 class AiSystem : public EventSystem<AiSystem> {
 public:
-	AiSystem();
-	void update();
+    AiSystem();
+    void update();
 
 private:
-	void handle_activate_ai(const Event& e);
-	int num_ai_;
+    void handle_activate_ai(const Event& e);
+    int num_ai_;
+    unsigned int counter_;
 };
