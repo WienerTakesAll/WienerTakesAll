@@ -53,7 +53,6 @@ int main(int argc, char* args[]) {
     PhysicsSystem physics_system(asset_manager, physics_settings);
     AiSystem ai_system;
 
-
     if (!audio_system.init()) {
         std::cerr << "Audio system failed to initialize, continuing without audio " << std::endl;
     }

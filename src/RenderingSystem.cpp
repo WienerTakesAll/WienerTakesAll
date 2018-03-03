@@ -183,6 +183,7 @@ void RenderingSystem::render() {
         glDepthMask(GL_TRUE);
         glDisable(GL_BLEND);
         glDisable(GL_STENCIL_TEST);
+
     }
 
     end_render();
@@ -190,8 +191,6 @@ void RenderingSystem::render() {
 
 
 bool RenderingSystem::init_window() {
-
-
     SDL_GLContext context = SDL_GL_CreateContext(window_);
 
     if (!context) {
@@ -223,7 +222,6 @@ void RenderingSystem::start_render() const {
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 }
 
 void RenderingSystem::setup_cameras() {
