@@ -10,7 +10,7 @@ namespace {
     const std::string SKYBOX_SHADER_PATH = "assets/shaders/SkyboxShader";
     const std::string SHADOW_SHADER_PATH = "assets/shaders/ShadowShader";
     const std::string CAR_MESH_PATH = "assets/models/carBoxModel.obj";
-    const std::string TERRAIN_MESH_PATH = "assets/models/Terrain.obj";
+    const std::string TERRAIN_MESH_PATH = "assets/models/Arena.obj";
     const std::string SKYBOX_MESH_PATH = "assets/models/Skybox.obj";
     const std::string SKYBOX_TEXTURE_PATH = "assets/textures/Sky.png";
 }
