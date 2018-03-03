@@ -47,6 +47,10 @@ void UISystem::handle_load(const Event& e) {
 
 void UISystem::handle_key_press(const Event& e) {
     int key = e.get_value<int>("key", true).first;
+    int value = e.get_value<int>("value", true).first;
+    if (value != SDL_KEYDOWN) {
+        return;
+    }
 
     if (current_game_state_ == GameState::START_MENU) {
         switch (key) {
