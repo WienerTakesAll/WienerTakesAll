@@ -23,7 +23,6 @@ void UIObject::set_origin(glm::vec2 origin) {
 
 void UIObject::render(glm::mat4 camera) const {
     if (visible_) {
-        std::cout << "blahhhhhh" << std::endl;
         render_component_.render(camera);
     }
 }

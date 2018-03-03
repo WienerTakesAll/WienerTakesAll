@@ -21,11 +21,9 @@ void AiSystem::update() {
     counter_ = 0;
 
     for (int i = 0; i < num_ai_; i++) {
-        std::cout << "sending for ai " << 3 - i << " : ";
         unsigned int random = rand() % 20;
 
         if (random == 0) {
-            std::cout << "Turn LEFT " << std::endl;
             EventSystem::queue_event(
                 Event(
                     EventType::KEYPRESS_EVENT,
@@ -35,7 +33,6 @@ void AiSystem::update() {
                 )
             );
         } else if (random == 1) {
-            std::cout << "Turn RIGHT " << std::endl;
             EventSystem::queue_event(
                 Event(
                     EventType::KEYPRESS_EVENT,
