@@ -96,7 +96,7 @@ void RenderingSystem::handle_add_vehicle(const Event& e) {
     example_objects_[object_id.first].set_mesh(mesh);
     example_objects_[object_id.first].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
     example_objects_[object_id.first].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
-
+    example_objects_[object_id.first].set_has_shadows(true);
     car_indices_.push_back(object_id.first);
 }
 

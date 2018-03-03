@@ -21,6 +21,7 @@ public:
     void apply_transform(glm::mat4x4 transform);
     // Sets current transform to new transform
     void set_transform(glm::mat4x4 transform);
+    void set_has_shadows(bool has_shadow);
     const glm::mat4x4& get_transform() const;
 
     void set_mesh(MeshAsset* mesh);
@@ -41,4 +42,5 @@ private:
     MeshAsset* mesh_;
     TextureAsset* texture_;
     ShaderAsset* shader_;
+    bool has_shadows_;
 };

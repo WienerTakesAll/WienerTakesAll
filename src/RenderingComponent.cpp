@@ -9,9 +9,10 @@
 #include "ShaderAsset.h"
 
 RenderingComponent::RenderingComponent()
-    : mesh_(nullptr),
-      texture_(nullptr),
-      shader_(nullptr) {
+    : mesh_(nullptr)
+    , texture_(nullptr)
+    , shader_(nullptr)
+    , has_shadows_(false) {
 }
 
 void RenderingComponent::render(glm::mat4x4 camera, float ambient) const {
@@ -72,6 +73,9 @@ void RenderingComponent::render(glm::mat4x4 camera, float ambient) const {
 }
 
 void RenderingComponent::render_lighting(glm::mat4x4 camera, glm::vec3 light_direction, ShaderAsset* shadow_shader) const {
+    if (!has_shadows_) {
+        return;
+    }
 
     if (shadow_shader == nullptr || !shadow_shader->is_valid()) {
         std::cerr << "Trying to render with invalid shader!" << std::endl;
@@ -168,19 +172,16 @@ void RenderingComponent::render_lighting(glm::mat4x4 camera, glm::vec3 light_dir
 
 }
 
-
-
-
-
-
-
-
 void RenderingComponent::apply_transform(glm::mat4x4 transform) {
     transform_matrix_ *= transform;
 }
 
 void RenderingComponent::set_transform(glm::mat4x4 transform) {
     transform_matrix_ = transform;
+}
+
+void RenderingComponent::set_has_shadows(bool has_shadows) {
+    has_shadows_ = has_shadows;
 }
 
 const glm::mat4x4& RenderingComponent::get_transform() const {
