@@ -272,34 +272,10 @@ void PhysicsSystem::handle_reload_settings(const Event& e) {
     std::cout << "Setting scene gravity" << std::endl;
     g_scene_->setGravity(settings_.gravity);
 
-    MeshAsset* mesh = asset_manager_.get_mesh_asset(settings_.vehicle_mesh_asset_path);
-
-    /*
-    for (auto& dyn : dynamic_objects_) {
-        if (dyn.is_vehicle()) {
-            // FIXME: When changing meshes, the vehicle appears to detach
-            // from the rendering one and visually we stop updating them
-            // although collision events may still occur
-            std::cout << "Setting vehicle mesh" << std::endl;
-            auto transform = dyn.get_actor()->getGlobalPose();
-            dyn.set_mesh(g_physics_, g_cooking_, mesh);
-            dyn.get_actor()->setGlobalPose(transform);
-        }
-    }
-    */
-
     for (auto& vehicle : vehicles_) {
         std::cout << "Setting vehicle mass" << std::endl;
         vehicle->mWheelsSimData.setChassisMass(settings_.vehicle_mass);
     }
-
-    /*
-    // Experimental
-    MeshAsset* arena_mesh = asset_manager_.get_mesh_asset(settings_.arena_mesh);
-    std::cout << "Setting arena mesh" << std::endl;
-    static_objects_.back().set_mesh(g_physics_, g_cooking_, arena_mesh);
-    */
-
 
     std::cout << "Setting friction data" << std::endl;
     friction_pair_service_.set_friction_data(settings_.arena_tire_friction);
