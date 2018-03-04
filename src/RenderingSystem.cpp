@@ -146,10 +146,14 @@ void RenderingSystem::render() {
     setup_cameras();
 
     for (size_t i = 0; i < cameras_.size(); i++) {
-        int vx = 320 * (i % 2);
-        int vy = 240 * (i < 2);
+        int window_w, window_h;
+        SDL_GetWindowSize(asset_manager_.get_window(), &window_w, &window_h);
 
-        glViewport(vx, vy, 320, 240);
+
+        int vx = (window_w / 2) * (i % 2);
+        int vy = (window_h / 2) * (i < 2);
+
+        glViewport(vx, vy, (window_w / 2), (window_h / 2));
 
 
         glEnable(GL_DEPTH_TEST);

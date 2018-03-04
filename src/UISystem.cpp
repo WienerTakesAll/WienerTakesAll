@@ -2,13 +2,9 @@
 
 #include "AssetManager.h"
 
-namespace {
-    const int UI_VIEW_PORT_WIDTH = 640;
-    const int UI_VIEW_PORT_HEIGHT = 480;
-}
-
 UISystem::UISystem(AssetManager& asset_manager)
-    : start_menu_(asset_manager)
+    : asset_manager_(asset_manager)
+    , start_menu_(asset_manager)
     , current_game_state_(GameState::START_MENU) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &UISystem::handle_load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &UISystem::handle_key_press, this);
@@ -32,7 +28,9 @@ void UISystem::render() const {
 }
 
 void UISystem::start_render() const {
-    glViewport(0, 0, UI_VIEW_PORT_WIDTH, UI_VIEW_PORT_HEIGHT);
+    int window_w, window_h;
+    SDL_GetWindowSize(asset_manager_.get_window(), &window_w, &window_h);
+    glViewport(0, 0, window_w, window_h);
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
