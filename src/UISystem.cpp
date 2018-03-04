@@ -9,6 +9,7 @@ namespace {
 
 UISystem::UISystem(AssetManager& asset_manager)
     : start_menu_(asset_manager)
+    , gameplay_hud_(asset_manager)
     , current_game_state_(GameState::START_MENU) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &UISystem::handle_load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &UISystem::handle_key_press, this);
@@ -24,6 +25,8 @@ void UISystem::render() const {
 
     if (current_game_state_ == GameState::START_MENU) {
         start_menu_.render();
+    } else if (current_game_state_ == GameState::IN_GAME) {
+        gameplay_hud_.render();
     }
 
     SDL_GL_SwapWindow(window_);
@@ -44,6 +47,7 @@ void UISystem::end_render() const {
 
 void UISystem::handle_load(const Event& e) {
     start_menu_.load();
+    gameplay_hud_.load();
 }
 
 void UISystem::handle_key_press(const Event& e) {
