@@ -29,6 +29,7 @@ bool AudioSystem::init() {
     add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &AudioSystem::handle_update_settings_event, this);
     add_event_handler(EventType::VEHICLE_COLLISION, &AudioSystem::handle_vehicle_collision_event, this);
     add_event_handler(EventType::NEW_GAME_STATE, &AudioSystem::handle_new_game_state, this);
+    add_event_handler(EventType::NEW_IT, &AudioSystem::handle_new_it, this);
     init_successful_ = true;
     return init_successful_;
 }
@@ -170,3 +171,26 @@ void AudioSystem::handle_new_game_state(const Event& e) {
             break;
     }
 }
+
+void AudioSystem::handle_new_it(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    switch (object_id) {
+        case 0:
+            play_sound(SoundAsset::PLAYER_1_HAS_THE_WIENER);
+            break;
+
+        case 1:
+            play_sound(SoundAsset::PLAYER_2_HAS_THE_WIENER);
+            break;
+
+        case 2:
+            play_sound(SoundAsset::PLAYER_3_HAS_THE_WIENER);
+            break;
+
+        case 3:
+            play_sound(SoundAsset::PLAYER_4_HAS_THE_WIENER);
+            break;
+    }
+}
+
