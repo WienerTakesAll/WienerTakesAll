@@ -22,46 +22,41 @@ void AiSystem::update() {
     }
 
 
-	for (int i = 3; i >= 4 - num_ai_; i--) {
-		if (i != whos_it_)
-		{
-			path_to(i, cars_[whos_it_].position_);
-		}
-		else if(counter_ == 0)
-		{
-			unsigned int random = rand() % 20;
+    for (int i = 3; i >= 4 - num_ai_; i--) {
+        if (i != whos_it_) {
+            path_to(i, cars_[whos_it_].position_);
+        } else if (counter_ == 0) {
+            unsigned int random = rand() % 20;
 
-			if (random == 0) {
-				EventSystem::queue_event(
-					Event(
-						EventType::KEYPRESS_EVENT,
-						"player_id", i,
-						"key", SDL_CONTROLLER_AXIS_LEFTX,
-						"value", -32768
-					)
-				);
-			}
-			else if (random == 1) {
-				EventSystem::queue_event(
-					Event(
-						EventType::KEYPRESS_EVENT,
-						"player_id", i,
-						"key", SDL_CONTROLLER_AXIS_LEFTX,
-						"value", 32768
-					)
-				);
-			}
-			else {
-				EventSystem::queue_event(
-					Event(
-						EventType::KEYPRESS_EVENT,
-						"player_id", i,
-						"key", SDL_CONTROLLER_AXIS_TRIGGERRIGHT,
-						"value", rand() % 32768
-					)
-				);
-			}
-		}
+            if (random == 0) {
+                EventSystem::queue_event(
+                    Event(
+                        EventType::KEYPRESS_EVENT,
+                        "player_id", i,
+                        "key", SDL_CONTROLLER_AXIS_LEFTX,
+                        "value", -32768
+                    )
+                );
+            } else if (random == 1) {
+                EventSystem::queue_event(
+                    Event(
+                        EventType::KEYPRESS_EVENT,
+                        "player_id", i,
+                        "key", SDL_CONTROLLER_AXIS_LEFTX,
+                        "value", 32768
+                    )
+                );
+            } else {
+                EventSystem::queue_event(
+                    Event(
+                        EventType::KEYPRESS_EVENT,
+                        "player_id", i,
+                        "key", SDL_CONTROLLER_AXIS_TRIGGERRIGHT,
+                        "value", rand() % 32768
+                    )
+                );
+            }
+        }
 
 
     }
@@ -88,64 +83,62 @@ void AiSystem::handle_object_transform(const Event& e) {
     float qy = e.get_value<float>("qua_y", true).first;
     float qz = e.get_value<float>("qua_z", true).first;
 
-	cars_[object_id].position_ = glm::vec3(x, 0, z);
-	cars_[object_id].rotation_ = glm::quat(qw, qx, qy, qz);
+    cars_[object_id].position_ = glm::vec3(x, 0, z);
+    cars_[object_id].rotation_ = glm::quat(qw, qx, qy, qz);
 }
 
 
 void AiSystem::path_to(int car, const glm::vec3& point_) {
 
-	car_data& this_car = cars_[car];
+    car_data& this_car = cars_[car];
 
-	glm::vec3 vec_to = glm::normalize(point_ - this_car.position_);
-	glm::vec3 vec_facing = glm::vec3(0,0,1) * this_car.rotation_;
+    glm::vec3 vec_to = glm::normalize(point_ - this_car.position_);
+    glm::vec3 vec_facing = glm::vec3(0, 0, 1) * this_car.rotation_;
 
-	glm::vec2 vec2_to = glm::normalize(glm::vec2(vec_to.x, vec_to.z));
-	glm::vec2 vec2_facing = glm::normalize(glm::vec2(-vec_facing.x, vec_facing.z));
+    glm::vec2 vec2_to = glm::normalize(glm::vec2(vec_to.x, vec_to.z));
+    glm::vec2 vec2_facing = glm::normalize(glm::vec2(-vec_facing.x, vec_facing.z));
 
-	float angle = glm::orientedAngle(vec2_facing, vec2_to);
+    float angle = glm::orientedAngle(vec2_facing, vec2_to);
 
-	int axis = std::min(SHRT_MAX, (int)(SHRT_MAX * (abs(angle)-0.05)));
+    int axis = std::min(SHRT_MAX, (int)(SHRT_MAX * (abs(angle) - 0.05)));
 
-	if (angle < -0.05) {
-		EventSystem::queue_event(
-			Event(
-				EventType::KEYPRESS_EVENT,
-				"player_id", car,
-				"key", SDL_CONTROLLER_AXIS_LEFTX,
-				"value", -axis
-			)
-		);
-	}
-	else if (angle > 0.05) {
-		EventSystem::queue_event(
-			Event(
-				EventType::KEYPRESS_EVENT,
-				"player_id", car,
-				"key", SDL_CONTROLLER_AXIS_LEFTX,
-				"value", axis
-			)
-		);
-	}
-	else {
-		EventSystem::queue_event(
-			Event(
-				EventType::KEYPRESS_EVENT,
-				"player_id", car,
-				"key", SDL_CONTROLLER_AXIS_LEFTX,
-				"value", 0
-			)
-		);
-	}
-	
+    if (angle < -0.05) {
+        EventSystem::queue_event(
+            Event(
+                EventType::KEYPRESS_EVENT,
+                "player_id", car,
+                "key", SDL_CONTROLLER_AXIS_LEFTX,
+                "value", -axis
+            )
+        );
+    } else if (angle > 0.05) {
+        EventSystem::queue_event(
+            Event(
+                EventType::KEYPRESS_EVENT,
+                "player_id", car,
+                "key", SDL_CONTROLLER_AXIS_LEFTX,
+                "value", axis
+            )
+        );
+    } else {
+        EventSystem::queue_event(
+            Event(
+                EventType::KEYPRESS_EVENT,
+                "player_id", car,
+                "key", SDL_CONTROLLER_AXIS_LEFTX,
+                "value", 0
+            )
+        );
+    }
 
-	EventSystem::queue_event(
-	Event(
-	EventType::KEYPRESS_EVENT,
-	"player_id", car,
-	"key", SDL_CONTROLLER_AXIS_TRIGGERRIGHT,
-	"value", SHRT_MAX
-	)
-	);
+
+    EventSystem::queue_event(
+        Event(
+            EventType::KEYPRESS_EVENT,
+            "player_id", car,
+            "key", SDL_CONTROLLER_AXIS_TRIGGERRIGHT,
+            "value", SHRT_MAX
+        )
+    );
 
 }
