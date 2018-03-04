@@ -173,7 +173,7 @@ void PhysicsSystem::update() {
 
         physx::PxTransform transform = object.get_actor()->getGlobalPose();
 
-
+        //If the player is out of the arena, put them back in
         if (transform.p.y < -5) {
             transform.p.x = 0;
             transform.p.y = 2;

@@ -18,9 +18,6 @@ PhysicsComponent<static_actor>::PhysicsComponent(unsigned int id)
 
 template <bool static_actor>
 PhysicsComponent<static_actor>::~PhysicsComponent() {
-    if (id_ptr_ != nullptr) {
-        // delete id_ptr_;
-    }
 }
 
 template <bool static_actor>

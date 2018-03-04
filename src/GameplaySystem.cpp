@@ -256,7 +256,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::HAND_BRAKE,
-                                    "value", (float)1);
+                                    "value", 1.f);
             break;
         }
 

@@ -33,5 +33,6 @@ private:
     SDL_Window* window_;
     GameState current_game_state_;
 
+    //Checks whether joystick has already been pressed up/down
     bool controller_buffer_;
 };
