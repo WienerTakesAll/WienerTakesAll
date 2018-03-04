@@ -118,9 +118,9 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
         );
     }
 
-	else if (new_game_state == GameState::END_GAME) {
-		gameobject_counter_->reset_counter();
-	}
+    else if (new_game_state == GameState::END_GAME) {
+        gameobject_counter_->reset_counter();
+    }
 
 
 
@@ -238,7 +238,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
 
             if (std::abs(value) < 6000) {
                 value = 0;
-            } else if(value < 0){
+            } else if (value < 0) {
                 value += 5000;
             } else {
                 value -= 5000;
@@ -307,12 +307,12 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
     std::vector<float> b_pos = object_positions_[b_id];
 
 
-	std::vector<float> v_dir = { a_pos[0] - b_pos[0], a_pos[1] - b_pos[1], a_pos[2] - b_pos[2] };
-	float magnitude = std::sqrt(v_dir[0] * v_dir[0] + v_dir[1] * v_dir[1] + v_dir[2] * v_dir[2]);
+    std::vector<float> v_dir = { a_pos[0] - b_pos[0], a_pos[1] - b_pos[1], a_pos[2] - b_pos[2] };
+    float magnitude = std::sqrt(v_dir[0] * v_dir[0] + v_dir[1] * v_dir[1] + v_dir[2] * v_dir[2]);
 
-	v_dir[0] /= magnitude;
-	v_dir[1] /= magnitude;
-	v_dir[2] /= magnitude;
+    v_dir[0] /= magnitude;
+    v_dir[1] /= magnitude;
+    v_dir[2] /= magnitude;
 
     // Apply knockback
     EventSystem::queue_event(

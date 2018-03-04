@@ -39,7 +39,7 @@ void CollisionEventsSubsystem::onContact(
 
     collisions_.emplace_back(a_id, b_id);
 
-	std::cout << "car1: " << a_id << " car2: " << b_id << std::endl;
+    std::cout << "car1: " << a_id << " car2: " << b_id << std::endl;
 }
 
 void CollisionEventsSubsystem::onTrigger(
