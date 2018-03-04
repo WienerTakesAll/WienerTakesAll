@@ -12,6 +12,8 @@ GameplaySystem::GameplaySystem()
     add_event_handler(EventType::LOAD_EVENT, &GameplaySystem::handle_load, this);
     add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
     add_event_handler(EventType::NEW_GAME_STATE, &GameplaySystem::handle_new_game_state, this);
+    add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &GameplaySystem::handle_object_transform_event, this);
+    add_event_handler(EventType::VEHICLE_COLLISION, &GameplaySystem::handle_vehicle_collision, this);
 
     EventSystem::queue_event(
         Event(
@@ -83,13 +85,19 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
             )
         );
 
-
-
         // Terrain
         EventSystem::queue_event(
             Event(
                 EventType::ADD_ARENA,
                 "object_id", gameobject_counter_->assign_id()
+            )
+        );
+
+        // Terrain
+        EventSystem::queue_event(
+            Event(
+                EventType::ACTIVATE_AI,
+                "num_ai", 4 - num_humans
             )
         );
     }
@@ -225,4 +233,43 @@ void GameplaySystem::handle_key_press(const Event& e) {
     for (const auto& event : new_events) {
         EventSystem::queue_event(Event(event));
     }
+}
+
+void GameplaySystem::handle_object_transform_event(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+    float x = e.get_value<float>("pos_x", true).first;
+    float y = e.get_value<float>("pos_y", true).first;
+    float z = e.get_value<float>("pos_z", true).first;
+
+    object_positions_[object_id] = {x, y, z};
+}
+
+void GameplaySystem::handle_vehicle_collision(const Event& e) {
+    int a_id = e.get_value<int>("a_id", true).first;
+    int b_id = e.get_value<int>("b_id", true).first;
+
+    std::vector<float> a_pos = object_positions_[a_id];
+    std::vector<float> b_pos = object_positions_[b_id];
+
+    EventSystem::queue_event(
+        Event(
+            EventType::OBJECT_APPLY_FORCE,
+            "object_id", a_id,
+            // TODO: Pass glm::vec3 in events
+            "x", a_pos[0] - b_pos[0] * 5000,
+            "y", 3000.f,
+            "z", a_pos[2] - b_pos[2] * 5000
+        )
+    );
+
+    EventSystem::queue_event(
+        Event(
+            EventType::OBJECT_APPLY_FORCE,
+            "object_id", b_id,
+            // TODO: Pass glm::vec3 in events
+            "x", b_pos[0] - a_pos[0] * 5000,
+            "y", 3000.f,
+            "z", b_pos[2] - a_pos[2] * 5000
+        )
+    );
 }

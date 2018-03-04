@@ -12,7 +12,7 @@ struct AudioSettings {
     int mix_chunk_size = 4096;
     // Information for loading sound assets. First value is the key, second is the path.
     std::vector<std::pair<const SoundAsset, const std::string>> sound_assets_info = {
-        {SoundAsset::BEAT, "assets/audio/beat.wav"}
+        {SoundAsset::BOING, "assets/audio/boing.wav"}
     };
     // Information for loading music assets. First value is the key, second is the path.
     std::vector<std::pair<const MusicAsset, const std::string>> music_assets_info = {

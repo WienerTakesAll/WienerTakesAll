@@ -32,6 +32,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, const PhysicsSettings&
     EventSystem::add_event_handler(EventType::ADD_ARENA, &PhysicsSystem::handle_add_arena, this);
     EventSystem::add_event_handler(EventType::VEHICLE_CONTROL, &PhysicsSystem::handle_vehicle_control, this);
     EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &PhysicsSystem::handle_reload_settings, this);
+    EventSystem::add_event_handler(EventType::OBJECT_APPLY_FORCE, &PhysicsSystem::handle_object_apply_force, this);
 
     // Setup Visual Debugger
     PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
@@ -76,13 +77,28 @@ void PhysicsSystem::update() {
     assert(g_scene_);
 
     for (std::pair<int, int> collision : collision_events_subsystem_.consume_collisions()) {
-        EventSystem::queue_event(
-            Event(
-                EventType::VEHICLE_COLLISION,
-                "a_id", collision.first,
-                "b_id", collision.second
-            )
-        );
+        bool a_is_vehicle = false;
+        bool b_is_vehicle = false;
+
+        for (auto& dynamic_object : dynamic_objects_) {
+            if (dynamic_object.get_id() == collision.first && dynamic_object.is_vehicle()) {
+                a_is_vehicle = true;
+            }
+
+            if (dynamic_object.get_id() == collision.second && dynamic_object.is_vehicle()) {
+                b_is_vehicle = true;
+            }
+        }
+
+        if (a_is_vehicle && b_is_vehicle) {
+            EventSystem::queue_event(
+                Event(
+                    EventType::VEHICLE_COLLISION,
+                    "a_id", collision.first,
+                    "b_id", collision.second
+                )
+            );
+        }
     }
 
     const int SIM_STEPS = 4;
@@ -231,6 +247,7 @@ void PhysicsSystem::handle_add_vehicle(const Event& e) {
 
     vehicle.set_actor(vehicles_.back()->getRigidDynamicActor());
     vehicle.set_transform(transform);
+    vehicle.set_is_vehicle(true);
     vehicle_controls_.push_back(VehicleControls());
 }
 
@@ -279,6 +296,20 @@ void PhysicsSystem::handle_reload_settings(const Event& e) {
 
     std::cout << "Setting friction data" << std::endl;
     friction_pair_service_.set_friction_data(settings_.arena_tire_friction);
+}
+
+void PhysicsSystem::handle_object_apply_force(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+    float x = e.get_value<float>("x", true).first;
+    float y = e.get_value<float>("y", true).first;
+    float z = e.get_value<float>("z", true).first;
+
+    for (PhysicsComponent<false> dynamic_object : dynamic_objects_) {
+        if (dynamic_object.get_id() == object_id) {
+            dynamic_object.get_actor()->addForce(PxVec3(x, y, z));
+            return;
+        }
+    }
 }
 
 void PhysicsSystem::create_4w_vehicle (

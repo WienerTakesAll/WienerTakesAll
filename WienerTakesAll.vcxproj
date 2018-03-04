@@ -77,13 +77,14 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>lib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>PsFastXmlDEBUG_x86.lib;PxFoundationDEBUG_x86.lib;PxPvdSDKDEBUG_x86.lib;PxTaskDEBUG_x86.lib;LowLevelAABBDEBUG.lib;LowLevelParticlesDEBUG.lib;PhysX3DEBUG_x86.lib;SimulationControllerDEBUG.lib;LowLevelClothDEBUG.lib;PhysX3CharacterKinematicDEBUG_x86.lib;PhysX3ExtensionsDEBUG.lib;LowLevelDEBUG.lib;PhysX3CommonDEBUG_x86.lib;PhysX3VehicleDEBUG.lib;LowLevelDynamicsDEBUG.lib;PhysX3CookingDEBUG_x86.lib;SceneQueryDEBUG.lib;assimp-vc140-mt.lib;glew32.lib;glew32s.lib;opengl32.lib;SDL2.lib;SDL2_mixer.lib;SDL2main.lib;SDL2test.lib;SDL2_image.lib;libyaml-cppmdd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>PsFastXmlDEBUG_x86.lib;PxFoundationDEBUG_x86.lib;PxPvdSDKDEBUG_x86.lib;PxTaskDEBUG_x86.lib;LowLevelAABBDEBUG.lib;LowLevelParticlesDEBUG.lib;PhysX3DEBUG_x86.lib;SimulationControllerDEBUG.lib;LowLevelClothDEBUG.lib;PhysX3CharacterKinematicDEBUG_x86.lib;PhysX3ExtensionsDEBUG.lib;LowLevelDEBUG.lib;PhysX3CommonDEBUG_x86.lib;PhysX3VehicleDEBUG.lib;LowLevelDynamicsDEBUG.lib;PhysX3CookingDEBUG_x86.lib;SceneQueryDEBUG.lib;assimp-vc140-mt.lib;glew32.lib;glew32s.lib;opengl32.lib;SDL2.lib;SDL2_mixer.lib;SDL2_image.lib;SDL2main.lib;SDL2test.lib;libyaml-cppmdd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -102,6 +103,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\AiSystem.cpp" />
     <ClCompile Include="src\AssetManager.cpp" />
     <ClCompile Include="src\AudioSystem.cpp" />
     <ClCompile Include="src\CollisionEventsSubsystem.cpp" />
@@ -130,6 +132,7 @@
     <ClCompile Include="src\WheelMeshGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\AiSystem.h" />
     <ClInclude Include="src\AssetManager.h" />
     <ClInclude Include="src\AudioSettings.h" />
     <ClInclude Include="src\AudioSystem.h" />

@@ -7,8 +7,12 @@
 
 namespace {
     const std::string STANDARD_SHADER_PATH = "assets/shaders/SimpleShader";
+    const std::string SKYBOX_SHADER_PATH = "assets/shaders/SkyboxShader";
+    const std::string SHADOW_SHADER_PATH = "assets/shaders/ShadowShader";
     const std::string CAR_MESH_PATH = "assets/models/carBoxModel.obj";
-    const std::string TERRAIN_MESH_PATH = "assets/models/Terrain.obj";
+    const std::string TERRAIN_MESH_PATH = "assets/models/Arena.obj";
+    const std::string SKYBOX_MESH_PATH = "assets/models/Skybox.obj";
+    const std::string SKYBOX_TEXTURE_PATH = "assets/textures/Sky.png";
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
@@ -21,14 +25,17 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::ADD_VEHICLE, &RenderingSystem::handle_add_vehicle, this);
     EventSystem::add_event_handler(EventType::ADD_ARENA, &RenderingSystem::handle_add_terrain, this);
     EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
+
+    init_window();
 }
 
 void RenderingSystem::update() {
 }
 
 void RenderingSystem::load(const Event& e) {
-    init_window();
     setup_cameras();
+
+    shadow_shader_ = asset_manager_.get_shader_asset(SHADOW_SHADER_PATH);
 }
 
 void RenderingSystem::handle_key_press(const Event& e) {
@@ -89,7 +96,7 @@ void RenderingSystem::handle_add_vehicle(const Event& e) {
     example_objects_[object_id.first].set_mesh(mesh);
     example_objects_[object_id.first].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
     example_objects_[object_id.first].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
-
+    example_objects_[object_id.first].set_has_shadows(true);
     car_indices_.push_back(object_id.first);
 }
 
@@ -103,6 +110,15 @@ void RenderingSystem::handle_add_terrain(const Event& e) {
     example_objects_.emplace_back();
     example_objects_[object_id].set_mesh(mesh);
     example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
+
+
+    MeshAsset* skybox_mesh = asset_manager_.get_mesh_asset(SKYBOX_MESH_PATH);
+    ShaderAsset* skybox_shader = asset_manager_.get_shader_asset(SKYBOX_SHADER_PATH);
+    TextureAsset* skybox_texture = asset_manager_.get_texture_asset(SKYBOX_TEXTURE_PATH);
+    example_objects_.emplace_back();
+    example_objects_.back().set_mesh(skybox_mesh);
+    example_objects_.back().set_shader(skybox_shader);
+    example_objects_.back().set_texture(skybox_texture);
 }
 
 void RenderingSystem::handle_object_transform(const Event& e) {
@@ -131,9 +147,43 @@ void RenderingSystem::render() {
 
         glViewport(vx, vy, 320, 240);
 
+
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_MULTISAMPLE);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+
         for (auto& object : example_objects_) {
-            object.render(cameras_[i]);
+            object.render(cameras_[i], 0.3f);
         }
+
+        for (auto& object : example_objects_) {
+            object.render_lighting(cameras_[i], glm::vec3(-0.1f, -1.0f, 0.f), shadow_shader_);
+        }
+
+
+        glEnable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
+        glDepthFunc(GL_EQUAL);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glBlendEquation(GL_FUNC_ADD);
+
+        glEnable(GL_STENCIL_TEST);
+        glStencilFunc(GL_EQUAL, 0, ~0);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        glStencilMask(0);
+
+        glDepthMask(GL_FALSE);
+
+        for (auto& object : example_objects_) {
+            object.render(cameras_[i], 0.f);
+        }
+
+        glDepthFunc(GL_LESS);
+        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
+        glDisable(GL_STENCIL_TEST);
+
     }
 
     end_render();
@@ -141,13 +191,12 @@ void RenderingSystem::render() {
 
 
 bool RenderingSystem::init_window() {
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-    SDL_GL_CreateContext(window_);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+    SDL_GLContext context = SDL_GL_CreateContext(window_);
+
+    if (!context) {
+        fprintf(stderr, "Couldn't create context: %s\n", SDL_GetError());
+        return false;
+    }
 
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
@@ -166,7 +215,8 @@ bool RenderingSystem::init_window() {
 void RenderingSystem::start_render() const {
     //Clear the buffers and setup the opengl requirements
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glStencilMask(~0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
@@ -175,7 +225,7 @@ void RenderingSystem::start_render() const {
 }
 
 void RenderingSystem::setup_cameras() {
-    glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 100.0f);
+    glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 200.0f);
 
     glm::mat4x4 transform;
 
