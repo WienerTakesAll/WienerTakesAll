@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 #include <math.h>
 
@@ -117,14 +118,26 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "num_ai", 4 - num_humans
             )
         );
-    }
-
-    else if (new_game_state == GameState::END_GAME) {
+    } else if (new_game_state == GameState::START_MENU) {
         gameobject_counter_->reset_counter();
     }
 
 
+    else if (new_game_state == GameState::END_GAME) {
 
+        for (int i = 0; i < 4; ++i) {
+            EventSystem::queue_event(
+                Event(
+                    EventType::OBJECT_APPLY_FORCE,
+                    "object_id", i,
+                    // TODO: Pass glm::vec3 in events
+                    "x", 50000.f,
+                    "y", 200000.f,
+                    "z", 50000.f
+                )
+            );
+        }
+    }
 
     current_game_state_ = new_game_state;
 }
@@ -257,6 +270,12 @@ void GameplaySystem::handle_key_press(const Event& e) {
                                     "index", player_id,
                                     "type", VehicleControlType::HAND_BRAKE,
                                     "value", 1.f);
+            break;
+        }
+
+        case SDLK_ESCAPE: {
+            new_events.emplace_back(EventType::NEW_GAME_STATE,
+                                    "state", GameState::END_GAME);
             break;
         }
 

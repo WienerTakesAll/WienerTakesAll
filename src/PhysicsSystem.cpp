@@ -331,7 +331,8 @@ void PhysicsSystem::handle_object_apply_force(const Event& e) {
 void PhysicsSystem::handle_new_game_state(const Event& e) {
     GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
 
-    if (new_game_state == GameState::END_GAME) {
+
+    if (new_game_state == GameState::START_MENU) {
         for (auto& dynamic_object : dynamic_objects_) {
             dynamic_object.get_actor()->release();
         }
@@ -354,6 +355,16 @@ void PhysicsSystem::handle_new_game_state(const Event& e) {
         dynamic_objects_.clear();
         static_objects_.clear();
         vehicles_.clear();
+    }
+
+
+    if (new_game_state == GameState::END_GAME) {
+        for (auto& control : vehicle_controls_) {
+            control.forward_drive = 0.f;
+            control.braking_force = 0.f;
+            control.hand_break = 0.f;
+            control.horizontal_drive = 0.f;
+        }
     }
 
 }
