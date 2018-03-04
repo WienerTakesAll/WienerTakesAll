@@ -218,10 +218,11 @@ void GameplaySystem::handle_key_press(const Event& e) {
         }
 
         case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: {
+
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::FORWARD_DRIVE,
-                                    "value", (float)value / 32768);
+                                    "value", (float)value / (1.5f * 32768));
             break;
         }
 
@@ -234,10 +235,19 @@ void GameplaySystem::handle_key_press(const Event& e) {
         }
 
         case SDL_CONTROLLER_AXIS_LEFTX: {
+
+            if (std::abs(value) < 6000) {
+                value = 0;
+            } else if(value < 0){
+                value += 5000;
+            } else {
+                value -= 5000;
+            }
+
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", (float)value / -32768);
+                                    "value", (float)(value) / -32768);
             break;
         }
 
@@ -245,7 +255,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::HAND_BRAKE,
-                                    "value", true);
+                                    "value", (float)1);
             break;
         }
 
@@ -310,9 +320,9 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
             EventType::OBJECT_APPLY_FORCE,
             "object_id", a_id,
             // TODO: Pass glm::vec3 in events
-            "x", v_dir[0] * 10000,
-            "y", 10000.f,
-            "z", v_dir[2] * 10000
+            "x", v_dir[0] * 50000,
+            "y", 100000.f,
+            "z", v_dir[2] * 50000
         )
     );
 
@@ -321,9 +331,9 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
             EventType::OBJECT_APPLY_FORCE,
             "object_id", b_id,
             // TODO: Pass glm::vec3 in events
-            "x", -v_dir[0] * 10000,
-            "y", 10000.f,
-            "z", -v_dir[2] * 10000
+            "x", -v_dir[0] * 50000,
+            "y", 100000.f,
+            "z", -v_dir[2] * 50000
         )
     );
 

@@ -172,6 +172,18 @@ void PhysicsSystem::update() {
 
         physx::PxTransform transform = object.get_actor()->getGlobalPose();
 
+
+        if (transform.p.y < -5) {
+            transform.p.x = 0;
+            transform.p.y = 2;
+            transform.p.z = 0;
+            transform.q.w = 1;
+            transform.q.x = 0;
+            transform.q.y = 0;
+            transform.q.z = 0;
+            object.get_actor()->setGlobalPose(transform);
+        }
+
         EventSystem::queue_event(
             Event(
                 EventType::OBJECT_TRANSFORM_EVENT,
