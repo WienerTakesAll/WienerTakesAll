@@ -12,6 +12,7 @@ GameplaySystem::GameplaySystem()
     add_event_handler(EventType::LOAD_EVENT, &GameplaySystem::handle_load, this);
     add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
     add_event_handler(EventType::NEW_GAME_STATE, &GameplaySystem::handle_new_game_state, this);
+    add_event_handler(EventType::ADD_VEHICLE, &GameplaySystem::handle_add_vehicle, this);
 
     EventSystem::queue_event(
         Event(
@@ -23,6 +24,7 @@ GameplaySystem::GameplaySystem()
 
 void GameplaySystem::update() {
     // Update game state here
+    scoring_subsystem_.update();
 }
 
 void GameplaySystem::handle_load(const Event& e) {
@@ -31,6 +33,8 @@ void GameplaySystem::handle_load(const Event& e) {
 
 void GameplaySystem::handle_new_game_state(const Event& e) {
     GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
+
+    scoring_subsystem_.handle_new_game_state(new_game_state);
 
     if (new_game_state == GameState::IN_GAME) {
         int num_humans = e.get_value<int>("num_players", true).first;
@@ -231,4 +235,9 @@ void GameplaySystem::handle_key_press(const Event& e) {
     for (const auto& event : new_events) {
         EventSystem::queue_event(Event(event));
     }
+}
+
+void GameplaySystem::handle_add_vehicle(const Event& e) {
+    std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
+    scoring_subsystem_.add_vehicle(object_id.first);
 }
