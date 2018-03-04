@@ -13,23 +13,23 @@ public:
 
 private:
     void handle_activate_ai(const Event& e);
-	void handle_object_transform(const Event& e);
+    void handle_object_transform(const Event& e);
 
-	void path_to(int car, const glm::vec3& point_);
+    void path_to(int car, const glm::vec3& point_);
 
     int num_ai_;
 
-	struct car_data {
-		struct car_transform_data {
-			glm::vec3 position_;
-			glm::quat rotation_;
-		};
+    struct car_data {
+        struct car_transform_data {
+            glm::vec3 position_;
+            glm::quat rotation_;
+        };
 
-		car_transform_data car_transform_;
-	};
+        car_transform_data car_transform_;
+    };
 
 
-	std::array<car_data, 4> cars_;
-	unsigned int counter_;
+    std::array<car_data, 4> cars_;
+    unsigned int counter_;
     unsigned int whos_it_;
 };
