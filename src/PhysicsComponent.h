@@ -27,6 +27,7 @@ public:
     bool is_vehicle() const;
     physx::PxVehicleDrive4W* get_wheels() const;
 
+    void set_is_vehicle(bool is_vehicle);
     void set_actor(physx::PxRigidDynamic* actor);
     void set_mesh(
         physx::PxPhysics* physics,

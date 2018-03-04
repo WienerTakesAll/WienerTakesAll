@@ -142,3 +142,15 @@ void PhysicsComponent<false>::create_geometry(    physx::PxPhysics* physics,
     g_mesh_geometry_ = new physx::PxConvexMeshGeometry(g_mesh_);
 
 }
+
+template<>
+void PhysicsComponent<true>::set_is_vehicle(bool is_vehicle) {
+    std::cerr << "cannot set static object to be vehicle!" << std::endl;
+    assert(false);
+}
+
+template<>
+void PhysicsComponent<false>::set_is_vehicle(bool is_vehicle) {
+    is_vehicle_ = is_vehicle;
+}
+

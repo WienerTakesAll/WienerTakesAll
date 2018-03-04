@@ -70,7 +70,7 @@ void AudioSystem::handle_update_settings_event(const Event& event) {
 }
 
 void AudioSystem::handle_vehicle_collision_event(const Event& e) {
-    play_sound(SoundAsset::BEAT);
+    play_sound(SoundAsset::BOING);
 }
 
 void AudioSystem::play_sound(const SoundAsset sound_type, const int loops /*= 0*/) const {
