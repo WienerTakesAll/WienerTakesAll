@@ -32,4 +32,6 @@ private:
     StartMenu start_menu_;
     SDL_Window* window_;
     GameState current_game_state_;
+
+    bool controller_buffer_;
 };

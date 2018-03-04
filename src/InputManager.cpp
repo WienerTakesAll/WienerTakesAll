@@ -41,7 +41,6 @@ void InputManager::process_input(SDL_Event* event) {
             key = event->cbutton.button;
             std::cout << "[Player " << player_id << "] ";
             should_queue_event = process_controller_button(key);
-
             break;
         }
 
