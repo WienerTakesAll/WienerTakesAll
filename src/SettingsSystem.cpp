@@ -185,30 +185,30 @@ bool SettingsSystem::reload_physics_settings() {
     success &= load_key<float>(KEYS_STEER_LEFT_FALL, steer_left_fall);
     success &= load_key<float>(KEYS_STEER_RIGHT_FALL, steer_right_fall);
 
-    if (success) {
-        physics_settings_.g_pad_smoothing_data = {
-            {accel_rise, brake_rise, handbrake_rise, steer_left_rise, steer_right_rise},
-            {accel_fall, brake_fall, handbrake_fall, steer_left_fall, steer_right_fall}
-        };
-    }
+    assert(success);
+    physics_settings_.g_pad_smoothing_data = {
+        {accel_rise, brake_rise, handbrake_rise, steer_left_rise, steer_right_rise},
+        {accel_fall, brake_fall, handbrake_fall, steer_left_fall, steer_right_fall}
+    };
 
     std::vector<float> speed_data;
     success &= load_key<std::vector<float>>(KEYS_STEER_VS_FORWARD, speed_data);
 
-    if (success) {
-        assert( speed_data.size() == 16 );
+    assert(success);
+    assert( speed_data.size() == 16 );
 
-        for (unsigned int index = 0; index < speed_data.size(); ++index) {
-            physics_settings_.g_steer_vs_forward_speed_data[index] = speed_data.at(index);
-        }
-
-        physics_settings_.g_steer_vs_forward_speed_table = physx::PxFixedSizeLookupTable<8>(physics_settings_.g_steer_vs_forward_speed_data, 4);
+    for (unsigned int index = 0; index < speed_data.size(); ++index) {
+        physics_settings_.g_steer_vs_forward_speed_data[index] = speed_data.at(index);
     }
+
+    physics_settings_.g_steer_vs_forward_speed_table = physx::PxFixedSizeLookupTable<8>(physics_settings_.g_steer_vs_forward_speed_data, 4);
 
     success &= load_key<std::string>(KEYS_VEHICLE_MESH, physics_settings_.vehicle_mesh_asset_path);
     success &= load_key<float>(KEYS_VEHICLE_MASS, physics_settings_.vehicle_mass);
     success &= load_key<std::string>(KEYS_ARENA_MESH, physics_settings_.arena_mesh);
     success &= load_key<float>(KEYS_ARENA_TIRE_FRICTION, physics_settings_.arena_tire_friction);
+
+    assert(success);
 
     return success;
 }
@@ -241,6 +241,11 @@ std::string SettingsSystem::vec_to_str(const std::vector<std::string>& vec) cons
 
 void SettingsSystem::handle_keypress_event(const Event& e) {
     auto key = e.get_value<int>("key", true);
+    int value = e.get_value<int>("value", true).first;
+
+    if (value != SDL_KEYDOWN) {
+        return;
+    }
 
     switch (key.first) {
         case SDLK_F5:

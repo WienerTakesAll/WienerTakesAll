@@ -32,6 +32,6 @@ physics:
           *PX_MAX_F32, *PX_MAX_F32 ]
     vehicle_mesh: "assets/models/carBoxModel.obj"
     vehicle_mass: 1000.0
-    arena_mesh: "assets/models/Terrain.obj"
-    arena_tire_friction: 5.0
+    arena_mesh: "assets/models/Arena.obj"
+    arena_tire_friction: 1.0
 
