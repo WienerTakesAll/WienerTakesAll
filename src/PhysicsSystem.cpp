@@ -173,6 +173,18 @@ void PhysicsSystem::update() {
 
         physx::PxTransform transform = object.get_actor()->getGlobalPose();
 
+        //If the player is out of the arena, put them back in
+        if (transform.p.y < -5) {
+            transform.p.x = 0;
+            transform.p.y = 2;
+            transform.p.z = 0;
+            transform.q.w = 1;
+            transform.q.x = 0;
+            transform.q.y = 0;
+            transform.q.z = 0;
+            object.get_actor()->setGlobalPose(transform);
+        }
+
         EventSystem::queue_event(
             Event(
                 EventType::OBJECT_TRANSFORM_EVENT,
@@ -319,6 +331,7 @@ void PhysicsSystem::handle_object_apply_force(const Event& e) {
 void PhysicsSystem::handle_new_game_state(const Event& e) {
     GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
 
+
     if (new_game_state == GameState::START_MENU) {
         for (auto& dynamic_object : dynamic_objects_) {
             dynamic_object.get_actor()->release();
@@ -343,6 +356,7 @@ void PhysicsSystem::handle_new_game_state(const Event& e) {
         static_objects_.clear();
         vehicles_.clear();
     }
+
 
     if (new_game_state == GameState::END_GAME) {
         for (auto& control : vehicle_controls_) {
