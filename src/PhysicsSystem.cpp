@@ -144,6 +144,7 @@ void PhysicsSystem::update() {
                 sq_data_->get_raycast_query_result_buffer()
             );
 
+            sq_wheel_raycast_batch_query->release();
 
             physx::PxVehicleUpdates(
                 TIME_PER_UPDATE / SIM_STEPS,
