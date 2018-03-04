@@ -7,8 +7,11 @@
 
 namespace {
     const std::string STANDARD_SHADER_PATH = "assets/shaders/SimpleShader";
-    const std::string CAR_MESH_PATH = "assets/models/carBoxModel.obj";
-    const std::string TERRAIN_MESH_PATH = "assets/models/Terrain.obj";
+    const std::string TEXTURE_SHADER_PATH = "assets/shaders/TextureShader";
+    const std::string CAR_MESH_PATH = "assets/models/WienerCarModel.obj";
+    const std::string TERRAIN_MESH_PATH = "assets/models/ArenaPlane.obj";
+    const std::string TERRAIN_TEXTURE_PATH = "assets/textures/texturePit.png";
+    const std::string CAR_TEXTURE_PATH = "assets/textures/textureCar.png";
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
@@ -87,7 +90,8 @@ void RenderingSystem::handle_add_vehicle(const Event& e) {
     // Store car
     example_objects_.emplace_back();
     example_objects_[object_id.first].set_mesh(mesh);
-    example_objects_[object_id.first].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
+    example_objects_[object_id.first].set_shader(asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH));
+    example_objects_[object_id.first].set_texture(asset_manager_.get_texture_asset(CAR_TEXTURE_PATH));
     example_objects_[object_id.first].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
 
     car_indices_.push_back(object_id.first);
@@ -102,7 +106,9 @@ void RenderingSystem::handle_add_terrain(const Event& e) {
     // Store terrain
     example_objects_.emplace_back();
     example_objects_[object_id].set_mesh(mesh);
-    example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
+    example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH));
+    example_objects_[object_id].set_texture(asset_manager_.get_texture_asset(TERRAIN_TEXTURE_PATH));
+
 }
 
 void RenderingSystem::handle_object_transform(const Event& e) {
