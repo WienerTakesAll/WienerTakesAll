@@ -16,6 +16,7 @@ GameplaySystem::GameplaySystem()
     add_event_handler(EventType::ADD_VEHICLE, &GameplaySystem::handle_add_vehicle, this);
     add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &GameplaySystem::handle_object_transform_event, this);
     add_event_handler(EventType::VEHICLE_COLLISION, &GameplaySystem::handle_vehicle_collision, this);
+    add_event_handler(EventType::NEW_IT, &GameplaySystem::handle_new_it, this);
 
     EventSystem::queue_event(
         Event(
@@ -27,7 +28,17 @@ GameplaySystem::GameplaySystem()
 
 void GameplaySystem::update() {
     // Update game state here
-    scoring_subsystem_.update();
+    if (should_update_score()) {
+        scoring_subsystem_.update();
+
+        EventSystem::queue_event(
+            Event(
+                EventType::UPDATE_SCORE,
+                "object_id", current_it_id_,
+                "score", scoring_subsystem_.get_current_it_score()
+            )
+        );
+    }
 }
 
 void GameplaySystem::handle_load(const Event& e) {
@@ -259,16 +270,36 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
     object_locations_[object_id] = {x, y, z};
 }
 
+void GameplaySystem::handle_new_it(const Event& e) {
+    int new_it_id = e.get_value<int>("object_id", true).first;
+    current_it_id_ = new_it_id;
+    scoring_subsystem_.set_new_it_id(new_it_id);
+}
+
 void GameplaySystem::handle_vehicle_collision(const Event& e) {
     int a_id = e.get_value<int>("a_id", true).first;
     int b_id = e.get_value<int>("b_id", true).first;
     std::cout << a_id << " collided with " << b_id << std::endl;
 
+    int new_it = -1;
+
     if (current_it_id_ == a_id) {
-        current_it_id_ = b_id;
-        scoring_subsystem_.set_new_it_id(current_it_id_);
+        new_it = b_id;
     } else if (current_it_id_ == b_id) {
-        current_it_id_ = a_id;
-        scoring_subsystem_.set_new_it_id(current_it_id_);
+        new_it = a_id;
     }
+
+    if (new_it != -1) {
+        EventSystem::queue_event(
+            Event(
+                EventType::NEW_IT,
+                "object_id", new_it
+            )
+        );
+    }
+}
+
+bool GameplaySystem::should_update_score() const {
+    return  current_game_state_ ==  GameState::IN_GAME  &&
+            current_it_id_      !=  -1;
 }

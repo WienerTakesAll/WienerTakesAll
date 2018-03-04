@@ -13,9 +13,10 @@ public:
     void update();
     void set_new_game_state(const GameState new_game_state);
     void set_new_it_id(const int new_it_id);
+    int get_current_it_score();
 
 private:
     int current_it_id_;
     GameState game_state_;
-    std::map<int, unsigned int> scores_;
+    std::map<int, int> scores_;
 };
