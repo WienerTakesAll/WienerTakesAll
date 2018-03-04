@@ -1,6 +1,6 @@
 #include <cmath>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 #include "SDL.h"
 
