@@ -30,3 +30,9 @@ void UIObject::render(glm::mat4 camera) const {
 void UIObject::set_texture(TextureAsset* tex) {
     render_component_.set_texture(tex);
 }
+
+void UIObject::scale(float factor) {
+    render_component_.set_transform(glm::scale(glm::mat4(), glm::vec3(factor, factor, 0)));
+    render_component_.apply_transform(glm::translate(glm::mat4(), glm::vec3(origin_, 0)));
+    render_component_.apply_transform(glm::scale(glm::mat4(), glm::vec3(size_, 0)));
+}

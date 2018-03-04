@@ -5,12 +5,13 @@
 UISystem::UISystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager)
     , start_menu_(asset_manager)
+    , gameplay_hud_(asset_manager)
     , current_game_state_(GameState::START_MENU)
     , controller_buffer_(false) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &UISystem::handle_load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &UISystem::handle_key_press, this);
     EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &UISystem::handle_new_game_state, this);
-
+    EventSystem::add_event_handler(EventType::UPDATE_SCORE, &UISystem::handle_update_score, this);
 
     window_ = asset_manager.get_window();
 }
@@ -23,6 +24,8 @@ void UISystem::render() const {
 
     if (current_game_state_ == GameState::START_MENU) {
         start_menu_.render();
+    } else if (current_game_state_ == GameState::IN_GAME) {
+        gameplay_hud_.render();
     }
 
     SDL_GL_SwapWindow(window_);
@@ -45,6 +48,7 @@ void UISystem::end_render() const {
 
 void UISystem::handle_load(const Event& e) {
     start_menu_.load();
+    gameplay_hud_.load();
 }
 
 void UISystem::handle_key_press(const Event& e) {
@@ -126,3 +130,10 @@ void UISystem::handle_new_game_state(const Event& e) {
     current_game_state_ = new_game_state;
 }
 
+
+void UISystem::handle_update_score(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+    int score = e.get_value<int>("score", true).first;
+
+    gameplay_hud_.update_score(object_id, score);
+}
