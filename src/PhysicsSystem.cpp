@@ -79,7 +79,7 @@ void PhysicsSystem::update() {
         bool a_is_vehicle = false;
         bool b_is_vehicle = false;
 
-        for (auto dynamic_object : dynamic_objects_) {
+        for (auto& dynamic_object : dynamic_objects_) {
             if (dynamic_object.get_id() == collision.first && dynamic_object.is_vehicle()) {
                 a_is_vehicle = true;
             }
