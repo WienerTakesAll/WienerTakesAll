@@ -14,7 +14,7 @@
 #include "VehicleWheelQueryResults.h"
 #include "VehicleSceneQueryData.h"
 
-PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physics_settings)
+PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, const PhysicsSettings& physics_settings)
     : g_foundation_(PxCreateFoundation(PX_FOUNDATION_VERSION, g_allocator_, g_error_callback_))
     , g_pvd_(PxCreatePvd(*g_foundation_))
     , g_physics_(PxCreatePhysics(PX_PHYSICS_VERSION, *g_foundation_, physx::PxTolerancesScale(), false, g_pvd_))
@@ -31,6 +31,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, PhysicsSettings& physi
     EventSystem::add_event_handler(EventType::ADD_VEHICLE, &PhysicsSystem::handle_add_vehicle, this);
     EventSystem::add_event_handler(EventType::ADD_ARENA, &PhysicsSystem::handle_add_arena, this);
     EventSystem::add_event_handler(EventType::VEHICLE_CONTROL, &PhysicsSystem::handle_vehicle_control, this);
+    EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &PhysicsSystem::handle_reload_settings, this);
     EventSystem::add_event_handler(EventType::OBJECT_APPLY_FORCE, &PhysicsSystem::handle_object_apply_force, this);
 
     // Setup Visual Debugger
@@ -285,6 +286,19 @@ void PhysicsSystem::handle_vehicle_control(const Event& e) {
     }
 }
 
+void PhysicsSystem::handle_reload_settings(const Event& e) {
+    std::cout << "Setting scene gravity" << std::endl;
+    g_scene_->setGravity(settings_.gravity);
+
+    for (auto& vehicle : vehicles_) {
+        std::cout << "Setting vehicle mass" << std::endl;
+        vehicle->mWheelsSimData.setChassisMass(settings_.vehicle_mass);
+    }
+
+    std::cout << "Setting friction data" << std::endl;
+    friction_pair_service_.set_friction_data(settings_.arena_tire_friction);
+}
+
 void PhysicsSystem::handle_object_apply_force(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
     float x = e.get_value<float>("x", true).first;
@@ -298,7 +312,6 @@ void PhysicsSystem::handle_object_apply_force(const Event& e) {
         }
     }
 }
-
 
 void PhysicsSystem::create_4w_vehicle (
     const PxMaterial& material,

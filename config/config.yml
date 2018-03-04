@@ -7,3 +7,31 @@ audio:
     channels: 2
     chunk_size: 4096
 
+physics:
+    max_float: &PX_MAX_F32 3.4028234663852885981170418348452e38
+    gravity: [0.0, -0.981, 0.0]
+    pad_smoothing_data:
+        accel_rise: 6.0
+        brake_rise: 6.0
+        handbrake_rise: 12.0
+        steer_left_rise: 2.5
+        steer_right_rise: 2.5
+        accel_fall: 10.0
+        brake_fall: 10.0
+        handbrake_fall: 12.0
+        steer_left_fall: 5.0
+        steer_right_fall: 5.0
+    steer_vs_forward_speed_data:
+        [ 0.0, 0.75,
+          5.0, 0.75,
+          30.0, 0.125,
+          120.0, 0.1,
+          *PX_MAX_F32, *PX_MAX_F32,
+          *PX_MAX_F32, *PX_MAX_F32,
+          *PX_MAX_F32, *PX_MAX_F32,
+          *PX_MAX_F32, *PX_MAX_F32 ]
+    vehicle_mesh: "assets/models/carBoxModel.obj"
+    vehicle_mass: 1000.0
+    arena_mesh: "assets/models/Arena.obj"
+    arena_tire_friction: 1.0
+
