@@ -13,15 +13,14 @@ PhysicsComponent<static_actor>::PhysicsComponent(unsigned int id)
     : valid_(false)
     , id_(id)
     , g_actor_(nullptr)
-	, id_ptr_(nullptr) {
+    , id_ptr_(nullptr) {
 }
 
 template <bool static_actor>
 PhysicsComponent<static_actor>::~PhysicsComponent() {
-	if (id_ptr_ != nullptr)
-	{
-		// delete id_ptr_;
-	}
+    if (id_ptr_ != nullptr) {
+        // delete id_ptr_;
+    }
 }
 
 template <bool static_actor>
@@ -74,11 +73,12 @@ void PhysicsComponent<static_actor>::set_actor(physx::PxRigidDynamic* actor) {
     std::cout << "set_actor id: " << id_ << std::endl;
     g_actor_ = actor;
 
-	if (id_ptr_ != nullptr) {
-		delete id_ptr_;
-	}
-	id_ptr_ = new int(id_);
-	g_actor_->userData = id_ptr_;
+    if (id_ptr_ != nullptr) {
+        delete id_ptr_;
+    }
+
+    id_ptr_ = new int(id_);
+    g_actor_->userData = id_ptr_;
 
     std::cout << "set_actor g_actor_->userData: " << *(int*)g_actor_->userData << std::endl;
 }

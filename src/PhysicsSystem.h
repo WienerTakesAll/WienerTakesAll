@@ -31,7 +31,7 @@ private:
     void handle_vehicle_control(const Event& e);
     void handle_reload_settings(const Event& e);
     void handle_object_apply_force(const Event& e);
-	void handle_new_game_state(const Event& e);
+    void handle_new_game_state(const Event& e);
 
     void create_4w_vehicle(
         const physx::PxMaterial& material,
