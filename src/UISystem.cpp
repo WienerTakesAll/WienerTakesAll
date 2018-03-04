@@ -84,7 +84,8 @@ void UISystem::handle_key_press(const Event& e) {
                 if (std::abs(value) < 10000) {
                     controller_buffer_ = false;
                     break;
-                } 
+                }
+
                 if (controller_buffer_) {
                     break;
                 }
@@ -94,10 +95,10 @@ void UISystem::handle_key_press(const Event& e) {
 
                 if (value > 0) {
                     start_menu_.move_selection_down();
-                }
-                else {
+                } else {
                     start_menu_.move_selection_up();
                 }
+
                 break;
 
         }
