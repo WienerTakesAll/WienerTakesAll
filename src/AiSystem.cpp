@@ -21,7 +21,6 @@ void AiSystem::update() {
         counter_ = 0;
     }
 
-
     for (int i = 3; i >= 4 - num_ai_; i--) {
         if (i != whos_it_) {
             path_to(i, cars_[whos_it_].position_);
