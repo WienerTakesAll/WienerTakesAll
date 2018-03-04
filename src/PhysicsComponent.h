@@ -20,8 +20,8 @@ public:
     bool is_valid() const;
     unsigned int get_id() const;
     physx::PxMaterial* get_material() const;
-    auto get_mesh() const;
-    auto get_mesh_geometry() const;
+    PxMeshType* get_mesh() const;
+    PxMeshGeometryType* get_mesh_geometry() const;
     physx::PxShape* get_mesh_shape() const;
     auto get_actor() const;
     bool is_vehicle() const;

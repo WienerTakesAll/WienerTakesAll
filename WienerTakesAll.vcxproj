@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{038B5A43-42E7-4335-8F57-B1C789618B53}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -120,6 +120,7 @@
     <ClCompile Include="src\PhysicsSystemUtils.cpp" />
     <ClCompile Include="src\RenderingComponent.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
+    <ClCompile Include="src\ScoringSubsystem.cpp" />
     <ClCompile Include="src\SettingsSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderAsset.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="src\PhysicsSystemUtils.h" />
     <ClInclude Include="src\RenderingComponent.h" />
     <ClInclude Include="src\RenderingSystem.h" />
+    <ClInclude Include="src\ScoringSubsystem.h" />
     <ClInclude Include="src\SettingsSystem.h" />
     <ClInclude Include="src\SettingsSystem_impl.h" />
     <ClInclude Include="src\Shader.h" />

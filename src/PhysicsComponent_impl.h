@@ -70,12 +70,12 @@ physx::PxMaterial* PhysicsComponent<static_actor>::get_material() const {
 }
 
 template <bool static_actor>
-auto PhysicsComponent<static_actor>::get_mesh() const {
+typename PhysicsComponent<static_actor>::PxMeshType* PhysicsComponent<static_actor>::get_mesh() const {
     return g_mesh_;
 }
 
 template <bool static_actor>
-auto PhysicsComponent<static_actor>::get_mesh_geometry() const {
+typename PhysicsComponent<static_actor>::PxMeshGeometryType* PhysicsComponent<static_actor>::get_mesh_geometry() const {
     return g_mesh_geometry_;
 }
 

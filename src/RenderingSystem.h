@@ -25,6 +25,7 @@ private:
     void handle_add_vehicle(const Event& e);
     void handle_add_terrain(const Event& e);
     void handle_object_transform(const Event& e);
+    void handle_new_it(const Event& e);
 
     void start_render() const;
     void setup_cameras();
@@ -41,5 +42,6 @@ private:
 
     AssetManager& asset_manager_;
     ShaderAsset* shadow_shader_;
+    unsigned int whos_it;
 };
 
