@@ -10,13 +10,22 @@
 struct MeshAsset {
     struct MeshData {
         struct VertexData {
-            float position_[3];
-            float normal_[3];
-            float colors_[3];
-            float uv_[2];
+            glm::vec3 position_;
+            glm::vec3 normal_;
+            glm::vec3 colors_;
+            glm::vec3 uv_;
         };
         std::vector<VertexData> vertices_;
         std::vector<GLuint> indices_;
+
+        struct VolumeVertexData {
+            glm::vec4 position_;
+            glm::vec3 normal_;
+        };
+
+        std::vector<VolumeVertexData> shadow_volume_vertices_;
+        std::vector<GLuint> shadow_volume_indices_;
+
     };
     bool valid_;
     std::vector<MeshData> meshes_;

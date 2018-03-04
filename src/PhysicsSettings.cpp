@@ -1,7 +1,7 @@
 #include "PhysicsSettings.h"
 
 PhysicsSettings::PhysicsSettings()
-    : gravity(physx::PxVec3 (0.0f, -0.1f, 0.0f))
+    : gravity(physx::PxVec3 (0.0f, -0.981f, 0.0f))
     , g_pad_smoothing_data( {
     {
         6.0f,    //rise rate eANALOG_INPUT_ACCEL
@@ -17,9 +17,9 @@ PhysicsSettings::PhysicsSettings()
         5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
     }
 })
-, vehicle_mesh_asset_path("assets/models/carBoxModel.obj")
-, vehicle_mass(1500.f)
-, arena_mesh("assets/models/ArenaPlane.obj")
+, vehicle_mesh_asset_path("assets/models/NoWienerCarModel.obj")
+, vehicle_mass(1000.f)
+, arena_mesh("assets/models/Arena.obj")
 , arena_tire_friction(1.f) {
     physx::PxF32 g_steer_vs_forward_speed_data[2 * 8] = {
         0.0f,        0.75f,

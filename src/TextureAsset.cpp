@@ -17,6 +17,7 @@ void TextureAsset::load(const std::string& file_path) {
     if (!surface) {
         std::cerr << "Unable to load texture " << file_path << std::endl;
         valid_ = false;
+        return;
     }
 
     //Load the texture into opengl here!
