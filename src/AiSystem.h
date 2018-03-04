@@ -19,10 +19,10 @@ private:
 
     int num_ai_;
 
-	struct car_data {
-		glm::vec3 position_;
-		glm::quat rotation_;
-	};
+    struct car_data {
+        glm::vec3 position_;
+        glm::quat rotation_;
+    };
 
     std::array<car_data, 4> cars_;
     unsigned int counter_;

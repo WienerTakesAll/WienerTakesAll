@@ -34,4 +34,5 @@ private:
     void handle_update_settings_event(const Event& e);
     void handle_vehicle_collision_event(const Event& e);
     void handle_new_game_state(const Event& e);
+    void handle_new_it(const Event& e);
 };
