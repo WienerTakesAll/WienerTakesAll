@@ -17,6 +17,8 @@ enum class EventType {
     VEHICLE_CONTROL,
     VEHICLE_COLLISION,
     ACTIVATE_AI,
+    UPDATE_SCORE,
+    NEW_IT,
 
     // Keep at end of list
     EVENT_COUNT
