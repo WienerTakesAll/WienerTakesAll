@@ -21,7 +21,7 @@ int GameObjectCounter::assign_id() const {
 }
 
 void GameObjectCounter::reset_counter() const {
-	id_ = 0;
+    id_ = 0;
 }
 
 // GameObjectCounter destructor

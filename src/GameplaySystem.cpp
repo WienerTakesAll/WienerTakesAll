@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 
 #include "SDL.h"
@@ -118,12 +119,25 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
         );
     }
 
-	else if (new_game_state == GameState::END_GAME) {
-		gameobject_counter_->reset_counter();
-	}
+    else if (new_game_state == GameState::START_MENU) {
+        gameobject_counter_->reset_counter();
+    }
 
+    else if (new_game_state == GameState::END_GAME) {
 
-
+        for (int i = 0; i < 4; ++i) {
+            EventSystem::queue_event(
+                Event(
+                    EventType::OBJECT_APPLY_FORCE,
+                    "object_id", i,
+                    // TODO: Pass glm::vec3 in events
+                    "x", 50000.f,
+                    "y", 200000.f,
+                    "z", 50000.f
+                )
+            );
+        }
+    }
 
     current_game_state_ = new_game_state;
 }
@@ -249,6 +263,12 @@ void GameplaySystem::handle_key_press(const Event& e) {
             break;
         }
 
+        case SDLK_ESCAPE: {
+            new_events.emplace_back(EventType::NEW_GAME_STATE,
+                                    "state", GameState::END_GAME);
+            break;
+        }
+
         default:
             return;
     }
@@ -297,12 +317,12 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
     std::vector<float> b_pos = object_positions_[b_id];
 
 
-	std::vector<float> v_dir = { a_pos[0] - b_pos[0], a_pos[1] - b_pos[1], a_pos[2] - b_pos[2] };
-	float magnitude = std::sqrt(v_dir[0] * v_dir[0] + v_dir[1] * v_dir[1] + v_dir[2] * v_dir[2]);
+    std::vector<float> v_dir = { a_pos[0] - b_pos[0], a_pos[1] - b_pos[1], a_pos[2] - b_pos[2] };
+    float magnitude = std::sqrt(v_dir[0] * v_dir[0] + v_dir[1] * v_dir[1] + v_dir[2] * v_dir[2]);
 
-	v_dir[0] /= magnitude;
-	v_dir[1] /= magnitude;
-	v_dir[2] /= magnitude;
+    v_dir[0] /= magnitude;
+    v_dir[1] /= magnitude;
+    v_dir[2] /= magnitude;
 
     // Apply knockback
     EventSystem::queue_event(

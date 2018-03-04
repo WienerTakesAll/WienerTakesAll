@@ -12,10 +12,10 @@ UISystem::UISystem(AssetManager& asset_manager)
     , current_game_state_(GameState::START_MENU) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &UISystem::handle_load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &UISystem::handle_key_press, this);
-	EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &UISystem::handle_new_game_state, this);
+    EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &UISystem::handle_new_game_state, this);
 
 
-	window_ = asset_manager.get_window();
+    window_ = asset_manager.get_window();
 }
 
 void UISystem::update() {
@@ -78,12 +78,27 @@ void UISystem::handle_key_press(const Event& e) {
                 break;
         }
     }
+
+    if (current_game_state_ == GameState::END_GAME) {
+        switch (key) {
+            case SDLK_RETURN:
+                EventSystem::queue_event(
+                    Event(
+                        EventType::NEW_GAME_STATE,
+                        "state", GameState::START_MENU
+                    )
+                );
+                break;
+
+            default:
+                break;
+        }
+    }
 }
 
 
-void UISystem::handle_new_game_state(const Event& e)
-{
-	GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
+void UISystem::handle_new_game_state(const Event& e) {
+    GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
 
-	current_game_state_ = new_game_state;
+    current_game_state_ = new_game_state;
 }

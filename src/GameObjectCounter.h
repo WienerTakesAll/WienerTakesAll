@@ -4,7 +4,7 @@ class GameObjectCounter {
 public:
     static GameObjectCounter* get_instance();
     int assign_id() const;
-	void reset_counter() const;
+    void reset_counter() const;
     ~GameObjectCounter();
 
 private:
