@@ -41,7 +41,6 @@ int main(int argc, char* args[]) {
 
 
     SettingsSystem settings_system(SETTINGS_FILE);
-    PhysicsSettings physics_settings;
 
 
     AudioSystem audio_system(settings_system.get_audio_settings());
@@ -50,7 +49,7 @@ int main(int argc, char* args[]) {
     GameplaySystem gameplay_system;
     InputManager input_manager(settings_system.get_input_settings());
     UISystem ui_system(asset_manager);
-    PhysicsSystem physics_system(asset_manager, physics_settings);
+    PhysicsSystem physics_system(asset_manager, settings_system.get_physics_settings());
     AiSystem ai_system;
 
     if (!audio_system.init()) {
@@ -62,7 +61,8 @@ int main(int argc, char* args[]) {
     bool game_is_running = true;
 
     while (game_is_running) {
-        auto frame_end_time = std::chrono::steady_clock::now() + FRAME_DURATION_MS;
+        auto frame_start_time = std::chrono::steady_clock::now();
+        auto frame_end_time = frame_start_time + FRAME_DURATION_MS;
         SDL_Event event;
 
         // Input
@@ -103,15 +103,12 @@ int main(int argc, char* args[]) {
         ai_system.handle_events(events);
         events.clear();
 
-
-
         // Gameplay
         ai_system.update();
         gameplay_system.update();
 
         // Physics
         physics_system.update();
-
 
         // Rendering
         rendering_system.update();
@@ -123,6 +120,13 @@ int main(int argc, char* args[]) {
 
         // Maintain a maximum frame rate of 60fps
         if ( game_is_running ) {
+            std::chrono::duration<double> diff =
+                std::chrono::steady_clock::now() - frame_end_time;
+
+            if (diff.count() > 0) {
+                std::cout << "Missed update by " << diff.count() << "s" << std::endl;
+            }
+
             std::this_thread::sleep_until( frame_end_time );
         }
 
