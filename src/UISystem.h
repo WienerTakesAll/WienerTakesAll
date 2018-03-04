@@ -27,6 +27,7 @@ private:
 
     void handle_load(const Event& e);
     void handle_key_press(const Event& e);
+	void handle_new_game_state(const Event& e);
 
     StartMenu start_menu_;
     SDL_Window* window_;

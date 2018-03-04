@@ -20,6 +20,10 @@ int GameObjectCounter::assign_id() const {
     return id_++;
 }
 
+void GameObjectCounter::reset_counter() const {
+	id_ = 0;
+}
+
 // GameObjectCounter destructor
 GameObjectCounter::~GameObjectCounter() {
     id_ = -1;

@@ -5,6 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include "GameState.h"
+
 namespace {
     const std::string STANDARD_SHADER_PATH = "assets/shaders/SimpleShader";
     const std::string SKYBOX_SHADER_PATH = "assets/shaders/SkyboxShader";
@@ -25,6 +27,8 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::ADD_VEHICLE, &RenderingSystem::handle_add_vehicle, this);
     EventSystem::add_event_handler(EventType::ADD_ARENA, &RenderingSystem::handle_add_terrain, this);
     EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
+	EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &RenderingSystem::handle_new_game_state, this);
+
 
     init_window();
 }
@@ -133,9 +137,23 @@ void RenderingSystem::handle_object_transform(const Event& e) {
     float qy = e.get_value<float>("qua_y", true).first;
     float qz = e.get_value<float>("qua_z", true).first;
 
+	if (example_objects_.size() <= object_id) return;
+
     example_objects_[object_id].set_transform(glm::translate(glm::mat4(), glm::vec3(x, y, z)));
     example_objects_[object_id].apply_transform(glm::toMat4(glm::quat(qw, qx, qy, qz)));
 }
+
+void RenderingSystem::handle_new_game_state(const Event& e) {
+	GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
+
+	if (new_game_state == GameState::END_GAME)
+	{
+		example_objects_.clear();
+		car_indices_.clear();
+	}
+}
+
+
 
 void RenderingSystem::render() {
     start_render();
@@ -233,7 +251,7 @@ void RenderingSystem::setup_cameras() {
         transform = example_objects_[car_indices_[i]].get_transform();
         glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
 
-        cameras_[i] = glm::translate(transform, glm::vec3(0, 3, -5));
+        cameras_[i] = glm::translate(transform, glm::vec3(0, 2.5, -7));
         cameras_[i] = P * glm::lookAt(glm::vec3(cameras_[i][3]), car_pos, glm::vec3(0, 1, 0));
     }
 }

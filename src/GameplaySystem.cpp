@@ -8,12 +8,15 @@
 
 GameplaySystem::GameplaySystem()
     : gameobject_counter_(GameObjectCounter::get_instance())
-    , current_game_state_(GameState::START_MENU) {
+    , current_game_state_(GameState::START_MENU)
+    , current_it_id_(-1) {
     add_event_handler(EventType::LOAD_EVENT, &GameplaySystem::handle_load, this);
     add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
     add_event_handler(EventType::NEW_GAME_STATE, &GameplaySystem::handle_new_game_state, this);
+    add_event_handler(EventType::ADD_VEHICLE, &GameplaySystem::handle_add_vehicle, this);
     add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &GameplaySystem::handle_object_transform_event, this);
     add_event_handler(EventType::VEHICLE_COLLISION, &GameplaySystem::handle_vehicle_collision, this);
+    add_event_handler(EventType::NEW_IT, &GameplaySystem::handle_new_it, this);
 
     EventSystem::queue_event(
         Event(
@@ -25,6 +28,17 @@ GameplaySystem::GameplaySystem()
 
 void GameplaySystem::update() {
     // Update game state here
+    if (should_update_score()) {
+        scoring_subsystem_.update();
+
+        EventSystem::queue_event(
+            Event(
+                EventType::UPDATE_SCORE,
+                "object_id", current_it_id_,
+                "score", scoring_subsystem_.get_current_it_score()
+            )
+        );
+    }
 }
 
 void GameplaySystem::handle_load(const Event& e) {
@@ -33,6 +47,8 @@ void GameplaySystem::handle_load(const Event& e) {
 
 void GameplaySystem::handle_new_game_state(const Event& e) {
     GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
+
+    scoring_subsystem_.set_new_game_state(new_game_state);
 
     if (new_game_state == GameState::IN_GAME) {
         int num_humans = e.get_value<int>("num_players", true).first;
@@ -101,6 +117,13 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
             )
         );
     }
+
+	else if (new_game_state == GameState::END_GAME) {
+		gameobject_counter_->reset_counter();
+	}
+
+
+
 
     current_game_state_ = new_game_state;
 }
@@ -235,6 +258,21 @@ void GameplaySystem::handle_key_press(const Event& e) {
     }
 }
 
+void GameplaySystem::handle_add_vehicle(const Event& e) {
+    std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
+    scoring_subsystem_.add_vehicle(object_id.first);
+
+    // Temporary, set first vehicle to be added as first it.
+    // Assumes first vehicle object_id = 0.
+    if (object_id.first == 0) {
+        EventSystem::queue_event(
+            Event(
+                EventType::NEW_IT,
+                "object_id", object_id.first
+            )
+        );
+    }
+}
 void GameplaySystem::handle_object_transform_event(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
     float x = e.get_value<float>("pos_x", true).first;
@@ -244,12 +282,20 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
     object_positions_[object_id] = {x, y, z};
 }
 
+void GameplaySystem::handle_new_it(const Event& e) {
+    int new_it_id = e.get_value<int>("object_id", true).first;
+    current_it_id_ = new_it_id;
+    scoring_subsystem_.set_new_it_id(new_it_id);
+}
+
 void GameplaySystem::handle_vehicle_collision(const Event& e) {
     int a_id = e.get_value<int>("a_id", true).first;
     int b_id = e.get_value<int>("b_id", true).first;
+    std::cout << a_id << " collided with " << b_id << std::endl;
 
     std::vector<float> a_pos = object_positions_[a_id];
     std::vector<float> b_pos = object_positions_[b_id];
+
 
 	std::vector<float> v_dir = { a_pos[0] - b_pos[0], a_pos[1] - b_pos[1], a_pos[2] - b_pos[2] };
 	float magnitude = std::sqrt(v_dir[0] * v_dir[0] + v_dir[1] * v_dir[1] + v_dir[2] * v_dir[2]);
@@ -258,7 +304,7 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
 	v_dir[1] /= magnitude;
 	v_dir[2] /= magnitude;
 
-
+    // Apply knockback
     EventSystem::queue_event(
         Event(
             EventType::OBJECT_APPLY_FORCE,
@@ -280,4 +326,27 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
             "z", -v_dir[2] * 10000
         )
     );
+
+    // Check for new it
+    int new_it = -1;
+
+    if (current_it_id_ == a_id) {
+        new_it = b_id;
+    } else if (current_it_id_ == b_id) {
+        new_it = a_id;
+    }
+
+    if (new_it != -1) {
+        EventSystem::queue_event(
+            Event(
+                EventType::NEW_IT,
+                "object_id", new_it
+            )
+        );
+    }
+}
+
+bool GameplaySystem::should_update_score() const {
+    return  current_game_state_ ==  GameState::IN_GAME  &&
+            current_it_id_      !=  -1;
 }
