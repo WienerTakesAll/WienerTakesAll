@@ -104,14 +104,12 @@ void AiSystem::path_to(int car, const glm::vec3& point_) {
 	int axis = std::min(SHRT_MAX, (int)(SHRT_MAX * (abs(angle)-0.05)));
 
 	if (angle < -0.05) {
-		axis = -axis;
-
 		EventSystem::queue_event(
 			Event(
 				EventType::KEYPRESS_EVENT,
 				"player_id", car,
 				"key", SDL_CONTROLLER_AXIS_LEFTX,
-				"value", axis
+				"value", -axis
 			)
 		);
 	}
@@ -145,11 +143,4 @@ void AiSystem::path_to(int car, const glm::vec3& point_) {
 	"value", SHRT_MAX
 	)
 	);
-
-
-	std::cout << "car " << car << " angle " << angle << " axis " << axis << std::endl;
-	std::cout << "diff1 " << vec2_to.x << " " << vec2_to.y << std::endl;
-	std::cout << "diff2 " << vec2_facing.x << " " << vec2_facing.y << std::endl;
-
-
 }
