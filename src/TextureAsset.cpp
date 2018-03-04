@@ -34,6 +34,18 @@ void TextureAsset::load(const std::string& file_path) {
     GLsizei p_height = surface->h;
 
     if (p_format.BytesPerPixel == 4) {
+
+#ifdef __APPLE__
+
+        for (size_t i = 0; i < p_width * p_height; i++) {
+            int pix = ((int*)(surface->pixels))[i];
+            ((int*)(surface->pixels))[i] = ((pix & 0xFF) << 16) | (pix & 0xFF00) | ((pix & 0xFF0000) >> 16) | (pix & 0xFF000000);
+        }
+
+#endif
+
+
+
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         gl_p_format = GL_RGBA;
