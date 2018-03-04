@@ -251,14 +251,22 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
     std::vector<float> a_pos = object_positions_[a_id];
     std::vector<float> b_pos = object_positions_[b_id];
 
+	std::vector<float> v_dir = { a_pos[0] - b_pos[0], a_pos[1] - b_pos[1], a_pos[2] - b_pos[2] };
+	float magnitude = std::sqrt(v_dir[0] * v_dir[0] + v_dir[1] * v_dir[1] + v_dir[2] * v_dir[2]);
+
+	v_dir[0] /= magnitude;
+	v_dir[1] /= magnitude;
+	v_dir[2] /= magnitude;
+
+
     EventSystem::queue_event(
         Event(
             EventType::OBJECT_APPLY_FORCE,
             "object_id", a_id,
             // TODO: Pass glm::vec3 in events
-            "x", a_pos[0] - b_pos[0] * 5000,
-            "y", 3000.f,
-            "z", a_pos[2] - b_pos[2] * 5000
+            "x", v_dir[0] * 10000,
+            "y", 10000.f,
+            "z", v_dir[2] * 10000
         )
     );
 
@@ -267,9 +275,9 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
             EventType::OBJECT_APPLY_FORCE,
             "object_id", b_id,
             // TODO: Pass glm::vec3 in events
-            "x", b_pos[0] - a_pos[0] * 5000,
-            "y", 3000.f,
-            "z", b_pos[2] - a_pos[2] * 5000
+            "x", -v_dir[0] * 10000,
+            "y", 10000.f,
+            "z", -v_dir[2] * 10000
         )
     );
 }

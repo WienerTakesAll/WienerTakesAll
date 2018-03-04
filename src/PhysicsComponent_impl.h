@@ -12,46 +12,16 @@ template <bool static_actor>
 PhysicsComponent<static_actor>::PhysicsComponent(unsigned int id)
     : valid_(false)
     , id_(id)
-    , g_actor_(nullptr) {
-}
-
-template <bool static_actor>
-PhysicsComponent<static_actor>::PhysicsComponent(const PhysicsComponent& that)
-    : valid_(that.is_valid())
-    , id_(that.get_id())
-    , g_material_(that.get_material())
-    , g_mesh_(that.get_mesh())
-    , g_mesh_geometry_(that.get_mesh_geometry())
-    , g_mesh_shape_(that.get_mesh_shape())
-    , g_actor_(that.get_actor())
-    , is_vehicle_(that.is_vehicle())
-    , g_drive_4w_(that.get_wheels()) {
-    if (g_actor_) {
-        g_actor_->userData = &id_;
-    }
-}
-
-template <bool static_actor>
-PhysicsComponent<static_actor>& PhysicsComponent<static_actor>::operator=(const PhysicsComponent& that) {
-    valid_ = that.is_valid();
-    id_ = that.get_id();
-    g_material_ = that.get_material();
-    g_mesh_ = that.get_mesh();
-    g_mesh_geometry_ = that.get_mesh_geometry();
-    g_mesh_shape_ = that.get_mesh_shape();
-    g_actor_ = that.get_actor();
-    is_vehicle_ = that.is_vehicle();
-    g_drive_4w_ = that.get_wheels();
-
-    if (g_actor_) {
-        g_actor_->userData = &id_;
-    }
-
-    return *this;
+    , g_actor_(nullptr)
+	, id_ptr_(nullptr) {
 }
 
 template <bool static_actor>
 PhysicsComponent<static_actor>::~PhysicsComponent() {
+	if (id_ptr_ != nullptr)
+	{
+		// delete id_ptr_;
+	}
 }
 
 template <bool static_actor>
@@ -70,12 +40,12 @@ physx::PxMaterial* PhysicsComponent<static_actor>::get_material() const {
 }
 
 template <bool static_actor>
-auto PhysicsComponent<static_actor>::get_mesh() const {
+typename PhysicsComponent<static_actor>::PxMeshType* PhysicsComponent<static_actor>::get_mesh() const {
     return g_mesh_;
 }
 
 template <bool static_actor>
-auto PhysicsComponent<static_actor>::get_mesh_geometry() const {
+typename PhysicsComponent<static_actor>::PxMeshGeometryType* PhysicsComponent<static_actor>::get_mesh_geometry() const {
     return g_mesh_geometry_;
 }
 
@@ -103,7 +73,13 @@ template <bool static_actor>
 void PhysicsComponent<static_actor>::set_actor(physx::PxRigidDynamic* actor) {
     std::cout << "set_actor id: " << id_ << std::endl;
     g_actor_ = actor;
-    g_actor_->userData = &id_;
+
+	if (id_ptr_ != nullptr) {
+		delete id_ptr_;
+	}
+	id_ptr_ = new int(id_);
+	g_actor_->userData = id_ptr_;
+
     std::cout << "set_actor g_actor_->userData: " << *(int*)g_actor_->userData << std::endl;
 }
 

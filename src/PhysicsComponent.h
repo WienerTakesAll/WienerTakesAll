@@ -13,15 +13,13 @@ public:
     using PxMeshGeometryType = typename std::conditional<static_actor, physx::PxTriangleMeshGeometry, physx::PxConvexMeshGeometry>::type;
 
     PhysicsComponent(unsigned int id);
-    PhysicsComponent(const PhysicsComponent& that);
-    PhysicsComponent& operator=(const PhysicsComponent& that);
     ~PhysicsComponent();
 
     bool is_valid() const;
     unsigned int get_id() const;
     physx::PxMaterial* get_material() const;
-    auto get_mesh() const;
-    auto get_mesh_geometry() const;
+	PxMeshType* get_mesh() const;
+	PxMeshGeometryType* get_mesh_geometry() const;
     physx::PxShape* get_mesh_shape() const;
     auto get_actor() const;
     bool is_vehicle() const;
@@ -59,6 +57,7 @@ private:
 
     bool valid_;
     unsigned int id_;
+	int* id_ptr_;
 
     physx::PxMaterial* g_material_;
     PxMeshType* g_mesh_;

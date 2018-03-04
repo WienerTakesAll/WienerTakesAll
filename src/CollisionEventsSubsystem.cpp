@@ -36,7 +36,10 @@ void CollisionEventsSubsystem::onContact(
 ) {
     int a_id = *(int*)pairHeader.actors[0]->userData;
     int b_id = *(int*)pairHeader.actors[1]->userData;
+
     collisions_.emplace_back(a_id, b_id);
+
+	std::cout << "car1: " << a_id << " car2: " << b_id << std::endl;
 }
 
 void CollisionEventsSubsystem::onTrigger(
