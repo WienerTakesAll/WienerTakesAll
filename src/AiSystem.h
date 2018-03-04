@@ -20,12 +20,8 @@ private:
     int num_ai_;
 
 	struct car_data {
-		struct car_transform_data {
-			glm::vec3 position_;
-			glm::quat rotation_;
-		};
-
-		car_transform_data car_transform_;
+		glm::vec3 position_;
+		glm::quat rotation_;
 	};
 
 
