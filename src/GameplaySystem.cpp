@@ -9,7 +9,8 @@
 GameplaySystem::GameplaySystem()
     : gameobject_counter_(GameObjectCounter::get_instance())
     , current_game_state_(GameState::START_MENU)
-    , current_it_id_(-1) {
+    , current_it_id_(-1)
+    , is_first_vehicle(true) {
     add_event_handler(EventType::LOAD_EVENT, &GameplaySystem::handle_load, this);
     add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
     add_event_handler(EventType::NEW_GAME_STATE, &GameplaySystem::handle_new_game_state, this);
@@ -256,9 +257,14 @@ void GameplaySystem::handle_add_vehicle(const Event& e) {
     scoring_subsystem_.add_vehicle(object_id.first);
 
     // Temporary, set first vehicle to be added as first it
-    if (current_it_id_ == -1) {
-        current_it_id_ = object_id.first;
-        scoring_subsystem_.set_new_it_id(current_it_id_);
+    if (current_it_id_ == -1 && is_first_vehicle) {
+        is_first_vehicle = false;
+        EventSystem::queue_event(
+            Event(
+                EventType::NEW_IT,
+                "object_id", object_id.first
+            )
+        );
     }
 }
 void GameplaySystem::handle_object_transform_event(const Event& e) {

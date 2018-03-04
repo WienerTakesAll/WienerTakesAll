@@ -25,6 +25,7 @@ private:
     bool should_update_score() const;
 
     int current_it_id_;
+    bool is_first_vehicle;
     std::map<int, std::vector<float>> object_locations_;
     GameObjectCounter* gameobject_counter_;
     GameState current_game_state_;
