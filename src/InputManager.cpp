@@ -197,6 +197,9 @@ bool InputManager::process_keyboard(const int& key, int& player_id) {
         case SDLK_RETURN:
             break;
 
+        case SDLK_ESCAPE:
+            break;
+
         default:
             is_key_mapped = false;
             std::cout << "UNMAPPED" << std::endl;

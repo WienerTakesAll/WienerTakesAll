@@ -28,7 +28,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -120,6 +120,7 @@
     <ClCompile Include="src\PhysicsSystemUtils.cpp" />
     <ClCompile Include="src\RenderingComponent.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
+    <ClCompile Include="src\ScoringSubsystem.cpp" />
     <ClCompile Include="src\SettingsSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderAsset.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="src\PhysicsSystemUtils.h" />
     <ClInclude Include="src\RenderingComponent.h" />
     <ClInclude Include="src\RenderingSystem.h" />
+    <ClInclude Include="src\ScoringSubsystem.h" />
     <ClInclude Include="src\SettingsSystem.h" />
     <ClInclude Include="src\SettingsSystem_impl.h" />
     <ClInclude Include="src\Shader.h" />
