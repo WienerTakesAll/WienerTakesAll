@@ -14,6 +14,7 @@ public:
     void set_origin(glm::vec2 origin);
     void render(glm::mat4 camera) const;
     void set_texture(TextureAsset* tex);
+    void scale(float factor);
 
     bool visible_;
 
