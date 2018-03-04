@@ -9,10 +9,13 @@
 
 namespace {
     const std::string STANDARD_SHADER_PATH = "assets/shaders/SimpleShader";
+    const std::string TEXTURE_SHADER_PATH = "assets/shaders/TextureShader";
     const std::string SKYBOX_SHADER_PATH = "assets/shaders/SkyboxShader";
     const std::string SHADOW_SHADER_PATH = "assets/shaders/ShadowShader";
-    const std::string CAR_MESH_PATH = "assets/models/carBoxModel.obj";
+    const std::string CAR_MESH_PATH = "assets/models/WienerCarModel.obj";
+    const std::string CAR_TEXTURE_PATH = "assets/textures/textureCar.png";
     const std::string TERRAIN_MESH_PATH = "assets/models/Arena.obj";
+    const std::string TERRAIN_TEXTURE_PATH = "assets/textures/texturePit.png";
     const std::string SKYBOX_MESH_PATH = "assets/models/Skybox.obj";
     const std::string SKYBOX_TEXTURE_PATH = "assets/textures/Sky.png";
 }
@@ -98,23 +101,24 @@ void RenderingSystem::handle_add_vehicle(const Event& e) {
     // Store car
     example_objects_.emplace_back();
     example_objects_[object_id.first].set_mesh(mesh);
-    example_objects_[object_id.first].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
+    example_objects_[object_id.first].set_shader(asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH));
+    example_objects_[object_id.first].set_texture(asset_manager_.get_texture_asset(CAR_TEXTURE_PATH));
     example_objects_[object_id.first].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
     example_objects_[object_id.first].set_has_shadows(true);
     car_indices_.push_back(object_id.first);
+
 }
 
 void RenderingSystem::handle_add_terrain(const Event& e) {
     // Load game object parameters
     int object_id = e.get_value<int>("object_id", true).first;
-
     MeshAsset* mesh = asset_manager_.get_mesh_asset(TERRAIN_MESH_PATH);
 
     // Store terrain
     example_objects_.emplace_back();
     example_objects_[object_id].set_mesh(mesh);
-    example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
-
+    example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH));
+    example_objects_[object_id].set_texture(asset_manager_.get_texture_asset(TERRAIN_TEXTURE_PATH));
 
     MeshAsset* skybox_mesh = asset_manager_.get_mesh_asset(SKYBOX_MESH_PATH);
     ShaderAsset* skybox_shader = asset_manager_.get_shader_asset(SKYBOX_SHADER_PATH);
@@ -176,7 +180,7 @@ void RenderingSystem::render() {
         }
 
         for (auto& object : example_objects_) {
-            object.render_lighting(cameras_[i], glm::vec3(-0.1f, -1.0f, 0.f), shadow_shader_);
+            //object.render_lighting(cameras_[i], glm::vec3(-0.1f, -1.0f, 0.f), shadow_shader_);
         }
 
 

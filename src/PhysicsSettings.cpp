@@ -17,7 +17,7 @@ PhysicsSettings::PhysicsSettings()
         5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
     }
 })
-, vehicle_mesh_asset_path("assets/models/carBoxModel.obj")
+, vehicle_mesh_asset_path("assets/models/WienerCarModel.obj")
 , vehicle_mass(1000.f)
 , arena_mesh("assets/models/Arena.obj")
 , arena_tire_friction(1.f) {
