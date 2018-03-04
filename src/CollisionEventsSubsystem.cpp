@@ -36,6 +36,7 @@ void CollisionEventsSubsystem::onContact(
 ) {
     int a_id = *(int*)pairHeader.actors[0]->userData;
     int b_id = *(int*)pairHeader.actors[1]->userData;
+
     collisions_.emplace_back(a_id, b_id);
 }
 

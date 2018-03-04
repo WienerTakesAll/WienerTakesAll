@@ -1,4 +1,6 @@
+#include <cmath>
 #include <iostream>
+#include <cmath>
 
 #include "SDL.h"
 
@@ -116,6 +118,25 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "num_ai", 4 - num_humans
             )
         );
+    } else if (new_game_state == GameState::START_MENU) {
+        gameobject_counter_->reset_counter();
+    }
+
+
+    else if (new_game_state == GameState::END_GAME) {
+
+        for (int i = 0; i < 4; ++i) {
+            EventSystem::queue_event(
+                Event(
+                    EventType::OBJECT_APPLY_FORCE,
+                    "object_id", i,
+                    // TODO: Pass glm::vec3 in events
+                    "x", 50000.f,
+                    "y", 200000.f,
+                    "z", 50000.f
+                )
+            );
+        }
     }
 
     current_game_state_ = new_game_state;
@@ -211,10 +232,11 @@ void GameplaySystem::handle_key_press(const Event& e) {
         }
 
         case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: {
+
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::FORWARD_DRIVE,
-                                    "value", (float)value / 32768);
+                                    "value", (float)value / (1.5f * 32768));
             break;
         }
 
@@ -227,10 +249,19 @@ void GameplaySystem::handle_key_press(const Event& e) {
         }
 
         case SDL_CONTROLLER_AXIS_LEFTX: {
+
+            if (std::abs(value) < 6000) {
+                value = 0;
+            } else if (value < 0) {
+                value += 5000;
+            } else {
+                value -= 5000;
+            }
+
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", (float)value / -32768);
+                                    "value", (float)(value) / -32768);
             break;
         }
 
@@ -238,7 +269,13 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::HAND_BRAKE,
-                                    "value", true);
+                                    "value", 1.f);
+            break;
+        }
+
+        case SDLK_ESCAPE: {
+            new_events.emplace_back(EventType::NEW_GAME_STATE,
+                                    "state", GameState::END_GAME);
             break;
         }
 
@@ -289,15 +326,23 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
     std::vector<float> a_pos = object_positions_[a_id];
     std::vector<float> b_pos = object_positions_[b_id];
 
+
+    std::vector<float> v_dir = { a_pos[0] - b_pos[0], a_pos[1] - b_pos[1], a_pos[2] - b_pos[2] };
+    float magnitude = std::sqrt(v_dir[0] * v_dir[0] + v_dir[1] * v_dir[1] + v_dir[2] * v_dir[2]);
+
+    v_dir[0] /= magnitude;
+    v_dir[1] /= magnitude;
+    v_dir[2] /= magnitude;
+
     // Apply knockback
     EventSystem::queue_event(
         Event(
             EventType::OBJECT_APPLY_FORCE,
             "object_id", a_id,
             // TODO: Pass glm::vec3 in events
-            "x", a_pos[0] - b_pos[0] * 5000,
-            "y", 3000.f,
-            "z", a_pos[2] - b_pos[2] * 5000
+            "x", v_dir[0] * 50000,
+            "y", 100000.f,
+            "z", v_dir[2] * 50000
         )
     );
 
@@ -306,9 +351,9 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
             EventType::OBJECT_APPLY_FORCE,
             "object_id", b_id,
             // TODO: Pass glm::vec3 in events
-            "x", b_pos[0] - a_pos[0] * 5000,
-            "y", 3000.f,
-            "z", b_pos[2] - a_pos[2] * 5000
+            "x", -v_dir[0] * 50000,
+            "y", 100000.f,
+            "z", -v_dir[2] * 50000
         )
     );
 

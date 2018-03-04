@@ -26,6 +26,8 @@ private:
     void handle_add_terrain(const Event& e);
     void handle_object_transform(const Event& e);
     void handle_new_it(const Event& e);
+    void handle_new_game_state(const Event& e);
+
 
     void start_render() const;
     void setup_cameras();

@@ -13,8 +13,6 @@ public:
     using PxMeshGeometryType = typename std::conditional<static_actor, physx::PxTriangleMeshGeometry, physx::PxConvexMeshGeometry>::type;
 
     PhysicsComponent(unsigned int id);
-    PhysicsComponent(const PhysicsComponent& that);
-    PhysicsComponent& operator=(const PhysicsComponent& that);
     ~PhysicsComponent();
 
     bool is_valid() const;
@@ -59,6 +57,7 @@ private:
 
     bool valid_;
     unsigned int id_;
+    int* id_ptr_;
 
     physx::PxMaterial* g_material_;
     PxMeshType* g_mesh_;
