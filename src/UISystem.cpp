@@ -13,6 +13,7 @@ UISystem::UISystem(AssetManager& asset_manager)
     , current_game_state_(GameState::START_MENU) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &UISystem::handle_load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &UISystem::handle_key_press, this);
+    EventSystem::add_event_handler(EventType::UPDATE_SCORE, &UISystem::handle_update_score, this);
 
     window_ = asset_manager.get_window();
 }
@@ -80,4 +81,11 @@ void UISystem::handle_key_press(const Event& e) {
                 break;
         }
     }
+}
+
+void UISystem::handle_update_score(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+    int score = e.get_value<int>("score", true).first;
+
+    gameplay_hud_.update_score(object_id, score);
 }
