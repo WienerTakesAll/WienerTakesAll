@@ -1,8 +1,10 @@
-#include "GameplayHud.h"
+#include <cmath>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "GameplayHud.h"
+
 namespace {
-    const float MAX_SCORE = 1000.0f;
+    const int MAX_SCORE = 1000;
 }
 
 GameplayHud::GameplayHud(AssetManager& asset_manager)
@@ -79,5 +81,11 @@ void GameplayHud::render() const {
 }
 
 void GameplayHud::update_score(const int& player, const int& score) {
-    scores_.at(player).scale(score / MAX_SCORE);
+    scores_.at(player).scale(std::min((float) score / MAX_SCORE, 1.0f));
+}
+
+void GameplayHud::reset_scores() {
+    for (auto& score : scores_) {
+        score.scale(0.0f);
+    }
 }

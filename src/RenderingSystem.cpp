@@ -156,7 +156,7 @@ void RenderingSystem::handle_object_transform(const Event& e) {
 void RenderingSystem::handle_new_it(const Event& e) {
     MeshAsset* bun_mesh = asset_manager_.get_mesh_asset(CAR_MESH_PATH);
     MeshAsset* dog_mesh = asset_manager_.get_mesh_asset(WEINER_MESH_PATH);
-    
+
     example_objects_[whos_it].set_mesh(bun_mesh);
 
     whos_it = e.get_value<int>("object_id", true).first;

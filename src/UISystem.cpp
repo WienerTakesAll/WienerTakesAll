@@ -24,7 +24,10 @@ void UISystem::render() const {
 
     if (current_game_state_ == GameState::START_MENU) {
         start_menu_.render();
-    } else if (current_game_state_ == GameState::IN_GAME) {
+    }
+
+    if (current_game_state_ == GameState::IN_GAME
+            || current_game_state_ == GameState::END_GAME ) {
         gameplay_hud_.render();
     }
 
@@ -126,6 +129,10 @@ void UISystem::handle_key_press(const Event& e) {
 
 void UISystem::handle_new_game_state(const Event& e) {
     GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
+
+    if (new_game_state == GameState::START_MENU) {
+        gameplay_hud_.reset_scores();
+    }
 
     current_game_state_ = new_game_state;
 }
