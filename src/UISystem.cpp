@@ -9,7 +9,8 @@ namespace {
 
 UISystem::UISystem(AssetManager& asset_manager)
     : start_menu_(asset_manager)
-    , current_game_state_(GameState::START_MENU) {
+    , current_game_state_(GameState::START_MENU)
+    , controller_buffer_(false) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &UISystem::handle_load, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &UISystem::handle_key_press, this);
     EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &UISystem::handle_new_game_state, this);
@@ -52,12 +53,13 @@ void UISystem::handle_key_press(const Event& e) {
     int key = e.get_value<int>("key", true).first;
     int value = e.get_value<int>("value", true).first;
 
-    if (value != SDL_KEYDOWN) {
+    if (value != SDL_KEYDOWN && value != SDL_CONTROLLERBUTTONDOWN && key != SDL_CONTROLLER_AXIS_LEFTY) {
         return;
     }
 
     if (current_game_state_ == GameState::START_MENU) {
         switch (key) {
+            case SDL_CONTROLLER_BUTTON_START:
             case SDLK_RETURN:
                 EventSystem::queue_event(
                     Event(
@@ -76,6 +78,28 @@ void UISystem::handle_key_press(const Event& e) {
             case SDLK_DOWN:
                 start_menu_.move_selection_down();
                 break;
+
+            case SDL_CONTROLLER_AXIS_LEFTY:
+
+                if (std::abs(value) < 10000) {
+                    controller_buffer_ = false;
+                    break;
+                } 
+                if (controller_buffer_) {
+                    break;
+                }
+
+
+                controller_buffer_ = true;
+
+                if (value > 0) {
+                    start_menu_.move_selection_down();
+                }
+                else {
+                    start_menu_.move_selection_up();
+                }
+                break;
+
         }
     }
 }
