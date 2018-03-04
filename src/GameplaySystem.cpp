@@ -256,9 +256,9 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
             EventType::OBJECT_APPLY_FORCE,
             "object_id", a_id,
             // TODO: Pass glm::vec3 in events
-            "x", a_pos[0] - b_pos[0] * 10000,
-            "y", 0000.f,
-            "z", a_pos[2] - b_pos[2] * 10000
+            "x", a_pos[0] - b_pos[0] * 5000,
+            "y", 3000.f,
+            "z", a_pos[2] - b_pos[2] * 5000
         )
     );
 
@@ -267,9 +267,9 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
             EventType::OBJECT_APPLY_FORCE,
             "object_id", b_id,
             // TODO: Pass glm::vec3 in events
-            "x", b_pos[0] - a_pos[0] * 10000,
-            "y", 0000.f,
-            "z", b_pos[2] - a_pos[2] * 10000
+            "x", b_pos[0] - a_pos[0] * 5000,
+            "y", 3000.f,
+            "z", b_pos[2] - a_pos[2] * 5000
         )
     );
 }
