@@ -164,7 +164,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
                 new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                         "index", player_id,
                                         "type", VehicleControlType::FORWARD_DRIVE,
-                                        "value", 0.5f);
+                                        "value", 0.8f);
                 new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                         "index", player_id,
                                         "type", VehicleControlType::BRAKE,
@@ -191,7 +191,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::BRAKE,
-                                    "value", 0.5f);
+                                    "value", 0.8f);
             break;
         }
 

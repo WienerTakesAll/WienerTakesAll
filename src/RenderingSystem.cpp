@@ -12,7 +12,8 @@ namespace {
     const std::string TEXTURE_SHADER_PATH = "assets/shaders/TextureShader";
     const std::string SKYBOX_SHADER_PATH = "assets/shaders/SkyboxShader";
     const std::string SHADOW_SHADER_PATH = "assets/shaders/ShadowShader";
-    const std::string CAR_MESH_PATH = "assets/models/WienerCarModel.obj";
+    const std::string CAR_MESH_PATH = "assets/models/NoWienerCarModel.obj";
+    const std::string WEINER_MESH_PATH = "assets/models/WienerCarModel.obj";
     const std::string CAR_TEXTURE_PATH = "assets/textures/textureCar.png";
     const std::string TERRAIN_MESH_PATH = "assets/models/Arena.obj";
     const std::string TERRAIN_TEXTURE_PATH = "assets/textures/texturePit.png";
@@ -21,7 +22,8 @@ namespace {
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
-    : asset_manager_(asset_manager) {
+    : asset_manager_(asset_manager)
+    , whos_it(0) {
     window_ = asset_manager.get_window();
 
 
@@ -30,6 +32,7 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::ADD_VEHICLE, &RenderingSystem::handle_add_vehicle, this);
     EventSystem::add_event_handler(EventType::ADD_ARENA, &RenderingSystem::handle_add_terrain, this);
     EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
+    EventSystem::add_event_handler(EventType::NEW_IT, &RenderingSystem::handle_new_it, this);
     EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &RenderingSystem::handle_new_game_state, this);
 
 
@@ -149,6 +152,19 @@ void RenderingSystem::handle_object_transform(const Event& e) {
     example_objects_[object_id].apply_transform(glm::toMat4(glm::quat(qw, qx, qy, qz)));
 }
 
+
+void RenderingSystem::handle_new_it(const Event& e) {
+    MeshAsset* bun_mesh = asset_manager_.get_mesh_asset(CAR_MESH_PATH);
+    MeshAsset* dog_mesh = asset_manager_.get_mesh_asset(WEINER_MESH_PATH);
+    
+    example_objects_[whos_it].set_mesh(bun_mesh);
+
+    whos_it = e.get_value<int>("object_id", true).first;
+
+    example_objects_[whos_it].set_mesh(dog_mesh);
+}
+
+
 void RenderingSystem::handle_new_game_state(const Event& e) {
     GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
 
@@ -157,7 +173,6 @@ void RenderingSystem::handle_new_game_state(const Event& e) {
         car_indices_.clear();
     }
 }
-
 
 
 void RenderingSystem::render() {

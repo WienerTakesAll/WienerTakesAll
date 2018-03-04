@@ -14,6 +14,7 @@ public:
 private:
     void handle_activate_ai(const Event& e);
     void handle_object_transform(const Event& e);
+    void handle_new_it(const Event& e);
 
     void path_to(int car, const glm::vec3& point_);
 

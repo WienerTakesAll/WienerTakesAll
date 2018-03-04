@@ -13,6 +13,7 @@ AiSystem::AiSystem()
     srand(time(NULL)); // AI uses randomness, so initialize random seed
     add_event_handler(EventType::ACTIVATE_AI, &AiSystem::handle_activate_ai, this);
     add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &AiSystem::handle_object_transform, this);
+    add_event_handler(EventType::NEW_IT, &AiSystem::handle_new_it, this);
 }
 
 void AiSystem::update() {
@@ -84,6 +85,10 @@ void AiSystem::handle_object_transform(const Event& e) {
 
     cars_[object_id].position_ = glm::vec3(x, 0, z);
     cars_[object_id].rotation_ = glm::quat(qw, qx, qy, qz);
+}
+
+void AiSystem::handle_new_it(const Event& e) {
+    whos_it_ = e.get_value<int>("object_id", true).first;
 }
 
 
