@@ -25,6 +25,10 @@ void ScoringSubsystem::update() {
 }
 
 void ScoringSubsystem::set_new_game_state(const GameState new_game_state) {
+    if (new_game_state == GameState::START_MENU) {
+        scores_.clear();
+    }
+
     game_state_ = new_game_state;
 }
 

@@ -11,6 +11,7 @@ public:
     void load();
     void render() const;
     void update_score(const int& player, const int& value);
+    void reset_scores();
 
 private:
     AssetManager& asset_manager_;
