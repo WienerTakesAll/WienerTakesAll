@@ -11,8 +11,8 @@
 namespace {
     const int SDL_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
-    const int SCREEN_WIDTH = 640;
-    const int SCREEN_HEIGHT = 480;
+    const int SCREEN_WIDTH = 1024;
+    const int SCREEN_HEIGHT = 720;
 }
 
 AssetManager::AssetManager() {
