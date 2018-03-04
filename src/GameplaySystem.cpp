@@ -272,7 +272,7 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
     float y = e.get_value<float>("pos_y", true).first;
     float z = e.get_value<float>("pos_z", true).first;
 
-    object_locations_[object_id] = {x, y, z};
+    object_positions_[object_id] = {x, y, z};
 }
 
 void GameplaySystem::handle_new_it(const Event& e) {
@@ -286,6 +286,33 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
     int b_id = e.get_value<int>("b_id", true).first;
     std::cout << a_id << " collided with " << b_id << std::endl;
 
+    std::vector<float> a_pos = object_positions_[a_id];
+    std::vector<float> b_pos = object_positions_[b_id];
+
+    // Apply knockback
+    EventSystem::queue_event(
+        Event(
+            EventType::OBJECT_APPLY_FORCE,
+            "object_id", a_id,
+            // TODO: Pass glm::vec3 in events
+            "x", a_pos[0] - b_pos[0] * 5000,
+            "y", 3000.f,
+            "z", a_pos[2] - b_pos[2] * 5000
+        )
+    );
+
+    EventSystem::queue_event(
+        Event(
+            EventType::OBJECT_APPLY_FORCE,
+            "object_id", b_id,
+            // TODO: Pass glm::vec3 in events
+            "x", b_pos[0] - a_pos[0] * 5000,
+            "y", 3000.f,
+            "z", b_pos[2] - a_pos[2] * 5000
+        )
+    );
+
+    // Check for new it
     int new_it = -1;
 
     if (current_it_id_ == a_id) {

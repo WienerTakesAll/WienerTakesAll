@@ -29,6 +29,7 @@ private:
     void handle_add_vehicle(const Event& e);
     void handle_add_arena(const Event& e);
     void handle_vehicle_control(const Event& e);
+    void handle_object_apply_force(const Event& e);
 
     void create_4w_vehicle(
         const physx::PxMaterial& material,
