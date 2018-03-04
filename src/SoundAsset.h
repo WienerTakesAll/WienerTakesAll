@@ -1,3 +1,3 @@
 #pragma once
 
-enum class SoundAsset {BEAT};
+enum class SoundAsset {BOING};
