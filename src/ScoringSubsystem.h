@@ -11,10 +11,11 @@ public:
     ScoringSubsystem();
     void add_vehicle(const int object_id);
     void update();
-    void handle_new_game_state(const GameState new_game_state);
+    void set_new_game_state(const GameState new_game_state);
+    void set_new_it_id(const int new_it_id);
 
 private:
+    int current_it_id_;
     GameState game_state_;
-    int current_it_;
     std::map<int, unsigned int> scores_;
 };

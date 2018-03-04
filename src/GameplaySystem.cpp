@@ -8,7 +8,8 @@
 
 GameplaySystem::GameplaySystem()
     : gameobject_counter_(GameObjectCounter::get_instance())
-    , current_game_state_(GameState::START_MENU) {
+    , current_game_state_(GameState::START_MENU)
+    , current_it_id_(-1) {
     add_event_handler(EventType::LOAD_EVENT, &GameplaySystem::handle_load, this);
     add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
     add_event_handler(EventType::NEW_GAME_STATE, &GameplaySystem::handle_new_game_state, this);
@@ -36,7 +37,7 @@ void GameplaySystem::handle_load(const Event& e) {
 void GameplaySystem::handle_new_game_state(const Event& e) {
     GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
 
-    scoring_subsystem_.handle_new_game_state(new_game_state);
+    scoring_subsystem_.set_new_game_state(new_game_state);
 
     if (new_game_state == GameState::IN_GAME) {
         int num_humans = e.get_value<int>("num_players", true).first;
@@ -242,6 +243,12 @@ void GameplaySystem::handle_key_press(const Event& e) {
 void GameplaySystem::handle_add_vehicle(const Event& e) {
     std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
     scoring_subsystem_.add_vehicle(object_id.first);
+
+    // Temporary, set first vehicle to be added as first it
+    if (current_it_id_ == -1) {
+        current_it_id_ = object_id.first;
+        scoring_subsystem_.set_new_it_id(current_it_id_);
+    }
 }
 void GameplaySystem::handle_object_transform_event(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
@@ -256,4 +263,12 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
     int a_id = e.get_value<int>("a_id", true).first;
     int b_id = e.get_value<int>("b_id", true).first;
     std::cout << a_id << " collided with " << b_id << std::endl;
+
+    if (current_it_id_ == a_id) {
+        current_it_id_ = b_id;
+        scoring_subsystem_.set_new_it_id(current_it_id_);
+    } else if (current_it_id_ == b_id) {
+        current_it_id_ = a_id;
+        scoring_subsystem_.set_new_it_id(current_it_id_);
+    }
 }
