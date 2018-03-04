@@ -13,6 +13,7 @@
 #include "PhysicsSystemUtils.h"
 #include "VehicleWheelQueryResults.h"
 #include "VehicleSceneQueryData.h"
+#include "GameState.h"
 
 PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, const PhysicsSettings& physics_settings)
     : g_foundation_(PxCreateFoundation(PX_FOUNDATION_VERSION, g_allocator_, g_error_callback_))
@@ -33,6 +34,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, const PhysicsSettings&
     EventSystem::add_event_handler(EventType::VEHICLE_CONTROL, &PhysicsSystem::handle_vehicle_control, this);
     EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &PhysicsSystem::handle_reload_settings, this);
     EventSystem::add_event_handler(EventType::OBJECT_APPLY_FORCE, &PhysicsSystem::handle_object_apply_force, this);
+    EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &PhysicsSystem::handle_new_game_state, this);
 
     // Setup Visual Debugger
     PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
@@ -312,6 +314,47 @@ void PhysicsSystem::handle_object_apply_force(const Event& e) {
         }
     }
 }
+
+
+void PhysicsSystem::handle_new_game_state(const Event& e) {
+    GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
+
+    if (new_game_state == GameState::START_MENU) {
+        for (auto& dynamic_object : dynamic_objects_) {
+            dynamic_object.get_actor()->release();
+        }
+
+        for (auto& static_object : static_objects_) {
+            static_object.get_actor()->release();
+        }
+
+        for (auto& wheels : vehicles_) {
+            wheels->release();
+        }
+
+        for (auto& control : vehicle_controls_) {
+            control.forward_drive = 0.f;
+            control.braking_force = 0.f;
+            control.hand_break = 0.f;
+            control.horizontal_drive = 0.f;
+        }
+
+        dynamic_objects_.clear();
+        static_objects_.clear();
+        vehicles_.clear();
+    }
+
+    if (new_game_state == GameState::END_GAME) {
+        for (auto& control : vehicle_controls_) {
+            control.forward_drive = 0.f;
+            control.braking_force = 0.f;
+            control.hand_break = 0.f;
+            control.horizontal_drive = 0.f;
+        }
+    }
+
+}
+
 
 void PhysicsSystem::create_4w_vehicle (
     const PxMaterial& material,
