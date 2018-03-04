@@ -13,9 +13,9 @@ public:
 
 private:
     void handle_activate_ai(const Event& e);
-	void handle_object_transform(const Event& e);
+    void handle_object_transform(const Event& e);
 
-	void path_to(int car, const glm::vec3& point_);
+    void path_to(int car, const glm::vec3& point_);
 
     int num_ai_;
 
@@ -24,8 +24,7 @@ private:
 		glm::quat rotation_;
 	};
 
-
-	std::array<car_data, 4> cars_;
-	unsigned int counter_;
+    std::array<car_data, 4> cars_;
+    unsigned int counter_;
     unsigned int whos_it_;
 };
