@@ -255,7 +255,8 @@ void GameplaySystem::handle_add_vehicle(const Event& e) {
     std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
     scoring_subsystem_.add_vehicle(object_id.first);
 
-    // Temporary, set first vehicle to be added as first it
+    // Temporary, set first vehicle to be added as first it.
+    // Assumes first vehicle object_id = 0.
     if (object_id.first == 0) {
         EventSystem::queue_event(
             Event(
