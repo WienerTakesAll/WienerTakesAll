@@ -199,9 +199,9 @@ void RenderingSystem::render() {
             object.render(cameras_[i], 0.3f);
         }
 
-        for (auto& object : example_objects_) {
-            //object.render_lighting(cameras_[i], glm::vec3(-0.1f, -1.0f, 0.f), shadow_shader_);
-        }
+        // for (auto& object : example_objects_) {
+        //     object.render_lighting(cameras_[i], glm::vec3(-0.1f, -1.0f, 0.f), shadow_shader_);
+        // }
 
 
         glEnable(GL_BLEND);
