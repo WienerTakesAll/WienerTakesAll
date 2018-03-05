@@ -24,12 +24,15 @@ void UISystem::render() const {
 
     if (current_game_state_ == GameState::START_MENU) {
         start_menu_.render();
+
     }
 
     if (current_game_state_ == GameState::IN_GAME
             || current_game_state_ == GameState::END_GAME ) {
         gameplay_hud_.render();
     }
+
+
 
     SDL_GL_SwapWindow(window_);
 
@@ -64,6 +67,7 @@ void UISystem::handle_key_press(const Event& e) {
 
     if (current_game_state_ == GameState::START_MENU) {
         switch (key) {
+            case SDL_CONTROLLER_BUTTON_A:
             case SDL_CONTROLLER_BUTTON_START:
             case SDLK_RETURN:
                 EventSystem::queue_event(
@@ -111,6 +115,8 @@ void UISystem::handle_key_press(const Event& e) {
 
     if (current_game_state_ == GameState::END_GAME) {
         switch (key) {
+            case SDL_CONTROLLER_BUTTON_A:
+            case SDL_CONTROLLER_BUTTON_START:
             case SDLK_RETURN:
                 EventSystem::queue_event(
                     Event(
