@@ -18,7 +18,7 @@ namespace {
     const std::string TERRAIN_MESH_PATH = "assets/models/Arena.obj";
     const std::string TERRAIN_TEXTURE_PATH = "assets/textures/texturePit.png";
     const std::string SKYBOX_MESH_PATH = "assets/models/Skybox.obj";
-    const std::string SKYBOX_TEXTURE_PATH = "assets/textures/Sky.png";
+    const std::string SKYBOX_TEXTURE_PATH = "assets/textures/park.png";
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
@@ -267,7 +267,7 @@ void RenderingSystem::start_render() const {
 }
 
 void RenderingSystem::setup_cameras() {
-    glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 400.0f);
+    glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 1000.0f);
 
     glm::mat4x4 transform;
 
