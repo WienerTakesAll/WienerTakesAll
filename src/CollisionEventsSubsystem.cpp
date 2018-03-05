@@ -2,6 +2,10 @@
 
 #include "CollisionEventsSubsystem.h"
 
+CollisionEventsSubsystem::CollisionEventsSubsystem()
+    : delay (0) {
+}
+
 std::vector<std::pair<int, int>> CollisionEventsSubsystem::consume_collisions() {
     if (--delay < 0) {
         delay = 0;
