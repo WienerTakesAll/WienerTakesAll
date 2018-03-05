@@ -47,8 +47,7 @@ void GameplaySystem::update() {
                     "score", score_value
                 )
             );
-        }
-        else {
+        } else {
             EventSystem::queue_event(
                 Event(
                     EventType::NEW_GAME_STATE,

@@ -3,8 +3,10 @@
 #include "CollisionEventsSubsystem.h"
 
 std::vector<std::pair<int, int>> CollisionEventsSubsystem::consume_collisions() {
-    if(--delay < 0) delay = 0;
-    
+    if (--delay < 0) {
+        delay = 0;
+    }
+
     auto ret = collisions_;
     collisions_.clear();
     return ret;
@@ -36,7 +38,10 @@ void CollisionEventsSubsystem::onContact(
     const physx::PxContactPair* pairs,
     physx::PxU32 nbPairs
 ) {
-    if (delay > 0) return;
+    if (delay > 0) {
+        return;
+    }
+
     delay = 10;
 
     int a_id = *(int*)pairHeader.actors[0]->userData;
