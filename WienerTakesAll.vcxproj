@@ -107,6 +107,7 @@
     <ClCompile Include="src\AssetManager.cpp" />
     <ClCompile Include="src\AudioSystem.cpp" />
     <ClCompile Include="src\CollisionEventsSubsystem.cpp" />
+    <ClCompile Include="src\EndGameScreen.cpp" />
     <ClCompile Include="src\Event.cpp" />
     <ClCompile Include="src\FrictionPairService.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
@@ -141,6 +142,7 @@
     <ClInclude Include="src\CarControlType.h" />
     <ClInclude Include="src\CollisionEventsSubsystem.h" />
     <ClInclude Include="src\CollisionFlags.h" />
+    <ClInclude Include="src\EndGameScreen.h" />
     <ClInclude Include="src\Event.h" />
     <ClInclude Include="src\EventSystem.h" />
     <ClInclude Include="src\EventSystem_impl.h" />
