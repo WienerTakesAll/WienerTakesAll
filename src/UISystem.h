@@ -13,6 +13,7 @@
 #include "GameState.h"
 #include "StartMenu.h"
 #include "GameplayHud.h"
+#include "EndGameScreen.h"
 
 class AssetManager;
 
@@ -34,6 +35,7 @@ private:
     AssetManager& asset_manager_;
     StartMenu start_menu_;
     GameplayHud gameplay_hud_;
+    EndGameScreen end_game_screen_;
     SDL_Window* window_;
     GameState current_game_state_;
 

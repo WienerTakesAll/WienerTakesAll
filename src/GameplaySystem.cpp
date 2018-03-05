@@ -51,7 +51,8 @@ void GameplaySystem::update() {
             EventSystem::queue_event(
                 Event(
                     EventType::NEW_GAME_STATE,
-                    "state", GameState::END_GAME
+                    "state", GameState::END_GAME,
+                    "winner", current_it_id_
                 )
             );
         }
