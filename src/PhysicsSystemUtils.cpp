@@ -162,7 +162,7 @@ PxVehicleChassisData create_chassis_data(
 
     // The origin is at the center of the chassis mesh.
     // Set the center of mass to be below this point and a little towards the front.
-    const PxVec3 CHASSIS_CM_OFFSET = PxVec3(0.0f, -CHASSIS_DIMS.y * 0.5f + .65f, 0.25f);
+    const PxVec3 CHASSIS_CM_OFFSET = PxVec3(0.0f, -CHASSIS_DIMS.y * 0.5f, 0.25f);
 
     // Now compute the chassis mass and moment of inertia.
     // Use the moment of inertia of a cuboid as an approximate value for the chassis moi.

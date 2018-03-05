@@ -7,6 +7,9 @@
 class CollisionEventsSubsystem : public physx::PxSimulationEventCallback {
 
 public:
+
+    CollisionEventsSubsystem();
+
     // clears all collisions after calling
     std::vector<std::pair<int, int>> consume_collisions();
 
