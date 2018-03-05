@@ -267,7 +267,7 @@ void RenderingSystem::start_render() const {
 }
 
 void RenderingSystem::setup_cameras() {
-    glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 200.0f);
+    glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 400.0f);
 
     glm::mat4x4 transform;
 
