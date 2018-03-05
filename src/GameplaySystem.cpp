@@ -291,7 +291,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
 
         case SDLK_ESCAPE: {
             new_events.emplace_back(EventType::NEW_GAME_STATE,
-                                    "state", GameState::END_GAME);
+                                    "state", GameState::START_MENU);
             break;
         }
 

@@ -34,10 +34,23 @@ void EndGameScreen::load() {
                       background_tex,
                       ui_shader_
                   );
+
+    TextureAsset* congratulations_tex =
+        asset_manager_.get_texture_asset("assets/textures/congratulations.png");
+    congratulations_ = UIObject( // cover screen
+                           glm::vec2(-1.f),
+                           glm::vec3(1.0f),
+                           glm::vec2(2.0f),
+                           square_mesh_,
+                           congratulations_tex,
+                           ui_shader_
+                       );
 }
 
 void EndGameScreen::set_winner(int winner_id) {
     crown_.visible_ = true;
+
+    congratulations_.visible_ = true;
 
     switch (winner_id) {
         case 0:
@@ -63,12 +76,14 @@ void EndGameScreen::set_winner(int winner_id) {
         default:
             crown_location_ = // not visible
                 glm::translate(glm::mat4(), glm::vec3(1000, 1000, 1000));
+            congratulations_.visible_ = false;
             break;
     }
 }
 
 void EndGameScreen::render() const {
     background_.render(glm::mat4());
+    congratulations_.render(glm::mat4());
     crown_.render(crown_location_);
 }
 
