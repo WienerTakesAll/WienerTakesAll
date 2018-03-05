@@ -23,6 +23,17 @@ void EndGameScreen::load() {
                  ui_shader_
              );
     crown_.visible_ = false;
+
+    TextureAsset* background_tex =
+        asset_manager_.get_texture_asset("assets/textures/greyed_out.png");
+    background_ = UIObject( // cover screen
+                      glm::vec2(-1.f),
+                      glm::vec3(1.0f),
+                      glm::vec2(2.0f),
+                      square_mesh_,
+                      background_tex,
+                      ui_shader_
+                  );
 }
 
 void EndGameScreen::set_winner(int winner_id) {
@@ -57,6 +68,7 @@ void EndGameScreen::set_winner(int winner_id) {
 }
 
 void EndGameScreen::render() const {
+    background_.render(glm::mat4());
     crown_.render(crown_location_);
 }
 

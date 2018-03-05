@@ -18,4 +18,5 @@ private:
 
     UIObject crown_;
     glm::mat4 crown_location_;
+    UIObject background_;
 };
