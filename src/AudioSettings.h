@@ -16,7 +16,8 @@ struct AudioSettings {
         {SoundAsset::PLAYER_1_HAS_THE_WIENER, "assets/audio/player_1_has_the_wiener.wav"},
         {SoundAsset::PLAYER_2_HAS_THE_WIENER, "assets/audio/player_2_has_the_wiener.wav"},
         {SoundAsset::PLAYER_3_HAS_THE_WIENER, "assets/audio/player_3_has_the_wiener.wav"},
-        {SoundAsset::PLAYER_4_HAS_THE_WIENER, "assets/audio/player_4_has_the_wiener.wav"}
+        {SoundAsset::PLAYER_4_HAS_THE_WIENER, "assets/audio/player_4_has_the_wiener.wav"},
+        {SoundAsset::CHEERING, "assets/audio/cheering.wav"}
     };
     // Information for loading music assets. First value is the key, second is the path.
     std::vector<std::pair<const MusicAsset, const std::string>> music_assets_info = {

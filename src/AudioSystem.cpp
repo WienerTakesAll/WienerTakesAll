@@ -169,6 +169,10 @@ void AudioSystem::handle_new_game_state(const Event& e) {
         case GameState::IN_GAME:
             play_music(MusicAsset::IN_GAME, true);
             break;
+
+        case GameState::END_GAME:
+            play_sound(SoundAsset::CHEERING);
+            break;
     }
 }
 
