@@ -10,6 +10,9 @@
 
 namespace {
     const int MAX_SCORE = 2500;
+    const int MAX_TRIGGER_VALUE = 32768;
+    const float DRIVE_SPEED = 0.8f;
+    const float BRAKE_SPEED = 0.8f;
 }
 
 GameplaySystem::GameplaySystem()
@@ -179,7 +182,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
                 new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                         "index", player_id,
                                         "type", VehicleControlType::FORWARD_DRIVE,
-                                        "value", 0.8f);
+                                        "value", DRIVE_SPEED);
                 new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                         "index", player_id,
                                         "type", VehicleControlType::BRAKE,
@@ -206,7 +209,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::BRAKE,
-                                    "value", 0.8f);
+                                    "value", BRAKE_SPEED);
             break;
         }
 
@@ -251,7 +254,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::FORWARD_DRIVE,
-                                    "value", (float)value / (1.5f * 32768));
+                                    "value", (float)value / MAX_TRIGGER_VALUE * DRIVE_SPEED);
             break;
         }
 
@@ -259,7 +262,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::BRAKE,
-                                    "value", (float)value / 32768);
+                                    "value", (float)value / MAX_TRIGGER_VALUE);
             break;
         }
 
@@ -276,7 +279,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", (float)(value) / -32768);
+                                    "value", (float)(value) / -MAX_TRIGGER_VALUE);
             break;
         }
 
