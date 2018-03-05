@@ -6,6 +6,7 @@ UISystem::UISystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager)
     , start_menu_(asset_manager)
     , gameplay_hud_(asset_manager)
+    , end_game_screen_(asset_manager)
     , current_game_state_(GameState::START_MENU)
     , controller_buffer_(false) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &UISystem::handle_load, this);
@@ -22,17 +23,20 @@ void UISystem::update() {
 void UISystem::render() const {
     start_render();
 
-    if (current_game_state_ == GameState::START_MENU) {
-        start_menu_.render();
+    switch (current_game_state_) {
+        case GameState::START_MENU:
+            start_menu_.render();
+            break;
 
+        case GameState::IN_GAME:
+            gameplay_hud_.render();
+            break;
+
+        case GameState::END_GAME:
+            gameplay_hud_.render();
+            end_game_screen_.render();
+            break;
     }
-
-    if (current_game_state_ == GameState::IN_GAME
-            || current_game_state_ == GameState::END_GAME ) {
-        gameplay_hud_.render();
-    }
-
-
 
     SDL_GL_SwapWindow(window_);
 
@@ -55,6 +59,7 @@ void UISystem::end_render() const {
 void UISystem::handle_load(const Event& e) {
     start_menu_.load();
     gameplay_hud_.load();
+    end_game_screen_.load();
 }
 
 void UISystem::handle_key_press(const Event& e) {
@@ -136,8 +141,19 @@ void UISystem::handle_key_press(const Event& e) {
 void UISystem::handle_new_game_state(const Event& e) {
     GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
 
-    if (new_game_state == GameState::START_MENU) {
-        gameplay_hud_.reset_scores();
+    switch (new_game_state) {
+        case GameState::START_MENU:
+            gameplay_hud_.reset_scores();
+            break;
+
+        case GameState::END_GAME:
+            if (e.get_value<int>("winner", false).second) {
+                int winner_id = e.get_value<int>("winner", false).first;
+                end_game_screen_.set_winner(winner_id);
+            } else {
+                end_game_screen_.set_winner(-1);
+            }
+
     }
 
     current_game_state_ = new_game_state;
