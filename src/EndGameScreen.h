@@ -8,7 +8,6 @@ public:
     EndGameScreen(AssetManager& asset_manager);
     void load();
     void set_winner(int winner_id);
-    void set_no_winner();
     void render() const;
 
 private:

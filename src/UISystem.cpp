@@ -151,7 +151,7 @@ void UISystem::handle_new_game_state(const Event& e) {
                 int winner_id = e.get_value<int>("winner", false).first;
                 end_game_screen_.set_winner(winner_id);
             } else {
-                end_game_screen_.set_no_winner();
+                end_game_screen_.set_winner(-1);
             }
 
     }

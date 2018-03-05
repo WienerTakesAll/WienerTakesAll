@@ -27,10 +27,33 @@ void EndGameScreen::load() {
 
 void EndGameScreen::set_winner(int winner_id) {
     crown_.visible_ = true;
-}
 
-void EndGameScreen::set_no_winner() {
-    set_winner(0); // TODO
+    switch (winner_id) {
+        case 0:
+            crown_location_ = // top left
+                glm::translate(glm::mat4(), glm::vec3(-0.8f, 0.6f, 0.f));
+            break;
+
+        case 1:
+            crown_location_ = // top right
+                glm::translate(glm::mat4(), glm::vec3(0.2f, 0.6f, 0.f));
+            break;
+
+        case 2:
+            crown_location_ = // bottom left
+                glm::translate(glm::mat4(), glm::vec3(-0.8f, -0.45f, 0.f));
+            break;
+
+        case 3:
+            crown_location_ = // bottom right
+                glm::translate(glm::mat4(), glm::vec3(0.2f, -0.45f, 0.f));
+            break;
+
+        default:
+            crown_location_ = // not visible
+                glm::translate(glm::mat4(), glm::vec3(1000, 1000, 1000));
+            break;
+    }
 }
 
 void EndGameScreen::render() const {
