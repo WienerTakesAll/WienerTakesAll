@@ -3,6 +3,11 @@
 ## Controls
 
 All controls can be controlled by an Xbox controller.
+
+- Right trigger to go forward
+- Left trigger to brake
+- Left stick to turn
+
 Alternatively, they can also be controlled by keyboard controls as well.
 
  - Player 1 WASD
