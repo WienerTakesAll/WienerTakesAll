@@ -1,5 +1,18 @@
 # WienerTakesAll
 
+## Controls
+
+All controls can be controlled by an Xbox controller.
+Alternatively, they can also be controlled by keyboard controls as well.
+
+ - Player 1 WASD
+ - Player 2 TFGH
+ - Player 3 IJKL
+ - Player 4 Arrow keys
+
+Menu selection on the keyboard is down with the enter key.
+Escape will end the game early.
+
 ## Compiling
 
 ### Linux
