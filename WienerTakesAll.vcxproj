@@ -111,6 +111,7 @@
     <ClCompile Include="src\FrictionPairService.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
     <ClCompile Include="src\GameObjectCounter.cpp" />
+    <ClCompile Include="src\GameplayHud.cpp" />
     <ClCompile Include="src\GameplaySystem.cpp" />
     <ClCompile Include="src\InputManager.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="src\FrictionPairService.h" />
     <ClInclude Include="src\GameObject.h" />
     <ClInclude Include="src\GameObjectCounter.h" />
+    <ClInclude Include="src\GameplayHud.h" />
     <ClInclude Include="src\GameplaySystem.h" />
     <ClInclude Include="src\GameState.h" />
     <ClInclude Include="src\InputManager.h" />

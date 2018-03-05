@@ -40,4 +40,6 @@ public:
 
 private:
     std::vector<std::pair<int, int>> collisions_;
+
+    int delay;
 };

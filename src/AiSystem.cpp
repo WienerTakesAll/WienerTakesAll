@@ -52,7 +52,7 @@ void AiSystem::update() {
                         EventType::KEYPRESS_EVENT,
                         "player_id", i,
                         "key", SDL_CONTROLLER_AXIS_TRIGGERRIGHT,
-                        "value", rand() % 32768
+                        "value", 32768
                     )
                 );
             }

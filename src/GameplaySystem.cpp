@@ -8,6 +8,10 @@
 #include "GameplaySystem.h"
 #include "VehicleControls.h"
 
+namespace {
+    const int MAX_SCORE = 2500;
+}
+
 GameplaySystem::GameplaySystem()
     : gameobject_counter_(GameObjectCounter::get_instance())
     , current_game_state_(GameState::START_MENU)
@@ -33,13 +37,25 @@ void GameplaySystem::update() {
     if (should_update_score()) {
         scoring_subsystem_.update();
 
-        EventSystem::queue_event(
-            Event(
-                EventType::UPDATE_SCORE,
-                "object_id", current_it_id_,
-                "score", scoring_subsystem_.get_current_it_score()
-            )
-        );
+        int score_value = scoring_subsystem_.get_current_it_score();
+
+        if (score_value < MAX_SCORE) {
+            EventSystem::queue_event(
+                Event(
+                    EventType::UPDATE_SCORE,
+                    "object_id", current_it_id_,
+                    "score", score_value
+                )
+            );
+        }
+        else {
+            EventSystem::queue_event(
+                Event(
+                    EventType::NEW_GAME_STATE,
+                    "state", GameState::END_GAME
+                )
+            );
+        }
     }
 }
 
