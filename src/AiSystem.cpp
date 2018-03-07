@@ -75,7 +75,7 @@ void AiSystem::handle_object_transform(const Event& e) {
     }
 
     float x = e.get_value<float>("pos_x", true).first;
-    float y = e.get_value<float>("pos_y", true).first;
+    // float y = e.get_value<float>("pos_y", true).first;
     float z = e.get_value<float>("pos_z", true).first;
 
     float qw = e.get_value<float>("qua_w", true).first;
