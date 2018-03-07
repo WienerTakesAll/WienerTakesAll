@@ -19,6 +19,8 @@ namespace {
     const std::string TERRAIN_TEXTURE_PATH = "assets/textures/texturePit.png";
     const std::string SKYBOX_MESH_PATH = "assets/models/Skybox.obj";
     const std::string SKYBOX_TEXTURE_PATH = "assets/textures/park.png";
+
+    const int CAMERA_LAG_FRAMES = 5; 
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
@@ -284,7 +286,7 @@ void RenderingSystem::setup_cameras() {
 
     cameras_queue_.push(new_cameras);
 
-    if (cameras_queue_.size() > 5) {
+    if (cameras_queue_.size() > CAMERA_LAG_FRAMES) {
         cameras_queue_.pop();
     }
 }
