@@ -146,6 +146,10 @@ void UISystem::handle_new_game_state(const Event& e) {
             gameplay_hud_.reset_scores();
             break;
 
+        case GameState::IN_GAME:
+            // do nothing
+            break;
+
         case GameState::END_GAME:
             if (e.get_value<int>("winner", false).second) {
                 int winner_id = e.get_value<int>("winner", false).first;
@@ -154,6 +158,7 @@ void UISystem::handle_new_game_state(const Event& e) {
                 end_game_screen_.set_winner(-1);
             }
 
+            break;
     }
 
     current_game_state_ = new_game_state;
