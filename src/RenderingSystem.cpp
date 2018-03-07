@@ -28,15 +28,12 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     , whos_it(0) {
     window_ = asset_manager.get_window();
 
-
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
-    EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
     EventSystem::add_event_handler(EventType::ADD_VEHICLE, &RenderingSystem::handle_add_vehicle, this);
     EventSystem::add_event_handler(EventType::ADD_ARENA, &RenderingSystem::handle_add_terrain, this);
     EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
     EventSystem::add_event_handler(EventType::NEW_IT, &RenderingSystem::handle_new_it, this);
     EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &RenderingSystem::handle_new_game_state, this);
-
 
     init_window();
 }
@@ -48,42 +45,6 @@ void RenderingSystem::load(const Event& e) {
     setup_cameras();
 
     shadow_shader_ = asset_manager_.get_shader_asset(SHADOW_SHADER_PATH);
-}
-
-void RenderingSystem::handle_key_press(const Event& e) {
-//     // function calls to get_value: param1= string:name, param2 = bool:crash_on_fail
-//     // pair.first == the int, pair.second == bool
-//     // std::pair<int, bool> player_id = e.get_value<int>("player_id", true);
-//     std::pair<int, bool> key = e.get_value<int>("key", true);
-//     // std::pair<int, bool> value = e.get_value<int>("value", true);
-
-//     glm::mat4 transform;
-
-//     switch (key.first) {
-//         case SDLK_a:
-//             //transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(0, 1, 0));
-//             break;
-
-//         case SDLK_d:
-//             //transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(0, 1, 0));
-//             break;
-
-//         case SDLK_w:
-//             //transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(1, 0, 0));
-//             break;
-
-//         case SDLK_s:
-//             //transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(1, 0, 0));
-//             break;
-
-//         default:
-//             break;
-//     }
-
-//     for (auto& cam : cameras_) {
-//         cam *= transform;
-//     }
-
 }
 
 void RenderingSystem::handle_add_vehicle(const Event& e) {
@@ -207,7 +168,6 @@ void RenderingSystem::render() {
         //     object.render_lighting(cameras[i], glm::vec3(-0.1f, -1.0f, 0.f), shadow_shader_);
         // }
 
-
         glEnable(GL_BLEND);
         glEnable(GL_CULL_FACE);
         glDepthFunc(GL_EQUAL);
@@ -276,6 +236,7 @@ void RenderingSystem::setup_cameras() {
 
     glm::mat4x4 transform;
 
+    // get camera setup for all 4 car's current positioning
     for (size_t i = 0; i < car_indices_.size(); i++) {
         transform = example_objects_[car_indices_[i]].get_transform();
         glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
@@ -289,9 +250,13 @@ void RenderingSystem::setup_cameras() {
         new_cameras[i] = P * glm::lookAt(glm::vec3(camera_position[3]), car_pos, glm::vec3(0, 1, 0));
     }
 
+    // push camera setup to back of queue
     cameras_queue_.push(new_cameras);
 
     if (cameras_queue_.size() > CAMERA_LAG_FRAMES) {
+        // ensure the camera setup is the camera setup of
+        // at most CAMERA_LAG_FRAMES ago
+        // i.e. in a normal case we will be rendering the cameras based on where the cars were 5 frames ago
         cameras_queue_.pop();
     }
 }

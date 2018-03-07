@@ -22,7 +22,6 @@ public:
 
 private:
     void load(const Event& e);
-    void handle_key_press(const Event& e);
     void handle_add_vehicle(const Event& e);
     void handle_add_terrain(const Event& e);
     void handle_object_transform(const Event& e);
@@ -40,7 +39,7 @@ private:
     GLuint vertex_array_id_;
     std::vector<RenderingComponent> example_objects_;
     std::vector<size_t> car_indices_;
-    // FIFO so camera is lagging behind actual car location
+    // FIFO array so the rendered camera lags behind the current car location
     std::queue<std::array<glm::mat4x4, 4>> cameras_queue_;
 
     AssetManager& asset_manager_;
