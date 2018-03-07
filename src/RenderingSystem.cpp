@@ -49,38 +49,38 @@ void RenderingSystem::load(const Event& e) {
 }
 
 void RenderingSystem::handle_key_press(const Event& e) {
-    // function calls to get_value: param1= string:name, param2 = bool:crash_on_fail
-    // pair.first == the int, pair.second == bool
-    // std::pair<int, bool> player_id = e.get_value<int>("player_id", true);
-    std::pair<int, bool> key = e.get_value<int>("key", true);
-    // std::pair<int, bool> value = e.get_value<int>("value", true);
+//     // function calls to get_value: param1= string:name, param2 = bool:crash_on_fail
+//     // pair.first == the int, pair.second == bool
+//     // std::pair<int, bool> player_id = e.get_value<int>("player_id", true);
+//     std::pair<int, bool> key = e.get_value<int>("key", true);
+//     // std::pair<int, bool> value = e.get_value<int>("value", true);
 
-    glm::mat4 transform;
+//     glm::mat4 transform;
 
-    switch (key.first) {
-        case SDLK_a:
-            //transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(0, 1, 0));
-            break;
+//     switch (key.first) {
+//         case SDLK_a:
+//             //transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(0, 1, 0));
+//             break;
 
-        case SDLK_d:
-            //transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(0, 1, 0));
-            break;
+//         case SDLK_d:
+//             //transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(0, 1, 0));
+//             break;
 
-        case SDLK_w:
-            //transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(1, 0, 0));
-            break;
+//         case SDLK_w:
+//             //transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(1, 0, 0));
+//             break;
 
-        case SDLK_s:
-            //transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(1, 0, 0));
-            break;
+//         case SDLK_s:
+//             //transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(1, 0, 0));
+//             break;
 
-        default:
-            break;
-    }
+//         default:
+//             break;
+//     }
 
-    for (auto& cam : cameras_) {
-        cam *= transform;
-    }
+//     for (auto& cam : cameras_) {
+//         cam *= transform;
+//     }
 
 }
 
@@ -179,7 +179,9 @@ void RenderingSystem::render() {
     start_render();
     setup_cameras();
 
-    for (size_t i = 0; i < cameras_.size(); i++) {
+    auto cameras = cameras_queue_.front();
+
+    for (size_t i = 0; i < cameras.size(); i++) {
         int window_w, window_h;
         SDL_GetWindowSize(asset_manager_.get_window(), &window_w, &window_h);
 
@@ -196,12 +198,12 @@ void RenderingSystem::render() {
         glCullFace(GL_BACK);
 
         for (auto& object : example_objects_) {
-            object.render(cameras_[i], 0.3f);
+            object.render(cameras[i], 0.3f);
         }
 
-        for (auto& object : example_objects_) {
-            //object.render_lighting(cameras_[i], glm::vec3(-0.1f, -1.0f, 0.f), shadow_shader_);
-        }
+        // for (auto& object : example_objects_) {
+        //     object.render_lighting(cameras[i], glm::vec3(-0.1f, -1.0f, 0.f), shadow_shader_);
+        // }
 
 
         glEnable(GL_BLEND);
@@ -218,7 +220,7 @@ void RenderingSystem::render() {
         glDepthMask(GL_FALSE);
 
         for (auto& object : example_objects_) {
-            object.render(cameras_[i], 0.f);
+            object.render(cameras[i], 0.f);
         }
 
         glDepthFunc(GL_LESS);
@@ -267,6 +269,7 @@ void RenderingSystem::start_render() const {
 }
 
 void RenderingSystem::setup_cameras() {
+    std::array<glm::mat4x4, 4> new_cameras;
     glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 1000.0f);
 
     glm::mat4x4 transform;
@@ -275,8 +278,14 @@ void RenderingSystem::setup_cameras() {
         transform = example_objects_[car_indices_[i]].get_transform();
         glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
 
-        cameras_[i] = glm::translate(transform, glm::vec3(0, 2.5, -7));
-        cameras_[i] = P * glm::lookAt(glm::vec3(cameras_[i][3]), car_pos, glm::vec3(0, 1, 0));
+        auto camera_position = glm::translate(transform, glm::vec3(0, 2.5, -7));
+        new_cameras[i] = P * glm::lookAt(glm::vec3(camera_position[3]), car_pos, glm::vec3(0, 1, 0));
+    }
+
+    cameras_queue_.push(new_cameras);
+
+    if (cameras_queue_.size() > 5) {
+        cameras_queue_.pop();
     }
 }
 
