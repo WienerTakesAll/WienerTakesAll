@@ -20,7 +20,7 @@ namespace {
     const std::string SKYBOX_MESH_PATH = "assets/models/Skybox.obj";
     const std::string SKYBOX_TEXTURE_PATH = "assets/textures/park.png";
 
-    const int CAMERA_LAG_FRAMES = 5; 
+    const int CAMERA_LAG_FRAMES = 5;
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
@@ -281,6 +281,11 @@ void RenderingSystem::setup_cameras() {
         glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
 
         auto camera_position = glm::translate(transform, glm::vec3(0, 2.5, -7));
+
+        if (camera_position[3].y < 1.5) {
+            camera_position[3].y = 1.5;
+        }
+
         new_cameras[i] = P * glm::lookAt(glm::vec3(camera_position[3]), car_pos, glm::vec3(0, 1, 0));
     }
 
