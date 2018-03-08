@@ -5,6 +5,7 @@
 UISystem::UISystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager)
     , start_menu_(asset_manager)
+    , loading_screen_(asset_manager)
     , gameplay_hud_(asset_manager)
     , end_game_screen_(asset_manager)
     , current_game_state_(GameState::START_MENU)
@@ -29,7 +30,7 @@ void UISystem::render() const {
             break;
 
         case GameState::IN_GAME:
-            gameplay_hud_.render();
+            loading_screen_.render();
             break;
 
         case GameState::END_GAME:
@@ -58,6 +59,7 @@ void UISystem::end_render() const {
 
 void UISystem::handle_load(const Event& e) {
     start_menu_.load();
+    loading_screen_.load();
     gameplay_hud_.load();
     end_game_screen_.load();
 }
@@ -147,8 +149,8 @@ void UISystem::handle_new_game_state(const Event& e) {
             break;
 
         case GameState::IN_GAME:
-            // do nothing
-            break;
+            loading_screen_.render();
+             break;
 
         case GameState::END_GAME:
             if (e.get_value<int>("winner", false).second) {

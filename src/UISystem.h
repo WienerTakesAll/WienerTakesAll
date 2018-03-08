@@ -12,6 +12,7 @@
 #include "MeshAsset.h"
 #include "GameState.h"
 #include "StartMenu.h"
+#include "LoadingScreen.h"
 #include "GameplayHud.h"
 #include "EndGameScreen.h"
 
@@ -31,9 +32,11 @@ private:
     void handle_key_press(const Event& e);
     void handle_new_game_state(const Event& e);
     void handle_update_score(const Event& e);
+    void handle_major_load_complete(const Event& e);
 
     AssetManager& asset_manager_;
     StartMenu start_menu_;
+    LoadingScreen loading_screen_;
     GameplayHud gameplay_hud_;
     EndGameScreen end_game_screen_;
     SDL_Window* window_;
