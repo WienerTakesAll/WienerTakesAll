@@ -35,6 +35,7 @@ private:
     void handle_major_load_complete(const Event& e);
 
     AssetManager& asset_manager_;
+    int loading_frames_counter_;
     StartMenu start_menu_;
     LoadingScreen loading_screen_;
     GameplayHud gameplay_hud_;

@@ -4,6 +4,7 @@
 
 UISystem::UISystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager)
+    , loading_frames_counter_(0)
     , start_menu_(asset_manager)
     , loading_screen_(asset_manager)
     , gameplay_hud_(asset_manager)
@@ -19,6 +20,9 @@ UISystem::UISystem(AssetManager& asset_manager)
 }
 
 void UISystem::update() {
+    if(loading_frames_counter_ < 4 && current_game_state_ == IN_GAME) {
+        loading_frames_counter_++;
+    }
 }
 
 void UISystem::render() const {
@@ -30,7 +34,12 @@ void UISystem::render() const {
             break;
 
         case GameState::IN_GAME:
-            loading_screen_.render();
+            if(loading_frames_counter_ < 3) {
+                // render loading screen for first 3 frames of in game
+                loading_screen_.render();
+            } else {
+                gameplay_hud_.render();
+            }
             break;
 
         case GameState::END_GAME:
@@ -84,7 +93,7 @@ void UISystem::handle_key_press(const Event& e) {
                         "num_players", start_menu_.selected_num_of_players()
                     )
                 );
-                current_game_state_ = GameState::IN_GAME;
+                loading_frames_counter_ = 0;
                 break;
 
             case SDLK_UP:
