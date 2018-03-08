@@ -19,6 +19,8 @@ namespace {
     const std::string TERRAIN_TEXTURE_PATH = "assets/textures/texturePit.png";
     const std::string SKYBOX_MESH_PATH = "assets/models/Skybox.obj";
     const std::string SKYBOX_TEXTURE_PATH = "assets/textures/park.png";
+
+    const int CAMERA_LAG_FRAMES = 5;
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
@@ -26,15 +28,12 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     , whos_it(0) {
     window_ = asset_manager.get_window();
 
-
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
-    EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_key_press, this);
     EventSystem::add_event_handler(EventType::ADD_VEHICLE, &RenderingSystem::handle_add_vehicle, this);
     EventSystem::add_event_handler(EventType::ADD_ARENA, &RenderingSystem::handle_add_terrain, this);
     EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
     EventSystem::add_event_handler(EventType::NEW_IT, &RenderingSystem::handle_new_it, this);
     EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &RenderingSystem::handle_new_game_state, this);
-
 
     init_window();
 }
@@ -46,42 +45,6 @@ void RenderingSystem::load(const Event& e) {
     setup_cameras();
 
     shadow_shader_ = asset_manager_.get_shader_asset(SHADOW_SHADER_PATH);
-}
-
-void RenderingSystem::handle_key_press(const Event& e) {
-    // function calls to get_value: param1= string:name, param2 = bool:crash_on_fail
-    // pair.first == the int, pair.second == bool
-    // std::pair<int, bool> player_id = e.get_value<int>("player_id", true);
-    std::pair<int, bool> key = e.get_value<int>("key", true);
-    // std::pair<int, bool> value = e.get_value<int>("value", true);
-
-    glm::mat4 transform;
-
-    switch (key.first) {
-        case SDLK_a:
-            //transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(0, 1, 0));
-            break;
-
-        case SDLK_d:
-            //transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(0, 1, 0));
-            break;
-
-        case SDLK_w:
-            //transform = glm::rotate(glm::mat4(), 0.1f, glm::vec3(1, 0, 0));
-            break;
-
-        case SDLK_s:
-            //transform = glm::rotate(glm::mat4(), -0.1f, glm::vec3(1, 0, 0));
-            break;
-
-        default:
-            break;
-    }
-
-    for (auto& cam : cameras_) {
-        cam *= transform;
-    }
-
 }
 
 void RenderingSystem::handle_add_vehicle(const Event& e) {
@@ -179,7 +142,9 @@ void RenderingSystem::render() {
     start_render();
     setup_cameras();
 
-    for (size_t i = 0; i < cameras_.size(); i++) {
+    auto cameras = cameras_queue_.front();
+
+    for (size_t i = 0; i < cameras.size(); i++) {
         int window_w, window_h;
         SDL_GetWindowSize(asset_manager_.get_window(), &window_w, &window_h);
 
@@ -196,13 +161,12 @@ void RenderingSystem::render() {
         glCullFace(GL_BACK);
 
         for (auto& object : example_objects_) {
-            object.render(cameras_[i], 0.3f);
+            object.render(cameras[i], 0.3f);
         }
 
         // for (auto& object : example_objects_) {
-        //     object.render_lighting(cameras_[i], glm::vec3(-0.1f, -1.0f, 0.f), shadow_shader_);
+        //     object.render_lighting(cameras[i], glm::vec3(-0.1f, -1.0f, 0.f), shadow_shader_);
         // }
-
 
         glEnable(GL_BLEND);
         glEnable(GL_CULL_FACE);
@@ -218,7 +182,7 @@ void RenderingSystem::render() {
         glDepthMask(GL_FALSE);
 
         for (auto& object : example_objects_) {
-            object.render(cameras_[i], 0.f);
+            object.render(cameras[i], 0.f);
         }
 
         glDepthFunc(GL_LESS);
@@ -268,16 +232,33 @@ void RenderingSystem::start_render() const {
 }
 
 void RenderingSystem::setup_cameras() {
+    std::array<glm::mat4x4, 4> new_cameras;
     glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 1000.0f);
 
     glm::mat4x4 transform;
 
+    // get camera setup for all 4 car's current positioning
     for (size_t i = 0; i < car_indices_.size(); i++) {
         transform = example_objects_[car_indices_[i]].get_transform();
         glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
 
-        cameras_[i] = glm::translate(transform, glm::vec3(0, 2.5, -7));
-        cameras_[i] = P * glm::lookAt(glm::vec3(cameras_[i][3]), car_pos, glm::vec3(0, 1, 0));
+        auto camera_position = glm::translate(transform, glm::vec3(0, 2.5, -7));
+
+        if (camera_position[3].y < 1.5) {
+            camera_position[3].y = 1.5;
+        }
+
+        new_cameras[i] = P * glm::lookAt(glm::vec3(camera_position[3]), car_pos, glm::vec3(0, 1, 0));
+    }
+
+    // push camera setup to back of queue
+    cameras_queue_.push(new_cameras);
+
+    if (cameras_queue_.size() > CAMERA_LAG_FRAMES) {
+        // ensure the camera setup is the camera setup of
+        // at most CAMERA_LAG_FRAMES ago
+        // i.e. in a normal case we will be rendering the cameras based on where the cars were 5 frames ago
+        cameras_queue_.pop();
     }
 }
 
