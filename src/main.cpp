@@ -82,7 +82,7 @@ int main(int argc, char* args[]) {
 
 
 
-        // Events
+        // Send Events
         input_manager.send_events(events);
         gameplay_system.send_events(events);
         physics_system.send_events(events);
@@ -91,31 +91,28 @@ int main(int argc, char* args[]) {
         ui_system.send_events(events);
         ai_system.send_events(events);
 
+        // Handle events
         input_manager.handle_events(events);
         gameplay_system.handle_events(events);
         physics_system.handle_events(events);
         rendering_system.handle_events(events);
         ui_system.handle_events(events);
-
-
         audio_system.handle_events(events);
         settings_system.handle_events(events);
         ai_system.handle_events(events);
+
+        // Clear events
         events.clear();
 
-        // Gameplay
+        // Update
         ai_system.update();
         gameplay_system.update();
-
-        // Physics
         physics_system.update();
-
-        // Rendering
         rendering_system.update();
-        rendering_system.render();
-
-        // UI
         ui_system.update();
+
+        // Render
+        rendering_system.render();
         ui_system.render();
 
         // Maintain a maximum frame rate of 60fps
