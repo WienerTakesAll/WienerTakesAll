@@ -4,7 +4,9 @@
 
 UISystem::UISystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager)
+    , loading_frames_counter_(0)
     , start_menu_(asset_manager)
+    , loading_screen_(asset_manager)
     , gameplay_hud_(asset_manager)
     , end_game_screen_(asset_manager)
     , current_game_state_(GameState::START_MENU)
@@ -18,6 +20,9 @@ UISystem::UISystem(AssetManager& asset_manager)
 }
 
 void UISystem::update() {
+    if(loading_frames_counter_ < 4 && current_game_state_ == IN_GAME) {
+        loading_frames_counter_++;
+    }
 }
 
 void UISystem::render() const {
@@ -29,7 +34,12 @@ void UISystem::render() const {
             break;
 
         case GameState::IN_GAME:
-            gameplay_hud_.render();
+            if(loading_frames_counter_ < 3) {
+                // render loading screen for first 3 frames of in game
+                loading_screen_.render();
+            } else {
+                gameplay_hud_.render();
+            }
             break;
 
         case GameState::END_GAME:
@@ -58,6 +68,7 @@ void UISystem::end_render() const {
 
 void UISystem::handle_load(const Event& e) {
     start_menu_.load();
+    loading_screen_.load();
     gameplay_hud_.load();
     end_game_screen_.load();
 }
@@ -82,7 +93,7 @@ void UISystem::handle_key_press(const Event& e) {
                         "num_players", start_menu_.selected_num_of_players()
                     )
                 );
-                current_game_state_ = GameState::IN_GAME;
+                loading_frames_counter_ = 0;
                 break;
 
             case SDLK_UP:
@@ -146,6 +157,10 @@ void UISystem::handle_new_game_state(const Event& e) {
             gameplay_hud_.reset_scores();
             break;
 
+        case GameState::IN_GAME:
+            loading_screen_.render();
+             break;
+
         case GameState::END_GAME:
             if (e.get_value<int>("winner", false).second) {
                 int winner_id = e.get_value<int>("winner", false).first;
@@ -154,6 +169,7 @@ void UISystem::handle_new_game_state(const Event& e) {
                 end_game_screen_.set_winner(-1);
             }
 
+            break;
     }
 
     current_game_state_ = new_game_state;

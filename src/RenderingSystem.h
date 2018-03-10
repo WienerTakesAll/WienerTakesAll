@@ -1,13 +1,14 @@
 #pragma once
 
-#include "EventSystem.h"
-#include "RenderingComponent.h"
-#include "ShaderAsset.h"
+#include <queue>
 
 #include "GL/glew.h"
 #include "SDL_opengl.h"
 #include "SDL.h"
 
+#include "EventSystem.h"
+#include "RenderingComponent.h"
+#include "ShaderAsset.h"
 #include "TextureAsset.h"
 
 class AssetManager;
@@ -21,7 +22,6 @@ public:
 
 private:
     void load(const Event& e);
-    void handle_key_press(const Event& e);
     void handle_add_vehicle(const Event& e);
     void handle_add_terrain(const Event& e);
     void handle_object_transform(const Event& e);
@@ -39,8 +39,8 @@ private:
     GLuint vertex_array_id_;
     std::vector<RenderingComponent> example_objects_;
     std::vector<size_t> car_indices_;
-    std::array<glm::mat4x4, 4> cameras_;
-
+    // FIFO array so the rendered camera lags behind the current car location
+    std::queue<std::array<glm::mat4x4, 4>> cameras_queue_;
 
     AssetManager& asset_manager_;
     ShaderAsset* shadow_shader_;

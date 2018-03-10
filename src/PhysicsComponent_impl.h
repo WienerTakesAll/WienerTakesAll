@@ -12,8 +12,8 @@ template <bool static_actor>
 PhysicsComponent<static_actor>::PhysicsComponent(unsigned int id)
     : valid_(false)
     , id_(id)
-    , g_actor_(nullptr)
-    , id_ptr_(nullptr) {
+    , id_ptr_(nullptr)
+    , g_actor_(nullptr) {
 }
 
 template <bool static_actor>
