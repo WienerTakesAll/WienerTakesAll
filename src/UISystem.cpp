@@ -20,7 +20,7 @@ UISystem::UISystem(AssetManager& asset_manager)
 }
 
 void UISystem::update() {
-    if(loading_frames_counter_ < 4 && current_game_state_ == IN_GAME) {
+    if (loading_frames_counter_ < 4 && current_game_state_ == IN_GAME) {
         loading_frames_counter_++;
     }
 }
@@ -34,12 +34,13 @@ void UISystem::render() const {
             break;
 
         case GameState::IN_GAME:
-            if(loading_frames_counter_ < 3) {
+            if (loading_frames_counter_ < 3) {
                 // render loading screen for first 3 frames of in game
                 loading_screen_.render();
             } else {
                 gameplay_hud_.render();
             }
+
             break;
 
         case GameState::END_GAME:
@@ -159,7 +160,7 @@ void UISystem::handle_new_game_state(const Event& e) {
 
         case GameState::IN_GAME:
             loading_screen_.render();
-             break;
+            break;
 
         case GameState::END_GAME:
             if (e.get_value<int>("winner", false).second) {
