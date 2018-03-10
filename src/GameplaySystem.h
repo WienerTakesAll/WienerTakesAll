@@ -24,9 +24,10 @@ private:
 
     bool should_update_score() const;
 
-    int current_it_id_;
-    std::map<int, std::vector<float>> object_positions_;
     GameObjectCounter* gameobject_counter_;
     GameState current_game_state_;
+    int current_it_id_;
+
+    std::map<int, std::vector<float>> object_positions_;
     ScoringSubsystem scoring_subsystem_;
 };

@@ -115,6 +115,7 @@
     <ClCompile Include="src\GameplayHud.cpp" />
     <ClCompile Include="src\GameplaySystem.cpp" />
     <ClCompile Include="src\InputManager.cpp" />
+    <ClCompile Include="src\LoadingScreen.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PhysicsComponent.cpp" />
     <ClCompile Include="src\PhysicsSettings.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="src\GameState.h" />
     <ClInclude Include="src\InputManager.h" />
     <ClInclude Include="src\InputSettings.h" />
+    <ClInclude Include="src\LoadingScreen.h" />
     <ClInclude Include="src\MeshAsset.h" />
     <ClInclude Include="src\MeshStuff.h" />
     <ClInclude Include="src\MusicAsset.h" />
