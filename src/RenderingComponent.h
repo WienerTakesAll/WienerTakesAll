@@ -25,11 +25,13 @@ public:
     const glm::mat4x4& get_transform() const;
 
     void set_mesh(MeshAsset* mesh);
+	void set_shadow_mesh(MeshAsset* shadow_mesh);
     void set_texture(TextureAsset* texture);
     void set_shader(ShaderAsset* shader);
 
 private:
     void setupBuffer();
+	void setupShadowBuffer();
 
     std::vector<GLuint> gl_vertex_buffers_;
     std::vector<GLuint> gl_index_buffers_;
@@ -40,6 +42,7 @@ private:
 
     glm::mat4 transform_matrix_;
     MeshAsset* mesh_;
+	MeshAsset* shadow_mesh_;
     TextureAsset* texture_;
     ShaderAsset* shader_;
     bool has_shadows_;
