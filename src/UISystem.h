@@ -33,6 +33,7 @@ private:
     void handle_new_game_state(const Event& e);
     void handle_update_score(const Event& e);
     void handle_major_load_complete(const Event& e);
+    void handle_vector_to_leader(const Event& e);
 
     AssetManager& asset_manager_;
     int loading_frames_counter_;
