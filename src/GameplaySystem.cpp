@@ -329,6 +329,17 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
     float z = e.get_value<float>("pos_z", true).first;
 
     object_positions_[object_id] = {x, y, z};
+
+    const std::vector<float>& leader_pos = object_positions_[current_it_id_];
+    EventSystem::queue_event(
+        Event(
+            EventType::VECTOR_TO_LEADER,
+            "object_id", object_id,
+            "x", leader_pos[0] - x,
+            "y", leader_pos[1] - y,
+            "z", leader_pos[2] - z
+        )
+    );
 }
 
 void GameplaySystem::handle_new_it(const Event& e) {
