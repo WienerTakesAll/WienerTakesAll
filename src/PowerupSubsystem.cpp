@@ -24,14 +24,15 @@ void PowerupSubsystem::set_new_game_state(const GameState new_game_state) {
     game_state_ = new_game_state;
 }
 
-void PowerupSubsystem::create_powerup(const int object_id, const PowerupType type) {
+void PowerupSubsystem::create_powerup(const int object_id, const PowerupType type, glm::vec3 pos) {
     powerup_id_ = object_id;
     powerup_type_ = type;
+    powerup_pos_ = pos;
 }
 
 PowerupType PowerupSubsystem::get_next_powerup_type() const {
     // Random powerup type
-    PowerupType new_type = static_cast<PowerupType>(rand() % (int) PowerupType::POWERUP_TYPE_COUNT);
+    PowerupType new_type = static_cast<PowerupType>(rand() % (int) PowerupType::NONE);
     return new_type;
 }
 

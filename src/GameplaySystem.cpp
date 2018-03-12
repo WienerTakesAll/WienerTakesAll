@@ -364,7 +364,12 @@ void GameplaySystem::handle_add_powerup(const Event& e) {
     int powerup_id = e.get_value<int>("object_id", true).first;
     PowerupType new_type = (PowerupType) e.get_value<int>("type", true).first;
 
-    powerup_subsystem_.create_powerup(powerup_id, new_type);
+    float x = e.get_value<float>("pos_x", true).first;
+    float y = e.get_value<float>("pos_y", true).first;
+    float z = e.get_value<float>("pos_z", true).first;
+    glm::vec3 pos = glm::vec3(x, y, z);
+
+    powerup_subsystem_.create_powerup(powerup_id, new_type, pos);
 }
 
 void GameplaySystem::handle_vehicle_collision(const Event& e) {
