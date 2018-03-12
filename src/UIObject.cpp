@@ -4,11 +4,18 @@
 
 #include "UIObject.h"
 
-UIObject::UIObject(glm::vec2 origin, glm::vec3 colour, glm::vec2 size, MeshAsset* mesh, TextureAsset* tex, ShaderAsset* shader)
+UIObject::UIObject(
+    glm::vec2 origin,
+    glm::vec3 colour,
+    glm::vec2 size,
+    MeshAsset* mesh,
+    TextureAsset* tex,
+    ShaderAsset* shader
+)
     : visible_(true)
-    , size_(size)
     , origin_(origin)
     , colour_(colour)
+    , size_(size)
     , render_component_() {
     render_component_.set_mesh(mesh);
     render_component_.set_texture(tex);

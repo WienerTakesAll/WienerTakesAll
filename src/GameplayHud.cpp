@@ -70,6 +70,29 @@ void GameplayHud::load() {
     for (auto& score : scores_) {
         score.scale(0.0f);
     }
+
+    float pointer_size_x = 0.16f;
+    float pointer_size_y = 0.22f;
+    std::array<glm::vec2, 4> player_screen_centers = {
+        glm::vec2(-0.5f - pointer_size_x / 2.f, 0.5f - pointer_size_y / 2.f),
+        glm::vec2(0.5f - pointer_size_x / 2.f, 0.5f - pointer_size_y / 2.f),
+        glm::vec2(-0.5f - pointer_size_x / 2.f, -0.5f - pointer_size_y / 2.f),
+        glm::vec2(0.5f - pointer_size_x / 2.f, -0.5f - pointer_size_y / 2)
+    };
+
+
+    for (int i = 0; i < leader_pointers_.size(); i++) {
+        TextureAsset* pointer_tex = asset_manager_.get_texture_asset("assets/textures/logo.png");
+        leader_pointers_[i] = UIObject(
+                                  player_screen_centers[i],
+                                  glm::vec3(1.0f),
+                                  glm::vec2(0.16f, 0.22f),
+                                  square_mesh_,
+                                  pointer_tex,
+                                  ui_shader_
+                              );
+    }
+
 }
 
 void GameplayHud::render() const {
@@ -77,6 +100,10 @@ void GameplayHud::render() const {
 
     for (auto& score : scores_) {
         score.render(glm::mat4());
+    }
+
+    for (int i = 0; i < leader_pointers_.size(); i++) {
+        leader_pointers_[i].render(leader_pointer_positions_[i]);
     }
 }
 
@@ -89,3 +116,32 @@ void GameplayHud::reset_scores() {
         score.scale(0.0f);
     }
 }
+
+void GameplayHud::update_leader_pointer(int player_id, std::array<float, 3> vector_to_leader) {
+    glm::vec2 origin_translate = glm::normalize(glm::vec2(vector_to_leader[0], vector_to_leader[2]));
+    std::cout << "position vector " << player_id  << ": "
+              << origin_translate[0] << " "
+              << origin_translate[1] << " " << std::endl;
+    leader_pointer_positions_[player_id] =
+        glm::translate(glm::mat4(), glm::vec3(origin_translate[0] / -4.f, origin_translate[1] / 4.f, 0.f));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

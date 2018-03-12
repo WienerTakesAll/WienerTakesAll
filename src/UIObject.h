@@ -26,8 +26,8 @@ public:
     bool visible_;
 
 private:
-    glm::vec2 size_;
     glm::vec2 origin_;
     glm::vec3 colour_;
+    glm::vec2 size_;
     RenderingComponent render_component_;
 };

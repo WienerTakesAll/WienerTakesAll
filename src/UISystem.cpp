@@ -190,4 +190,6 @@ void UISystem::handle_vector_to_leader(const Event& e) {
     float x = e.get_value<float>("x", true).first;
     float y = e.get_value<float>("y", true).first;
     float z = e.get_value<float>("z", true).first;
+
+    gameplay_hud_.update_leader_pointer(object_id, {x, y, z});
 }
