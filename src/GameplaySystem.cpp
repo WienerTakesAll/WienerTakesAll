@@ -3,6 +3,8 @@
 #include <cmath>
 
 #include "SDL.h"
+#include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #include "GameObjectCounter.h"
 #include "GameplaySystem.h"
@@ -327,17 +329,30 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
     float x = e.get_value<float>("pos_x", true).first;
     float y = e.get_value<float>("pos_y", true).first;
     float z = e.get_value<float>("pos_z", true).first;
+    float qw = e.get_value<float>("qua_w", true).first;
+    float qx = e.get_value<float>("qua_x", true).first;
+    float qy = e.get_value<float>("qua_y", true).first;
+    float qz = e.get_value<float>("qua_z", true).first;
 
     object_positions_[object_id] = {x, y, z};
 
-    const std::vector<float>& leader_pos = object_positions_[current_it_id_];
+    glm::vec3 it_pos = glm::vec3(
+                           object_positions_[current_it_id_][0],
+                           object_positions_[current_it_id_][1],
+                           object_positions_[current_it_id_][2]
+                       );
+
+    glm::vec3 vec_to = glm::normalize(glm::vec3(it_pos - glm::vec3(x, y, z)));
+    glm::mat4 rot_matrix = glm::toMat4(glm::quat(qw, qx, qy, qz));
+    glm::vec4 vec_to_it = glm::vec4(vec_to, 0.f) * rot_matrix;
+
     EventSystem::queue_event(
         Event(
-            EventType::VECTOR_TO_LEADER,
+            EventType::VECTOR_TO_IT,
             "object_id", object_id,
-            "x", leader_pos[0] - x,
-            "y", leader_pos[1] - y,
-            "z", leader_pos[2] - z
+            "x", vec_to_it[0],
+            "y", vec_to_it[1],
+            "z", vec_to_it[2]
         )
     );
 }

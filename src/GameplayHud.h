@@ -12,7 +12,7 @@ public:
     void render() const;
     void update_score(const int& player, const int& value);
     void reset_scores();
-    void update_leader_pointer(int player_id, std::array<float, 3> vector_to_leader);
+    void update_it_pointer(int player_id, glm::vec3 vector_to_it);
 
 private:
     AssetManager& asset_manager_;

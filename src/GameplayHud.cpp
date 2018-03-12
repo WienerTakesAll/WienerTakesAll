@@ -117,8 +117,8 @@ void GameplayHud::reset_scores() {
     }
 }
 
-void GameplayHud::update_leader_pointer(int player_id, std::array<float, 3> vector_to_leader) {
-    glm::vec2 origin_translate = glm::normalize(glm::vec2(vector_to_leader[0], vector_to_leader[2]));
+void GameplayHud::update_it_pointer(int player_id, glm::vec3 vector_to_it) {
+    glm::vec2 origin_translate = glm::normalize(glm::vec2(vector_to_it.x, vector_to_it.z));
     std::cout << "position vector " << player_id  << ": "
               << origin_translate[0] << " "
               << origin_translate[1] << " " << std::endl;

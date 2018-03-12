@@ -19,7 +19,7 @@ enum class EventType {
     ACTIVATE_AI,
     UPDATE_SCORE,
     NEW_IT,
-    VECTOR_TO_LEADER,
+    VECTOR_TO_IT,
 
     // Keep at end of list
     EVENT_COUNT
