@@ -4,6 +4,7 @@
 
 #include "EventSystem.h"
 #include "GameState.h"
+#include "PowerupSubsystem.h"
 #include "ScoringSubsystem.h"
 
 class GameObjectCounter;
@@ -21,6 +22,7 @@ private:
     void handle_new_it(const Event& e);
     void handle_object_transform_event(const Event& e);
     void handle_vehicle_collision(const Event& e);
+    void handle_add_powerup(const Event& e);
 
     bool should_update_score() const;
 
@@ -29,5 +31,6 @@ private:
     int current_it_id_;
 
     std::map<int, std::vector<float>> object_positions_;
+    PowerupSubsystem powerup_subsystem_;
     ScoringSubsystem scoring_subsystem_;
 };

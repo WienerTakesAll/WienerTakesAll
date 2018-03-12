@@ -19,6 +19,8 @@ enum class EventType {
     ACTIVATE_AI,
     UPDATE_SCORE,
     NEW_IT,
+    ADD_SKYBOX,
+    ADD_POWERUP,
 
     // Keep at end of list
     EVENT_COUNT

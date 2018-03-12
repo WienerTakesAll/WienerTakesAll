@@ -26,6 +26,7 @@ GameplaySystem::GameplaySystem()
     add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &GameplaySystem::handle_object_transform_event, this);
     add_event_handler(EventType::VEHICLE_COLLISION, &GameplaySystem::handle_vehicle_collision, this);
     add_event_handler(EventType::NEW_IT, &GameplaySystem::handle_new_it, this);
+    add_event_handler(EventType::ADD_POWERUP, &GameplaySystem::handle_add_powerup, this);
 
     EventSystem::queue_event(
         Event(
@@ -63,12 +64,13 @@ void GameplaySystem::update() {
 }
 
 void GameplaySystem::handle_load(const Event& e) {
-
+    powerup_subsystem_.load();
 }
 
 void GameplaySystem::handle_new_game_state(const Event& e) {
     GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
 
+    powerup_subsystem_.set_new_game_state(new_game_state);
     scoring_subsystem_.set_new_game_state(new_game_state);
 
     if (new_game_state == GameState::IN_GAME) {
@@ -130,13 +132,34 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
             )
         );
 
-        // Terrain
+        // Skybox
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_SKYBOX,
+                "object_id", gameobject_counter_->assign_id()
+            )
+        );
+
+        // AI
         EventSystem::queue_event(
             Event(
                 EventType::ACTIVATE_AI,
                 "num_ai", 4 - num_humans
             )
         );
+
+        // Powerup
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_POWERUP,
+                "object_id", gameobject_counter_->assign_id(),
+                "type", static_cast<int>(powerup_subsystem_.get_next_powerup_type()),
+                "pos_x", 0.0f,
+                "pos_y", 1.5f,
+                "pos_z", 2.0f
+            )
+        );
+
     } else if (new_game_state == GameState::START_MENU) {
         gameobject_counter_->reset_counter();
     }
@@ -335,6 +358,13 @@ void GameplaySystem::handle_new_it(const Event& e) {
     int new_it_id = e.get_value<int>("object_id", true).first;
     current_it_id_ = new_it_id;
     scoring_subsystem_.set_new_it_id(new_it_id);
+}
+
+void GameplaySystem::handle_add_powerup(const Event& e) {
+    int powerup_id = e.get_value<int>("object_id", true).first;
+    PowerupType new_type = (PowerupType) e.get_value<int>("type", true).first;
+
+    powerup_subsystem_.create_powerup(powerup_id, new_type);
 }
 
 void GameplaySystem::handle_vehicle_collision(const Event& e) {

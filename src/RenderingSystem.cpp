@@ -6,6 +6,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "GameState.h"
+#include "Powerup.h"
 
 namespace {
     const std::string STANDARD_SHADER_PATH = "assets/shaders/SimpleShader";
@@ -19,6 +20,9 @@ namespace {
     const std::string TERRAIN_TEXTURE_PATH = "assets/textures/texturePit.png";
     const std::string SKYBOX_MESH_PATH = "assets/models/Skybox.obj";
     const std::string SKYBOX_TEXTURE_PATH = "assets/textures/park.png";
+    const std::string KETCHUP_MESH_PATH = "assets/models/Ketchup.obj";
+    const std::string PICKLE_MESH_PATH = "assets/models/Pickle.obj";
+    const std::string HOT_SAUCE_MESH_PATH = "assets/models/HotSauce.obj";
 
     const int CAMERA_LAG_FRAMES = 5;
 }
@@ -34,6 +38,8 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
     EventSystem::add_event_handler(EventType::NEW_IT, &RenderingSystem::handle_new_it, this);
     EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &RenderingSystem::handle_new_game_state, this);
+    EventSystem::add_event_handler(EventType::ADD_SKYBOX, &RenderingSystem::handle_add_skybox, this);
+    EventSystem::add_event_handler(EventType::ADD_POWERUP, &RenderingSystem::handle_add_powerup, this);
 
     init_window();
 }
@@ -85,14 +91,6 @@ void RenderingSystem::handle_add_terrain(const Event& e) {
     example_objects_[object_id].set_mesh(mesh);
     example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH));
     example_objects_[object_id].set_texture(asset_manager_.get_texture_asset(TERRAIN_TEXTURE_PATH));
-
-    MeshAsset* skybox_mesh = asset_manager_.get_mesh_asset(SKYBOX_MESH_PATH);
-    ShaderAsset* skybox_shader = asset_manager_.get_shader_asset(SKYBOX_SHADER_PATH);
-    TextureAsset* skybox_texture = asset_manager_.get_texture_asset(SKYBOX_TEXTURE_PATH);
-    example_objects_.emplace_back();
-    example_objects_.back().set_mesh(skybox_mesh);
-    example_objects_.back().set_shader(skybox_shader);
-    example_objects_.back().set_texture(skybox_texture);
 }
 
 void RenderingSystem::handle_object_transform(const Event& e) {
@@ -135,6 +133,57 @@ void RenderingSystem::handle_new_game_state(const Event& e) {
         example_objects_.clear();
         car_indices_.clear();
     }
+}
+
+void RenderingSystem::handle_add_skybox(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    MeshAsset* skybox_mesh = asset_manager_.get_mesh_asset(SKYBOX_MESH_PATH);
+    ShaderAsset* skybox_shader = asset_manager_.get_shader_asset(SKYBOX_SHADER_PATH);
+    TextureAsset* skybox_texture = asset_manager_.get_texture_asset(SKYBOX_TEXTURE_PATH);
+
+    example_objects_.emplace_back();
+    example_objects_[object_id].set_mesh(skybox_mesh);
+    example_objects_[object_id].set_shader(skybox_shader);
+    example_objects_[object_id].set_texture(skybox_texture);
+}
+
+void RenderingSystem::handle_add_powerup(const Event& e) {
+    PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
+
+    if (powerup_type == PowerupType::NONE) {
+        return;
+    }
+
+    int object_id = e.get_value<int>("object_id", true).first;
+    float x = e.get_value<float>("pos_x", true).first;
+    float y = e.get_value<float>("pos_y", true).first;
+    float z = e.get_value<float>("pos_z", true).first;
+
+    MeshAsset* mesh;
+
+    switch (powerup_type) {
+        case PowerupType::KETCHUP:
+            mesh = asset_manager_.get_mesh_asset(KETCHUP_MESH_PATH);
+            break;
+
+        case PowerupType::PICKLE:
+            mesh = asset_manager_.get_mesh_asset(PICKLE_MESH_PATH);
+            break;
+
+        case PowerupType::HOT:
+            mesh = asset_manager_.get_mesh_asset(HOT_SAUCE_MESH_PATH);
+            break;
+
+        default:
+            break;
+    }
+
+    example_objects_.emplace_back();
+    example_objects_[object_id].set_mesh(mesh);
+    example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
+    example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
+    // example_objects_[object_id].set_has_shadows(true);
 }
 
 
