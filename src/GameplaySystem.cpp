@@ -1,6 +1,5 @@
 #include <cmath>
 #include <iostream>
-#include <cmath>
 
 #include "SDL.h"
 
@@ -379,6 +378,12 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
     float y = e.get_value<float>("pos_y", true).first;
     float z = e.get_value<float>("pos_z", true).first;
 
+    float qw = e.get_value<float>("qua_w", true).first;
+    float qx = e.get_value<float>("qua_x", true).first;
+    float qy = e.get_value<float>("qua_y", true).first;
+    float qz = e.get_value<float>("qua_z", true).first;
+
+    object_rotations_[object_id] = glm::quat(qw, qx, qy, qz);
     object_positions_[object_id] = glm::vec3(x, y, z);
 
     if (powerup_subsystem_.is_powerup(object_id)) {

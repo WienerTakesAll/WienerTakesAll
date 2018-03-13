@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <map>
 
 #include "EventSystem.h"
@@ -35,6 +37,7 @@ private:
     int current_it_id_;
 
     std::map<int, glm::vec3> object_positions_;
+    std::map<int, glm::quat> object_rotations_;
     PowerupSubsystem powerup_subsystem_;
     ScoringSubsystem scoring_subsystem_;
 };
