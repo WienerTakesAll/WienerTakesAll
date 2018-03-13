@@ -244,15 +244,16 @@ void RenderingSystem::setup_cameras() {
     // get camera setup for all 4 car's current positioning
     for (size_t i = 0; i < car_indices_.size(); i++) {
         transform = example_objects_[car_indices_[i]].get_transform();
+
         glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
 
         auto camera_position = glm::translate(transform, glm::vec3(0, 2.5, -7));
-
+       
         if (camera_position[3].y < 1.5) {
             camera_position[3].y = 1.5;
         }
 
-        new_cameras[i] = P * glm::lookAt(glm::vec3(camera_position[3]), car_pos, glm::vec3(0, 1, 0));
+        new_cameras[i] = P * glm::lookAt(glm::vec3(camera_position[3]), car_pos , glm::vec3(0, 1, 0));
     }
 
     // push camera setup to back of queue

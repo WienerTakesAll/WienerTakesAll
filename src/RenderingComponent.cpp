@@ -140,31 +140,6 @@ void RenderingComponent::render_lighting(glm::mat4x4 camera, glm::vec3 light_dir
         glDrawElements(GL_TRIANGLES, shadow_mesh_->meshes_[i].shadow_volume_indices_.size(), GL_UNSIGNED_INT, 0);
     }
 
-    /*
-    glFrontFace(GL_CW);
-    glCullFace(GL_BACK);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
-
-    for (size_t i = 0; i < mesh_->meshes_.size(); i++) {
-        glBindBuffer(GL_ARRAY_BUFFER, gl_shadow_vertex_buffers_[i]);
-        glVertexAttribPointer
-            ( 0, 4, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VolumeVertexData)
-            , reinterpret_cast<void*>offsetof(MeshAsset::MeshData::VolumeVertexData,position_));
-        glVertexAttribPointer
-            ( 1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VolumeVertexData)
-            , reinterpret_cast<void*>offsetof(MeshAsset::MeshData::VolumeVertexData,normal_));
-
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_shadow_index_buffers_[i]);
-
-        glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(transform_matrix_));
-        glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(camera));
-        glUniform3f(uniform_light, light_direction.x, light_direction.y, light_direction.z);
-
-        glDrawElements(GL_TRIANGLES, mesh_->meshes_[i].shadow_volume_indices_.size(), GL_UNSIGNED_INT, 0);
-    }*/
-
-    glFrontFace(GL_CCW);
     glCullFace(GL_BACK);
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glDepthMask(GL_TRUE);
