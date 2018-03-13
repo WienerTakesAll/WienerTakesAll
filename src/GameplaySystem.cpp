@@ -12,6 +12,7 @@ namespace {
     const int MAX_TRIGGER_VALUE = 32768;
     const float DRIVE_SPEED = 0.8f;
     const float BRAKE_SPEED = 0.8f;
+    const float KETCHUP_BOOST = 50000.0f;
     const glm::vec3 HOT_KNOCK_BACK_FORCE(50000.f, 200000.f, 50000.f);
 }
 
@@ -476,15 +477,26 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
     PowerupType type = powerup_subsystem_.use_powerup(object_id);
 
     switch (type) {
-        case PowerupType::KETCHUP:
-            std::cout << "KETCHUP used by player " << object_id << std::endl;
+        case PowerupType::KETCHUP: {
+            glm::vec3 boost_direction = object_rotations_[object_id] * glm::vec3(0.0f, 0.0f, KETCHUP_BOOST);
+            EventSystem::queue_event(
+                Event(
+                    EventType::OBJECT_APPLY_FORCE,
+                    "object_id", object_id,
+                    "x", boost_direction.x,
+                    "y", boost_direction.y,
+                    "z", boost_direction.z
+                )
+            );
             break;
+        }
 
-        case PowerupType::PICKLE:
+        case PowerupType::PICKLE: {
             std::cout << "PICKLE used by player " << object_id << std::endl;
             break;
+        }
 
-        case PowerupType::HOT:
+        case PowerupType::HOT: {
             for (int i = 0; i < 4; ++i) {
                 if (i == object_id) {
                     continue;
@@ -503,10 +515,12 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
             }
 
             break;
+        }
 
         case PowerupType::NONE:
-        default:
+        default: {
             break;
+        }
     }
 
 }
