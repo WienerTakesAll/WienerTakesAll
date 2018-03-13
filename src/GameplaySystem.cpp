@@ -379,7 +379,7 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
     float y = e.get_value<float>("pos_y", true).first;
     float z = e.get_value<float>("pos_z", true).first;
 
-    object_positions_[object_id] = {x, y, z};
+    object_positions_[object_id] = glm::vec3(x, y, z);
 
     if (powerup_subsystem_.is_powerup(object_id)) {
         powerup_subsystem_.change_powerup_position(object_id, glm::vec3(x, y, z));
@@ -511,16 +511,9 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
     int b_id = e.get_value<int>("b_id", true).first;
     std::cout << a_id << " collided with " << b_id << std::endl;
 
-    std::vector<float> a_pos = object_positions_[a_id];
-    std::vector<float> b_pos = object_positions_[b_id];
-
-
-    std::vector<float> v_dir = { a_pos[0] - b_pos[0], a_pos[1] - b_pos[1], a_pos[2] - b_pos[2] };
-    float magnitude = std::sqrt(v_dir[0] * v_dir[0] + v_dir[1] * v_dir[1] + v_dir[2] * v_dir[2]);
-
-    v_dir[0] /= magnitude;
-    v_dir[1] /= magnitude;
-    v_dir[2] /= magnitude;
+    glm::vec3 a_pos = object_positions_[a_id];
+    glm::vec3 b_pos = object_positions_[b_id];
+    glm::vec3 v_dir = glm::normalize(a_pos - b_pos);
 
     // Apply knockback
     EventSystem::queue_event(

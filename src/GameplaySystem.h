@@ -34,7 +34,7 @@ private:
     GameState current_game_state_;
     int current_it_id_;
 
-    std::map<int, std::vector<float>> object_positions_;
+    std::map<int, glm::vec3> object_positions_;
     PowerupSubsystem powerup_subsystem_;
     ScoringSubsystem scoring_subsystem_;
 };
