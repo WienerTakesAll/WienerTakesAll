@@ -23,6 +23,7 @@ public:
     const int get_powerup_id() const;
     PowerupType get_next_powerup_type() const;
     const bool is_powerup(const int object_id) const;
+    const bool can_use_powerup(const int object_id) const;
 
     PowerupType use_powerup(const int object_id);
 

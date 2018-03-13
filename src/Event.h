@@ -24,6 +24,7 @@ enum class EventType {
     PICKUP_POWERUP,
     CHANGE_POWERUP,
     MOVE_POWERUP,
+    USE_POWERUP,
 
     // Keep at end of list
     EVENT_COUNT

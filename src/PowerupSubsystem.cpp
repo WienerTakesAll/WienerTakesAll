@@ -82,6 +82,12 @@ const bool PowerupSubsystem::is_powerup(const int object_id) const {
     return powerup_id_ == object_id;
 }
 
+const bool PowerupSubsystem::can_use_powerup(const int object_id) const {
+    return
+        object_powerups_.find(object_id) != object_powerups_.end() &&
+        object_powerups_.at(object_id) != PowerupType::NONE;
+}
+
 PowerupType PowerupSubsystem::use_powerup(const int object_id) {
     // Check if object_id has a pre-existing powerup. If so, return that. Else, return NONE.
     PowerupType type = object_powerups_.find(object_id) == object_powerups_.end()

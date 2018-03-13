@@ -13,6 +13,7 @@ namespace {
     const int MAX_TRIGGER_VALUE = 32768;
     const float DRIVE_SPEED = 0.8f;
     const float BRAKE_SPEED = 0.8f;
+    const glm::vec3 HOT_KNOCK_BACK_FORCE(50000.f, 200000.f, 50000.f);
 }
 
 GameplaySystem::GameplaySystem()
@@ -30,6 +31,7 @@ GameplaySystem::GameplaySystem()
     add_event_handler(EventType::PICKUP_POWERUP, &GameplaySystem::handle_pickup_powerup, this);
     add_event_handler(EventType::CHANGE_POWERUP, &GameplaySystem::handle_change_powerup, this);
     add_event_handler(EventType::MOVE_POWERUP, &GameplaySystem::handle_move_powerup, this);
+    add_event_handler(EventType::USE_POWERUP, &GameplaySystem::handle_use_powerup, this);
 
     EventSystem::queue_event(
         Event(
@@ -291,6 +293,13 @@ void GameplaySystem::handle_key_press(const Event& e) {
             break;
         }
 
+        // keyboard powerup
+        case SDLK_SPACE: {
+            new_events.emplace_back(EventType::USE_POWERUP,
+                                    "index", player_id);
+            break;
+        }
+
         case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: {
 
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
@@ -440,6 +449,52 @@ void GameplaySystem::handle_move_powerup(const Event& e) {
     float y = e.get_value<float>("pos_y", true).first;
     float z = e.get_value<float>("pos_z", true).first;
     powerup_subsystem_.move_powerup(object_id, glm::vec3(x, y, z));
+}
+
+void GameplaySystem::handle_use_powerup(const Event& e) {
+    int object_id = e.get_value<int>("index", true).first;
+
+    if (!powerup_subsystem_.can_use_powerup(object_id)) {
+        std::cout << "pid: " << object_id << " cannot powerup" << std::endl;
+        return;
+    }
+
+    PowerupType type = powerup_subsystem_.use_powerup(object_id);
+
+    switch (type) {
+        case PowerupType::KETCHUP:
+            std::cout << "KETCHUP used by player " << object_id << std::endl;
+            break;
+
+        case PowerupType::PICKLE:
+            std::cout << "PICKLE used by player " << object_id << std::endl;
+            break;
+
+        case PowerupType::HOT:
+            for (int i = 0; i < 4; ++i) {
+                if (i == object_id) {
+                    continue;
+                }
+
+                EventSystem::queue_event(
+                    Event(
+                        EventType::OBJECT_APPLY_FORCE,
+                        "object_id", i,
+                        // TODO: Pass glm::vec3 in events
+                        "x", HOT_KNOCK_BACK_FORCE.x,
+                        "y", HOT_KNOCK_BACK_FORCE.y,
+                        "z", HOT_KNOCK_BACK_FORCE.z
+                    )
+                );
+            }
+
+            break;
+
+        case PowerupType::NONE:
+        default:
+            break;
+    }
+
 }
 
 void GameplaySystem::handle_vehicle_collision(const Event& e) {
