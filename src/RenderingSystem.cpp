@@ -98,6 +98,10 @@ void RenderingSystem::handle_add_terrain(const Event& e) {
 void RenderingSystem::handle_object_transform(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
 
+    if (example_objects_.size() <= object_id) {
+        return;
+    }
+
     float x = e.get_value<float>("pos_x", true).first;
     float y = e.get_value<float>("pos_y", true).first;
     float z = e.get_value<float>("pos_z", true).first;
@@ -106,10 +110,6 @@ void RenderingSystem::handle_object_transform(const Event& e) {
     float qx = e.get_value<float>("qua_x", true).first;
     float qy = e.get_value<float>("qua_y", true).first;
     float qz = e.get_value<float>("qua_z", true).first;
-
-    if (example_objects_.size() <= object_id) {
-        return;
-    }
 
     example_objects_[object_id].set_transform(glm::translate(glm::mat4(), glm::vec3(x, y, z)));
     example_objects_[object_id].apply_transform(glm::toMat4(glm::quat(qw, qx, qy, qz)));

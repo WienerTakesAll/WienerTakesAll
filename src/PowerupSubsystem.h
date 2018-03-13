@@ -12,20 +12,22 @@ public:
     void load();
     void update();
     void set_new_game_state(const GameState new_game_state);
-
     void create_powerup(const int object_id, const PowerupType type, glm::vec3 pos);
 
-    const bool should_pickup_powerup(const int object_id, glm::vec3 object_pos) const;
-    void pickup_powerup(const int object_id);
+    // Modifiers
+    void change_powerup_position(const int object_id, glm::vec3 pos);
     void change_powerup_type(const PowerupType new_type);
     void move_powerup(const int object_id, glm::vec3 pos);
-
-    const int get_powerup_id() const;
-    PowerupType get_next_powerup_type() const;
-    const bool is_powerup(const int object_id) const;
-    const bool can_use_powerup(const int object_id) const;
-
+    void pickup_powerup(const int object_id);
     PowerupType use_powerup(const int object_id);
+
+    // Utility functions
+    const bool can_use_powerup(const int object_id) const;
+    const bool is_powerup(const int object_id) const;
+    glm::vec3 get_next_powerup_position() const;
+    PowerupType get_next_powerup_type() const;
+    const int get_powerup_id() const;
+    const bool should_pickup_powerup(const int object_id, glm::vec3 object_pos) const;
 
 private:
     int powerup_id_;

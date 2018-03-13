@@ -169,14 +169,15 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
         );
 
         // Powerup
+        glm::vec3 powerup_loc = powerup_subsystem_.get_next_powerup_position();
         EventSystem::queue_event(
             Event(
                 EventType::ADD_POWERUP,
                 "object_id", gameobject_counter_->assign_id(),
                 "type", static_cast<int>(powerup_subsystem_.get_next_powerup_type()),
-                "pos_x", 0.0f,
-                "pos_y", 1.5f,
-                "pos_z", 2.0f
+                "pos_x", powerup_loc.x,
+                "pos_y", powerup_loc.y,
+                "pos_z", powerup_loc.z
             )
         );
 
@@ -380,6 +381,10 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
 
     object_positions_[object_id] = {x, y, z};
 
+    if (powerup_subsystem_.is_powerup(object_id)) {
+        powerup_subsystem_.change_powerup_position(object_id, glm::vec3(x, y, z));
+    }
+
     // A vehicle close enough to powerup should pick it up
     if (powerup_subsystem_.should_pickup_powerup(object_id, glm::vec3(x, y, z))) {
         EventSystem::queue_event(
@@ -427,13 +432,18 @@ void GameplaySystem::handle_pickup_powerup(const Event& e) {
     );
 
     // Move powerup to new location
+    glm::vec3 new_location = powerup_subsystem_.get_next_powerup_position();
     EventSystem::queue_event(
         Event(
-            EventType::MOVE_POWERUP,
+            EventType::OBJECT_TRANSFORM_EVENT,
             "object_id", powerup_id,
-            "pos_x", 2.0f,
-            "pos_y", 0.0f,
-            "pos_z", 0.0f
+            "pos_x", new_location.x,
+            "pos_y", new_location.y,
+            "pos_z", new_location.z,
+            "qua_w", 1.0f,
+            "qua_x", 0.0f,
+            "qua_y", 0.0f,
+            "qua_z", 0.0f
         )
     );
 }
@@ -455,7 +465,6 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
     int object_id = e.get_value<int>("index", true).first;
 
     if (!powerup_subsystem_.can_use_powerup(object_id)) {
-        std::cout << "pid: " << object_id << " cannot powerup" << std::endl;
         return;
     }
 
