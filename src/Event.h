@@ -21,6 +21,9 @@ enum class EventType {
     NEW_IT,
     ADD_SKYBOX,
     ADD_POWERUP,
+    PICKUP_POWERUP,
+    CHANGE_POWERUP,
+    MOVE_POWERUP,
 
     // Keep at end of list
     EVENT_COUNT

@@ -40,6 +40,8 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &RenderingSystem::handle_new_game_state, this);
     EventSystem::add_event_handler(EventType::ADD_SKYBOX, &RenderingSystem::handle_add_skybox, this);
     EventSystem::add_event_handler(EventType::ADD_POWERUP, &RenderingSystem::handle_add_powerup, this);
+    EventSystem::add_event_handler(EventType::CHANGE_POWERUP, &RenderingSystem::handle_change_powerup, this);
+    EventSystem::add_event_handler(EventType::MOVE_POWERUP, &RenderingSystem::handle_move_powerup, this);
 
     init_window();
 }
@@ -184,6 +186,44 @@ void RenderingSystem::handle_add_powerup(const Event& e) {
     example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
     example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
     // example_objects_[object_id].set_has_shadows(true);
+}
+
+void RenderingSystem::handle_change_powerup(const Event& e) {
+    PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
+
+    if (powerup_type == PowerupType::NONE) {
+        return;
+    }
+
+    int object_id = e.get_value<int>("object_id", true).first;
+    MeshAsset* mesh;
+
+    switch (powerup_type) {
+        case PowerupType::KETCHUP:
+            mesh = asset_manager_.get_mesh_asset(KETCHUP_MESH_PATH);
+            break;
+
+        case PowerupType::PICKLE:
+            mesh = asset_manager_.get_mesh_asset(PICKLE_MESH_PATH);
+            break;
+
+        case PowerupType::HOT:
+            mesh = asset_manager_.get_mesh_asset(HOT_SAUCE_MESH_PATH);
+            break;
+
+        default:
+            break;
+    }
+
+    example_objects_[object_id].set_mesh(mesh);
+}
+
+void RenderingSystem::handle_move_powerup(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+    float x = e.get_value<float>("pos_x", true).first;
+    float y = e.get_value<float>("pos_y", true).first;
+    float z = e.get_value<float>("pos_z", true).first;
+    example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
 }
 
 

@@ -23,6 +23,9 @@ private:
     void handle_object_transform_event(const Event& e);
     void handle_vehicle_collision(const Event& e);
     void handle_add_powerup(const Event& e);
+    void handle_pickup_powerup(const Event& e);
+    void handle_change_powerup(const Event& e);
+    void handle_move_powerup(const Event& e);
 
     bool should_update_score() const;
 
