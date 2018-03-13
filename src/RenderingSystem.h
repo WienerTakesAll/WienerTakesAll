@@ -27,6 +27,10 @@ private:
     void handle_object_transform(const Event& e);
     void handle_new_it(const Event& e);
     void handle_new_game_state(const Event& e);
+    void handle_add_skybox(const Event& e);
+    void handle_add_powerup(const Event& e);
+    void handle_change_powerup(const Event& e);
+    void handle_move_powerup(const Event& e);
 
 
     void start_render() const;

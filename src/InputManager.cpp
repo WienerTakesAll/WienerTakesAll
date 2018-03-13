@@ -172,6 +172,7 @@ bool InputManager::process_keyboard(const int& key, int& player_id) {
             break;
 
         case SDLK_SPACE:
+            player_id = 0;
             break;
 
         case SDLK_LEFT:
