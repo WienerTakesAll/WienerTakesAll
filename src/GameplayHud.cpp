@@ -133,7 +133,9 @@ void GameplayHud::update_it_pointer(int player_id, glm::vec3 vector_to_it) {
 
     float angle = glm::orientedAngle(origin_translate, glm::vec2(0, 1));
 
-    if (angle > 3.14159 / 2 && angle < 3.14159 * 3 / 2) {
+    const float PI = 3.14159;
+
+    if (abs(angle) > PI / 2) {
         it_pointers_[player_id].set_rotation(angle);
     } else {
         it_pointers_[player_id].visible_ = false;
