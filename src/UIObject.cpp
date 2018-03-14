@@ -40,7 +40,7 @@ void UIObject::set_texture(TextureAsset* tex) {
 }
 
 void UIObject::set_scale(float factor) {
-    scale_ *= factor;
+    scale_ = factor;
     render_component_.set_transform(glm::scale(glm::mat4(), glm::vec3(scale_, scale_, 0)));
     render_component_.apply_transform(glm::translate(glm::mat4(), glm::vec3(origin_, 0)));
     render_component_.apply_transform(glm::scale(glm::mat4(), glm::vec3(size_, 0)));
