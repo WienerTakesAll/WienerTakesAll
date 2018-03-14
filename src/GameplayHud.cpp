@@ -1,5 +1,7 @@
 #include <cmath>
+
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 #include "GameplayHud.h"
 
@@ -68,11 +70,11 @@ void GameplayHud::load() {
     scores_ = { score_p1, score_p2, score_p3, score_p4 };
 
     for (auto& score : scores_) {
-        score.scale(0.0f);
+        score.set_scale(0.0f);
     }
 
-    float pointer_size_x = 0.16f;
-    float pointer_size_y = 0.22f;
+    float pointer_size_x = 0.08f;
+    float pointer_size_y = pointer_size_x * 16.f / 9.f;
     std::array<glm::vec2, 4> player_screen_centers = {
         glm::vec2(-0.5f - pointer_size_x / 2.f, 0.5f - pointer_size_y / 2.f),
         glm::vec2(0.5f - pointer_size_x / 2.f, 0.5f - pointer_size_y / 2.f),
@@ -81,16 +83,16 @@ void GameplayHud::load() {
     };
 
 
-    for (int i = 0; i < leader_pointers_.size(); i++) {
-        TextureAsset* pointer_tex = asset_manager_.get_texture_asset("assets/textures/logo.png");
-        leader_pointers_[i] = UIObject(
-                                  player_screen_centers[i],
-                                  glm::vec3(1.0f),
-                                  glm::vec2(0.16f, 0.22f),
-                                  square_mesh_,
-                                  pointer_tex,
-                                  ui_shader_
-                              );
+    for (unsigned int i = 0; i < it_pointers_.size(); i++) {
+        TextureAsset* pointer_tex = asset_manager_.get_texture_asset("assets/textures/pointer.png");
+        it_pointers_[i] = UIObject(
+                              player_screen_centers[i],
+                              glm::vec3(1.0f),
+                              glm::vec2(pointer_size_x, pointer_size_y),
+                              square_mesh_,
+                              pointer_tex,
+                              ui_shader_
+                          );
     }
 
 }
@@ -102,46 +104,39 @@ void GameplayHud::render() const {
         score.render(glm::mat4());
     }
 
-    for (int i = 0; i < leader_pointers_.size(); i++) {
-        leader_pointers_[i].render(leader_pointer_positions_[i]);
+    for (unsigned int i = 0; i < it_pointers_.size(); i++) {
+        it_pointers_[i].render(it_pointer_transforms_[i]);
     }
 }
 
 void GameplayHud::update_score(const int& player, const int& score) {
-    scores_.at(player).scale(std::min((float) score / MAX_SCORE, 1.0f));
+    scores_.at(player).set_scale(std::min((float) score / MAX_SCORE, 1.0f));
 }
 
 void GameplayHud::reset_scores() {
     for (auto& score : scores_) {
-        score.scale(0.0f);
+        score.set_scale(0.0f);
     }
 }
 
 void GameplayHud::update_it_pointer(int player_id, glm::vec3 vector_to_it) {
+    if (std::isnan(vector_to_it.x)) {
+        it_pointers_[player_id].visible_ = false;
+    } else {
+        it_pointers_[player_id].visible_ = true;
+    }
+
     glm::vec2 origin_translate = glm::normalize(glm::vec2(vector_to_it.x, vector_to_it.z));
-    std::cout << "position vector " << player_id  << ": "
-              << origin_translate[0] << " "
-              << origin_translate[1] << " " << std::endl;
-    leader_pointer_positions_[player_id] =
+
+    it_pointer_transforms_[player_id] =
         glm::translate(glm::mat4(), glm::vec3(origin_translate[0] / -4.f, origin_translate[1] / 4.f, 0.f));
+
+    float angle = glm::orientedAngle(origin_translate, glm::vec2(0, 1));
+
+    if (angle > 3.14159 / 2 && angle < 3.14159 * 3 / 2) {
+        it_pointers_[player_id].set_rotation(angle);
+    } else {
+        it_pointers_[player_id].visible_ = false;
+    }
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

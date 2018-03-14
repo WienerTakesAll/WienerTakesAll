@@ -21,7 +21,8 @@ public:
     void set_origin(glm::vec2 origin);
     void render(glm::mat4 camera) const;
     void set_texture(TextureAsset* tex);
-    void scale(float factor);
+    void set_scale(float factor);
+    void set_rotation(float angle_radians);
 
     bool visible_;
 
@@ -29,5 +30,6 @@ private:
     glm::vec2 origin_;
     glm::vec3 colour_;
     glm::vec2 size_;
+    float scale_;
     RenderingComponent render_component_;
 };

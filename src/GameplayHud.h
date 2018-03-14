@@ -22,6 +22,6 @@ private:
     UIObject scoreboard_;
     std::array<UIObject, 4> scores_;
 
-    std::array<UIObject, 4> leader_pointers_;
-    std::array<glm::mat4, 4> leader_pointer_positions_;
+    std::array<UIObject, 4> it_pointers_;
+    std::array<glm::mat4, 4> it_pointer_transforms_;
 };
