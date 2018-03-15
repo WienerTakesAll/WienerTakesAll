@@ -30,8 +30,6 @@ private:
     void handle_add_skybox(const Event& e);
     void handle_add_powerup(const Event& e);
     void handle_change_powerup(const Event& e);
-    void handle_move_powerup(const Event& e);
-
 
     void start_render() const;
     void setup_cameras();

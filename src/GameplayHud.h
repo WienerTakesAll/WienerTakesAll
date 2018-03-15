@@ -22,6 +22,7 @@ private:
 
     UIObject scoreboard_;
     std::array<UIObject, 4> scores_;
+    int current_it_;
 
     std::array<UIObject, 4> it_pointers_;
     std::array<glm::mat4, 4> it_pointer_transforms_;

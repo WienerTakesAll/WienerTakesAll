@@ -4,5 +4,5 @@ enum class PowerupType {
     KETCHUP,
     PICKLE,
     HOT,
-    NONE
+    POWERUP_COUNT
 };

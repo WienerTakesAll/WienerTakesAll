@@ -98,6 +98,7 @@ void GameplayHud::load() {
                               pointer_tex,
                               ui_shader_
                           );
+        it_pointers_[i].visible_ = false;
     }
 
 }
@@ -125,6 +126,11 @@ void GameplayHud::reset_scores() {
 }
 
 void GameplayHud::update_it_pointer(int player_id, glm::vec3 vector_to_it) {
+    if (current_it_ == player_id) {
+        it_pointers_[player_id].visible_ = false;
+        return;
+    }
+
     it_pointers_[player_id].visible_ = true;
 
     glm::vec2 origin_translate = glm::normalize(glm::vec2(vector_to_it.x, vector_to_it.z));
@@ -145,5 +151,5 @@ void GameplayHud::update_it_pointer(int player_id, glm::vec3 vector_to_it) {
 }
 
 void GameplayHud::new_it(int it_id) {
-    it_pointers_[it_id].visible_ = false;
+    current_it_ = it_id;
 }

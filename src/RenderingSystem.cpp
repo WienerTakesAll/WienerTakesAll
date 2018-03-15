@@ -41,7 +41,6 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::ADD_SKYBOX, &RenderingSystem::handle_add_skybox, this);
     EventSystem::add_event_handler(EventType::ADD_POWERUP, &RenderingSystem::handle_add_powerup, this);
     EventSystem::add_event_handler(EventType::CHANGE_POWERUP, &RenderingSystem::handle_change_powerup, this);
-    EventSystem::add_event_handler(EventType::MOVE_POWERUP, &RenderingSystem::handle_move_powerup, this);
 
     init_window();
 }
@@ -153,7 +152,7 @@ void RenderingSystem::handle_add_skybox(const Event& e) {
 void RenderingSystem::handle_add_powerup(const Event& e) {
     PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
 
-    if (powerup_type == PowerupType::NONE) {
+    if (powerup_type == PowerupType::POWERUP_COUNT) {
         return;
     }
 
@@ -191,7 +190,7 @@ void RenderingSystem::handle_add_powerup(const Event& e) {
 void RenderingSystem::handle_change_powerup(const Event& e) {
     PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
 
-    if (powerup_type == PowerupType::NONE) {
+    if (powerup_type == PowerupType::POWERUP_COUNT) {
         return;
     }
 
@@ -217,16 +216,6 @@ void RenderingSystem::handle_change_powerup(const Event& e) {
 
     example_objects_[object_id].set_mesh(mesh);
 }
-
-void RenderingSystem::handle_move_powerup(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
-    float x = e.get_value<float>("pos_x", true).first;
-    float y = e.get_value<float>("pos_y", true).first;
-    float z = e.get_value<float>("pos_z", true).first;
-
-    example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
-}
-
 
 void RenderingSystem::render() {
     start_render();
