@@ -70,7 +70,7 @@ void GameplaySystem::update() {
         powerup_subsystem_.update();
 
         if (object_positions_.find(powerup_subsystem_.get_powerup_id()) == object_positions_.end() ||
-            !powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id())) {
+                !powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id())) {
             return;
         }
 
@@ -518,7 +518,7 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
             break;
         }
 
-        case PowerupType::NONE:
+        case PowerupType::POWERUP_COUNT:
         default: {
             break;
         }

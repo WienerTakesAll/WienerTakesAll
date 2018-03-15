@@ -15,7 +15,7 @@ namespace {
 PowerupSubsystem::PowerupSubsystem()
     : powerup_id_(-1)
     , frame_counter_(0)
-    , powerup_type_(PowerupType::NONE) {
+    , powerup_type_(PowerupType::POWERUP_COUNT) {
 }
 
 void PowerupSubsystem::load() {
@@ -65,11 +65,11 @@ void PowerupSubsystem::pickup_powerup(const int object_id) {
 PowerupType PowerupSubsystem::use_powerup(const int object_id) {
     // Check if object_id has a pre-existing powerup. If so, return that. Else, return NONE.
     PowerupType type = object_powerups_.find(object_id) == object_powerups_.end()
-                       ? PowerupType::NONE
+                       ? PowerupType::POWERUP_COUNT
                        : object_powerups_[object_id];
 
     // Clear powerup entry.
-    object_powerups_[object_id] = PowerupType::NONE;
+    object_powerups_[object_id] = PowerupType::POWERUP_COUNT;
 
     return type;
 }
@@ -77,7 +77,7 @@ PowerupType PowerupSubsystem::use_powerup(const int object_id) {
 const bool PowerupSubsystem::can_use_powerup(const int object_id) const {
     return
         object_powerups_.find(object_id) != object_powerups_.end() &&
-        object_powerups_.at(object_id) != PowerupType::NONE;
+        object_powerups_.at(object_id) != PowerupType::POWERUP_COUNT;
 }
 
 const bool PowerupSubsystem::is_powerup(const int object_id) const {
@@ -93,7 +93,7 @@ glm::vec3 PowerupSubsystem::get_next_powerup_position() const {
 
 PowerupType PowerupSubsystem::get_next_powerup_type() const {
     // Random powerup type
-    PowerupType new_type = static_cast<PowerupType>(rand() % (int) PowerupType::NONE);
+    PowerupType new_type = static_cast<PowerupType>(rand() % (int) PowerupType::POWERUP_COUNT);
     return new_type;
 }
 

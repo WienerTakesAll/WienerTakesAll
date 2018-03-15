@@ -152,7 +152,7 @@ void RenderingSystem::handle_add_skybox(const Event& e) {
 void RenderingSystem::handle_add_powerup(const Event& e) {
     PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
 
-    if (powerup_type == PowerupType::NONE) {
+    if (powerup_type == PowerupType::POWERUP_COUNT) {
         return;
     }
 
@@ -190,7 +190,7 @@ void RenderingSystem::handle_add_powerup(const Event& e) {
 void RenderingSystem::handle_change_powerup(const Event& e) {
     PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
 
-    if (powerup_type == PowerupType::NONE) {
+    if (powerup_type == PowerupType::POWERUP_COUNT) {
         return;
     }
 
