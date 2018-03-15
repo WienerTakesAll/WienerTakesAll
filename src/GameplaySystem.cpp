@@ -69,7 +69,8 @@ void GameplaySystem::update() {
     if (current_game_state_ == GameState::IN_GAME) {
         powerup_subsystem_.update();
 
-        if (object_positions_.find(powerup_subsystem_.get_powerup_id()) == object_positions_.end()) {
+        if (object_positions_.find(powerup_subsystem_.get_powerup_id()) == object_positions_.end() ||
+            !powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id())) {
             return;
         }
 
