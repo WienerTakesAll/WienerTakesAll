@@ -223,6 +223,7 @@ void RenderingSystem::handle_move_powerup(const Event& e) {
     float x = e.get_value<float>("pos_x", true).first;
     float y = e.get_value<float>("pos_y", true).first;
     float z = e.get_value<float>("pos_z", true).first;
+
     example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
 }
 

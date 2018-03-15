@@ -403,9 +403,9 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
         );
     }
 
-    if(object_id < 4 && object_id != current_it_id_) {
+    if (object_id < 4 && object_id != current_it_id_) {
         glm::vec3 vec_to = glm::normalize(object_positions_[current_it_id_] - object_positions_[object_id]);
-		glm::mat4 rot_matrix = glm::toMat4(object_rotations_[object_id]);
+        glm::mat4 rot_matrix = glm::toMat4(object_rotations_[object_id]);
         glm::vec4 vec_to_it = rot_matrix * glm::vec4(vec_to, 1.f);
 
         EventSystem::queue_event(

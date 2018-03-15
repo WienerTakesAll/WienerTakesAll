@@ -125,11 +125,7 @@ void GameplayHud::reset_scores() {
 }
 
 void GameplayHud::update_it_pointer(int player_id, glm::vec3 vector_to_it) {
-    if (std::isnan(vector_to_it.x)) {
-        it_pointers_[player_id].visible_ = false;
-    } else {
-        it_pointers_[player_id].visible_ = true;
-    }
+    it_pointers_[player_id].visible_ = true;
 
     glm::vec2 origin_translate = glm::normalize(glm::vec2(vector_to_it.x, vector_to_it.z));
 
@@ -140,10 +136,14 @@ void GameplayHud::update_it_pointer(int player_id, glm::vec3 vector_to_it) {
 
     const float PI = 3.14159;
 
-    if (abs(angle) > PI / 2) {
+    if (angle > PI / 2 || angle < -PI / 2) {
         it_pointers_[player_id].set_rotation(angle);
     } else {
         it_pointers_[player_id].visible_ = false;
     }
 
+}
+
+void GameplayHud::new_it(int it_id) {
+    it_pointers_[it_id].visible_ = false;
 }

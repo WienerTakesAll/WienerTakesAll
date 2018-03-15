@@ -13,6 +13,7 @@ public:
     void update_score(const int& player, const int& value);
     void reset_scores();
     void update_it_pointer(int player_id, glm::vec3 vector_to_it);
+    void new_it(int it_id);
 
 private:
     AssetManager& asset_manager_;

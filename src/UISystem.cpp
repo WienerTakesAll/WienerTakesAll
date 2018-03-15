@@ -16,6 +16,7 @@ UISystem::UISystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &UISystem::handle_new_game_state, this);
     EventSystem::add_event_handler(EventType::UPDATE_SCORE, &UISystem::handle_update_score, this);
     EventSystem::add_event_handler(EventType::UPDATE_DIRECTION_TO_IT, &UISystem::handle_update_direction_to_it, this);
+    EventSystem::add_event_handler(EventType::NEW_IT, &UISystem::handle_new_it, this);
 
     window_ = asset_manager.get_window();
 }
@@ -191,5 +192,10 @@ void UISystem::handle_update_direction_to_it(const Event& e) {
     float y = e.get_value<float>("y", true).first;
     float z = e.get_value<float>("z", true).first;
 
-	gameplay_hud_.update_it_pointer(object_id, {x, y, z});
+    gameplay_hud_.update_it_pointer(object_id, {x, y, z});
+}
+
+void UISystem::handle_new_it(const Event& e) {
+    int new_it_id = e.get_value<int>("object_id", true).first;
+    gameplay_hud_.new_it(new_it_id);
 }
