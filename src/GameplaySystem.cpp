@@ -403,25 +403,22 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
         );
     }
 
-    glm::vec3 it_pos = glm::vec3(
-                           object_positions_[current_it_id_].x,
-                           object_positions_[current_it_id_].y,
-                           object_positions_[current_it_id_].z
-                       );
+    if(object_id < 4 && object_id != current_it_id_) {
+        glm::vec3 vec_to = glm::normalize(object_positions_[current_it_id_] - object_positions_[object_id]);
+		glm::mat4 rot_matrix = glm::toMat4(object_rotations_[object_id]);
+        glm::vec4 vec_to_it = rot_matrix * glm::vec4(vec_to, 1.f);
 
-    glm::vec3 vec_to = glm::normalize(glm::vec3(it_pos - glm::vec3(x, y, z)));
-    glm::mat4 rot_matrix = glm::toMat4(glm::quat(qw, qx, qy, qz));
-    glm::vec4 vec_to_it = glm::vec4(vec_to, 0.f) * rot_matrix;
+        EventSystem::queue_event(
+            Event(
+                EventType::UPDATE_DIRECTION_TO_IT,
+                "object_id", object_id,
+                "x", vec_to_it[0],
+                "y", vec_to_it[1],
+                "z", vec_to_it[2]
+            )
+        );
+    }
 
-    EventSystem::queue_event(
-        Event(
-            EventType::VECTOR_TO_IT,
-            "object_id", object_id,
-            "x", vec_to_it[0],
-            "y", vec_to_it[1],
-            "z", vec_to_it[2]
-        )
-    );
 }
 
 void GameplaySystem::handle_new_it(const Event& e) {

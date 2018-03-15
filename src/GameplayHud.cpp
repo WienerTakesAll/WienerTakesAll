@@ -76,9 +76,14 @@ void GameplayHud::load() {
     float pointer_size_x = 0.08f;
     float pointer_size_y = pointer_size_x * 16.f / 9.f;
     std::array<glm::vec2, 4> player_screen_centers = {
+        // NOTE: 0.5 == quarter length of screen
+        // (-0.5, 0.5f) center of top left quadrant
         glm::vec2(-0.5f - pointer_size_x / 2.f, 0.5f - pointer_size_y / 2.f),
+        // (0.5, 0.5f) center of top right quadrant
         glm::vec2(0.5f - pointer_size_x / 2.f, 0.5f - pointer_size_y / 2.f),
+        // (-0.5, -0.5f) center of bottom left quadrant
         glm::vec2(-0.5f - pointer_size_x / 2.f, -0.5f - pointer_size_y / 2.f),
+        // (0.5, -0.5f) center of bottom right quadrant
         glm::vec2(0.5f - pointer_size_x / 2.f, -0.5f - pointer_size_y / 2)
     };
 

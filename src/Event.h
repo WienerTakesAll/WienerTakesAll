@@ -19,7 +19,7 @@ enum class EventType {
     ACTIVATE_AI,
     UPDATE_SCORE,
     NEW_IT,
-    VECTOR_TO_IT,
+    UPDATE_DIRECTION_TO_IT,
     ADD_SKYBOX,
     ADD_POWERUP,
     PICKUP_POWERUP,
