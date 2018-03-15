@@ -109,5 +109,5 @@ const bool PowerupSubsystem::should_pickup_powerup(const int object_id, glm::vec
 }
 
 const bool PowerupSubsystem::should_update_powerup_position(const int object_id) const {
-    return frame_counter_ < POWERUP_LOCK_FRAMES;
+    return frame_counter_ >= POWERUP_LOCK_FRAMES;
 }
