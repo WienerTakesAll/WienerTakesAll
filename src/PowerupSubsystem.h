@@ -17,7 +17,6 @@ public:
     // Modifiers
     void change_powerup_position(const int object_id, glm::vec3 pos);
     void change_powerup_type(const PowerupType new_type);
-    void move_powerup(const int object_id, glm::vec3 pos);
     void pickup_powerup(const int object_id);
     PowerupType use_powerup(const int object_id);
 

@@ -49,10 +49,6 @@ void PowerupSubsystem::change_powerup_type(const PowerupType new_type) {
     powerup_type_ = new_type;
 }
 
-void PowerupSubsystem::move_powerup(const int object_id, glm::vec3 pos) {
-    powerup_pos_ += pos;
-}
-
 void PowerupSubsystem::pickup_powerup(const int object_id) {
     // Prevent pickup if powerup was just picked up
     if (frame_counter_ < POWERUP_LOCK_FRAMES) {

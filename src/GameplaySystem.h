@@ -27,7 +27,6 @@ private:
     void handle_add_powerup(const Event& e);
     void handle_pickup_powerup(const Event& e);
     void handle_change_powerup(const Event& e);
-    void handle_move_powerup(const Event& e);
     void handle_use_powerup(const Event& e);
 
     bool should_update_score() const;
