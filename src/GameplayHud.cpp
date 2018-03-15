@@ -142,6 +142,7 @@ void GameplayHud::update_it_pointer(int player_id, glm::vec3 vector_to_it) {
 
     const float PI = 3.14159;
 
+    // only show the pointer if it's behind the car
     if (angle > PI / 2 || angle < -PI / 2) {
         it_pointers_[player_id].set_rotation(angle);
     } else {
