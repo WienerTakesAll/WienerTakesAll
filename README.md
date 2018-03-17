@@ -21,7 +21,7 @@ Escape will end the game early.
 ## Load Warning
 
 On a Windows machine, the physics may take a couple minutes to load after starting the game from the menu.
-There will only be a black screen, please be patient.y
+There will only be a black screen, please be patient.
 
 ## Compiling
 
