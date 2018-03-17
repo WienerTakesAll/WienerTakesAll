@@ -6,11 +6,6 @@
 #include "GameState.h"
 #include "Powerup.h"
 
-enum PowerupTarget {
-    SELF,
-    OTHERS
-};
-
 class PowerupSubsystem {
 public:
     PowerupSubsystem();
