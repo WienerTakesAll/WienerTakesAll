@@ -13,7 +13,7 @@ namespace {
     const std::string SKYBOX_SHADER_PATH = "assets/shaders/SkyboxShader";
     const std::string SHADOW_SHADER_PATH = "assets/shaders/ShadowShader";
     const std::string CAR_MESH_PATH = "assets/models/NoWienerCarModel.obj";
-	const std::string CAR_SHADOW_MESH_PATH = "assets/models/CarShadowModel.obj";
+    const std::string CAR_SHADOW_MESH_PATH = "assets/models/CarShadowModel.obj";
     const std::string WEINER_MESH_PATH = "assets/models/WienerCarModel.obj";
     const std::string CAR_TEXTURE_PATH = "assets/textures/textureCar.png";
     const std::string TERRAIN_MESH_PATH = "assets/models/Arena.obj";
@@ -64,12 +64,12 @@ void RenderingSystem::handle_add_vehicle(const Event& e) {
 
 
     MeshAsset* mesh = asset_manager_.get_mesh_asset(CAR_MESH_PATH);
-	MeshAsset* shadow_mesh = asset_manager_.get_mesh_asset(CAR_SHADOW_MESH_PATH);
+    MeshAsset* shadow_mesh = asset_manager_.get_mesh_asset(CAR_SHADOW_MESH_PATH);
 
     // Store car
     example_objects_.emplace_back();
     example_objects_[object_id.first].set_mesh(mesh);
-	example_objects_[object_id.first].set_shadow_mesh(shadow_mesh);
+    example_objects_[object_id.first].set_shadow_mesh(shadow_mesh);
 
     example_objects_[object_id.first].set_shader(asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH));
     example_objects_[object_id.first].set_texture(asset_manager_.get_texture_asset(CAR_TEXTURE_PATH));
@@ -248,12 +248,12 @@ void RenderingSystem::setup_cameras() {
         glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
 
         auto camera_position = glm::translate(transform, glm::vec3(0, 2.5, -7));
-       
+
         if (camera_position[3].y < 1.5) {
             camera_position[3].y = 1.5;
         }
 
-        new_cameras[i] = P * glm::lookAt(glm::vec3(camera_position[3]), car_pos , glm::vec3(0, 1, 0));
+        new_cameras[i] = P * glm::lookAt(glm::vec3(camera_position[3]), car_pos, glm::vec3(0, 1, 0));
     }
 
     // push camera setup to back of queue

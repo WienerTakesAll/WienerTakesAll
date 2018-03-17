@@ -12,7 +12,7 @@ RenderingComponent::RenderingComponent()
     : mesh_(nullptr)
     , texture_(nullptr)
     , shader_(nullptr)
-	, shadow_mesh_(nullptr)
+    , shadow_mesh_(nullptr)
     , has_shadows_(false) {
 }
 
@@ -171,8 +171,8 @@ void RenderingComponent::set_mesh(MeshAsset* mesh) {
 }
 
 void RenderingComponent::set_shadow_mesh(MeshAsset* shadow_mesh) {
-	shadow_mesh_ = shadow_mesh;
-	setupShadowBuffer();
+    shadow_mesh_ = shadow_mesh;
+    setupShadowBuffer();
 }
 
 
@@ -214,33 +214,33 @@ void RenderingComponent::setupBuffer() {
 
 void RenderingComponent::setupShadowBuffer() {
 
-	size_t buffer_count = shadow_mesh_->meshes_.size();
+    size_t buffer_count = shadow_mesh_->meshes_.size();
 
-	if (!buffer_count) {
-		return;
-	}
+    if (!buffer_count) {
+        return;
+    }
 
-	gl_shadow_vertex_buffers_.resize(buffer_count);
-	gl_shadow_index_buffers_.resize(buffer_count);
+    gl_shadow_vertex_buffers_.resize(buffer_count);
+    gl_shadow_index_buffers_.resize(buffer_count);
 
-	glGenBuffers(buffer_count, &gl_shadow_vertex_buffers_[0]);
-	glGenBuffers(buffer_count, &gl_shadow_index_buffers_[0]);
-
-
-	for (size_t i = 0; i < buffer_count; i++) {
-
-		if (shadow_mesh_ && shadow_mesh_->meshes_[i].shadow_volume_vertices_.size() && shadow_mesh_->meshes_[i].shadow_volume_indices_.size()) {
-			glBindBuffer(GL_ARRAY_BUFFER, gl_shadow_vertex_buffers_[i]);
-			glBufferData
-			(GL_ARRAY_BUFFER, sizeof(MeshAsset::MeshData::VolumeVertexData)*shadow_mesh_->meshes_[i].shadow_volume_vertices_.size()
-				, &shadow_mesh_->meshes_[i].shadow_volume_vertices_.front(), GL_STATIC_DRAW);
+    glGenBuffers(buffer_count, &gl_shadow_vertex_buffers_[0]);
+    glGenBuffers(buffer_count, &gl_shadow_index_buffers_[0]);
 
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_shadow_index_buffers_[i]);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, shadow_mesh_->meshes_[i].shadow_volume_indices_.size() * sizeof(GLuint), &shadow_mesh_->meshes_[i].shadow_volume_indices_.front(), GL_STATIC_DRAW);
-		}
+    for (size_t i = 0; i < buffer_count; i++) {
 
-	}
+        if (shadow_mesh_ && shadow_mesh_->meshes_[i].shadow_volume_vertices_.size() && shadow_mesh_->meshes_[i].shadow_volume_indices_.size()) {
+            glBindBuffer(GL_ARRAY_BUFFER, gl_shadow_vertex_buffers_[i]);
+            glBufferData
+            (GL_ARRAY_BUFFER, sizeof(MeshAsset::MeshData::VolumeVertexData)*shadow_mesh_->meshes_[i].shadow_volume_vertices_.size()
+             , &shadow_mesh_->meshes_[i].shadow_volume_vertices_.front(), GL_STATIC_DRAW);
+
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_shadow_index_buffers_[i]);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, shadow_mesh_->meshes_[i].shadow_volume_indices_.size() * sizeof(GLuint), &shadow_mesh_->meshes_[i].shadow_volume_indices_.front(), GL_STATIC_DRAW);
+        }
+
+    }
 
 
 
