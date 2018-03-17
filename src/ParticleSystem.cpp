@@ -12,9 +12,11 @@ ParticleSystem::ParticleSystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager)
     , hotdog_indicator_gen_()
     , whos_it(0) {
+    /*
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &ParticleSystem::handle_load, this);
     EventSystem::add_event_handler(EventType::NEW_IT, &ParticleSystem::handle_new_it, this);
     EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &ParticleSystem::handle_object_transform, this);
+    */
 }
 
 void ParticleSystem::update() {
@@ -35,6 +37,8 @@ void ParticleSystem::handle_load(const Event& e) {
     indicator_component.set_texture(asset_manager_.get_texture_asset(HOTDOG_INDICATOR_TEXTURE_PATH));
 
     hotdog_indicator_gen_.init(indicator_component);
+    hotdog_indicator_gen_.set_probability(1.0f);
+    hotdog_indicator_gen_.set_particle_lifetime(1);
 }
 
 void ParticleSystem::handle_new_it(const Event& e) {
@@ -50,6 +54,6 @@ void ParticleSystem::handle_object_transform(const Event& e) {
         int pos_y = e.get_value<float>("pos_y", true).first;
         int pos_z = e.get_value<float>("pos_z", true).first;
 
-        hotdog_indicator_gen_.set_position(glm::vec3(pos_x, pos_y, pos_z));
+        hotdog_indicator_gen_.set_position(glm::vec3(pos_x, pos_y + 1, pos_z));
     }
 }

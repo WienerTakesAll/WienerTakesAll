@@ -6,5 +6,5 @@ struct Particle {
     glm::vec3 velocity;
     float rotation_rads;
     float scale;
-    int lifetime;
+    unsigned int life;
 };
