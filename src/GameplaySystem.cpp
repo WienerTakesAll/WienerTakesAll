@@ -291,38 +291,24 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_a: // fall through
         case SDLK_f:
         case SDLK_j:
-        case SDLK_LEFT: {
-            float steer_amount = KEYBOARD_STEER_AMOUNT;
-
-            if (value == SDL_KEYUP) {
-                steer_amount = 0.f;
-            }
-
+        case SDLK_LEFT:
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", steer_amount);
+                                    "value", value == SDL_KEYUP ? KEYBOARD_STEER_AMOUNT : 0.f);
 
             break;
-        }
 
         // keyboard right steer
         case SDLK_d: // fall through
         case SDLK_h:
         case SDLK_l:
-        case SDLK_RIGHT: {
-            float steer_amount = -KEYBOARD_STEER_AMOUNT;
-
-            if (value == SDL_KEYUP) {
-                steer_amount = 0.f;
-            }
-
+        case SDLK_RIGHT:
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", steer_amount);
+                                    "value", value == SDL_KEYUP ? KEYBOARD_STEER_AMOUNT : 0.f);
             break;
-        }
 
         case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
 
