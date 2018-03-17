@@ -295,7 +295,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", value == SDL_KEYUP ? KEYBOARD_STEER_AMOUNT : 0.f);
+                                    "value", value != SDL_KEYUP ? KEYBOARD_STEER_AMOUNT : 0.f);
 
             break;
 
@@ -307,7 +307,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", value == SDL_KEYUP ? KEYBOARD_STEER_AMOUNT : 0.f);
+                                    "value", value != SDL_KEYUP ? KEYBOARD_STEER_AMOUNT : 0.f);
             break;
 
         case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
