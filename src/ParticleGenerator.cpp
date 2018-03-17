@@ -1,7 +1,10 @@
 #include "ParticleGenerator.h"
 #include "RenderingComponent.h"
+#include "TextureAsset.h"
 #include "ShaderAsset.h"
+#include "MeshAsset.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include "glm/gtc/type_ptr.hpp"
 #include <algorithm>
 #include <iostream>
 #include <cstdlib> // for rand
@@ -65,10 +68,40 @@ void ParticleGenerator::render(const glm::mat4& camera) {
     glm::mat4 base_transform = {glm::mat3(camera)};
     base_transform = glm::transpose(base_transform);
 
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+    glBindTexture(GL_TEXTURE_2D, rendering_component_.texture_->get_texture_id());
+    glEnable(GL_TEXTURE_2D);
+
+    GLuint uniform_model = glGetUniformLocation(shader->get_program_id(), "Model");
+    GLuint uniform_view = glGetUniformLocation(shader->get_program_id(), "View");
+
     for (auto& particle : particles_) {
         glm::mat4 model = glm::scale(base_transform, glm::vec3(particle.scale));
         model = glm::rotate(model, particle.rotation_rads, glm::vec3(0, 0, 1));
         model = glm::translate(model, particle.position);
+
+        for (size_t i = 0; i < rendering_component_.mesh_->meshes_.size(); ++i) {
+            glBindBuffer(GL_ARRAY_BUFFER, rendering_component_.gl_vertex_buffers_[i]);
+            glVertexAttribPointer
+            (0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
+             , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, position_)));
+            glVertexAttribPointer
+            (1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
+             , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, normal_)));
+            glVertexAttribPointer
+            (2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
+             , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, uv_)));
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rendering_component_.gl_index_buffers_[i]);
+
+
+            glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
+            glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(camera));
+
+            glDrawElements(GL_TRIANGLES, rendering_component_.mesh_->meshes_[i].indices_.size(), GL_UNSIGNED_INT, 0);
+        }
     }
 }
 
