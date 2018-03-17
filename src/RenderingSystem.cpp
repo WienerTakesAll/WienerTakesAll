@@ -14,6 +14,7 @@ namespace {
     const std::string SKYBOX_SHADER_PATH = "assets/shaders/SkyboxShader";
     const std::string SHADOW_SHADER_PATH = "assets/shaders/ShadowShader";
     const std::string CAR_MESH_PATH = "assets/models/NoWienerCarModel.obj";
+    const std::string CAR_SHADOW_MESH_PATH = "assets/models/CarShadowModel.obj";
     const std::string WEINER_MESH_PATH = "assets/models/WienerCarModel.obj";
     const std::string CAR_TEXTURE_PATH = "assets/textures/textureCar.png";
     const std::string TERRAIN_MESH_PATH = "assets/models/Arena.obj";
@@ -70,10 +71,13 @@ void RenderingSystem::handle_add_vehicle(const Event& e) {
 
 
     MeshAsset* mesh = asset_manager_.get_mesh_asset(CAR_MESH_PATH);
+    MeshAsset* shadow_mesh = asset_manager_.get_mesh_asset(CAR_SHADOW_MESH_PATH);
 
     // Store car
     example_objects_.emplace_back();
     example_objects_[object_id.first].set_mesh(mesh);
+    example_objects_[object_id.first].set_shadow_mesh(shadow_mesh);
+
     example_objects_[object_id.first].set_shader(asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH));
     example_objects_[object_id.first].set_texture(asset_manager_.get_texture_asset(CAR_TEXTURE_PATH));
     example_objects_[object_id.first].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
@@ -243,9 +247,9 @@ void RenderingSystem::render() {
             object.render(cameras[i], 0.3f);
         }
 
-        // for (auto& object : example_objects_) {
-        //     object.render_lighting(cameras[i], glm::vec3(-0.1f, -1.0f, 0.f), shadow_shader_);
-        // }
+        for (auto& object : example_objects_) {
+            object.render_lighting(cameras[i], glm::vec3(-0.4f, -1.0f, 0.f), shadow_shader_);
+        }
 
         glEnable(GL_BLEND);
         glEnable(GL_CULL_FACE);
@@ -319,6 +323,7 @@ void RenderingSystem::setup_cameras() {
     // get camera setup for all 4 car's current positioning
     for (size_t i = 0; i < car_indices_.size(); i++) {
         transform = example_objects_[car_indices_[i]].get_transform();
+
         glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
 
         auto camera_position = glm::translate(transform, glm::vec3(0, 2.5, -7));
