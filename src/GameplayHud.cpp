@@ -1,5 +1,7 @@
 #include <cmath>
+
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 #include "GameplayHud.h"
 
@@ -68,8 +70,37 @@ void GameplayHud::load() {
     scores_ = { score_p1, score_p2, score_p3, score_p4 };
 
     for (auto& score : scores_) {
-        score.scale(0.0f);
+        score.set_scale(0.0f);
     }
+
+    float pointer_size_x = 0.08f;
+    float pointer_size_y = pointer_size_x * 16.f / 9.f;
+    std::array<glm::vec2, 4> player_screen_centers = {
+        // NOTE: 0.5 == quarter length of screen
+        // (-0.5, 0.5f) center of top left quadrant
+        glm::vec2(-0.5f - pointer_size_x / 2.f, 0.5f - pointer_size_y / 2.f),
+        // (0.5, 0.5f) center of top right quadrant
+        glm::vec2(0.5f - pointer_size_x / 2.f, 0.5f - pointer_size_y / 2.f),
+        // (-0.5, -0.5f) center of bottom left quadrant
+        glm::vec2(-0.5f - pointer_size_x / 2.f, -0.5f - pointer_size_y / 2.f),
+        // (0.5, -0.5f) center of bottom right quadrant
+        glm::vec2(0.5f - pointer_size_x / 2.f, -0.5f - pointer_size_y / 2)
+    };
+
+
+    for (unsigned int i = 0; i < it_pointers_.size(); i++) {
+        TextureAsset* pointer_tex = asset_manager_.get_texture_asset("assets/textures/pointer.png");
+        it_pointers_[i] = UIObject(
+                              player_screen_centers[i],
+                              glm::vec3(1.0f),
+                              glm::vec2(pointer_size_x, pointer_size_y),
+                              square_mesh_,
+                              pointer_tex,
+                              ui_shader_
+                          );
+        it_pointers_[i].visible_ = false;
+    }
+
 }
 
 void GameplayHud::render() const {
@@ -78,14 +109,48 @@ void GameplayHud::render() const {
     for (auto& score : scores_) {
         score.render(glm::mat4());
     }
+
+    for (unsigned int i = 0; i < it_pointers_.size(); i++) {
+        it_pointers_[i].render(it_pointer_transforms_[i]);
+    }
 }
 
 void GameplayHud::update_score(const int& player, const int& score) {
-    scores_.at(player).scale(std::min((float) score / MAX_SCORE, 1.0f));
+    scores_.at(player).set_scale(std::min((float) score / MAX_SCORE, 1.0f));
 }
 
 void GameplayHud::reset_scores() {
     for (auto& score : scores_) {
-        score.scale(0.0f);
+        score.set_scale(0.0f);
     }
+}
+
+void GameplayHud::update_it_pointer(int player_id, glm::vec3 vector_to_it) {
+    if (current_it_ == player_id) {
+        it_pointers_[player_id].visible_ = false;
+        return;
+    }
+
+    it_pointers_[player_id].visible_ = true;
+
+    glm::vec2 origin_translate = glm::normalize(glm::vec2(vector_to_it.x, vector_to_it.z));
+
+    it_pointer_transforms_[player_id] =
+        glm::translate(glm::mat4(), glm::vec3(origin_translate[0] / -4.f, origin_translate[1] / 4.f, 0.f));
+
+    float angle = glm::orientedAngle(origin_translate, glm::vec2(0, 1));
+
+    const float PI = 3.14159;
+
+    // only show the pointer if it's behind the car
+    if (angle > PI / 2 || angle < -PI / 2) {
+        it_pointers_[player_id].set_rotation(angle);
+    } else {
+        it_pointers_[player_id].visible_ = false;
+    }
+
+}
+
+void GameplayHud::new_it(int it_id) {
+    current_it_ = it_id;
 }

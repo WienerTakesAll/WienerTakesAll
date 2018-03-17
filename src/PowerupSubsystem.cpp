@@ -1,5 +1,6 @@
 #include <stdlib.h> /* srand, rand */
 #include <time.h> /* time */
+#include <algorithm>
 
 #include "SDL.h"
 #include <glm/gtx/vector_angle.hpp>
