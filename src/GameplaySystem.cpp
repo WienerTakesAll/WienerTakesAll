@@ -2,6 +2,8 @@
 #include <iostream>
 
 #include "SDL.h"
+#include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #include "GameObjectCounter.h"
 #include "GameplaySystem.h"
@@ -387,7 +389,6 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
     float x = e.get_value<float>("pos_x", true).first;
     float y = e.get_value<float>("pos_y", true).first;
     float z = e.get_value<float>("pos_z", true).first;
-
     float qw = e.get_value<float>("qua_w", true).first;
     float qx = e.get_value<float>("qua_x", true).first;
     float qy = e.get_value<float>("qua_y", true).first;
@@ -410,6 +411,23 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
             )
         );
     }
+
+    if (object_id < 4 && object_id != current_it_id_) {
+        glm::vec3 vec_to = glm::normalize(object_positions_[current_it_id_] - object_positions_[object_id]);
+        glm::mat4 rot_matrix = glm::toMat4(object_rotations_[object_id]);
+        glm::vec4 vec_to_it = glm::vec4(vec_to, 0.f) * rot_matrix;
+
+        EventSystem::queue_event(
+            Event(
+                EventType::UPDATE_DIRECTION_TO_IT,
+                "object_id", object_id,
+                "x", vec_to_it.x,
+                "y", vec_to_it.y,
+                "z", vec_to_it.z
+            )
+        );
+    }
+
 }
 
 void GameplaySystem::handle_new_it(const Event& e) {

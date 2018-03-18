@@ -260,6 +260,7 @@
     <ClInclude Include="src\LoadingScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="src\Particle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -269,6 +270,8 @@
     <ClInclude Include="src\ParticleSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+=======
+>>>>>>> a0d54d7e65ebf8f244288b8bcb1146d49f7921d1
     <ClInclude Include="src\Powerup.h">
       <Filter>Header Files</Filter>
     </ClInclude>

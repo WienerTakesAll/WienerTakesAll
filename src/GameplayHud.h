@@ -12,6 +12,8 @@ public:
     void render() const;
     void update_score(const int& player, const int& value);
     void reset_scores();
+    void update_it_pointer(int player_id, glm::vec3 vector_to_it);
+    void new_it(int it_id);
 
 private:
     AssetManager& asset_manager_;
@@ -20,8 +22,8 @@ private:
 
     UIObject scoreboard_;
     std::array<UIObject, 4> scores_;
-    UIObject score_p1_;
-    UIObject score_p2_;
-    UIObject score_p3_;
-    UIObject score_p4_;
+    int current_it_;
+
+    std::array<UIObject, 4> it_pointers_;
+    std::array<glm::mat4, 4> it_pointer_transforms_;
 };
