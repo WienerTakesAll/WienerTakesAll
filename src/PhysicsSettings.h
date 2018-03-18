@@ -16,5 +16,6 @@ public:
     std::string vehicle_mesh_asset_path;
     float vehicle_mass;
     std::string arena_mesh;
+    std::string charcoal_mesh;
     float arena_tire_friction;
 };

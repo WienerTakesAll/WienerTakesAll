@@ -20,6 +20,7 @@ PhysicsSettings::PhysicsSettings()
 , vehicle_mesh_asset_path("assets/models/WienerCarModel.obj")
 , vehicle_mass(1000.f)
 , arena_mesh("assets/models/Arena.obj")
+, charcoal_mesh("assets/models/BestRamp.obj")
 , arena_tire_friction(1.f) {
     physx::PxF32 g_steer_vs_forward_speed_data[2 * 8] = {
         0.0f,        0.75f,

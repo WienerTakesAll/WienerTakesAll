@@ -45,7 +45,7 @@ GameplaySystem::GameplaySystem()
 void GameplaySystem::update() {
     // Update game state here
     if (should_update_score()) {
-        scoring_subsystem_.update();
+        // scoring_subsystem_.update();
 
         int score_value = scoring_subsystem_.get_current_it_score();
 
@@ -125,7 +125,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "object_id", gameobject_counter_->assign_id(),
                 // TODO: Pass glm::vec3 in events
                 "pos_x", 10,
-                "pos_y", 2,
+                "pos_y", 10,
                 "pos_z", 0//,
                 // "name", "Vehicle 1"
             )
@@ -170,6 +170,25 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "object_id", gameobject_counter_->assign_id()
             )
         );
+
+        //CHARCOAL_TEST
+        for (size_t i = 0; i < 10; i++)
+        {
+            EventSystem::queue_event(
+                Event(
+                    EventType::ADD_CHARCOAL,
+                    "object_id", gameobject_counter_->assign_id(),
+                    // TODO: Pass glm::vec3 in events
+                    "pos_x", (rand() % 150) - 75,
+                    "pos_y", 1,
+                    "pos_z", (rand() % 150) - 75//,
+                               // "name", "Vehicle 1"
+                )
+            );
+        }
+
+
+
 
         // AI
         EventSystem::queue_event(

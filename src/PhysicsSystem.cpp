@@ -31,6 +31,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, const PhysicsSettings&
 
     EventSystem::add_event_handler(EventType::ADD_VEHICLE, &PhysicsSystem::handle_add_vehicle, this);
     EventSystem::add_event_handler(EventType::ADD_ARENA, &PhysicsSystem::handle_add_arena, this);
+    EventSystem::add_event_handler(EventType::ADD_CHARCOAL, &PhysicsSystem::handle_add_charcoal, this);
     EventSystem::add_event_handler(EventType::VEHICLE_CONTROL, &PhysicsSystem::handle_vehicle_control, this);
     EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &PhysicsSystem::handle_reload_settings, this);
     EventSystem::add_event_handler(EventType::OBJECT_APPLY_FORCE, &PhysicsSystem::handle_object_apply_force, this);
@@ -176,7 +177,7 @@ void PhysicsSystem::update() {
         //If the player is out of the arena, put them back in
         if (transform.p.y < -5) {
             transform.p.x = 0;
-            transform.p.y = 2;
+            transform.p.y = 10;
             transform.p.z = 0;
             transform.q.w = 1;
             transform.q.x = 0;
@@ -245,10 +246,10 @@ void PhysicsSystem::handle_add_vehicle(const Event& e) {
 
     // create wheel locations
     PxVec3 wheel_center_offsets[4];
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-1.f, 0.2f, 2.1f);
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = physx::PxVec3(1.f, 0.2f, 2.1f);
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-1.f, 0.2f, -.1f);
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(1.f, 0.2f, -.1f);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-1.f, -0.2f, 1.f);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = physx::PxVec3(1.f, -0.2f, 1.f);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-1.f, -0.2f, -2.1f);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(1.f, -0.2f, -2.1f);
 
     // create vehicle
     create_4w_vehicle(
@@ -277,6 +278,26 @@ void PhysicsSystem::handle_add_arena(const Event& e) {
 
     g_scene_->addActor(*static_objects_.back().get_actor());
 }
+
+void PhysicsSystem::handle_add_charcoal(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    physx::PxTransform transform(0.f, 0.f, 0.f);
+
+    transform.p.x = e.get_value<int>("pos_x", true).first;
+    transform.p.y = e.get_value<int>("pos_y", true).first;
+    transform.p.z = e.get_value<int>("pos_z", true).first;
+
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(settings_.charcoal_mesh);
+
+    static_objects_.emplace_back(object_id);
+    static_objects_.back().set_mesh(g_physics_, g_cooking_, mesh, transform);
+    static_objects_.back().set_material(arena_material_);
+
+    g_scene_->addActor(*static_objects_.back().get_actor());
+}
+
+
 
 void PhysicsSystem::handle_vehicle_control(const Event& e) {
     int vehicle_index = e.get_value<int>("index", true).first;

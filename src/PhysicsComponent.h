@@ -30,7 +30,8 @@ public:
     void set_mesh(
         physx::PxPhysics* physics,
         physx::PxCooking* cooking,
-        MeshAsset* mesh);
+        MeshAsset* mesh,
+        physx::PxTransform transform = physx::PxTransform(0,0,0));
     void create_vehicle(
         physx::PxPhysics* physics,
         physx::PxCooking* cooking,
