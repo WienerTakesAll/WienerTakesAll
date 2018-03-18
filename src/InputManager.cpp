@@ -10,7 +10,7 @@ InputManager::InputManager(const InputSettings& settings)
     : settings_(settings) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &InputManager::handle_load_event, this);
     EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &InputManager::handle_reload_settings_event, this);
-	EventSystem::add_event_handler(EventType::VEHICLE_COLLISION, &InputManager::handle_vehicle_collision, this);
+    EventSystem::add_event_handler(EventType::VEHICLE_COLLISION, &InputManager::handle_vehicle_collision, this);
 }
 
 void InputManager::process_input(SDL_Event* event) {
@@ -86,16 +86,16 @@ void InputManager::process_input(SDL_Event* event) {
 }
 
 void InputManager::quit() {
-	for (SDL_GameController* game_controller : controllers_) {
-		SDL_GameControllerClose(game_controller);
-	}
+    for (SDL_GameController* game_controller : controllers_) {
+        SDL_GameControllerClose(game_controller);
+    }
 
-	for(SDL_Haptic* haptic : haptics_) {
-		SDL_HapticClose(haptic);
-	}
+    for (SDL_Haptic* haptic : haptics_) {
+        SDL_HapticClose(haptic);
+    }
 
     controllers_.clear();
-	haptics_.clear();
+    haptics_.clear();
     std::cout << "All controllers_ closed" << std::endl;
 }
 
@@ -104,11 +104,11 @@ void InputManager::handle_reload_settings_event(const Event& event) {
 }
 
 void InputManager::handle_vehicle_collision(const Event& e) {
-	int a_id = e.get_value<int>("a_id", true).first;
-	rumble_controller(a_id);
+    int a_id = e.get_value<int>("a_id", true).first;
+    rumble_controller(a_id);
 
-	int b_id = e.get_value<int>("b_id", true).first;
-	rumble_controller(b_id);
+    int b_id = e.get_value<int>("b_id", true).first;
+    rumble_controller(b_id);
 }
 
 void InputManager::handle_load_event(const Event& e) {
@@ -120,39 +120,41 @@ void InputManager::handle_load_event(const Event& e) {
 
     for (int player_id = 0; player_id < num_controllers_player; ++player_id) {
         if (SDL_IsGameController(player_id)) {
-			// Link controller
+            // Link controller
             controller = SDL_GameControllerOpen(player_id);
-			if (!controller) {
-				std::cerr << "Could not open GameController " << player_id << ": " << SDL_GetError() << std::endl;
-				continue;
-			}
 
-			controllers_.push_back(controller);
+            if (!controller) {
+                std::cerr << "Could not open GameController " << player_id << ": " << SDL_GetError() << std::endl;
+                continue;
+            }
+
+            controllers_.push_back(controller);
             std::cout << "Controller for player " << player_id << " linked" << std::endl;
 
-			// Open haptic
-			SDL_Joystick* joystick = SDL_GameControllerGetJoystick(controller);
-			SDL_Haptic* haptic = SDL_HapticOpenFromJoystick(joystick);
-			if (!haptic) {
-				std::cerr << "Could not open haptic for player " << player_id << "'s controller" << std::endl;
-				haptics_.push_back(nullptr);
-				continue;
-			}
+            // Open haptic
+            SDL_Joystick* joystick = SDL_GameControllerGetJoystick(controller);
+            SDL_Haptic* haptic = SDL_HapticOpenFromJoystick(joystick);
 
-			// Initialize haptic rumble
-			if (SDL_HapticRumbleInit(haptic) != 0) {
-				std::cerr << "Could not initialize haptic rumble for player " << player_id << "'s controller" << std::endl;
-				haptics_.push_back(nullptr);
-				continue;
-			}
+            if (!haptic) {
+                std::cerr << "Could not open haptic for player " << player_id << "'s controller" << std::endl;
+                haptics_.push_back(nullptr);
+                continue;
+            }
 
-			haptics_.push_back(haptic);
-			std::cout << "Haptic rumble for player " << player_id << " also initialized" << std::endl;
+            // Initialize haptic rumble
+            if (SDL_HapticRumbleInit(haptic) != 0) {
+                std::cerr << "Could not initialize haptic rumble for player " << player_id << "'s controller" << std::endl;
+                haptics_.push_back(nullptr);
+                continue;
+            }
+
+            haptics_.push_back(haptic);
+            std::cout << "Haptic rumble for player " << player_id << " also initialized" << std::endl;
         }
     }
 
-	// Why, SDL2, why?
-	std::reverse(haptics_.begin(), haptics_.end());
+    // Why, SDL2, why?
+    std::reverse(haptics_.begin(), haptics_.end());
 }
 
 bool InputManager::process_keyboard(const int& key, int& player_id) {
@@ -367,13 +369,13 @@ bool InputManager::process_controller_axis(const int& axis, const int& value) {
 }
 
 void InputManager::rumble_controller(const int id) const {
-	if (id >= haptics_.size()) {
-		return;
-	}
+    if (id >= haptics_.size()) {
+        return;
+    }
 
-	if (haptics_[id] == nullptr) {
-		return;
-	}
+    if (haptics_[id] == nullptr) {
+        return;
+    }
 
-	SDL_HapticRumblePlay(haptics_[id], 0.5f, 500);
+    SDL_HapticRumblePlay(haptics_[id], 0.5f, 500);
 }
