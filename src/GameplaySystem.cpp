@@ -16,6 +16,7 @@ namespace {
     const float BRAKE_SPEED = 0.8f;
     const float KETCHUP_BOOST = 50000.0f;
     const glm::vec3 HOT_KNOCK_BACK_FORCE(50000.f, 200000.f, 50000.f);
+    const float KEYBOARD_STEER_AMOUNT = 0.5f;
 }
 
 GameplaySystem::GameplaySystem()
@@ -32,7 +33,6 @@ GameplaySystem::GameplaySystem()
     add_event_handler(EventType::ADD_POWERUP, &GameplaySystem::handle_add_powerup, this);
     add_event_handler(EventType::PICKUP_POWERUP, &GameplaySystem::handle_pickup_powerup, this);
     add_event_handler(EventType::CHANGE_POWERUP, &GameplaySystem::handle_change_powerup, this);
-    add_event_handler(EventType::USE_POWERUP, &GameplaySystem::handle_use_powerup, this);
 
     EventSystem::queue_event(
         Event(
@@ -229,11 +229,33 @@ void GameplaySystem::handle_key_press(const Event& e) {
     std::vector<Event> new_events;
 
     switch (key) {
+        // self powerup
+        case SDLK_q: // fall through
+        case SDLK_r:
+        case SDLK_u:
+        case SDLK_RSHIFT:
+        case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+            new_events.emplace_back(EventType::USE_POWERUP,
+                                    "target", PowerupTarget::SELF,
+                                    "index", player_id);
+            break;
+
+        // others powerup
+        case SDLK_e: // fall through
+        case SDLK_y:
+        case SDLK_o:
+        case SDLK_RETURN:
+        case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+            new_events.emplace_back(EventType::USE_POWERUP,
+                                    "target", PowerupTarget::OTHERS,
+                                    "index", player_id);
+            break;
+
         // Keyboard acceleration
         case SDLK_w: // fall through
         case SDLK_t:
         case SDLK_i:
-        case SDLK_UP: {
+        case SDLK_UP:
             if (value == SDL_KEYDOWN) {
                 new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                         "index", player_id,
@@ -251,13 +273,12 @@ void GameplaySystem::handle_key_press(const Event& e) {
             }
 
             break;
-        }
 
         // keyboard braking
         case SDLK_s: // fall through
         case SDLK_g:
         case SDLK_k:
-        case SDLK_DOWN: {
+        case SDLK_DOWN:
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::FORWARD_DRIVE,
@@ -267,69 +288,46 @@ void GameplaySystem::handle_key_press(const Event& e) {
                                     "type", VehicleControlType::BRAKE,
                                     "value", BRAKE_SPEED);
             break;
-        }
 
         // keyboard left steer
         case SDLK_a: // fall through
         case SDLK_f:
         case SDLK_j:
-        case SDLK_LEFT: {
-            float steer_amount_left = 0.5f;
-
-            if (value == SDL_KEYUP) {
-                steer_amount_left = 0.0f;
-            }
-
+        case SDLK_LEFT:
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", steer_amount_left);
+                                    "value", value != SDL_KEYUP ? KEYBOARD_STEER_AMOUNT : 0.f);
+
             break;
-        }
 
         // keyboard right steer
         case SDLK_d: // fall through
         case SDLK_h:
         case SDLK_l:
-        case SDLK_RIGHT: {
-            float steer_amount_right = -0.5f;
-
-            if (value == SDL_KEYUP) {
-                steer_amount_right = 0.0f;
-            }
-
+        case SDLK_RIGHT:
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", steer_amount_right);
+                                    "value", value != SDL_KEYUP ? -KEYBOARD_STEER_AMOUNT : 0.f);
             break;
-        }
 
-        // keyboard powerup
-        case SDLK_SPACE: {
-            new_events.emplace_back(EventType::USE_POWERUP,
-                                    "index", player_id);
-            break;
-        }
-
-        case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: {
+        case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
 
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::FORWARD_DRIVE,
                                     "value", (float)value / MAX_TRIGGER_VALUE * DRIVE_SPEED);
             break;
-        }
 
-        case SDL_CONTROLLER_AXIS_TRIGGERLEFT: {
+        case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::BRAKE,
                                     "value", (float)value / MAX_TRIGGER_VALUE);
             break;
-        }
 
-        case SDL_CONTROLLER_AXIS_LEFTX: {
+        case SDL_CONTROLLER_AXIS_LEFTX:
 
             if (std::abs(value) < 6000) {
                 value = 0;
@@ -344,21 +342,11 @@ void GameplaySystem::handle_key_press(const Event& e) {
                                     "type", VehicleControlType::STEER,
                                     "value", (float)(value) / -MAX_TRIGGER_VALUE);
             break;
-        }
 
-        case SDL_CONTROLLER_BUTTON_B: {
-            new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", player_id,
-                                    "type", VehicleControlType::HAND_BRAKE,
-                                    "value", 1.f);
-            break;
-        }
-
-        case SDLK_ESCAPE: {
+        case SDLK_ESCAPE:
             new_events.emplace_back(EventType::NEW_GAME_STATE,
                                     "state", GameState::START_MENU);
             break;
-        }
 
         default:
             return;
@@ -510,12 +498,11 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
             break;
         }
 
-        case PowerupType::PICKLE: {
+        case PowerupType::PICKLE:
             std::cout << "PICKLE used by player " << object_id << std::endl;
             break;
-        }
 
-        case PowerupType::HOT: {
+        case PowerupType::HOT:
             for (int i = 0; i < 4; ++i) {
                 if (i == object_id) {
                     continue;
@@ -534,14 +521,10 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
             }
 
             break;
-        }
 
-        case PowerupType::POWERUP_COUNT:
-        default: {
+        default:
             break;
-        }
     }
-
 }
 
 void GameplaySystem::handle_vehicle_collision(const Event& e) {
