@@ -21,7 +21,7 @@ PhysicsSettings::PhysicsSettings()
 , vehicle_mass(500.f)
 , wheel_mass(20.f)
 , arena_mesh("assets/models/Arena.obj")
-, charcoal_mesh("assets/models/BestRamp.obj")
+, charcoal_mesh("assets/models/Mound.obj")
 , arena_tire_friction(1.f) {
     physx::PxF32 g_steer_vs_forward_speed_data[2 * 8] = {
         0.0f,        0.75f,

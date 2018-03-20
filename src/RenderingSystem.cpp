@@ -24,7 +24,7 @@ namespace {
     const std::string KETCHUP_MESH_PATH = "assets/models/Ketchup.obj";
     const std::string PICKLE_MESH_PATH = "assets/models/Pickle.obj";
     const std::string HOT_SAUCE_MESH_PATH = "assets/models/HotSauce.obj";
-    const std::string CHARCOAL_MESH_PATH = "assets/models/BestRamp.obj";
+    const std::string CHARCOAL_MESH_PATH = "assets/models/Mound.obj";
 
     const int CAMERA_LAG_FRAMES = 5;
 }
@@ -124,8 +124,6 @@ void RenderingSystem::handle_add_charcoal(const Event& e) {
     example_objects_[object_id].set_texture(texture);
     example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
 }
-
-
 
 void RenderingSystem::handle_object_transform(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
