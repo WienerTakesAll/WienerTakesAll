@@ -315,11 +315,6 @@ void PhysicsSystem::handle_reload_settings(const Event& e) {
     std::cout << "Setting scene gravity" << std::endl;
     g_scene_->setGravity(settings_.gravity);
 
-    for (auto& vehicle : vehicles_) {
-        std::cout << "Setting vehicle mass" << std::endl;
-        vehicle->mWheelsSimData.setChassisMass(settings_.vehicle_mass);
-    }
-
     std::cout << "Setting friction data" << std::endl;
     friction_pair_service_.set_friction_data(settings_.arena_tire_friction);
 }
@@ -384,7 +379,7 @@ void PhysicsSystem::handle_new_game_state(const Event& e) {
 void PhysicsSystem::create_4w_vehicle (
     const PxMaterial& material,
     PxConvexMesh* chassis_convex_mesh,
-    PxConvexMesh** wheelConvexMeshes4
+    PxConvexMesh** wheel_convex_meshes_4
 ) {
     PxVehicleChassisData chassis_data =
         create_chassis_data(
@@ -395,7 +390,7 @@ void PhysicsSystem::create_4w_vehicle (
     PxRigidDynamic* vehicle_actor =
         create_4w_vehicle_actor(
             chassis_data,
-            wheelConvexMeshes4,
+            wheel_convex_meshes_4,
             chassis_convex_mesh,
             *g_scene_,
             *g_physics_,
@@ -410,13 +405,14 @@ void PhysicsSystem::create_4w_vehicle (
     PxVehicleWheelsSimData* wheels_sim_data =
         create_wheels_sim_data(
             chassis_data,
-            20.0f,
-            wheelConvexMeshes4,
+            settings_.wheel_mass,
+            wheel_convex_meshes_4,
             settings_.wheel_center_offsets
         );
 
     // Create a vehicle.
-    PxVehicleDrive4W* vehicle = PxVehicleDrive4W::allocate(4);
+    const int NUM_WHEELS = 4;
+    PxVehicleDrive4W* vehicle = PxVehicleDrive4W::allocate(NUM_WHEELS);
     vehicle->setup(g_physics_, vehicle_actor, *wheels_sim_data, drive_sim_data, 0);
 
     // Free the sim data because we don't need that any more.

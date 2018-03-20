@@ -31,6 +31,5 @@ physics:
           *PX_MAX_F32, *PX_MAX_F32,
           *PX_MAX_F32, *PX_MAX_F32 ]
     vehicle_mesh: "assets/models/WienerCarModel.obj"
-    vehicle_mass: 500.0
     arena_mesh: "assets/models/Arena.obj"
     arena_tire_friction: 4.0

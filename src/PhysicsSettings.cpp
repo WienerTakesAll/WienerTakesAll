@@ -18,7 +18,8 @@ PhysicsSettings::PhysicsSettings()
     }
 })
 , vehicle_mesh_asset_path("assets/models/WienerCarModel.obj")
-, vehicle_mass(1000.f)
+, vehicle_mass(500.f)
+, wheel_mass(20.f)
 , arena_mesh("assets/models/Arena.obj")
 , charcoal_mesh("assets/models/BestRamp.obj")
 , arena_tire_friction(1.f) {
