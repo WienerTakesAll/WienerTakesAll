@@ -18,4 +18,5 @@ public:
     std::string arena_mesh;
     std::string charcoal_mesh;
     float arena_tire_friction;
+    physx::PxVec3 wheel_center_offsets[4];
 };

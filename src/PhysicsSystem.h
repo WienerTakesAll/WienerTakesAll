@@ -36,11 +36,8 @@ private:
 
     void create_4w_vehicle(
         const physx::PxMaterial& material,
-        const physx::PxF32 chassisMass,
-        const physx::PxVec3* wheelCentreOffsets4,
         physx::PxConvexMesh* chassisConvexMesh,
-        physx::PxConvexMesh** wheelConvexMeshes4,
-        bool useAutoGearFlag
+        physx::PxConvexMesh** wheelConvexMeshes4
     );
 
     std::vector<PhysicsComponent<false>> dynamic_objects_;

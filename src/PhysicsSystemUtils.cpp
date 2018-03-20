@@ -144,7 +144,6 @@ PxVehicleChassisData create_chassis_data(
     const PxF32 chassis_mass,
     PxConvexMesh* chassis_convex_mesh
 ) {
-    PxVehicleChassisData chassis_data;
     // Extract the chassis AABB dimensions from the chassis convex mesh.
     PxVec3 chassis_min(PX_MAX_F32, PX_MAX_F32, PX_MAX_F32);
     PxVec3 chassis_max(-PX_MAX_F32, -PX_MAX_F32, -PX_MAX_F32);
@@ -160,10 +159,6 @@ PxVehicleChassisData create_chassis_data(
 
     const PxVec3 CHASSIS_DIMS = chassis_max - chassis_min;
 
-    // The origin is at the center of the chassis mesh.
-    // Set the center of mass to be below this point and a little towards the front.
-    const PxVec3 CHASSIS_CM_OFFSET = PxVec3(0.0f, -CHASSIS_DIMS.y * 0.5f, 0.25f);
-
     // Now compute the chassis mass and moment of inertia.
     // Use the moment of inertia of a cuboid as an approximate value for the chassis moi.
     PxVec3 chassis_moi(
@@ -171,14 +166,21 @@ PxVehicleChassisData create_chassis_data(
         (CHASSIS_DIMS.x * CHASSIS_DIMS.x + CHASSIS_DIMS.z * CHASSIS_DIMS.z)*chassis_mass / 12.0f,
         (CHASSIS_DIMS.x * CHASSIS_DIMS.x + CHASSIS_DIMS.y * CHASSIS_DIMS.y)*chassis_mass / 12.0f
     );
-    // A bit of tweaking here.  The car will have more responsive turning if we reduce the
-    // y-component of the chassis moment of inertia.
-    chassis_moi.y *= 0.8f;
+
 
     // Let's set up the chassis data structure now.
+    PxVehicleChassisData chassis_data;
+
     chassis_data.mMass = chassis_mass;
+
+    // A bit of tweaking here.  The car will have more responsive turning if we reduce the
+    // y-component of the chassis moment of inertia.
     chassis_data.mMOI = chassis_moi;
-    chassis_data.mCMOffset = CHASSIS_CM_OFFSET;
+    chassis_data.mMOI *= 0.8f;
+
+    // The origin is at the center of the chassis mesh.
+    // Set the center of mass to be below this point and a little towards the front.
+    chassis_data.mCMOffset = PxVec3(0.0f, -CHASSIS_DIMS.y * 0.5f, 0.25f);;
 
     return chassis_data;
 }

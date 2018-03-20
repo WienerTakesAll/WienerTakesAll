@@ -33,4 +33,8 @@ PhysicsSettings::PhysicsSettings()
         PX_MAX_F32, PX_MAX_F32
     };
     g_steer_vs_forward_speed_table = physx::PxFixedSizeLookupTable<8>(g_steer_vs_forward_speed_data, 4);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-1.f, -0.2f, 1.f);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = physx::PxVec3(1.f, -0.2f, 1.f);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-1.f, -0.2f, -2.1f);
+    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(1.f, -0.2f, -2.1f);
 }

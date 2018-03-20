@@ -172,8 +172,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
         );
 
         //CHARCOAL_TEST
-        for (size_t i = 0; i < 10; i++)
-        {
+        for (size_t i = 0; i < 10; i++) {
             EventSystem::queue_event(
                 Event(
                     EventType::ADD_CHARCOAL,
@@ -182,7 +181,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                     "pos_x", (rand() % 150) - 75,
                     "pos_y", 1,
                     "pos_z", (rand() % 150) - 75//,
-                               // "name", "Vehicle 1"
+                    // "name", "Vehicle 1"
                 )
             );
         }
