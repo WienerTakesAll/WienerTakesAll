@@ -180,7 +180,7 @@ PxVehicleChassisData create_chassis_data(
 
     // The origin is at the center of the chassis mesh.
     // Set the center of mass to be below this point and a little towards the front.
-    chassis_data.mCMOffset = PxVec3(0.0f, -CHASSIS_DIMS.y * 0.5f, 0.25f);;
+    chassis_data.mCMOffset = PxVec3(0.0f, -CHASSIS_DIMS.y, 0.f);;
 
     return chassis_data;
 }

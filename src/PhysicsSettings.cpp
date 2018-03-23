@@ -18,7 +18,7 @@ PhysicsSettings::PhysicsSettings()
     }
 })
 , vehicle_mesh_asset_path("assets/models/WienerCarModel.obj")
-, vehicle_mass(500.f)
+, vehicle_mass(700.f)
 , wheel_mass(20.f)
 , arena_mesh("assets/models/Arena.obj")
 , charcoal_mesh("assets/models/Mound.obj")

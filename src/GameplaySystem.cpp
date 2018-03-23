@@ -11,12 +11,12 @@
 
 namespace {
     const int MAX_SCORE = 2500;
-    const int MAX_TRIGGER_VALUE = 32768;
+    const int MAX_TRIGGER_VALUE = 32768 * 0.8;
     const float DRIVE_SPEED = 0.8f;
     const float BRAKE_SPEED = 0.8f;
     const float KETCHUP_BOOST = 50000.0f;
-    const glm::vec3 HOT_KNOCK_BACK_FORCE(50000.f, 200000.f, 50000.f);
-    const float KEYBOARD_STEER_AMOUNT = 0.5f;
+    const glm::vec3 HOT_KNOCK_BACK_FORCE(10000.f, 50000.f, 10000.f);
+    const float KEYBOARD_STEER_AMOUNT = 0.4f;
 }
 
 GameplaySystem::GameplaySystem()
@@ -552,9 +552,9 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
             EventType::OBJECT_APPLY_FORCE,
             "object_id", a_id,
             // TODO: Pass glm::vec3 in events
-            "x", v_dir[0] * 50000,
-            "y", 100000.f,
-            "z", v_dir[2] * 50000
+            "x", v_dir[0] * HOT_KNOCK_BACK_FORCE.x,
+            "y", HOT_KNOCK_BACK_FORCE.y,
+            "z", v_dir[2] * HOT_KNOCK_BACK_FORCE.z
         )
     );
 
@@ -563,9 +563,9 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
             EventType::OBJECT_APPLY_FORCE,
             "object_id", b_id,
             // TODO: Pass glm::vec3 in events
-            "x", -v_dir[0] * 50000,
-            "y", 100000.f,
-            "z", -v_dir[2] * 50000
+            "x", -v_dir[0] * HOT_KNOCK_BACK_FORCE.x,
+            "y", HOT_KNOCK_BACK_FORCE.y,
+            "z", -v_dir[2] * HOT_KNOCK_BACK_FORCE.z
         )
     );
 

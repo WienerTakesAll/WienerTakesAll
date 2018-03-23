@@ -355,8 +355,8 @@ void RenderingSystem::setup_cameras() {
 
         auto camera_position = glm::translate(transform, glm::vec3(0, 2.5, -7));
 
-        if (camera_position[3].y < 1.5) {
-            camera_position[3].y = 1.5;
+        if (camera_position[3].y < 4) {
+            camera_position[3].y = 4;
         }
 
         glm::vec3 lookAtPos(car_pos.x, camera_position[3][1], car_pos.z);
