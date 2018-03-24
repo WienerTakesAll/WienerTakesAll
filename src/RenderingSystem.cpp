@@ -251,8 +251,9 @@ void RenderingSystem::handle_change_powerup(const Event& e) {
 
 void RenderingSystem::handle_keypress(const Event& e) {
 	int key = e.get_value<int>("key", true).first;
+	int value = e.get_value<int>("value", true).first;
 
-	if (key == SDLK_F11) {
+	if (key == SDLK_F11 && value == SDL_KEYDOWN) {
 		asset_manager_.toggle_fullscreen();
 	}
 }

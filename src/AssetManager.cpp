@@ -9,7 +9,7 @@
 #include <iostream>
 
 namespace {
-    const int SDL_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP;
+    const int SDL_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN;
 
     const int SCREEN_WIDTH = 1024;
     const int SCREEN_HEIGHT = 720;
@@ -255,6 +255,8 @@ void AssetManager::construct_shadow_volume(MeshAsset::MeshData& mesh) {
 }
 
 void AssetManager::toggle_fullscreen() {
-	SDL_SetWindowFullscreen(window_, is_window_fullscreen ? 0 : SDL_WINDOW_FULLSCREEN);
+	if (SDL_SetWindowFullscreen(window_, is_window_fullscreen ? 0 : SDL_WINDOW_FULLSCREEN)) {
+		std::cout << "failed to toggle fullscreen: " << SDL_GetError() << std::endl;
+	}
 	is_window_fullscreen = !is_window_fullscreen;
 }
