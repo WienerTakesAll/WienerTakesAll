@@ -9,7 +9,7 @@
 #include <iostream>
 
 namespace {
-    const int SDL_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN;
+    const int SDL_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP;
 
     const int SCREEN_WIDTH = 1024;
     const int SCREEN_HEIGHT = 720;
@@ -37,6 +37,7 @@ AssetManager::AssetManager() {
         std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
     }
 
+	is_window_fullscreen = true;
 }
 
 AssetManager::~AssetManager() {
@@ -251,4 +252,9 @@ void AssetManager::construct_shadow_volume(MeshAsset::MeshData& mesh) {
         make_face(mesh.indices_[i + 2], infVert, mesh.indices_[i]);
     }
 
+}
+
+void AssetManager::toggle_fullscreen() {
+	SDL_SetWindowFullscreen(window_, is_window_fullscreen ? 0 : SDL_WINDOW_FULLSCREEN);
+	is_window_fullscreen = !is_window_fullscreen;
 }

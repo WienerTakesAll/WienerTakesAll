@@ -44,6 +44,7 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::ADD_SKYBOX, &RenderingSystem::handle_add_skybox, this);
     EventSystem::add_event_handler(EventType::ADD_POWERUP, &RenderingSystem::handle_add_powerup, this);
     EventSystem::add_event_handler(EventType::CHANGE_POWERUP, &RenderingSystem::handle_change_powerup, this);
+	EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_keypress, this);
 
     init_window();
 }
@@ -246,6 +247,14 @@ void RenderingSystem::handle_change_powerup(const Event& e) {
     }
 
     example_objects_[object_id].set_mesh(mesh);
+}
+
+void RenderingSystem::handle_keypress(const Event& e) {
+	int key = e.get_value<int>("key", true).first;
+
+	if (key == SDLK_F11) {
+		asset_manager_.toggle_fullscreen();
+	}
 }
 
 void RenderingSystem::render() {
