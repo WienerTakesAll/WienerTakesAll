@@ -31,6 +31,7 @@ PhysicsSystem::PhysicsSystem(AssetManager& asset_manager, const PhysicsSettings&
 
     EventSystem::add_event_handler(EventType::ADD_VEHICLE, &PhysicsSystem::handle_add_vehicle, this);
     EventSystem::add_event_handler(EventType::ADD_ARENA, &PhysicsSystem::handle_add_arena, this);
+    EventSystem::add_event_handler(EventType::ADD_CHARCOAL, &PhysicsSystem::handle_add_charcoal, this);
     EventSystem::add_event_handler(EventType::VEHICLE_CONTROL, &PhysicsSystem::handle_vehicle_control, this);
     EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &PhysicsSystem::handle_reload_settings, this);
     EventSystem::add_event_handler(EventType::OBJECT_APPLY_FORCE, &PhysicsSystem::handle_object_apply_force, this);
@@ -176,7 +177,7 @@ void PhysicsSystem::update() {
         //If the player is out of the arena, put them back in
         if (transform.p.y < -5) {
             transform.p.x = 0;
-            transform.p.y = 2;
+            transform.p.y = 10;
             transform.p.z = 0;
             transform.q.w = 1;
             transform.q.x = 0;
@@ -243,21 +244,11 @@ void PhysicsSystem::handle_add_vehicle(const Event& e) {
         );
     }
 
-    // create wheel locations
-    PxVec3 wheel_center_offsets[4];
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = physx::PxVec3(-1.f, 0.2f, 2.1f);
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = physx::PxVec3(1.f, 0.2f, 2.1f);
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_LEFT] = physx::PxVec3(-1.f, 0.2f, -.1f);
-    wheel_center_offsets[physx::PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = physx::PxVec3(1.f, 0.2f, -.1f);
-
     // create vehicle
     create_4w_vehicle(
         *vehicle.get_material(),
-        settings_.vehicle_mass,
-        wheel_center_offsets,
         vehicle.get_mesh(),
-        &wheel_meshes[0],
-        true
+        &wheel_meshes[0]
     );
 
     vehicle.set_actor(vehicles_.back()->getRigidDynamicActor());
@@ -277,6 +268,26 @@ void PhysicsSystem::handle_add_arena(const Event& e) {
 
     g_scene_->addActor(*static_objects_.back().get_actor());
 }
+
+void PhysicsSystem::handle_add_charcoal(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    physx::PxTransform transform(0.f, 0.f, 0.f);
+
+    transform.p.x = e.get_value<int>("pos_x", true).first;
+    transform.p.y = e.get_value<int>("pos_y", true).first;
+    transform.p.z = e.get_value<int>("pos_z", true).first;
+
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(settings_.charcoal_mesh);
+
+    static_objects_.emplace_back(object_id);
+    static_objects_.back().set_mesh(g_physics_, g_cooking_, mesh, transform);
+    static_objects_.back().set_material(arena_material_);
+
+    g_scene_->addActor(*static_objects_.back().get_actor());
+}
+
+
 
 void PhysicsSystem::handle_vehicle_control(const Event& e) {
     int vehicle_index = e.get_value<int>("index", true).first;
@@ -303,11 +314,6 @@ void PhysicsSystem::handle_vehicle_control(const Event& e) {
 void PhysicsSystem::handle_reload_settings(const Event& e) {
     std::cout << "Setting scene gravity" << std::endl;
     g_scene_->setGravity(settings_.gravity);
-
-    for (auto& vehicle : vehicles_) {
-        std::cout << "Setting vehicle mass" << std::endl;
-        vehicle->mWheelsSimData.setChassisMass(settings_.vehicle_mass);
-    }
 
     std::cout << "Setting friction data" << std::endl;
     friction_pair_service_.set_friction_data(settings_.arena_tire_friction);
@@ -372,44 +378,41 @@ void PhysicsSystem::handle_new_game_state(const Event& e) {
 
 void PhysicsSystem::create_4w_vehicle (
     const PxMaterial& material,
-    const PxF32 chassis_mass,
-    const PxVec3 wheel_centre_offsets[4],
     PxConvexMesh* chassis_convex_mesh,
-    PxConvexMesh* wheel_convex_meshes[4],
-    bool use_auto_gear_flag
+    PxConvexMesh** wheel_convex_meshes_4
 ) {
     PxVehicleChassisData chassis_data =
         create_chassis_data(
-            chassis_mass,
+            settings_.vehicle_mass,
             chassis_convex_mesh
         );
 
-    PxVehicleDriveSimData4W drive_sim_data =
-        create_drive_sim_data(
-            wheel_centre_offsets
-        );
-
-    PxVehicleWheelsSimData* wheels_sim_data =
-        create_wheels_sim_data(
-            chassis_data,
-            20.0f,
-            wheel_convex_meshes,
-            wheel_centre_offsets
-        );
-
-    // Instantiate and finalize the vehicle using physx.
     PxRigidDynamic* vehicle_actor =
         create_4w_vehicle_actor(
             chassis_data,
-            wheel_convex_meshes,
+            wheel_convex_meshes_4,
             chassis_convex_mesh,
             *g_scene_,
             *g_physics_,
             material
         );
 
+    PxVehicleDriveSimData4W drive_sim_data =
+        create_drive_sim_data(
+            settings_.wheel_center_offsets
+        );
+
+    PxVehicleWheelsSimData* wheels_sim_data =
+        create_wheels_sim_data(
+            chassis_data,
+            settings_.wheel_mass,
+            wheel_convex_meshes_4,
+            settings_.wheel_center_offsets
+        );
+
     // Create a vehicle.
-    PxVehicleDrive4W* vehicle = PxVehicleDrive4W::allocate(4);
+    const int NUM_WHEELS = 4;
+    PxVehicleDrive4W* vehicle = PxVehicleDrive4W::allocate(NUM_WHEELS);
     vehicle->setup(g_physics_, vehicle_actor, *wheels_sim_data, drive_sim_data, 0);
 
     // Free the sim data because we don't need that any more.
@@ -428,9 +431,10 @@ void PhysicsSystem::create_4w_vehicle (
     vehicle->mWheelsSimData.setSceneQueryFilterData(1, vehicle_qry_filter_data);
     vehicle->mWheelsSimData.setSceneQueryFilterData(2, vehicle_qry_filter_data);
     vehicle->mWheelsSimData.setSceneQueryFilterData(3, vehicle_qry_filter_data);
+    vehicle->mWheelsSimData.setChassisMass(settings_.vehicle_mass);
 
     // Set the autogear mode of the instantiate vehicle.
-    vehicle->mDriveDynData.setUseAutoGears(use_auto_gear_flag);
+    vehicle->mDriveDynData.setUseAutoGears(true);
 
     // Don't forget to add the actor to the scene.
     {

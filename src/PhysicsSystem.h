@@ -28,6 +28,7 @@ public:
 private:
     void handle_add_vehicle(const Event& e);
     void handle_add_arena(const Event& e);
+    void handle_add_charcoal(const Event& e);
     void handle_vehicle_control(const Event& e);
     void handle_reload_settings(const Event& e);
     void handle_object_apply_force(const Event& e);
@@ -35,11 +36,8 @@ private:
 
     void create_4w_vehicle(
         const physx::PxMaterial& material,
-        const physx::PxF32 chassisMass,
-        const physx::PxVec3* wheelCentreOffsets4,
         physx::PxConvexMesh* chassisConvexMesh,
-        physx::PxConvexMesh** wheelConvexMeshes4,
-        bool useAutoGearFlag
+        physx::PxConvexMesh** wheelConvexMeshes4
     );
 
     std::vector<PhysicsComponent<false>> dynamic_objects_;
