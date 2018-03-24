@@ -22,8 +22,8 @@ namespace {
     const std::string SKYBOX_MESH_PATH = "assets/models/Skybox.obj";
     const std::string SKYBOX_TEXTURE_PATH = "assets/textures/park.png";
     const std::string KETCHUP_MESH_PATH = "assets/models/Ketchup.obj";
-    const std::string PICKLE_MESH_PATH = "assets/models/Pickle.obj";
-    const std::string HOT_SAUCE_MESH_PATH = "assets/models/HotSauce.obj";
+    const std::string RELISH_MESH_PATH = "assets/models/Pickle.obj";
+    const std::string MUSTARD_MESH_PATH = "assets/models/HotSauce.obj";
     const std::string CHARCOAL_MESH_PATH = "assets/models/Mound.obj";
 
     const int CAMERA_LAG_FRAMES = 5;
@@ -199,15 +199,16 @@ void RenderingSystem::handle_add_powerup(const Event& e) {
             mesh = asset_manager_.get_mesh_asset(KETCHUP_MESH_PATH);
             break;
 
-        case PowerupType::PICKLE:
-            mesh = asset_manager_.get_mesh_asset(PICKLE_MESH_PATH);
+        case PowerupType::RELISH:
+            mesh = asset_manager_.get_mesh_asset(RELISH_MESH_PATH);
             break;
 
-        case PowerupType::HOT:
-            mesh = asset_manager_.get_mesh_asset(HOT_SAUCE_MESH_PATH);
+        case PowerupType::MUSTARD:
+            mesh = asset_manager_.get_mesh_asset(MUSTARD_MESH_PATH);
             break;
 
         default:
+            assert(false);
             break;
     }
 
@@ -233,15 +234,16 @@ void RenderingSystem::handle_change_powerup(const Event& e) {
             mesh = asset_manager_.get_mesh_asset(KETCHUP_MESH_PATH);
             break;
 
-        case PowerupType::PICKLE:
-            mesh = asset_manager_.get_mesh_asset(PICKLE_MESH_PATH);
+        case PowerupType::RELISH:
+            mesh = asset_manager_.get_mesh_asset(RELISH_MESH_PATH);
             break;
 
-        case PowerupType::HOT:
-            mesh = asset_manager_.get_mesh_asset(HOT_SAUCE_MESH_PATH);
+        case PowerupType::MUSTARD:
+            mesh = asset_manager_.get_mesh_asset(MUSTARD_MESH_PATH);
             break;
 
         default:
+            assert(false);
             break;
     }
 
