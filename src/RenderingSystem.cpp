@@ -254,7 +254,7 @@ void RenderingSystem::render() {
             object.render(cameras[i], 0.3f);
         }
 
-        particle_subsystem_.render(cameras[i]);
+        particle_subsystem_.render(cameras[i], i);
 
         for (auto& object : example_objects_) {
             object.render_lighting(cameras[i], glm::vec3(-0.4f, -1.0f, 0.f), shadow_shader_);

@@ -25,8 +25,10 @@ void ParticleSystem::update() {
     hotdog_indicator_gen_.update();
 }
 
-void ParticleSystem::render(const glm::mat4& camera) {
-    hotdog_indicator_gen_.render(camera);
+void ParticleSystem::render(const glm::mat4& camera, int camera_number) {
+	if (camera_number != whos_it) {
+		hotdog_indicator_gen_.render(camera);
+	}
 }
 
 void ParticleSystem::handle_load(const Event& e) {
