@@ -2,6 +2,7 @@
 
 #include "AssetManager.h"
 
+#include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
@@ -31,7 +32,7 @@ namespace {
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager)
-    , whos_it(0) {
+    , whos_it(0), car_speeds_({ 0.f,0.f,0.f,0.f }) {
     window_ = asset_manager.get_window();
 
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
@@ -143,6 +144,17 @@ void RenderingSystem::handle_object_transform(const Event& e) {
 
     example_objects_[object_id].set_transform(glm::translate(glm::mat4(), glm::vec3(x, y, z)));
     example_objects_[object_id].apply_transform(glm::toMat4(glm::quat(qw, qx, qy, qz)));
+
+    auto e_vx = e.get_value<float>("vel_x", false);
+    if (e_vx.second && object_id < 4)
+    {
+        float vx = e_vx.first;
+        float vy = e.get_value<float>("vel_y", true).first;
+        float vz = e.get_value<float>("vel_z", true).first;
+
+        car_speeds_[object_id] = glm::length(glm::vec2(vx,vz));
+    }
+
 }
 
 
@@ -343,8 +355,6 @@ void RenderingSystem::start_render() const {
 
 void RenderingSystem::setup_cameras() {
     std::array<glm::mat4x4, 4> new_cameras;
-    glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 1000.0f);
-
     glm::mat4x4 transform;
 
     // get camera setup for all 4 car's current positioning
@@ -360,6 +370,10 @@ void RenderingSystem::setup_cameras() {
         }
 
         glm::vec3 lookAtPos(car_pos.x, camera_position[3][1], car_pos.z);
+
+
+        float FOV = 60.f + car_speeds_[i] * 5.f;
+        glm::mat4 P = glm::perspective(glm::radians(FOV), 4.0f / 3.0f, 0.1f, 1000.0f);
 
         new_cameras[i] = P * glm::lookAt(glm::vec3(camera_position[3]), lookAtPos, glm::vec3(0, 1, 0));
     }

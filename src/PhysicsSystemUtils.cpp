@@ -198,8 +198,8 @@ PxVehicleDriveSimData4W create_drive_sim_data(
 
     // Engine
     PxVehicleEngineData engine;
-    engine.mPeakTorque = 100.0f;
-    engine.mMaxOmega = 60.0f; // approx 6000 rpm
+    engine.mPeakTorque = 10000.0f;
+    engine.mMaxOmega = 20.0f; // approx 6000 rpm
     drive_sim_data.setEngineData(engine);
 
     // Gears

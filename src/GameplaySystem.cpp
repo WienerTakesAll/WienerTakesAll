@@ -15,7 +15,7 @@ namespace {
     const float DRIVE_SPEED = 0.6f;
     const float BRAKE_SPEED = 0.8f;
     const float KETCHUP_BOOST = 50000.0f;
-    const float STEER_DAMPENING = 0.8f;
+    const float STEER_DAMPENING = 0.6f;
     const glm::vec3 HOT_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const float KEYBOARD_STEER_AMOUNT = 0.4f;
 }
@@ -427,6 +427,20 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
         );
     }
 
+
+    auto e_vx = e.get_value<float>("vel_x", false);
+    if (e_vx.second)
+    {
+        float vx = e_vx.first;
+        float vy = e.get_value<float>("vel_y", true).first;
+        float vz = e.get_value<float>("vel_z", true).first;
+
+        glm::vec3 velocity(vx, vy, vz);
+        object_velocities_[object_id] = velocity;
+    }
+
+
+
 }
 
 void GameplaySystem::handle_new_it(const Event& e) {
@@ -607,6 +621,6 @@ float GameplaySystem::calculatePlayerSpeed(int player)
     float speedPenalty = 1.f + ((averageScore - playerScore) * 0.02f);
     speedPenalty = std::max(1.f, std::min(1.f, speedPenalty));
 
-    float totalSpeed = speedPenalty * DRIVE_SPEED;
+    float totalSpeed = speedPenalty * DRIVE_SPEED * std::sqrt((4.f-object_velocities_[player].length())) * 0.25f;
     return std::max(0.f, std::min(1.f, totalSpeed));
 }
