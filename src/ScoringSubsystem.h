@@ -14,6 +14,7 @@ public:
     void set_new_game_state(const GameState new_game_state);
     void set_new_it_id(const int new_it_id);
     int get_current_it_score();
+    int get_player_score(int player);
 
 private:
     int current_it_id_;

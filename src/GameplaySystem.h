@@ -31,6 +31,8 @@ private:
 
     bool should_update_score() const;
 
+    float calculatePlayerSpeed(int player);
+
     GameObjectCounter* gameobject_counter_;
     GameState current_game_state_;
     int current_it_id_;
