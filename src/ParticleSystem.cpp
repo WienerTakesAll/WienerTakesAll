@@ -1,6 +1,8 @@
 #include "ParticleSystem.h"
 #include "RenderingComponent.h"
 #include "AssetManager.h"
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace {
     const std::string PARTICLE_SHADER_PATH = "assets/shaders/ParticleShader";
@@ -55,6 +57,15 @@ void ParticleSystem::handle_object_transform(const Event& e) {
         float pos_y = e.get_value<float>("pos_y", true).first;
         float pos_z = e.get_value<float>("pos_z", true).first;
 
-        hotdog_indicator_gen_.set_position(glm::vec3(pos_x + 0.5, pos_y + 3, pos_z + 0.5));
+		float qw = e.get_value<float>("qua_w", true).first;
+		float qx = e.get_value<float>("qua_x", true).first;
+		float qy = e.get_value<float>("qua_y", true).first;
+		float qz = e.get_value<float>("qua_z", true).first;
+
+		// try to center the indicator
+		glm::mat4 rotation = glm::toMat4(glm::quat(qx, qy, qz, qw));
+		glm::vec3 right = glm::normalize(rotation[0]);
+		glm::vec3 back = glm::normalize(rotation[2]);
+        hotdog_indicator_gen_.set_position(glm::vec3(pos_x, pos_y + 3, pos_z) + (0.5f * right) - back);
     }
 }

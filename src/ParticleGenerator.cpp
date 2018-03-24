@@ -1,3 +1,7 @@
+#define _USE_MATH_DEFINES
+#include <cmath>
+#undef _USE_MATH_DEFINES
+
 #include "ParticleGenerator.h"
 #include "RenderingComponent.h"
 #include "TextureAsset.h"
@@ -9,10 +13,6 @@
 #include <iostream>
 #include <cstdlib> // for rand
 #include <ctime>
-
-#define _USE_MATH_DEFINES
-#include <cmath>
-#undef _USE_MATH_DEFINES
 
 namespace {
     const float DEG_TO_RAD = M_PI / 180.0f;
@@ -31,8 +31,8 @@ ParticleGenerator::ParticleGenerator()
     , spawn_amount_min_(1)
     , rotation_max_(0.0f)
     , rotation_min_(0.0f)
-    , scale_max_(0.0f)
-    , scale_min_(0.0f) {
+    , scale_max_(1.0f)
+    , scale_min_(1.0f) {
     // TODO: replace with a different method as we are seeding the PRNG 3+ times already
     srand(time(NULL));
 }
@@ -50,7 +50,7 @@ void ParticleGenerator::update() {
 
         particle.velocity += acceleration_;
         particle.position += particle.velocity;
-        particle.rotation += rotation_delta_;
+        particle.rotation_rads += rotation_delta_;
         particle.scale += scale_delta_;
     }
 
@@ -112,6 +112,8 @@ void ParticleGenerator::render(const glm::mat4& camera) {
     for (auto& particle : particles_) {
         glm::mat4 model = glm::translate(glm::mat4(), particle.position);
         model *= glm::mat4(glm::transpose(glm::mat3(view)));
+		model = glm::scale(model, glm::vec3(particle.scale));
+		model = glm::rotate(model, particle.rotation_rads, glm::vec3(0.0f, 0.0f, 1.0f));
 
         for (size_t i = 0; i < rendering_component_.mesh_->meshes_.size(); ++i) {
             glBindBuffer(GL_ARRAY_BUFFER, rendering_component_.gl_vertex_buffers_[i]);
