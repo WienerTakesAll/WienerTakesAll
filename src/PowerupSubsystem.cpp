@@ -12,8 +12,6 @@ namespace {
     const float POWERUP_DISTANCE_THRESHOLD = 2.5f;
     const int POWERUP_LOCK_FRAMES = 120;
     const glm::vec3 POWERUP_LOCATION_LIMITS = glm::vec3(10.0f, 1.5f, 10.0f);
-    const float KETCHUP_BOOST = 50000.0f;
-    const glm::vec3 HOT_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
 }
 
 PowerupSubsystem::PowerupSubsystem()
@@ -66,68 +64,20 @@ void PowerupSubsystem::pickup_powerup(const int object_id) {
     frame_counter_ = 0;
 }
 
-std::vector<Event>&& PowerupSubsystem::use_powerup(
-    const int object_id,
-    const std::map<int, glm::quat>& object_rotations
-) {
-    // Check if object_id has a pre-existing powerup. If so, return that. Else, return NONE.
-    PowerupType type = object_powerups_.find(object_id) == object_powerups_.end()
-                       ? PowerupType::POWERUP_COUNT
-                       : object_powerups_[object_id];
-
+void PowerupSubsystem::spend_powerup(const int object_id) {
     // Clear powerup entry.
     object_powerups_[object_id] = PowerupType::POWERUP_COUNT;
-
-    std::vector<Event> powerup_events;
-
-    switch (type) {
-        case PowerupType::KETCHUP: {
-            std::cout << "KETCHUP used by player " << object_id << std::endl;
-            glm::vec3 boost_direction = object_rotations.at(object_id) * glm::vec3(0.0f, 0.0f, KETCHUP_BOOST);
-            powerup_events.emplace_back(
-                EventType::OBJECT_APPLY_FORCE,
-                "object_id", object_id,
-                "x", boost_direction.x,
-                "y", boost_direction.y,
-                "z", boost_direction.z
-            );
-            break;
-        }
-
-        case PowerupType::PICKLE:
-            std::cout << "PICKLE used by player " << object_id << std::endl;
-            break;
-
-        case PowerupType::HOT:
-            std::cout << "HOT used by player " << object_id << std::endl;
-            for (int i = 0; i < 4; ++i) {
-                if (i == object_id) {
-                    continue;
-                }
-
-                powerup_events.emplace_back(
-                    EventType::OBJECT_APPLY_FORCE,
-                    "object_id", i,
-                    // TODO: Pass glm::vec3 in events
-                    "x", HOT_KNOCK_BACK_FORCE.x,
-                    "y", HOT_KNOCK_BACK_FORCE.y,
-                    "z", HOT_KNOCK_BACK_FORCE.z
-                );
-            }
-
-            break;
-
-        default:
-            break;
-    }
-
-    return std::move(powerup_events);
 }
 
 const bool PowerupSubsystem::can_use_powerup(const int object_id) const {
     return
         object_powerups_.find(object_id) != object_powerups_.end() &&
         object_powerups_.at(object_id) != PowerupType::POWERUP_COUNT;
+}
+
+const PowerupType PowerupSubsystem::get_player_powerup_type(const int object_id) const {
+    assert(can_use_powerup(object_id));
+    return object_powerups_.at(object_id);
 }
 
 const bool PowerupSubsystem::is_powerup(const int object_id) const {

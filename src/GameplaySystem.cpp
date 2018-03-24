@@ -17,6 +17,8 @@ namespace {
     const float STEER_DAMPENING = 0.8f;
     const float KEYBOARD_STEER_AMOUNT = 0.4f;
     const glm::vec3 COLLISION_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
+    const float KETCHUP_BOOST = 50000.0f;
+    const glm::vec3 HOT_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
 }
 
 GameplaySystem::GameplaySystem()
@@ -246,9 +248,13 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_u:
         case SDLK_RSHIFT:
         case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-            new_events.emplace_back(EventType::USE_POWERUP,
-                                    "target", PowerupTarget::SELF,
-                                    "index", player_id);
+            if (powerup_subsystem_.can_use_powerup(player_id)) {
+                new_events.emplace_back(EventType::USE_POWERUP,
+                                        "type", powerup_subsystem_.get_player_powerup_type(player_id),
+                                        "target", PowerupTarget::SELF,
+                                        "index", player_id);
+            }
+
             break;
 
         // others powerup
@@ -257,9 +263,13 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_o:
         case SDLK_RETURN:
         case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-            new_events.emplace_back(EventType::USE_POWERUP,
-                                    "target", PowerupTarget::OTHERS,
-                                    "index", player_id);
+            if (powerup_subsystem_.can_use_powerup(player_id)) {
+                new_events.emplace_back(EventType::USE_POWERUP,
+                                        "type", powerup_subsystem_.get_player_powerup_type(player_id),
+                                        "target", PowerupTarget::OTHERS,
+                                        "index", player_id);
+            }
+
             break;
 
         // Keyboard acceleration
@@ -487,15 +497,53 @@ void GameplaySystem::handle_change_powerup(const Event& e) {
 
 void GameplaySystem::handle_use_powerup(const Event& e) {
     int object_id = e.get_value<int>("index", true).first;
+    int type = e.get_value<int>("index", true).first;
+    int target = e.get_value<int>("index", true).first;
 
-    if (!powerup_subsystem_.can_use_powerup(object_id)) {
-        return;
-    }
+    powerup_subsystem_.spend_powerup(object_id);
 
-    std::vector<Event> powerup_events = powerup_subsystem_.use_powerup(object_id, object_rotations_);
+    switch (type) {
+        case PowerupType::KETCHUP: {
+            std::cout << "KETCHUP used by player " << object_id << std::endl;
+            glm::vec3 boost_direction = object_rotations_[object_id] * glm::vec3(0.0f, 0.0f, KETCHUP_BOOST);
+            EventSystem::queue_event(
+                Event(
+                    EventType::OBJECT_APPLY_FORCE,
+                    "object_id", object_id,
+                    "x", boost_direction.x,
+                    "y", boost_direction.y,
+                    "z", boost_direction.z
+                ));
+            break;
+        }
 
-    for (auto& powerup_event : powerup_events) {
-        EventSystem::queue_event(std::move(powerup_event));
+        case PowerupType::PICKLE:
+            std::cout << "PICKLE used by player " << object_id << std::endl;
+            break;
+
+        case PowerupType::HOT:
+            std::cout << "HOT used by player " << object_id << std::endl;
+
+            for (int i = 0; i < 4; ++i) {
+                if (i == object_id) {
+                    continue;
+                }
+
+                EventSystem::queue_event(
+                    Event(
+                        EventType::OBJECT_APPLY_FORCE,
+                        "object_id", i,
+                        // TODO: Pass glm::vec3 in events
+                        "x", HOT_KNOCK_BACK_FORCE.x,
+                        "y", HOT_KNOCK_BACK_FORCE.y,
+                        "z", HOT_KNOCK_BACK_FORCE.z
+                    ));
+            }
+
+            break;
+
+        default:
+            break;
     }
 }
 
