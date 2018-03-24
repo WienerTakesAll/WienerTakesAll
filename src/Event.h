@@ -8,6 +8,7 @@ enum class EventType {
     NEW_GAME_STATE,
     ADD_VEHICLE,
     ADD_ARENA,
+    ADD_CHARCOAL,
     LOAD_EVENT,
     DUMMY_EVENT,
     OBJECT_TRANSFORM_EVENT,

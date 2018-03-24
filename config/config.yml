@@ -9,7 +9,7 @@ audio:
 
 physics:
     max_float: &PX_MAX_F32 3.4028234663852885981170418348452e38
-    gravity: [0.0, -0.981, 0.0]
+    gravity: [0.0, -1.0, 0.0]
     pad_smoothing_data:
         accel_rise: 6.0
         brake_rise: 6.0
@@ -31,7 +31,5 @@ physics:
           *PX_MAX_F32, *PX_MAX_F32,
           *PX_MAX_F32, *PX_MAX_F32 ]
     vehicle_mesh: "assets/models/WienerCarModel.obj"
-    vehicle_mass: 1000.0
     arena_mesh: "assets/models/Arena.obj"
-    arena_tire_friction: 1.0
-
+    arena_tire_friction: 4.0

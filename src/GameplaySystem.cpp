@@ -12,11 +12,12 @@
 namespace {
     const int MAX_SCORE = 2500;
     const int MAX_TRIGGER_VALUE = 32768;
-    const float DRIVE_SPEED = 0.8f;
+    const float DRIVE_SPEED = 0.6f;
     const float BRAKE_SPEED = 0.8f;
     const float KETCHUP_BOOST = 50000.0f;
-    const glm::vec3 HOT_KNOCK_BACK_FORCE(50000.f, 200000.f, 50000.f);
-    const float KEYBOARD_STEER_AMOUNT = 0.5f;
+    const float STEER_DAMPENING = 0.8f;
+    const glm::vec3 HOT_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
+    const float KEYBOARD_STEER_AMOUNT = 0.4f;
 }
 
 GameplaySystem::GameplaySystem()
@@ -114,8 +115,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 // TODO: Pass glm::vec3 in events
                 "pos_x", 4,
                 "pos_y", 2,
-                "pos_z", 0//,
-                // "name", "Vehicle 1"
+                "pos_z", 0
             )
         );
 
@@ -125,9 +125,8 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "object_id", gameobject_counter_->assign_id(),
                 // TODO: Pass glm::vec3 in events
                 "pos_x", 10,
-                "pos_y", 2,
+                "pos_y", 10,
                 "pos_z", 0//,
-                // "name", "Vehicle 1"
             )
         );
 
@@ -138,8 +137,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 // TODO: Pass glm::vec3 in events
                 "pos_x", -4,
                 "pos_y", 2,
-                "pos_z", 0//,
-                // "name", "Vehicle 1"
+                "pos_z", 0
             )
         );
 
@@ -150,8 +148,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 // TODO: Pass glm::vec3 in events
                 "pos_x", -10,
                 "pos_y", 2,
-                "pos_z", 0//,
-                // "name", "Vehicle 1"
+                "pos_z", 0
             )
         );
 
@@ -170,6 +167,20 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "object_id", gameobject_counter_->assign_id()
             )
         );
+
+        //CHARCOAL_TEST
+        for (size_t i = 0; i < 10; i++) {
+            EventSystem::queue_event(
+                Event(
+                    EventType::ADD_CHARCOAL,
+                    "object_id", gameobject_counter_->assign_id(),
+                    // TODO: Pass glm::vec3 in events
+                    "pos_x", (rand() % 150) - 75,
+                    "pos_y", 1,
+                    "pos_z", (rand() % 150) - 75//,
+                )
+            );
+        }
 
         // AI
         EventSystem::queue_event(
@@ -317,14 +328,14 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::FORWARD_DRIVE,
-                                    "value", (float)value / MAX_TRIGGER_VALUE * DRIVE_SPEED);
+                                    "value", (float)(value) / MAX_TRIGGER_VALUE * DRIVE_SPEED);
             break;
 
         case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::BRAKE,
-                                    "value", (float)value / MAX_TRIGGER_VALUE);
+                                    "value", (float)(value) / MAX_TRIGGER_VALUE);
             break;
 
         case SDL_CONTROLLER_AXIS_LEFTX:
@@ -340,7 +351,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", (float)(value) / -MAX_TRIGGER_VALUE);
+                                    "value", (float)(value * STEER_DAMPENING)  / -MAX_TRIGGER_VALUE);
             break;
 
         case SDLK_ESCAPE:
@@ -542,9 +553,9 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
             EventType::OBJECT_APPLY_FORCE,
             "object_id", a_id,
             // TODO: Pass glm::vec3 in events
-            "x", v_dir[0] * 50000,
-            "y", 100000.f,
-            "z", v_dir[2] * 50000
+            "x", v_dir[0] * HOT_KNOCK_BACK_FORCE.x,
+            "y", HOT_KNOCK_BACK_FORCE.y,
+            "z", v_dir[2] * HOT_KNOCK_BACK_FORCE.z
         )
     );
 
@@ -553,9 +564,9 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
             EventType::OBJECT_APPLY_FORCE,
             "object_id", b_id,
             // TODO: Pass glm::vec3 in events
-            "x", -v_dir[0] * 50000,
-            "y", 100000.f,
-            "z", -v_dir[2] * 50000
+            "x", -v_dir[0] * HOT_KNOCK_BACK_FORCE.x,
+            "y", HOT_KNOCK_BACK_FORCE.y,
+            "z", -v_dir[2] * HOT_KNOCK_BACK_FORCE.z
         )
     );
 
