@@ -56,6 +56,7 @@ void RenderingSystem::load(const Event& e) {
     setup_cameras();
 
     shadow_shader_ = asset_manager_.get_shader_asset(SHADOW_SHADER_PATH);
+	asset_manager_.toggle_fullscreen();
 }
 
 void RenderingSystem::handle_add_vehicle(const Event& e) {

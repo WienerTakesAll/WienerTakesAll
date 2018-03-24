@@ -9,7 +9,7 @@
 #include <iostream>
 
 namespace {
-    const int SDL_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN;
+    const int SDL_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
     const int SCREEN_WIDTH = 1024;
     const int SCREEN_HEIGHT = 720;
@@ -37,7 +37,7 @@ AssetManager::AssetManager() {
         std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
     }
 
-	is_window_fullscreen = true;
+	is_window_fullscreen = false;
 }
 
 AssetManager::~AssetManager() {
