@@ -11,11 +11,12 @@
 
 namespace {
     const int MAX_SCORE = 2500;
-    const int MAX_TRIGGER_VALUE = 32768 * 0.8;
-    const float DRIVE_SPEED = 0.8f;
+    const int MAX_TRIGGER_VALUE = 32768;
+    const float DRIVE_SPEED = 0.6f;
     const float BRAKE_SPEED = 0.8f;
     const float KETCHUP_BOOST = 50000.0f;
-    const glm::vec3 HOT_KNOCK_BACK_FORCE(10000.f, 50000.f, 10000.f);
+    const float STEER_DAMPENING = 0.8f;
+    const glm::vec3 HOT_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const float KEYBOARD_STEER_AMOUNT = 0.4f;
 }
 
@@ -327,14 +328,14 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::FORWARD_DRIVE,
-                                    "value", (float)value / MAX_TRIGGER_VALUE * DRIVE_SPEED);
+                                    "value", (float)(value) / MAX_TRIGGER_VALUE * DRIVE_SPEED);
             break;
 
         case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::BRAKE,
-                                    "value", (float)value / MAX_TRIGGER_VALUE);
+                                    "value", (float)(value) / MAX_TRIGGER_VALUE);
             break;
 
         case SDL_CONTROLLER_AXIS_LEFTX:
@@ -350,7 +351,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", (float)(value) / -MAX_TRIGGER_VALUE);
+                                    "value", (float)(value * STEER_DAMPENING)  / -MAX_TRIGGER_VALUE);
             break;
 
         case SDLK_ESCAPE:
