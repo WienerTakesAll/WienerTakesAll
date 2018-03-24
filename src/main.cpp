@@ -32,6 +32,28 @@ namespace {
 
     // Length of one frame (60fps ~= 16.66 milliseconds per frame)
     const auto FRAME_DURATION_MS = std::chrono::milliseconds( 16 );
+
+    template <bool Profile, typename C>
+    void runProfiledUpdate(C& runner, std::chrono::duration<double>& time) {
+        if (Profile) {
+            auto func_start = std::chrono::steady_clock::now();
+            runner.update();
+            time = std::chrono::steady_clock::now() - func_start;
+        } else {
+            runner.update();
+        }
+    }
+
+    template <bool Profile, typename C>
+    void runProfiledRender(C& runner, std::chrono::duration<double>& time) {
+        if (Profile) {
+            auto func_start = std::chrono::steady_clock::now();
+            runner.render();
+            time = std::chrono::steady_clock::now() - func_start;
+        } else {
+            runner.render();
+        }
+    }
 }
 
 int main(int argc, char* args[]) {
@@ -107,34 +129,28 @@ int main(int argc, char* args[]) {
         std::chrono::duration<double> events_elapsed = std::chrono::steady_clock::now() - events_start;
 
         // Update
-        auto ai_start_update = std::chrono::steady_clock::now();
-        ai_system.update();
-        std::chrono::duration<double> ai_elapsed_update = std::chrono::steady_clock::now() - ai_start_update;
+        std::chrono::duration<double> ai_elapsed_update;
+        runProfiledUpdate<PROFILING>(ai_system, ai_elapsed_update);
 
-        auto gameplay_start_update = std::chrono::steady_clock::now();
-        gameplay_system.update();
-        std::chrono::duration<double> gameplay_elapsed_update = std::chrono::steady_clock::now() - gameplay_start_update;
+        std::chrono::duration<double> gameplay_elapsed_update;
+        runProfiledUpdate<PROFILING>(gameplay_system, gameplay_elapsed_update);
 
-        auto physics_start_update = std::chrono::steady_clock::now();
-        physics_system.update();
-        std::chrono::duration<double> physics_elapsed_update = std::chrono::steady_clock::now() - physics_start_update;
+        std::chrono::duration<double> physics_elapsed_update;
+        runProfiledUpdate<PROFILING>(physics_system, physics_elapsed_update);
 
-        auto rendering_start_update = std::chrono::steady_clock::now();
-        rendering_system.update();
-        std::chrono::duration<double> rendering_elapsed_update = std::chrono::steady_clock::now() - rendering_start_update;
+        std::chrono::duration<double> rendering_elapsed_update;
+        runProfiledUpdate<PROFILING>(rendering_system, rendering_elapsed_update);
 
-        auto ui_start_update = std::chrono::steady_clock::now();
-        ui_system.update();
-        std::chrono::duration<double> ui_elapsed_update = std::chrono::steady_clock::now() - ui_start_update;
+        std::chrono::duration<double> ui_elapsed_update;
+        runProfiledUpdate<PROFILING>(ui_system, ui_elapsed_update);
+
 
         // Render
-        auto rendering_start_render = std::chrono::steady_clock::now();
-        rendering_system.render();
-        std::chrono::duration<double> rendering_elapsed_render = std::chrono::steady_clock::now() - rendering_start_render;
+        std::chrono::duration<double> rendering_elapsed_render;
+        runProfiledRender<PROFILING>(rendering_system, rendering_elapsed_render);
 
-        auto ui_start_render = std::chrono::steady_clock::now();
-        ui_system.render();
-        std::chrono::duration<double> ui_elapsed_render = std::chrono::steady_clock::now() - ui_start_render;
+        std::chrono::duration<double> ui_elapsed_render;
+        runProfiledRender<PROFILING>(ui_system, ui_elapsed_render);
 
         // Maintain a maximum frame rate of 60fps
         if ( game_is_running ) {
