@@ -1,6 +1,6 @@
-#include "ScoringSubsystem.h"
+#include <assert.h>
 
-#include <iostream>
+#include "ScoringSubsystem.h"
 
 ScoringSubsystem::ScoringSubsystem()
     : current_it_id_(-1) {

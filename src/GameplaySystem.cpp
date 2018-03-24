@@ -595,13 +595,13 @@ bool GameplaySystem::should_update_score() const {
 }
 
 
-float GameplaySystem::calculatePlayerSpeed(int player)
-{
+float GameplaySystem::calculatePlayerSpeed(int player) {
     float averageScore = 0;
-    for (size_t i = 0; i < 4; i++)
-    {
+
+    for (size_t i = 0; i < 4; i++) {
         averageScore += scoring_subsystem_.get_player_score(i);
     }
+
     averageScore *= 0.25f;
     float playerScore = scoring_subsystem_.get_player_score(player);
     float speedPenalty = 1.f + ((averageScore - playerScore) * 0.02f);

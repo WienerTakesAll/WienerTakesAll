@@ -34,38 +34,27 @@ namespace {
     const auto FRAME_DURATION_MS = std::chrono::milliseconds( 16 );
 
     template <bool Profile, typename C>
-    void runProfiledUpdate(C& runner, std::chrono::duration<double>& time)
-    {
-        if (Profile)
-        {
+    void runProfiledUpdate(C& runner, std::chrono::duration<double>& time) {
+        if (Profile) {
             auto func_start = std::chrono::steady_clock::now();
             runner.update();
             time = std::chrono::steady_clock::now() - func_start;
-        }
-        else
-        {
+        } else {
             runner.update();
         }
     }
 
     template <bool Profile, typename C>
-    void runProfiledRender(C& runner, std::chrono::duration<double>& time)
-    {
-        if (Profile)
-        {
+    void runProfiledRender(C& runner, std::chrono::duration<double>& time) {
+        if (Profile) {
             auto func_start = std::chrono::steady_clock::now();
             runner.render();
             time = std::chrono::steady_clock::now() - func_start;
-        }
-        else
-        {
+        } else {
             runner.render();
         }
     }
 }
-
-
-
 
 int main(int argc, char* args[]) {
     SDL_Init(SDL_INIT_EVERYTHING);
