@@ -44,6 +44,7 @@ void ParticleSystem::handle_load(const Event& e) {
     hotdog_indicator_gen_.set_probability(1.0f);
     hotdog_indicator_gen_.set_particle_lifetime(0);
     hotdog_indicator_gen_.set_particle_rotation_degrees(0.0f, 180.0f, 180.0f);
+    hotdog_indicator_gen_.set_position(glm::vec3(100.0f, 100.0f, 100.0f));
 }
 
 void ParticleSystem::handle_new_it(const Event& e) {
