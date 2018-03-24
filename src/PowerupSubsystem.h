@@ -5,6 +5,7 @@
 
 #include "GameState.h"
 #include "Powerup.h"
+#include "Event.h"
 
 class PowerupSubsystem {
 public:
@@ -18,7 +19,10 @@ public:
     void change_powerup_position(const int player_id, glm::vec3 pos);
     void change_powerup_type(const PowerupType new_type);
     void pickup_powerup(const int player_id);
-    PowerupType use_powerup(const int player_id);
+    std::vector<Event>&& use_powerup(
+        const int object_id,
+        const std::map<int, glm::quat>& object_rotations
+    );
 
     // Utility functions
     const bool can_use_powerup(const int object_id) const;
