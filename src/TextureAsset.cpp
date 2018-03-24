@@ -11,7 +11,7 @@ TextureAsset::TextureAsset() {
 TextureAsset::~TextureAsset() {
 }
 
-void TextureAsset::load(const std::string& file_path) {
+void TextureAsset::load(const std::string& file_path, const bool& do_clamp) {
     SDL_Surface* surface = IMG_Load(file_path.c_str());
 
     if (!surface) {
@@ -25,6 +25,11 @@ void TextureAsset::load(const std::string& file_path) {
     glBindTexture(GL_TEXTURE_2D, texture_id_);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    if (do_clamp) {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    }
 
     SDL_PixelFormat& p_format = *surface->format;
 

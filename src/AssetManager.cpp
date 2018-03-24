@@ -58,11 +58,11 @@ MeshAsset* AssetManager::get_mesh_asset(const std::string& filepath) {
     return &asset->second;
 }
 
-TextureAsset* AssetManager::get_texture_asset(const std::string& file_path) {
+TextureAsset* AssetManager::get_texture_asset(const std::string& file_path, const bool& do_clamp) {
     auto asset = texture_assets_.find(file_path);
 
     if (asset == texture_assets_.end()) {
-        load_texture_from_file(file_path);
+        load_texture_from_file(file_path, do_clamp);
         asset = texture_assets_.find(file_path);
     }
 
@@ -164,7 +164,7 @@ void AssetManager::load_mesh_from_file(const std::string& file_path) {
     }
 }
 
-void AssetManager::load_texture_from_file(const std::string& file_path) {
+void AssetManager::load_texture_from_file(const std::string& file_path, const bool& do_clamp) {
     auto texture_map = texture_assets_.emplace(file_path, TextureAsset());
 
     if (!texture_map.second) {
@@ -173,7 +173,7 @@ void AssetManager::load_texture_from_file(const std::string& file_path) {
     }
 
     TextureAsset& texture_data = texture_map.first->second;
-    texture_data.load(file_path);
+    texture_data.load(file_path, do_clamp);
 }
 
 void AssetManager::load_shader_from_file(const std::string& file_path) {
