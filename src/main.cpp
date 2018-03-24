@@ -1,8 +1,10 @@
+#define PROFILING 0
+
 #include <chrono>
 #include <iostream>
 #include <stdlib.h>
 #include <thread>
-
+#include <stdio.h>
 
 #include "AssetManager.h"
 #include "EventSystem.h"
@@ -10,7 +12,6 @@
 
 #include "SDL.h"
 #include "SDL_image.h"
-
 
 #include "AssetManager.h"
 #include "AudioSystem.h"
@@ -81,7 +82,7 @@ int main(int argc, char* args[]) {
         }
 
 
-
+        auto events_start = std::chrono::steady_clock::now();
         // Send Events
         input_manager.send_events(events);
         gameplay_system.send_events(events);
@@ -103,25 +104,54 @@ int main(int argc, char* args[]) {
 
         // Clear events
         events.clear();
+        std::chrono::duration<double> events_elapsed = std::chrono::steady_clock::now() - events_start;
 
         // Update
+        auto ai_start_update = std::chrono::steady_clock::now();
         ai_system.update();
+        std::chrono::duration<double> ai_elapsed_update = std::chrono::steady_clock::now() - ai_start_update;
+
+        auto gameplay_start_update = std::chrono::steady_clock::now();
         gameplay_system.update();
+        std::chrono::duration<double> gameplay_elapsed_update = std::chrono::steady_clock::now() - gameplay_start_update;
+
+        auto physics_start_update = std::chrono::steady_clock::now();
         physics_system.update();
+        std::chrono::duration<double> physics_elapsed_update = std::chrono::steady_clock::now() - physics_start_update;
+
+        auto rendering_start_update = std::chrono::steady_clock::now();
         rendering_system.update();
+        std::chrono::duration<double> rendering_elapsed_update = std::chrono::steady_clock::now() - rendering_start_update;
+
+        auto ui_start_update = std::chrono::steady_clock::now();
         ui_system.update();
+        std::chrono::duration<double> ui_elapsed_update = std::chrono::steady_clock::now() - ui_start_update;
 
         // Render
+        auto rendering_start_render = std::chrono::steady_clock::now();
         rendering_system.render();
+        std::chrono::duration<double> rendering_elapsed_render = std::chrono::steady_clock::now() - rendering_start_render;
+
+        auto ui_start_render = std::chrono::steady_clock::now();
         ui_system.render();
+        std::chrono::duration<double> ui_elapsed_render = std::chrono::steady_clock::now() - ui_start_render;
 
         // Maintain a maximum frame rate of 60fps
         if ( game_is_running ) {
             std::chrono::duration<double> diff =
                 std::chrono::steady_clock::now() - frame_end_time;
 
-            if (diff.count() > 0) {
-                std::cout << "Missed update by " << diff.count() << "s" << std::endl;
+            if (PROFILING) {
+                printf("E:%f%%, AU:%f%%, GU:%f%%, PU:%f%%, RU:%f%%, UU:%f%%, RR:%f%%, UR:%f%%, I:%f%%\n",
+                       events_elapsed.count() * 60.f * 100,
+                       ai_elapsed_update.count() * 60.f * 100,
+                       gameplay_elapsed_update.count() * 60.f * 100,
+                       physics_elapsed_update.count() * 60.f * 100,
+                       rendering_elapsed_update.count() * 60.f * 100,
+                       ui_elapsed_update.count() * 60.f * 100,
+                       rendering_elapsed_render.count() * 60.f * 100,
+                       ui_elapsed_render.count() * 60.f * 100,
+                       -diff.count() * 60.f * 100);
             }
 
             std::this_thread::sleep_until( frame_end_time );
