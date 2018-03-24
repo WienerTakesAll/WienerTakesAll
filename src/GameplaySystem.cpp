@@ -271,7 +271,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
                 new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                         "index", player_id,
                                         "type", VehicleControlType::FORWARD_DRIVE,
-                                        "value", DRIVE_SPEED);
+                                        "value", calculatePlayerSpeed(player_id));
                 new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                         "index", player_id,
                                         "type", VehicleControlType::BRAKE,
@@ -328,7 +328,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::FORWARD_DRIVE,
-                                    "value", (float)(value) / MAX_TRIGGER_VALUE * DRIVE_SPEED);
+                                    "value", (float)(value) / MAX_TRIGGER_VALUE * calculatePlayerSpeed(player_id));
             break;
 
         case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
@@ -592,4 +592,21 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
 bool GameplaySystem::should_update_score() const {
     return  current_game_state_ ==  GameState::IN_GAME  &&
             current_it_id_      !=  -1;
+}
+
+
+float GameplaySystem::calculatePlayerSpeed(int player)
+{
+    float averageScore = 0;
+    for (size_t i = 0; i < 4; i++)
+    {
+        averageScore += scoring_subsystem_.get_player_score(i);
+    }
+    averageScore *= 0.25f;
+    float playerScore = scoring_subsystem_.get_player_score(player);
+    float speedPenalty = 1.f + ((averageScore - playerScore) * 0.02f);
+    speedPenalty = std::max(1.f, std::min(1.f, speedPenalty));
+
+    float totalSpeed = speedPenalty * DRIVE_SPEED;
+    return std::max(0.f, std::min(1.f, totalSpeed));
 }

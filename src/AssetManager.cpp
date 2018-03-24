@@ -9,7 +9,7 @@
 #include <iostream>
 
 namespace {
-    const int SDL_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
+    const int SDL_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN;
 
     const int SCREEN_WIDTH = 1024;
     const int SCREEN_HEIGHT = 720;

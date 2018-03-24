@@ -39,3 +39,15 @@ void ScoringSubsystem::set_new_it_id(const int new_it_id) {
 int ScoringSubsystem::get_current_it_score() {
     return scores_[current_it_id_];
 }
+
+int ScoringSubsystem::get_player_score(int player) {
+    auto score = scores_.find(player);
+    if (score != scores_.end())
+    {
+        return score->second;
+    }
+    else
+    {
+        return 0;
+    }
+}
