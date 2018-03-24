@@ -517,12 +517,12 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
             break;
         }
 
-        case PowerupType::PICKLE:
-            std::cout << "PICKLE used by player " << object_id << std::endl;
+        case PowerupType::MUSTARD:
+            std::cout << "MUSTARD used by player " << object_id << std::endl;
             break;
 
-        case PowerupType::HOT:
-            std::cout << "HOT used by player " << object_id << std::endl;
+        case PowerupType::RELISH:
+            std::cout << "RELISH used by player " << object_id << std::endl;
 
             for (int i = 0; i < 4; ++i) {
                 if (i == object_id) {
