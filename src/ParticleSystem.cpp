@@ -4,7 +4,7 @@
 
 namespace {
     const std::string PARTICLE_SHADER_PATH = "assets/shaders/ParticleShader";
-    const std::string HOTDOG_INDICATOR_TEXTURE_PATH = "assets/textures/default.png";
+    const std::string HOTDOG_INDICATOR_TEXTURE_PATH = "assets/textures/pointer.png";
     const std::string PARTICLE_MESH_PATH = "assets/models/UIRect.obj";
 }
 
@@ -38,7 +38,8 @@ void ParticleSystem::handle_load(const Event& e) {
 
     hotdog_indicator_gen_.init(indicator_component);
     hotdog_indicator_gen_.set_probability(1.0f);
-    hotdog_indicator_gen_.set_particle_lifetime(1);
+    hotdog_indicator_gen_.set_particle_lifetime(0);
+    hotdog_indicator_gen_.set_particle_rotation_degrees(0.0f, 180.0f, 180.0f);
 }
 
 void ParticleSystem::handle_new_it(const Event& e) {
@@ -50,10 +51,10 @@ void ParticleSystem::handle_object_transform(const Event& e) {
 
     if (object_id == whos_it) {
         // update hotdog indicator
-        int pos_x = e.get_value<float>("pos_x", true).first;
-        int pos_y = e.get_value<float>("pos_y", true).first;
-        int pos_z = e.get_value<float>("pos_z", true).first;
+        float pos_x = e.get_value<float>("pos_x", true).first;
+        float pos_y = e.get_value<float>("pos_y", true).first;
+        float pos_z = e.get_value<float>("pos_z", true).first;
 
-        hotdog_indicator_gen_.set_position(glm::vec3(pos_x, pos_y + 1, pos_z));
+        hotdog_indicator_gen_.set_position(glm::vec3(pos_x + 0.5, pos_y + 3, pos_z + 0.5));
     }
 }
