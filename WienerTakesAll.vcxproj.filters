@@ -111,10 +111,10 @@
     <ClCompile Include="src\ParticleGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ParticleSystem.cpp">
+    <ClCompile Include="src\PowerupSubsystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PowerupSubsystem.cpp">
+    <ClCompile Include="src\ParticleSubsystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -260,22 +260,19 @@
     <ClInclude Include="src\LoadingScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-<<<<<<< HEAD
     <ClInclude Include="src\Particle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ParticleGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ParticleSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-=======
->>>>>>> a0d54d7e65ebf8f244288b8bcb1146d49f7921d1
     <ClInclude Include="src\Powerup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\PowerupSubsystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParticleSubsystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

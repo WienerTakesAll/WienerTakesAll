@@ -5,9 +5,9 @@
 
 class AssetManager;
 
-class ParticleSystem : public EventSystem<ParticleSystem> {
+class ParticleSubsystem {
 public:
-    ParticleSystem(AssetManager& asset_manager);
+    ParticleSubsystem(AssetManager& asset_manager);
     void update();
     void render(const glm::mat4& camera, int camera_num);
     void handle_load(const Event& e);

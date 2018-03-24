@@ -118,7 +118,7 @@
     <ClCompile Include="src\LoadingScreen.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ParticleGenerator.cpp" />
-    <ClCompile Include="src\ParticleSystem.cpp" />
+    <ClCompile Include="src\ParticleSubsystem.cpp" />
     <ClCompile Include="src\PhysicsComponent.cpp" />
     <ClCompile Include="src\PhysicsSettings.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
@@ -166,7 +166,7 @@
     <ClInclude Include="src\MusicAsset.h" />
     <ClInclude Include="src\Particle.h" />
     <ClInclude Include="src\ParticleGenerator.h" />
-    <ClInclude Include="src\ParticleSystem.h" />
+    <ClInclude Include="src\ParticleSubsystem.h" />
     <ClInclude Include="src\PhysicsComponent.h" />
     <ClInclude Include="src\PhysicsComponent_impl.h" />
     <ClInclude Include="src\PhysicsSettings.h" />
