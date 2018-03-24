@@ -222,8 +222,8 @@ bool InputManager::process_keyboard(const int& key, int& player_id) {
         case SDLK_F5:
             break;
 
-		case SDLK_F11:
-			break;
+        case SDLK_F11:
+            break;
 
         case SDLK_ESCAPE:
             break;

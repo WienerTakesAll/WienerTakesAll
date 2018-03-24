@@ -20,7 +20,7 @@ public:
     MeshAsset* get_mesh_asset(const std::string& file_path);
     TextureAsset* get_texture_asset(const std::string& file_path, const bool& do_clamp = false);
     ShaderAsset* get_shader_asset(const std::string& file_path);
-	void toggle_fullscreen();
+    void toggle_fullscreen();
 
     SDL_Window* get_window() const;
 
@@ -34,6 +34,6 @@ private:
     std::unordered_map<std::string, ShaderAsset> shader_assets_;
 
     SDL_Window* window_;
-	bool is_window_fullscreen;
+    bool is_window_fullscreen;
 };
 
