@@ -15,10 +15,13 @@ namespace {
     const float DRIVE_SPEED = 0.6f;
     const float BRAKE_SPEED = 0.8f;
     const float KETCHUP_BOOST = 1500.0f;
-    const float STEER_DAMPENING = 0.6f;
+    const float NORMAL_STEER_DAMPENING = 0.6f;
+    const float RELISH_STEER_DAMPENING = 1.0f;
     const glm::vec3 HOT_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
-    const float KEYBOARD_STEER_AMOUNT = 0.4f;
+    const float NORMAL_KEYBOARD_STEER_AMOUNT = 0.4f;
+    const float RELISH_KEYBOARD_STEER_AMOUNT = 0.4f;
     const glm::vec3 COLLISION_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
+    const float RELISH_DURATION = 2.5f;
 }
 
 GameplaySystem::GameplaySystem()
@@ -111,6 +114,10 @@ void GameplaySystem::update() {
                     ));
 
                 powerup_data.second.ketchup -= 0.01f;
+            }
+
+            if (powerup_data.second.relish > 0.f) {
+                powerup_data.second.relish -= 0.01f;
             }
         }
     }
@@ -333,24 +340,38 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_a: // fall through
         case SDLK_f:
         case SDLK_j:
-        case SDLK_LEFT:
+        case SDLK_LEFT: {
+            float steer_amount = NORMAL_KEYBOARD_STEER_AMOUNT;
+
+            if (powerup_datas_[player_id].relish > 0.f) {
+                steer_amount = RELISH_KEYBOARD_STEER_AMOUNT;
+            }
+
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", value != SDL_KEYUP ? KEYBOARD_STEER_AMOUNT : 0.f);
+                                    "value", value != SDL_KEYUP ? steer_amount : 0.f);
 
             break;
+        }
 
         // keyboard right steer
         case SDLK_d: // fall through
         case SDLK_h:
         case SDLK_l:
-        case SDLK_RIGHT:
+        case SDLK_RIGHT: {
+            float steer_amount = -NORMAL_KEYBOARD_STEER_AMOUNT;
+
+            if (powerup_datas_[player_id].relish > 0.f) {
+                steer_amount = RELISH_KEYBOARD_STEER_AMOUNT;
+            }
+
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", value != SDL_KEYUP ? -KEYBOARD_STEER_AMOUNT : 0.f);
+                                    "value", value != SDL_KEYUP ? steer_amount : 0.f);
             break;
+        }
 
         case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
 
@@ -367,9 +388,9 @@ void GameplaySystem::handle_key_press(const Event& e) {
                                     "value", (float)(value) / MAX_TRIGGER_VALUE);
             break;
 
-        case SDL_CONTROLLER_AXIS_LEFTX:
+        case SDL_CONTROLLER_AXIS_LEFTX: {
 
-            if (std::abs(value) < 6000) {
+            if (std::abs(value) < 6000) { // DEADZONE
                 value = 0;
             } else if (value < 0) {
                 value += 5000;
@@ -377,11 +398,18 @@ void GameplaySystem::handle_key_press(const Event& e) {
                 value -= 5000;
             }
 
+            float steer_dampening = NORMAL_STEER_DAMPENING;
+
+            if (powerup_datas_[player_id].relish > 0.f) {
+                steer_dampening = RELISH_STEER_DAMPENING;
+            }
+
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", (float)(value * STEER_DAMPENING)  / -MAX_TRIGGER_VALUE);
+                                    "value", (float)(value * steer_dampening)  / -MAX_TRIGGER_VALUE);
             break;
+        }
 
         case SDLK_ESCAPE:
             new_events.emplace_back(EventType::NEW_GAME_STATE,
@@ -588,7 +616,18 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
             }
 
         case PowerupType::RELISH:
-            std::cout << "relishing" << std::endl;
+            std::cout << "RELISH used by player " << object_id << std::endl;
+
+            if (target == PowerupTarget::SELF) {
+                powerup_datas_[object_id].relish = RELISH_DURATION;
+            } else {
+                for (auto& powerup_data : powerup_datas_) {
+                    if (powerup_data.first != object_id) {
+                        powerup_data.second.relish = RELISH_DURATION;
+                    }
+                }
+            }
+
             break;
 
         default:

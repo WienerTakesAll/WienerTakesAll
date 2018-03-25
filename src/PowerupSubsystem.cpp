@@ -94,6 +94,7 @@ glm::vec3 PowerupSubsystem::get_next_powerup_position() const {
 PowerupType PowerupSubsystem::get_next_powerup_type() const {
     // Random powerup type
     PowerupType new_type = static_cast<PowerupType>(rand() % (int) PowerupType::POWERUP_COUNT);
+    new_type = PowerupType::RELISH;
     return new_type;
 }
 
