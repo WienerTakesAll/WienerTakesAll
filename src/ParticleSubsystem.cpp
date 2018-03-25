@@ -21,9 +21,9 @@ void ParticleSubsystem::update() {
 }
 
 void ParticleSubsystem::render(const glm::mat4& camera, int camera_number) {
-	if (camera_number != whos_it) {
-		hotdog_indicator_gen_.render(camera);
-	}
+    if (camera_number != whos_it) {
+        hotdog_indicator_gen_.render(camera);
+    }
 }
 
 void ParticleSubsystem::handle_load(const Event& e) {
@@ -55,15 +55,15 @@ void ParticleSubsystem::handle_object_transform(const Event& e) {
         float pos_y = e.get_value<float>("pos_y", true).first;
         float pos_z = e.get_value<float>("pos_z", true).first;
 
-		float qw = e.get_value<float>("qua_w", true).first;
-		float qx = e.get_value<float>("qua_x", true).first;
-		float qy = e.get_value<float>("qua_y", true).first;
-		float qz = e.get_value<float>("qua_z", true).first;
+        float qw = e.get_value<float>("qua_w", true).first;
+        float qx = e.get_value<float>("qua_x", true).first;
+        float qy = e.get_value<float>("qua_y", true).first;
+        float qz = e.get_value<float>("qua_z", true).first;
 
-		// try to center the indicator
-		glm::mat4 rotation = glm::toMat4(glm::quat(qx, qy, qz, qw));
-		glm::vec3 right = glm::normalize(rotation[0]);
-		glm::vec3 back = glm::normalize(rotation[2]);
+        // try to center the indicator
+        glm::mat4 rotation = glm::toMat4(glm::quat(qx, qy, qz, qw));
+        glm::vec3 right = glm::normalize(glm::vec3(rotation[0]));
+        glm::vec3 back = glm::normalize(glm::vec3(rotation[2]));
         hotdog_indicator_gen_.set_position(glm::vec3(pos_x, pos_y + 3, pos_z) + (0.5f * right) - back);
     }
 }
