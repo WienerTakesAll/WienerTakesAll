@@ -210,7 +210,7 @@ void UISystem::handle_pickup_powerup(const Event& e) {
 }
 
 void UISystem::handle_use_powerup(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
+    int object_id = e.get_value<int>("index", true).first;
 
     gameplay_hud_.use_powerup(object_id);
 }

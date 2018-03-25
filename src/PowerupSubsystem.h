@@ -27,6 +27,7 @@ public:
     const bool is_powerup(const int object_id) const;
     glm::vec3 get_next_powerup_position() const;
     PowerupType get_next_powerup_type() const;
+    PowerupType get_powerup_type() const;
     const int get_powerup_id() const;
     const bool should_pickup_powerup(const int player_id, glm::vec3 object_pos) const;
     const bool should_update_powerup_position(const int object_id) const;
