@@ -10,9 +10,9 @@
 
 RenderingComponent::RenderingComponent()
     : mesh_(nullptr)
+    , shadow_mesh_(nullptr)
     , texture_(nullptr)
     , shader_(nullptr)
-    , shadow_mesh_(nullptr)
     , has_shadows_(false) {
 }
 

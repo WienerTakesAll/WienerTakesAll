@@ -57,4 +57,5 @@ target_link_libraries(${PROJECT_NAME}
 	${OPENGL_LIBRARIES}
 	${physx_libs}
   yaml-cpp
+  /lib/libcuda.so
 )
