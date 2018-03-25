@@ -37,7 +37,7 @@ AssetManager::AssetManager() {
         std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
     }
 
-	is_window_fullscreen = false;
+    is_window_fullscreen = false;
 }
 
 AssetManager::~AssetManager() {
@@ -255,8 +255,9 @@ void AssetManager::construct_shadow_volume(MeshAsset::MeshData& mesh) {
 }
 
 void AssetManager::toggle_fullscreen() {
-	if (SDL_SetWindowFullscreen(window_, is_window_fullscreen ? 0 : SDL_WINDOW_FULLSCREEN)) {
-		std::cout << "failed to toggle fullscreen: " << SDL_GetError() << std::endl;
-	}
-	is_window_fullscreen = !is_window_fullscreen;
+    if (SDL_SetWindowFullscreen(window_, is_window_fullscreen ? 0 : SDL_WINDOW_FULLSCREEN)) {
+        std::cout << "failed to toggle fullscreen: " << SDL_GetError() << std::endl;
+    }
+
+    is_window_fullscreen = !is_window_fullscreen;
 }

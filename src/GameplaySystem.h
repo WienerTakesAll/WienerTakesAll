@@ -41,8 +41,7 @@ private:
     std::map<int, glm::quat> object_rotations_;
     std::map<int, glm::vec3> object_velocities_;
 
-    struct player_powerup_data
-    {
+    struct player_powerup_data {
         float ketchup;
     };
     std::map<int, player_powerup_data> powerup_datas_;

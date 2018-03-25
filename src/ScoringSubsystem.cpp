@@ -38,9 +38,11 @@ int ScoringSubsystem::get_current_it_score() {
 
 int ScoringSubsystem::get_player_score(int player) {
     auto score = scores_.find(player);
-	if (score == scores_.end()) {
-		// Avoid crash
-		return 0;
-	}
+
+    if (score == scores_.end()) {
+        // Avoid crash
+        return 0;
+    }
+
     return score->second;
 }

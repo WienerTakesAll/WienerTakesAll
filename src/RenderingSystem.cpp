@@ -34,7 +34,9 @@ namespace {
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager)
-    , whos_it(0), car_speeds_({ 0.f,0.f,0.f,0.f }) {
+    , whos_it(0), car_speeds_( {
+    0.f, 0.f, 0.f, 0.f
+}) {
     window_ = asset_manager.get_window();
 
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
@@ -59,7 +61,7 @@ void RenderingSystem::load(const Event& e) {
     setup_cameras();
 
     shadow_shader_ = asset_manager_.get_shader_asset(SHADOW_SHADER_PATH);
-	asset_manager_.toggle_fullscreen();
+    asset_manager_.toggle_fullscreen();
 }
 
 void RenderingSystem::handle_add_vehicle(const Event& e) {
@@ -149,13 +151,13 @@ void RenderingSystem::handle_object_transform(const Event& e) {
     example_objects_[object_id].apply_transform(glm::toMat4(glm::quat(qw, qx, qy, qz)));
 
     auto e_vx = e.get_value<float>("vel_x", false);
-    if (e_vx.second && object_id < 4)
-    {
+
+    if (e_vx.second && object_id < 4) {
         float vx = e_vx.first;
         float vy = e.get_value<float>("vel_y", true).first;
         float vz = e.get_value<float>("vel_z", true).first;
 
-        car_speeds_[object_id] = glm::length(glm::vec2(vx,vz));
+        car_speeds_[object_id] = glm::length(glm::vec2(vx, vz));
     }
 
 }
@@ -213,12 +215,9 @@ void RenderingSystem::handle_add_powerup(const Event& e) {
             texture = asset_manager_.get_texture_asset(KETCHUP_TEXTURE_PATH);
             break;
 
-        //TODO: Add Relish/Pickle
-        /*
         case PowerupType::RELISH:
             texture = asset_manager_.get_texture_asset(RELISH_TEXTURE_PATH);
             break;
-        */
 
         case PowerupType::MUSTARD:
             texture = asset_manager_.get_texture_asset(MUSTARD_TEXTURE_PATH);
@@ -250,12 +249,9 @@ void RenderingSystem::handle_change_powerup(const Event& e) {
             texture = asset_manager_.get_texture_asset(KETCHUP_TEXTURE_PATH);
             break;
 
-        //TODO: Add Relish/Pickle
-        /*
         case PowerupType::RELISH:
             texture = asset_manager_.get_texture_asset(RELISH_TEXTURE_PATH);
             break;
-        */
 
         case PowerupType::MUSTARD:
             texture = asset_manager_.get_texture_asset(MUSTARD_TEXTURE_PATH);
@@ -270,12 +266,12 @@ void RenderingSystem::handle_change_powerup(const Event& e) {
 }
 
 void RenderingSystem::handle_keypress(const Event& e) {
-	int key = e.get_value<int>("key", true).first;
-	int value = e.get_value<int>("value", true).first;
+    int key = e.get_value<int>("key", true).first;
+    int value = e.get_value<int>("value", true).first;
 
-	if (key == SDLK_F11 && value == SDL_KEYDOWN) {
-		asset_manager_.toggle_fullscreen();
-	}
+    if (key == SDLK_F11 && value == SDL_KEYDOWN) {
+        asset_manager_.toggle_fullscreen();
+    }
 }
 
 void RenderingSystem::render() {

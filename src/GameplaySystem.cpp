@@ -97,10 +97,8 @@ void GameplaySystem::update() {
 
 
 
-        for (auto& powerup_data : powerup_datas_)
-        {
-            if (powerup_data.second.ketchup > 0.f)
-            {
+        for (auto& powerup_data : powerup_datas_) {
+            if (powerup_data.second.ketchup > 0.f) {
                 glm::vec3 boost_direction
                     = object_rotations_[powerup_data.first] * glm::vec3(0.0f, 0.0f, powerup_data.second.ketchup * KETCHUP_BOOST);
                 EventSystem::queue_event(
@@ -464,8 +462,8 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
 
 
     auto e_vx = e.get_value<float>("vel_x", false);
-    if (e_vx.second)
-    {
+
+    if (e_vx.second) {
         float vx = e_vx.first;
         float vy = e.get_value<float>("vel_y", true).first;
         float vz = e.get_value<float>("vel_z", true).first;
@@ -544,16 +542,12 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
     switch (type) {
         case PowerupType::KETCHUP: {
             std::cout << "KETCHUP used by player " << object_id << std::endl;
-            if (target == PowerupTarget::SELF)
-            {
+
+            if (target == PowerupTarget::SELF) {
                 powerup_datas_[object_id].ketchup = 1.0f;
-            }
-            else
-            {
-                for (auto& powerup_data : powerup_datas_)
-                {
-                    if (powerup_data.first != object_id)
-                    {
+            } else {
+                for (auto& powerup_data : powerup_datas_) {
+                    if (powerup_data.first != object_id) {
                         powerup_data.second.ketchup = 2.5f;
                     }
                 }
@@ -565,20 +559,17 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
         case PowerupType::MUSTARD:
             std::cout << "MUSTARD used by player " << object_id << std::endl;
 
-            if (target == PowerupTarget::SELF)
-            {
+            if (target == PowerupTarget::SELF) {
                 EventSystem::queue_event(
                     Event(
                         EventType::OBJECT_APPLY_FORCE,
                         "object_id", object_id,
                         // TODO: Pass glm::vec3 in events
-                        "x", HOT_KNOCK_BACK_FORCE.x*0.0f,
+                        "x", HOT_KNOCK_BACK_FORCE.x * 0.0f,
                         "y", HOT_KNOCK_BACK_FORCE.y,
-                        "z", HOT_KNOCK_BACK_FORCE.z*0.f
+                        "z", HOT_KNOCK_BACK_FORCE.z * 0.f
                     ));
-            }
-            else
-            {
+            } else {
                 for (int i = 0; i < 4; ++i) {
                     if (i == object_id) {
                         continue;
@@ -596,13 +587,9 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                 }
             }
 
-        //TODO: Add Relish/Pickle
-        /*
         case PowerupType::RELISH:
-
-
+            std::cout << "relishing" << std::endl;
             break;
-        */
 
         default:
             break;
@@ -678,6 +665,6 @@ float GameplaySystem::calculatePlayerSpeed(int player) {
     float speedPenalty = 1.f + ((averageScore - playerScore) * 0.02f);
     speedPenalty = std::max(1.f, std::min(1.f, speedPenalty));
 
-    float totalSpeed = speedPenalty * DRIVE_SPEED * std::sqrt((4.f-object_velocities_[player].length())) * 0.25f;
+    float totalSpeed = speedPenalty * DRIVE_SPEED * std::sqrt((4.f - object_velocities_[player].length())) * 0.25f;
     return std::max(0.f, std::min(1.f, totalSpeed));
 }
