@@ -18,14 +18,15 @@ public:
     ~AssetManager();
 
     MeshAsset* get_mesh_asset(const std::string& file_path);
-    TextureAsset* get_texture_asset(const std::string& file_path);
+    TextureAsset* get_texture_asset(const std::string& file_path, const bool& do_clamp = false);
     ShaderAsset* get_shader_asset(const std::string& file_path);
+    void toggle_fullscreen();
 
     SDL_Window* get_window() const;
 
 private:
     void load_mesh_from_file(const std::string& file_path);
-    void load_texture_from_file(const std::string& file_path);
+    void load_texture_from_file(const std::string& file_path, const bool& do_clamp = false);
     void load_shader_from_file(const std::string& file_path);
     void construct_shadow_volume(MeshAsset::MeshData& mesh);
     std::unordered_map<std::string, MeshAsset> mesh_assets_;
@@ -33,5 +34,6 @@ private:
     std::unordered_map<std::string, ShaderAsset> shader_assets_;
 
     SDL_Window* window_;
+    bool is_window_fullscreen;
 };
 

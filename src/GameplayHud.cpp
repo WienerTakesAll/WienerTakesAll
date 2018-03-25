@@ -22,7 +22,7 @@ void GameplayHud::load() {
     square_mesh_ = asset_manager_.get_mesh_asset("assets/models/UIRect.obj");
     ui_shader_ = asset_manager_.get_shader_asset("assets/shaders/UIShader");
     TextureAsset* background_tex =
-        asset_manager_.get_texture_asset("assets/textures/score_bg.png");
+        asset_manager_.get_texture_asset("assets/textures/score_bg.png", true);
     scoreboard_ = UIObject(
                       glm::vec2(-0.25f, -0.33f),
                       glm::vec3(1.0f),
@@ -32,7 +32,7 @@ void GameplayHud::load() {
                       ui_shader_
                   );
 
-    TextureAsset* p1_tex = asset_manager_.get_texture_asset("assets/textures/score_1.png");
+    TextureAsset* p1_tex = asset_manager_.get_texture_asset("assets/textures/score_1.png", true);
     UIObject score_p1 = UIObject(
                             glm::vec2(-0.25f, 0.0f),
                             glm::vec3(1.0f),
@@ -42,7 +42,7 @@ void GameplayHud::load() {
                             ui_shader_
                         );
 
-    TextureAsset* p2_tex = asset_manager_.get_texture_asset("assets/textures/score_2.png");
+    TextureAsset* p2_tex = asset_manager_.get_texture_asset("assets/textures/score_2.png", true);
     UIObject score_p2 = UIObject(
                             glm::vec2(0.0f),
                             glm::vec3(1.0f),
@@ -52,7 +52,7 @@ void GameplayHud::load() {
                             ui_shader_
                         );
 
-    TextureAsset* p3_tex = asset_manager_.get_texture_asset("assets/textures/score_3.png");
+    TextureAsset* p3_tex = asset_manager_.get_texture_asset("assets/textures/score_3.png", true);
     UIObject score_p3 = UIObject(
                             glm::vec2(-0.25f, -0.33f),
                             glm::vec3(1.0f),
@@ -62,7 +62,7 @@ void GameplayHud::load() {
                             ui_shader_
                         );
 
-    TextureAsset* p4_tex = asset_manager_.get_texture_asset("assets/textures/score_4.png");
+    TextureAsset* p4_tex = asset_manager_.get_texture_asset("assets/textures/score_4.png", true);
     UIObject score_p4 = UIObject(
                             glm::vec2(0.0f, -0.33f),
                             glm::vec3(1.0f),

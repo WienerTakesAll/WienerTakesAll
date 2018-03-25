@@ -173,6 +173,7 @@ void PhysicsSystem::update() {
         }
 
         physx::PxTransform transform = object.get_actor()->getGlobalPose();
+        physx::PxVec3 speed = object.get_actor()->getLinearVelocity();
 
         //If the player is out of the arena, put them back in
         if (transform.p.y < -5) {
@@ -196,7 +197,10 @@ void PhysicsSystem::update() {
                 "qua_w", transform.q.w,
                 "qua_x", transform.q.x,
                 "qua_y", transform.q.y,
-                "qua_z", transform.q.z
+                "qua_z", transform.q.z,
+                "vel_x", speed.x,
+                "vel_y", speed.y,
+                "vel_z", speed.z
             )
         );
     }
@@ -375,6 +379,16 @@ void PhysicsSystem::handle_new_game_state(const Event& e) {
 
 }
 
+void PhysicsSystem::handle_set_chassis_mass(const Event& e) {
+    std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
+    std::pair<float, bool> mass = e.get_value<float>("mass", true);
+    vehicles_[object_id.first]->mWheelsSimData.setChassisMass(mass.first);
+}
+
+void PhysicsSystem::handle_restore_chassis_mass(const Event& e) {
+    std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
+    vehicles_[object_id.first]->mWheelsSimData.setChassisMass(settings_.vehicle_mass);
+}
 
 void PhysicsSystem::create_4w_vehicle (
     const PxMaterial& material,
@@ -445,4 +459,3 @@ void PhysicsSystem::create_4w_vehicle (
     // Increment the number of vehicles
     vehicles_.push_back(vehicle);
 }
-

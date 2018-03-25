@@ -10,6 +10,7 @@
 #include "RenderingComponent.h"
 #include "ShaderAsset.h"
 #include "TextureAsset.h"
+#include "ParticleSubsystem.h"
 
 class AssetManager;
 
@@ -31,6 +32,7 @@ private:
     void handle_add_skybox(const Event& e);
     void handle_add_powerup(const Event& e);
     void handle_change_powerup(const Event& e);
+    void handle_keypress(const Event& e);
 
     void start_render() const;
     void setup_cameras();
@@ -44,9 +46,13 @@ private:
     std::vector<size_t> car_indices_;
     // FIFO array so the rendered camera lags behind the current car location
     std::queue<std::array<glm::mat4x4, 4>> cameras_queue_;
+    std::array<glm::vec3, 4> last_cameras_pos_;
+
+    std::array<float, 4> car_speeds_;
 
     AssetManager& asset_manager_;
     ShaderAsset* shadow_shader_;
+    ParticleSubsystem particle_subsystem_;
     unsigned int whos_it;
 };
 
