@@ -14,11 +14,11 @@ namespace {
     const int MAX_TRIGGER_VALUE = 32768;
     const float DRIVE_SPEED = 0.6f;
     const float BRAKE_SPEED = 0.8f;
-    const float STEER_DAMPENING = 0.8f;
+    const float KETCHUP_BOOST = 1500.0f;
+    const float STEER_DAMPENING = 0.6f;
+    const glm::vec3 HOT_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const float KEYBOARD_STEER_AMOUNT = 0.4f;
     const glm::vec3 COLLISION_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
-    const float KETCHUP_BOOST = 50000.0f;
-    const glm::vec3 HOT_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
 }
 
 GameplaySystem::GameplaySystem()
@@ -94,6 +94,27 @@ void GameplaySystem::update() {
                 "qua_z", 0.0f
             )
         );
+
+
+
+        for (auto& powerup_data : powerup_datas_)
+        {
+            if (powerup_data.second.ketchup > 0.f)
+            {
+                glm::vec3 boost_direction
+                    = object_rotations_[powerup_data.first] * glm::vec3(0.0f, 0.0f, powerup_data.second.ketchup * KETCHUP_BOOST);
+                EventSystem::queue_event(
+                    Event(
+                        EventType::OBJECT_APPLY_FORCE,
+                        "object_id", powerup_data.first,
+                        "x", boost_direction.x,
+                        "y", boost_direction.y,
+                        "z", boost_direction.z
+                    ));
+
+                powerup_data.second.ketchup -= 0.01f;
+            }
+        }
     }
 }
 
@@ -382,6 +403,10 @@ void GameplaySystem::handle_add_vehicle(const Event& e) {
     std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
     scoring_subsystem_.add_vehicle(object_id.first);
 
+    player_powerup_data data;
+    data.ketchup = 0.f;
+    powerup_datas_.emplace(object_id.first, data);
+
     // Temporary, set first vehicle to be added as first it.
     // Assumes first vehicle object_id = 0.
     if (object_id.first == 0) {
@@ -436,6 +461,20 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
             )
         );
     }
+
+
+    auto e_vx = e.get_value<float>("vel_x", false);
+    if (e_vx.second)
+    {
+        float vx = e_vx.first;
+        float vy = e.get_value<float>("vel_y", true).first;
+        float vz = e.get_value<float>("vel_z", true).first;
+
+        glm::vec3 velocity(vx, vy, vz);
+        object_velocities_[object_id] = velocity;
+    }
+
+
 
 }
 
@@ -497,50 +536,73 @@ void GameplaySystem::handle_change_powerup(const Event& e) {
 
 void GameplaySystem::handle_use_powerup(const Event& e) {
     int object_id = e.get_value<int>("index", true).first;
-    int type = e.get_value<int>("index", true).first;
-    int target = e.get_value<int>("index", true).first;
+    int type = e.get_value<int>("type", true).first;
+    int target = e.get_value<int>("target", true).first;
 
     powerup_subsystem_.spend_powerup(object_id);
 
     switch (type) {
         case PowerupType::KETCHUP: {
             std::cout << "KETCHUP used by player " << object_id << std::endl;
-            glm::vec3 boost_direction = object_rotations_[object_id] * glm::vec3(0.0f, 0.0f, KETCHUP_BOOST);
-            EventSystem::queue_event(
-                Event(
-                    EventType::OBJECT_APPLY_FORCE,
-                    "object_id", object_id,
-                    "x", boost_direction.x,
-                    "y", boost_direction.y,
-                    "z", boost_direction.z
-                ));
+            if (target == PowerupTarget::SELF)
+            {
+                powerup_datas_[object_id].ketchup = 1.0f;
+            }
+            else
+            {
+                for (auto& powerup_data : powerup_datas_)
+                {
+                    if (powerup_data.first != object_id)
+                    {
+                        powerup_data.second.ketchup = 2.5f;
+                    }
+                }
+            }
+
             break;
         }
 
         case PowerupType::MUSTARD:
             std::cout << "MUSTARD used by player " << object_id << std::endl;
-            break;
 
-        case PowerupType::RELISH:
-            std::cout << "RELISH used by player " << object_id << std::endl;
-
-            for (int i = 0; i < 4; ++i) {
-                if (i == object_id) {
-                    continue;
-                }
-
+            if (target == PowerupTarget::SELF)
+            {
                 EventSystem::queue_event(
                     Event(
                         EventType::OBJECT_APPLY_FORCE,
-                        "object_id", i,
+                        "object_id", object_id,
                         // TODO: Pass glm::vec3 in events
-                        "x", HOT_KNOCK_BACK_FORCE.x,
+                        "x", HOT_KNOCK_BACK_FORCE.x*0.0f,
                         "y", HOT_KNOCK_BACK_FORCE.y,
-                        "z", HOT_KNOCK_BACK_FORCE.z
+                        "z", HOT_KNOCK_BACK_FORCE.z*0.f
                     ));
             }
+            else
+            {
+                for (int i = 0; i < 4; ++i) {
+                    if (i == object_id) {
+                        continue;
+                    }
+
+                    EventSystem::queue_event(
+                        Event(
+                            EventType::OBJECT_APPLY_FORCE,
+                            "object_id", i,
+                            // TODO: Pass glm::vec3 in events
+                            "x", HOT_KNOCK_BACK_FORCE.x,
+                            "y", HOT_KNOCK_BACK_FORCE.y,
+                            "z", HOT_KNOCK_BACK_FORCE.z
+                        ));
+                }
+            }
+
+        //TODO: Add Relish/Pickle
+        /*
+        case PowerupType::RELISH:
+
 
             break;
+        */
 
         default:
             break;
@@ -616,6 +678,6 @@ float GameplaySystem::calculatePlayerSpeed(int player) {
     float speedPenalty = 1.f + ((averageScore - playerScore) * 0.02f);
     speedPenalty = std::max(1.f, std::min(1.f, speedPenalty));
 
-    float totalSpeed = speedPenalty * DRIVE_SPEED;
+    float totalSpeed = speedPenalty * DRIVE_SPEED * std::sqrt((4.f-object_velocities_[player].length())) * 0.25f;
     return std::max(0.f, std::min(1.f, totalSpeed));
 }
