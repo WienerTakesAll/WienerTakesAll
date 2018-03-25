@@ -33,12 +33,12 @@ namespace {
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
-    : asset_manager_(asset_manager)
-    , whos_it(0)
-    , car_speeds_( {
+    : car_speeds_( {
     0.f, 0.f, 0.f, 0.f
 })
-, particle_subsystem_(asset_manager) {
+, asset_manager_(asset_manager)
+, particle_subsystem_(asset_manager)
+, whos_it(0) {
     window_ = asset_manager.get_window();
 
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
@@ -140,7 +140,9 @@ void RenderingSystem::handle_object_transform(const Event& e) {
 
     int object_id = e.get_value<int>("object_id", true).first;
 
-    if (example_objects_.size() <= object_id) {
+    assert(object_id >= 0);
+
+    if (example_objects_.size() <= static_cast<size_t>(object_id)) {
         return;
     }
 
@@ -160,7 +162,7 @@ void RenderingSystem::handle_object_transform(const Event& e) {
 
     if (e_vx.second && object_id < 4) {
         float vx = e_vx.first;
-        float vy = e.get_value<float>("vel_y", true).first;
+        // float vy = e.get_value<float>("vel_y", true).first;
         float vz = e.get_value<float>("vel_z", true).first;
 
         car_speeds_[object_id] = glm::length(glm::vec2(vx, vz));
