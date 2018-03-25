@@ -10,6 +10,7 @@
 #include "RenderingComponent.h"
 #include "ShaderAsset.h"
 #include "TextureAsset.h"
+#include "ParticleSubsystem.h"
 
 class AssetManager;
 
@@ -51,6 +52,7 @@ private:
 
     AssetManager& asset_manager_;
     ShaderAsset* shadow_shader_;
+    ParticleSubsystem particle_subsystem_;
     unsigned int whos_it;
 };
 
