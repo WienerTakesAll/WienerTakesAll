@@ -17,6 +17,8 @@ UISystem::UISystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::UPDATE_SCORE, &UISystem::handle_update_score, this);
     EventSystem::add_event_handler(EventType::UPDATE_DIRECTION_TO_IT, &UISystem::handle_update_direction_to_it, this);
     EventSystem::add_event_handler(EventType::NEW_IT, &UISystem::handle_new_it, this);
+    EventSystem::add_event_handler(EventType::PICKUP_POWERUP, &UISystem::handle_pickup_powerup, this);
+    EventSystem::add_event_handler(EventType::USE_POWERUP, &UISystem::handle_use_powerup, this);
 
     window_ = asset_manager.get_window();
 }
@@ -198,4 +200,17 @@ void UISystem::handle_update_direction_to_it(const Event& e) {
 void UISystem::handle_new_it(const Event& e) {
     int new_it_id = e.get_value<int>("object_id", true).first;
     gameplay_hud_.new_it(new_it_id);
+}
+
+void UISystem::handle_pickup_powerup(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+    int powerup_type = e.get_value<int>("powerup_type", true).first;
+
+    gameplay_hud_.pickup_powerup(object_id, powerup_type);
+}
+
+void UISystem::handle_use_powerup(const Event& e) {
+    int object_id = e.get_value<int>("index", true).first;
+
+    gameplay_hud_.use_powerup(object_id);
 }

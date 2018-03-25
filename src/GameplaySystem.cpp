@@ -14,7 +14,7 @@ namespace {
     const int MAX_TRIGGER_VALUE = 32768;
     const float DRIVE_SPEED = 0.6f;
     const float BRAKE_SPEED = 0.8f;
-    const float KETCHUP_BOOST = 1500.0f;
+    const float KETCHUP_BOOST = 1000.0f;
     const float NORMAL_STEER_DAMPENING = 0.6f;
     const float RELISH_MASS = 2000.f;
     const float RELISH_STEER_DAMPENING = 6.0f;
@@ -489,7 +489,8 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
             Event(
                 EventType::PICKUP_POWERUP,
                 "object_id", object_id,
-                "powerup_id", powerup_subsystem_.get_powerup_id()
+                "powerup_id", powerup_subsystem_.get_powerup_id(),
+                "powerup_type", powerup_subsystem_.get_powerup_type()
             )
         );
     }
