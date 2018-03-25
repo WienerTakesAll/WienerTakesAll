@@ -97,8 +97,7 @@ PowerupType PowerupSubsystem::get_next_powerup_type() const {
     return new_type;
 }
 
-PowerupType PowerupSubsystem::get_powerup_type() const
-{
+PowerupType PowerupSubsystem::get_powerup_type() const {
     return powerup_type_;
 }
 
