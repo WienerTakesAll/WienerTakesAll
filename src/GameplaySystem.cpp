@@ -15,10 +15,14 @@ namespace {
     const float DRIVE_SPEED = 0.6f;
     const float BRAKE_SPEED = 0.8f;
     const float KETCHUP_BOOST = 1500.0f;
-    const float STEER_DAMPENING = 0.6f;
+    const float NORMAL_STEER_DAMPENING = 0.6f;
+    const float RELISH_MASS = 2000.f;
+    const float RELISH_STEER_DAMPENING = 6.0f;
     const glm::vec3 HOT_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
-    const float KEYBOARD_STEER_AMOUNT = 0.4f;
+    const float NORMAL_KEYBOARD_STEER_AMOUNT = 0.4f;
+    const float RELISH_KEYBOARD_STEER_AMOUNT = 4.0f;
     const glm::vec3 COLLISION_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
+    const float RELISH_DURATION = 2.5f;
 }
 
 GameplaySystem::GameplaySystem()
@@ -97,10 +101,8 @@ void GameplaySystem::update() {
 
 
 
-        for (auto& powerup_data : powerup_datas_)
-        {
-            if (powerup_data.second.ketchup > 0.f)
-            {
+        for (auto& powerup_data : powerup_datas_) {
+            if (powerup_data.second.ketchup > 0.f) {
                 glm::vec3 boost_direction
                     = object_rotations_[powerup_data.first] * glm::vec3(0.0f, 0.0f, powerup_data.second.ketchup * KETCHUP_BOOST);
                 EventSystem::queue_event(
@@ -113,6 +115,20 @@ void GameplaySystem::update() {
                     ));
 
                 powerup_data.second.ketchup -= 0.01f;
+            }
+
+
+            if (powerup_data.second.relish > 0.f && powerup_data.second.relish < 0.02f) {
+                EventSystem::queue_event(
+                    Event(
+                        EventType::RESTORE_CHASSIS_MASS,
+                        "object_id", powerup_data.first
+                    )
+                );
+            }
+
+            if (powerup_data.second.relish > 0.f) {
+                powerup_data.second.relish -= 0.01f;
             }
         }
     }
@@ -335,24 +351,45 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_a: // fall through
         case SDLK_f:
         case SDLK_j:
-        case SDLK_LEFT:
+        case SDLK_LEFT: {
+            float steer_amount = NORMAL_KEYBOARD_STEER_AMOUNT;
+
+            if (powerup_datas_[player_id].relish > 0.f) {
+                steer_amount = RELISH_KEYBOARD_STEER_AMOUNT;
+            }
+
+
+            float steer_value = value != SDL_KEYUP ? steer_amount : 0.f;
+            steer_value = std::max(-1.0f, std::min(1.0f, steer_value));
+
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", value != SDL_KEYUP ? KEYBOARD_STEER_AMOUNT : 0.f);
+                                    "value", steer_value);
 
             break;
+        }
 
         // keyboard right steer
         case SDLK_d: // fall through
         case SDLK_h:
         case SDLK_l:
-        case SDLK_RIGHT:
+        case SDLK_RIGHT: {
+            float steer_amount = -NORMAL_KEYBOARD_STEER_AMOUNT;
+
+            if (powerup_datas_[player_id].relish > 0.f) {
+                steer_amount = -RELISH_KEYBOARD_STEER_AMOUNT;
+            }
+
+            float steer_value = value != SDL_KEYUP ? steer_amount : 0.f;
+            steer_value = std::max(-1.0f, std::min(1.0f, steer_value));
+
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", value != SDL_KEYUP ? -KEYBOARD_STEER_AMOUNT : 0.f);
+                                    "value", steer_value);
             break;
+        }
 
         case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
 
@@ -369,9 +406,9 @@ void GameplaySystem::handle_key_press(const Event& e) {
                                     "value", (float)(value) / MAX_TRIGGER_VALUE);
             break;
 
-        case SDL_CONTROLLER_AXIS_LEFTX:
+        case SDL_CONTROLLER_AXIS_LEFTX: {
 
-            if (std::abs(value) < 6000) {
+            if (std::abs(value) < 6000) { // DEADZONE
                 value = 0;
             } else if (value < 0) {
                 value += 5000;
@@ -379,11 +416,21 @@ void GameplaySystem::handle_key_press(const Event& e) {
                 value -= 5000;
             }
 
+            float steer_dampening = NORMAL_STEER_DAMPENING;
+
+            if (powerup_datas_[player_id].relish > 0.f) {
+                steer_dampening = RELISH_STEER_DAMPENING;
+            }
+
+            float steer_value = (float)(value * steer_dampening) / -MAX_TRIGGER_VALUE;
+            steer_value = std::max(-1.0f, std::min(1.0f, steer_value));
+
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", (float)(value * STEER_DAMPENING)  / -MAX_TRIGGER_VALUE);
+                                    "value", steer_value);
             break;
+        }
 
         case SDLK_ESCAPE:
             new_events.emplace_back(EventType::NEW_GAME_STATE,
@@ -405,6 +452,7 @@ void GameplaySystem::handle_add_vehicle(const Event& e) {
 
     player_powerup_data data;
     data.ketchup = 0.f;
+    data.relish = 0.f;
     powerup_datas_.emplace(object_id.first, data);
 
     // Temporary, set first vehicle to be added as first it.
@@ -464,8 +512,8 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
 
 
     auto e_vx = e.get_value<float>("vel_x", false);
-    if (e_vx.second)
-    {
+
+    if (e_vx.second) {
         float vx = e_vx.first;
         float vy = e.get_value<float>("vel_y", true).first;
         float vz = e.get_value<float>("vel_z", true).first;
@@ -544,16 +592,12 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
     switch (type) {
         case PowerupType::KETCHUP: {
             std::cout << "KETCHUP used by player " << object_id << std::endl;
-            if (target == PowerupTarget::SELF)
-            {
+
+            if (target == PowerupTarget::SELF) {
                 powerup_datas_[object_id].ketchup = 1.0f;
-            }
-            else
-            {
-                for (auto& powerup_data : powerup_datas_)
-                {
-                    if (powerup_data.first != object_id)
-                    {
+            } else {
+                for (auto& powerup_data : powerup_datas_) {
+                    if (powerup_data.first != object_id) {
                         powerup_data.second.ketchup = 2.5f;
                     }
                 }
@@ -565,20 +609,17 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
         case PowerupType::MUSTARD:
             std::cout << "MUSTARD used by player " << object_id << std::endl;
 
-            if (target == PowerupTarget::SELF)
-            {
+            if (target == PowerupTarget::SELF) {
                 EventSystem::queue_event(
                     Event(
                         EventType::OBJECT_APPLY_FORCE,
                         "object_id", object_id,
                         // TODO: Pass glm::vec3 in events
-                        "x", HOT_KNOCK_BACK_FORCE.x*0.0f,
+                        "x", HOT_KNOCK_BACK_FORCE.x * 0.0f,
                         "y", HOT_KNOCK_BACK_FORCE.y,
-                        "z", HOT_KNOCK_BACK_FORCE.z*0.f
+                        "z", HOT_KNOCK_BACK_FORCE.z * 0.f
                     ));
-            }
-            else
-            {
+            } else {
                 for (int i = 0; i < 4; ++i) {
                     if (i == object_id) {
                         continue;
@@ -596,13 +637,36 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                 }
             }
 
-        //TODO: Add Relish/Pickle
-        /*
         case PowerupType::RELISH:
+            std::cout << "RELISH used by player " << object_id << std::endl;
 
+            if (target == PowerupTarget::SELF) {
+                powerup_datas_[object_id].relish = RELISH_DURATION;
+                EventSystem::queue_event(
+                    Event(
+                        EventType::SET_CHASSIS_MASS,
+                        "object_id", object_id,
+                        "mass", RELISH_MASS
+
+                    )
+                );
+            } else {
+                for (auto& powerup_data : powerup_datas_) {
+                    if (powerup_data.first != object_id) {
+                        powerup_data.second.relish = RELISH_DURATION;
+                        EventSystem::queue_event(
+                            Event(
+                                EventType::SET_CHASSIS_MASS,
+                                "object_id", powerup_data.first,
+                                "mass", RELISH_MASS
+
+                            )
+                        );
+                    }
+                }
+            }
 
             break;
-        */
 
         default:
             break;
@@ -678,6 +742,6 @@ float GameplaySystem::calculatePlayerSpeed(int player) {
     float speedPenalty = 1.f + ((averageScore - playerScore) * 0.02f);
     speedPenalty = std::max(1.f, std::min(1.f, speedPenalty));
 
-    float totalSpeed = speedPenalty * DRIVE_SPEED * std::sqrt((4.f-object_velocities_[player].length())) * 0.25f;
+    float totalSpeed = speedPenalty * DRIVE_SPEED * std::sqrt((4.f - object_velocities_[player].length())) * 0.25f;
     return std::max(0.f, std::min(1.f, totalSpeed));
 }

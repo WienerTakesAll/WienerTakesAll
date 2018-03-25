@@ -131,18 +131,17 @@ void ParticleGenerator::render(const glm::mat4& camera) {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rendering_component_.gl_index_buffers_[i]);
 
 
-            if (fixed_size_)
-            {
+            if (fixed_size_) {
                 glm::vec4 topLeftVertex = glm::vec4(rendering_component_.mesh_->meshes_[i].vertices_[2].position_, 1.0f);
                 glm::vec4 bottomRightVertex = glm::vec4(rendering_component_.mesh_->meshes_[i].vertices_[0].position_, 1.0f);
 
                 topLeftVertex = camera * model * topLeftVertex;
                 bottomRightVertex = camera * model * bottomRightVertex;
-                
+
                 float scale_value = std::sqrt(bottomRightVertex.z);
 
                 model = glm::scale(model, glm::vec3(scale_value, scale_value, 1.f));
-                model = glm::translate(model, glm::vec3(0.f, -0.1f*scale_value, 0.f));
+                model = glm::translate(model, glm::vec3(0.f, -0.1f * scale_value, 0.f));
             }
 
 
@@ -194,7 +193,6 @@ void ParticleGenerator::set_particle_scale(float delta, float max, float min) {
     scale_min_ = (min < 0 ? 0 : min);
 }
 
-void ParticleGenerator::set_particle_fixed_size(bool is_fixed_size)
-{
+void ParticleGenerator::set_particle_fixed_size(bool is_fixed_size) {
     fixed_size_ = is_fixed_size;
 }

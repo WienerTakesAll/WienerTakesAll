@@ -22,9 +22,10 @@ namespace {
     const std::string TERRAIN_TEXTURE_PATH = "assets/textures/texturePit.png";
     const std::string SKYBOX_MESH_PATH = "assets/models/Skybox.obj";
     const std::string SKYBOX_TEXTURE_PATH = "assets/textures/park.png";
-    const std::string KETCHUP_MESH_PATH = "assets/models/Ketchup.obj";
-    const std::string RELISH_MESH_PATH = "assets/models/Pickle.obj";
-    const std::string MUSTARD_MESH_PATH = "assets/models/HotSauce.obj";
+    const std::string PACKET_MESH_PATH = "assets/models/Packet.obj";
+    const std::string KETCHUP_TEXTURE_PATH = "assets/textures/KetchupPacket.png";
+    const std::string RELISH_TEXTURE_PATH = "assets/textures/RelishPacket.png";
+    const std::string MUSTARD_TEXTURE_PATH = "assets/textures/MustardPacket.png";
     const std::string CHARCOAL_MESH_PATH = "assets/models/Mound.obj";
     const std::string CHARCOAL_TEXTURE_PATH = "assets/textures/smouldering-charcoal.png";
 
@@ -33,8 +34,11 @@ namespace {
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager)
-    , whos_it(0), car_speeds_({ 0.f,0.f,0.f,0.f })
-    , particle_subsystem_(asset_manager) {
+    , whos_it(0)
+    , car_speeds_( {
+    0.f, 0.f, 0.f, 0.f
+})
+, particle_subsystem_(asset_manager) {
     window_ = asset_manager.get_window();
 
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
@@ -60,10 +64,8 @@ void RenderingSystem::load(const Event& e) {
     setup_cameras();
 
     shadow_shader_ = asset_manager_.get_shader_asset(SHADOW_SHADER_PATH);
-
-
     particle_subsystem_.handle_load(e);
-	asset_manager_.toggle_fullscreen();
+    asset_manager_.toggle_fullscreen();
 }
 
 void RenderingSystem::handle_add_vehicle(const Event& e) {
@@ -130,6 +132,7 @@ void RenderingSystem::handle_add_charcoal(const Event& e) {
     example_objects_[object_id].set_shader(shader);
     example_objects_[object_id].set_texture(texture);
     example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
+    example_objects_[object_id].set_has_shadows(false);
 }
 
 void RenderingSystem::handle_object_transform(const Event& e) {
@@ -154,13 +157,13 @@ void RenderingSystem::handle_object_transform(const Event& e) {
     example_objects_[object_id].apply_transform(glm::toMat4(glm::quat(qw, qx, qy, qz)));
 
     auto e_vx = e.get_value<float>("vel_x", false);
-    if (e_vx.second && object_id < 4)
-    {
+
+    if (e_vx.second && object_id < 4) {
         float vx = e_vx.first;
         float vy = e.get_value<float>("vel_y", true).first;
         float vz = e.get_value<float>("vel_z", true).first;
 
-        car_speeds_[object_id] = glm::length(glm::vec2(vx,vz));
+        car_speeds_[object_id] = glm::length(glm::vec2(vx, vz));
     }
 
 }
@@ -205,31 +208,27 @@ void RenderingSystem::handle_add_skybox(const Event& e) {
 void RenderingSystem::handle_add_powerup(const Event& e) {
     PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
 
-    if (powerup_type == PowerupType::POWERUP_COUNT) {
-        return;
-    }
+    assert(powerup_type != PowerupType::POWERUP_COUNT);
 
     int object_id = e.get_value<int>("object_id", true).first;
     float x = e.get_value<float>("pos_x", true).first;
     float y = e.get_value<float>("pos_y", true).first;
     float z = e.get_value<float>("pos_z", true).first;
 
-    MeshAsset* mesh;
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(PACKET_MESH_PATH);;
+    TextureAsset* texture;
 
     switch (powerup_type) {
         case PowerupType::KETCHUP:
-            mesh = asset_manager_.get_mesh_asset(KETCHUP_MESH_PATH);
+            texture = asset_manager_.get_texture_asset(KETCHUP_TEXTURE_PATH);
             break;
 
-        //TODO: Add Relish/Pickle
-        /*
         case PowerupType::RELISH:
-            mesh = asset_manager_.get_mesh_asset(RELISH_MESH_PATH);
+            texture = asset_manager_.get_texture_asset(RELISH_TEXTURE_PATH);
             break;
-        */
 
         case PowerupType::MUSTARD:
-            mesh = asset_manager_.get_mesh_asset(MUSTARD_MESH_PATH);
+            texture = asset_manager_.get_texture_asset(MUSTARD_TEXTURE_PATH);
             break;
 
         default:
@@ -239,35 +238,31 @@ void RenderingSystem::handle_add_powerup(const Event& e) {
 
     example_objects_.emplace_back();
     example_objects_[object_id].set_mesh(mesh);
-    example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
+    example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH));
+    example_objects_[object_id].set_texture(texture);
     example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
-    // example_objects_[object_id].set_has_shadows(true);
+    example_objects_[object_id].set_has_shadows(true);
 }
 
 void RenderingSystem::handle_change_powerup(const Event& e) {
     PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
 
-    if (powerup_type == PowerupType::POWERUP_COUNT) {
-        return;
-    }
+    assert(powerup_type != PowerupType::POWERUP_COUNT);
 
     int object_id = e.get_value<int>("object_id", true).first;
-    MeshAsset* mesh;
+    TextureAsset* texture;
 
     switch (powerup_type) {
         case PowerupType::KETCHUP:
-            mesh = asset_manager_.get_mesh_asset(KETCHUP_MESH_PATH);
+            texture = asset_manager_.get_texture_asset(KETCHUP_TEXTURE_PATH);
             break;
 
-        //TODO: Add Relish/Pickle
-        /*
         case PowerupType::RELISH:
-            mesh = asset_manager_.get_mesh_asset(RELISH_MESH_PATH);
+            texture = asset_manager_.get_texture_asset(RELISH_TEXTURE_PATH);
             break;
-        */
 
         case PowerupType::MUSTARD:
-            mesh = asset_manager_.get_mesh_asset(MUSTARD_MESH_PATH);
+            texture = asset_manager_.get_texture_asset(MUSTARD_TEXTURE_PATH);
             break;
 
         default:
@@ -275,16 +270,16 @@ void RenderingSystem::handle_change_powerup(const Event& e) {
             break;
     }
 
-    example_objects_[object_id].set_mesh(mesh);
+    example_objects_[object_id].set_texture(texture);
 }
 
 void RenderingSystem::handle_keypress(const Event& e) {
-	int key = e.get_value<int>("key", true).first;
-	int value = e.get_value<int>("value", true).first;
+    int key = e.get_value<int>("key", true).first;
+    int value = e.get_value<int>("value", true).first;
 
-	if (key == SDLK_F11 && value == SDL_KEYDOWN) {
-		asset_manager_.toggle_fullscreen();
-	}
+    if (key == SDLK_F11 && value == SDL_KEYDOWN) {
+        asset_manager_.toggle_fullscreen();
+    }
 }
 
 void RenderingSystem::render() {
@@ -294,6 +289,7 @@ void RenderingSystem::render() {
     auto cameras = cameras_queue_.front();
 
     for (size_t i = 0; i < cameras.size(); i++) {
+
         int window_w, window_h;
         SDL_GetWindowSize(asset_manager_.get_window(), &window_w, &window_h);
 
@@ -394,6 +390,16 @@ void RenderingSystem::setup_cameras() {
 
         auto camera_position = glm::translate(transform, glm::vec3(0, 2.5, -7));
 
+        {
+            glm::vec3 bad_camera_pos(camera_position[3]);
+            glm::vec3 old_camera_pos(last_cameras_pos_[i]);
+            glm::vec3 smooth_camera_pos
+                = bad_camera_pos * 0.25f + old_camera_pos * 0.75f;
+
+            camera_position[3] = glm::vec4(smooth_camera_pos, 1.0);
+        }
+
+
         if (camera_position[3].y < 4) {
             camera_position[3].y = 4;
         }
@@ -405,6 +411,8 @@ void RenderingSystem::setup_cameras() {
         glm::mat4 P = glm::perspective(glm::radians(FOV), 4.0f / 3.0f, 0.1f, 1000.0f);
 
         new_cameras[i] = P * glm::lookAt(glm::vec3(camera_position[3]), lookAtPos, glm::vec3(0, 1, 0));
+
+        last_cameras_pos_[i] = glm::vec3(camera_position[3]);
     }
 
     // push camera setup to back of queue

@@ -46,6 +46,8 @@ private:
     std::vector<size_t> car_indices_;
     // FIFO array so the rendered camera lags behind the current car location
     std::queue<std::array<glm::mat4x4, 4>> cameras_queue_;
+    std::array<glm::vec3, 4> last_cameras_pos_;
+
     std::array<float, 4> car_speeds_;
 
     AssetManager& asset_manager_;
