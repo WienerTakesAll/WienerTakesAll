@@ -173,6 +173,7 @@ void PhysicsSystem::update() {
         }
 
         physx::PxTransform transform = object.get_actor()->getGlobalPose();
+        physx::PxVec3 speed = object.get_actor()->getLinearVelocity();
 
         //If the player is out of the arena, put them back in
         if (transform.p.y < -5) {
@@ -196,7 +197,10 @@ void PhysicsSystem::update() {
                 "qua_w", transform.q.w,
                 "qua_x", transform.q.x,
                 "qua_y", transform.q.y,
-                "qua_z", transform.q.z
+                "qua_z", transform.q.z,
+                "vel_x", speed.x,
+                "vel_y", speed.y,
+                "vel_z", speed.z
             )
         );
     }
