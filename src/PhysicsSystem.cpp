@@ -379,6 +379,16 @@ void PhysicsSystem::handle_new_game_state(const Event& e) {
 
 }
 
+void PhysicsSystem::handle_set_chassis_mass(const Event& e) {
+    std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
+    std::pair<float, bool> mass = e.get_value<float>("mass", true);
+    vehicles_[object_id.first]->mWheelsSimData.setChassisMass(mass.first);
+}
+
+void PhysicsSystem::handle_restore_chassis_mass(const Event& e) {
+    std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
+    vehicles_[object_id.first]->mWheelsSimData.setChassisMass(settings_.vehicle_mass);
+}
 
 void PhysicsSystem::create_4w_vehicle (
     const PxMaterial& material,
@@ -449,4 +459,3 @@ void PhysicsSystem::create_4w_vehicle (
     // Increment the number of vehicles
     vehicles_.push_back(vehicle);
 }
-

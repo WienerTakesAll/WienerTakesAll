@@ -17,6 +17,7 @@ namespace {
     const float KETCHUP_BOOST = 1500.0f;
     const float NORMAL_STEER_DAMPENING = 0.6f;
     const float RELISH_STEER_DAMPENING = 1.0f;
+    const float RELISH_MASS = 2000.f;
     const glm::vec3 HOT_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const float NORMAL_KEYBOARD_STEER_AMOUNT = 0.4f;
     const float RELISH_KEYBOARD_STEER_AMOUNT = 0.4f;
@@ -114,6 +115,16 @@ void GameplaySystem::update() {
                     ));
 
                 powerup_data.second.ketchup -= 0.01f;
+            }
+
+
+            if (powerup_data.second.relish > 0.f && powerup_data.second.relish < 0.02f) {
+                EventSystem::queue_event(
+                    Event(
+                        EventType::RESTORE_CHASSIS_MASS,
+                        "object_id", powerup_data.first
+                    )
+                );
             }
 
             if (powerup_data.second.relish > 0.f) {
@@ -620,10 +631,26 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
 
             if (target == PowerupTarget::SELF) {
                 powerup_datas_[object_id].relish = RELISH_DURATION;
+                EventSystem::queue_event(
+                    Event(
+                        EventType::SET_CHASSIS_MASS,
+                        "object_id", object_id,
+                        "mass", RELISH_MASS
+
+                    )
+                );
             } else {
                 for (auto& powerup_data : powerup_datas_) {
                     if (powerup_data.first != object_id) {
                         powerup_data.second.relish = RELISH_DURATION;
+                        EventSystem::queue_event(
+                            Event(
+                                EventType::SET_CHASSIS_MASS,
+                                "object_id", powerup_data.first,
+                                "mass", RELISH_MASS
+
+                            )
+                        );
                     }
                 }
             }
