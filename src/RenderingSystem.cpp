@@ -53,6 +53,7 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::CHANGE_POWERUP, &RenderingSystem::handle_change_powerup, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_keypress, this);
     EventSystem::add_event_handler(EventType::USE_POWERUP, &RenderingSystem::handle_use_powerup, this);
+    EventSystem::add_event_handler(EventType::FINISH_POWERUP, &RenderingSystem::handle_finish_powerup, this);
 
     init_window();
 }
@@ -302,8 +303,6 @@ void RenderingSystem::handle_use_powerup(const Event& e) {
             break;
 
         case PowerupType::MUSTARD:
-            overlay[0] = overlay_intensity;
-            overlay[1] = overlay_intensity;
             break;
 
         default:
@@ -329,6 +328,12 @@ void RenderingSystem::handle_use_powerup(const Event& e) {
             assert(false);
             break;
     }
+}
+
+void RenderingSystem::handle_finish_powerup(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    example_objects_[object_id].set_colour_overlay(glm::vec3());
 }
 
 void RenderingSystem::render() {
