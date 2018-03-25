@@ -16,10 +16,10 @@ namespace {
     const float BRAKE_SPEED = 0.8f;
     const float KETCHUP_BOOST = 1500.0f;
     const float NORMAL_STEER_DAMPENING = 0.6f;
-    const float RELISH_STEER_DAMPENING = 1.0f;
+    const float RELISH_STEER_DAMPENING = 6.0f;
     const glm::vec3 HOT_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const float NORMAL_KEYBOARD_STEER_AMOUNT = 0.4f;
-    const float RELISH_KEYBOARD_STEER_AMOUNT = 0.4f;
+    const float RELISH_KEYBOARD_STEER_AMOUNT = 4.0f;
     const glm::vec3 COLLISION_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const float RELISH_DURATION = 2.5f;
 }
@@ -347,10 +347,14 @@ void GameplaySystem::handle_key_press(const Event& e) {
                 steer_amount = RELISH_KEYBOARD_STEER_AMOUNT;
             }
 
+
+            float steer_value = value != SDL_KEYUP ? steer_amount : 0.f;
+            steer_value = std::max(0.0f, std::min(1.0f, steer_value));
+
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", value != SDL_KEYUP ? steer_amount : 0.f);
+                                    "value", steer_value);
 
             break;
         }
@@ -366,10 +370,13 @@ void GameplaySystem::handle_key_press(const Event& e) {
                 steer_amount = RELISH_KEYBOARD_STEER_AMOUNT;
             }
 
+            float steer_value = value != SDL_KEYUP ? steer_amount : 0.f;
+            steer_value = std::max(0.0f, std::min(1.0f, steer_value));
+
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", value != SDL_KEYUP ? steer_amount : 0.f);
+                                    "value", steer_value);
             break;
         }
 
@@ -404,10 +411,13 @@ void GameplaySystem::handle_key_press(const Event& e) {
                 steer_dampening = RELISH_STEER_DAMPENING;
             }
 
+            float steer_value = (float)(value * steer_dampening) / -MAX_TRIGGER_VALUE;
+            steer_value = std::max(-1.0f, std::min(1.0f, steer_value));
+
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::STEER,
-                                    "value", (float)(value * steer_dampening)  / -MAX_TRIGGER_VALUE);
+                                    "value", steer_value);
             break;
         }
 
