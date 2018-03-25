@@ -29,6 +29,8 @@ public:
     void set_texture(TextureAsset* texture);
     void set_shader(ShaderAsset* shader);
 
+    friend class ParticleGenerator;
+
 private:
     void setupBuffer();
     void setupShadowBuffer();

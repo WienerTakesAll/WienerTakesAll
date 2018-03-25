@@ -32,7 +32,8 @@ namespace {
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager)
-    , whos_it(0), car_speeds_({ 0.f,0.f,0.f,0.f }) {
+    , whos_it(0), car_speeds_({ 0.f,0.f,0.f,0.f })
+    , particle_subsystem_(asset_manager) {
     window_ = asset_manager.get_window();
 
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
@@ -50,12 +51,15 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
 }
 
 void RenderingSystem::update() {
+    particle_subsystem_.update();
 }
 
 void RenderingSystem::load(const Event& e) {
     setup_cameras();
 
     shadow_shader_ = asset_manager_.get_shader_asset(SHADOW_SHADER_PATH);
+
+    particle_subsystem_.handle_load(e);
 }
 
 void RenderingSystem::handle_add_vehicle(const Event& e) {
@@ -125,6 +129,8 @@ void RenderingSystem::handle_add_charcoal(const Event& e) {
 }
 
 void RenderingSystem::handle_object_transform(const Event& e) {
+    particle_subsystem_.handle_object_transform(e);
+
     int object_id = e.get_value<int>("object_id", true).first;
 
     if (example_objects_.size() <= object_id) {
@@ -157,6 +163,8 @@ void RenderingSystem::handle_object_transform(const Event& e) {
 
 
 void RenderingSystem::handle_new_it(const Event& e) {
+    particle_subsystem_.handle_new_it(e);
+
     MeshAsset* bun_mesh = asset_manager_.get_mesh_asset(CAR_MESH_PATH);
     MeshAsset* dog_mesh = asset_manager_.get_mesh_asset(WEINER_MESH_PATH);
 
@@ -291,6 +299,8 @@ void RenderingSystem::render() {
         for (auto& object : example_objects_) {
             object.render(cameras[i], 0.3f);
         }
+
+        particle_subsystem_.render(cameras[i], i);
 
         for (auto& object : example_objects_) {
             object.render_lighting(cameras[i], glm::vec3(-0.4f, -1.0f, 0.f), shadow_shader_);
