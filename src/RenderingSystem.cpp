@@ -21,9 +21,10 @@ namespace {
     const std::string TERRAIN_TEXTURE_PATH = "assets/textures/texturePit.png";
     const std::string SKYBOX_MESH_PATH = "assets/models/Skybox.obj";
     const std::string SKYBOX_TEXTURE_PATH = "assets/textures/park.png";
-    const std::string KETCHUP_MESH_PATH = "assets/models/Ketchup.obj";
-    const std::string RELISH_MESH_PATH = "assets/models/Pickle.obj";
-    const std::string MUSTARD_MESH_PATH = "assets/models/HotSauce.obj";
+    const std::string PACKET_MESH_PATH = "assets/models/Packet.obj";
+    const std::string KETCHUP_TEXTURE_PATH = "assets/textures/KetchupPacket.png";
+    const std::string RELISH_TEXTURE_PATH = "assets/textures/RelishPacket.png";
+    const std::string MUSTARD_TEXTURE_PATH = "assets/textures/MustardPacket.png";
     const std::string CHARCOAL_MESH_PATH = "assets/models/Mound.obj";
 
     const int CAMERA_LAG_FRAMES = 5;
@@ -117,12 +118,11 @@ void RenderingSystem::handle_add_charcoal(const Event& e) {
 
     // Store terrain
     example_objects_.emplace_back();
-    example_objects_[object_id].set_has_shadows(true);
     example_objects_[object_id].set_mesh(mesh);
-    example_objects_[object_id].set_shadow_mesh(mesh);
     example_objects_[object_id].set_shader(shader);
     example_objects_[object_id].set_texture(texture);
     example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
+    example_objects_[object_id].set_has_shadows(false);
 }
 
 void RenderingSystem::handle_object_transform(const Event& e) {
@@ -183,28 +183,27 @@ void RenderingSystem::handle_add_skybox(const Event& e) {
 void RenderingSystem::handle_add_powerup(const Event& e) {
     PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
 
-    if (powerup_type == PowerupType::POWERUP_COUNT) {
-        return;
-    }
+    assert(powerup_type != PowerupType::POWERUP_COUNT);
 
     int object_id = e.get_value<int>("object_id", true).first;
     float x = e.get_value<float>("pos_x", true).first;
     float y = e.get_value<float>("pos_y", true).first;
     float z = e.get_value<float>("pos_z", true).first;
 
-    MeshAsset* mesh;
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(PACKET_MESH_PATH);;
+    TextureAsset* texture;
 
     switch (powerup_type) {
         case PowerupType::KETCHUP:
-            mesh = asset_manager_.get_mesh_asset(KETCHUP_MESH_PATH);
+            texture = asset_manager_.get_texture_asset(KETCHUP_TEXTURE_PATH);
             break;
 
         case PowerupType::RELISH:
-            mesh = asset_manager_.get_mesh_asset(RELISH_MESH_PATH);
+            texture = asset_manager_.get_texture_asset(RELISH_TEXTURE_PATH);
             break;
 
         case PowerupType::MUSTARD:
-            mesh = asset_manager_.get_mesh_asset(MUSTARD_MESH_PATH);
+            texture = asset_manager_.get_texture_asset(MUSTARD_TEXTURE_PATH);
             break;
 
         default:
@@ -214,32 +213,31 @@ void RenderingSystem::handle_add_powerup(const Event& e) {
 
     example_objects_.emplace_back();
     example_objects_[object_id].set_mesh(mesh);
-    example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
+    example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH));
+    example_objects_[object_id].set_texture(texture);
     example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
-    // example_objects_[object_id].set_has_shadows(true);
+    example_objects_[object_id].set_has_shadows(true);
 }
 
 void RenderingSystem::handle_change_powerup(const Event& e) {
     PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
 
-    if (powerup_type == PowerupType::POWERUP_COUNT) {
-        return;
-    }
+    assert(powerup_type != PowerupType::POWERUP_COUNT);
 
     int object_id = e.get_value<int>("object_id", true).first;
-    MeshAsset* mesh;
+    TextureAsset* texture;
 
     switch (powerup_type) {
         case PowerupType::KETCHUP:
-            mesh = asset_manager_.get_mesh_asset(KETCHUP_MESH_PATH);
+            texture = asset_manager_.get_texture_asset(KETCHUP_TEXTURE_PATH);
             break;
 
         case PowerupType::RELISH:
-            mesh = asset_manager_.get_mesh_asset(RELISH_MESH_PATH);
+            texture = asset_manager_.get_texture_asset(RELISH_TEXTURE_PATH);
             break;
 
         case PowerupType::MUSTARD:
-            mesh = asset_manager_.get_mesh_asset(MUSTARD_MESH_PATH);
+            texture = asset_manager_.get_texture_asset(MUSTARD_TEXTURE_PATH);
             break;
 
         default:
@@ -247,7 +245,7 @@ void RenderingSystem::handle_change_powerup(const Event& e) {
             break;
     }
 
-    example_objects_[object_id].set_mesh(mesh);
+    example_objects_[object_id].set_texture(texture);
 }
 
 void RenderingSystem::render() {
