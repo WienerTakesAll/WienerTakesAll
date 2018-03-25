@@ -45,6 +45,7 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::ADD_SKYBOX, &RenderingSystem::handle_add_skybox, this);
     EventSystem::add_event_handler(EventType::ADD_POWERUP, &RenderingSystem::handle_add_powerup, this);
     EventSystem::add_event_handler(EventType::CHANGE_POWERUP, &RenderingSystem::handle_change_powerup, this);
+    EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_keypress, this);
 
     init_window();
 }
@@ -56,6 +57,7 @@ void RenderingSystem::load(const Event& e) {
     setup_cameras();
 
     shadow_shader_ = asset_manager_.get_shader_asset(SHADOW_SHADER_PATH);
+	asset_manager_.toggle_fullscreen();
 }
 
 void RenderingSystem::handle_add_vehicle(const Event& e) {
@@ -249,6 +251,15 @@ void RenderingSystem::handle_change_powerup(const Event& e) {
     }
 
     example_objects_[object_id].set_mesh(mesh);
+}
+
+void RenderingSystem::handle_keypress(const Event& e) {
+	int key = e.get_value<int>("key", true).first;
+	int value = e.get_value<int>("value", true).first;
+
+	if (key == SDLK_F11 && value == SDL_KEYDOWN) {
+		asset_manager_.toggle_fullscreen();
+	}
 }
 
 void RenderingSystem::render() {
