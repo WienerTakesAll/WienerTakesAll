@@ -285,6 +285,7 @@ void RenderingSystem::render() {
     auto cameras = cameras_queue_.front();
 
     for (size_t i = 0; i < cameras.size(); i++) {
+
         int window_w, window_h;
         SDL_GetWindowSize(asset_manager_.get_window(), &window_w, &window_h);
 
@@ -383,6 +384,16 @@ void RenderingSystem::setup_cameras() {
 
         auto camera_position = glm::translate(transform, glm::vec3(0, 2.5, -7));
 
+        {
+            glm::vec3 bad_camera_pos(camera_position[3]);
+            glm::vec3 old_camera_pos(last_cameras_pos_[i]);
+            glm::vec3 smooth_camera_pos
+                = bad_camera_pos * 0.25f + old_camera_pos * 0.75f;
+
+            camera_position[3] = glm::vec4(smooth_camera_pos, 1.0);
+        }
+        
+
         if (camera_position[3].y < 4) {
             camera_position[3].y = 4;
         }
@@ -394,6 +405,8 @@ void RenderingSystem::setup_cameras() {
         glm::mat4 P = glm::perspective(glm::radians(FOV), 4.0f / 3.0f, 0.1f, 1000.0f);
 
         new_cameras[i] = P * glm::lookAt(glm::vec3(camera_position[3]), lookAtPos, glm::vec3(0, 1, 0));
+
+        last_cameras_pos_[i] = glm::vec3(camera_position[3]);
     }
 
     // push camera setup to back of queue
