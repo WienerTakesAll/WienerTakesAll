@@ -14,6 +14,8 @@ public:
     void reset_scores();
     void update_it_pointer(int player_id, glm::vec3 vector_to_it);
     void new_it(int it_id);
+    void pickup_powerup(int player, int type);
+    void use_powerup(int player);
 
 private:
     AssetManager& asset_manager_;
@@ -26,4 +28,6 @@ private:
 
     std::array<UIObject, 4> it_pointers_;
     std::array<glm::mat4, 4> it_pointer_transforms_;
+
+    std::array<UIObject, 4> powerup_holders_;
 };

@@ -416,7 +416,8 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
             Event(
                 EventType::PICKUP_POWERUP,
                 "object_id", object_id,
-                "powerup_id", powerup_subsystem_.get_powerup_id()
+                "powerup_id", powerup_subsystem_.get_powerup_id(),
+                "powerup_type", powerup_subsystem_.get_next_powerup_type()
             )
         );
     }
