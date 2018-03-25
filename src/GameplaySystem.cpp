@@ -360,7 +360,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
 
 
             float steer_value = value != SDL_KEYUP ? steer_amount : 0.f;
-            steer_value = std::max(0.0f, std::min(1.0f, steer_value));
+            steer_value = std::max(-1.0f, std::min(1.0f, steer_value));
 
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
@@ -378,11 +378,11 @@ void GameplaySystem::handle_key_press(const Event& e) {
             float steer_amount = -NORMAL_KEYBOARD_STEER_AMOUNT;
 
             if (powerup_datas_[player_id].relish > 0.f) {
-                steer_amount = RELISH_KEYBOARD_STEER_AMOUNT;
+                steer_amount = -RELISH_KEYBOARD_STEER_AMOUNT;
             }
 
             float steer_value = value != SDL_KEYUP ? steer_amount : 0.f;
-            steer_value = std::max(0.0f, std::min(1.0f, steer_value));
+            steer_value = std::max(-1.0f, std::min(1.0f, steer_value));
 
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
