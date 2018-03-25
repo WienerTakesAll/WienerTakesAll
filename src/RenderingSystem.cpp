@@ -52,6 +52,7 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::ADD_POWERUP, &RenderingSystem::handle_add_powerup, this);
     EventSystem::add_event_handler(EventType::CHANGE_POWERUP, &RenderingSystem::handle_change_powerup, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_keypress, this);
+    EventSystem::add_event_handler(EventType::USE_POWERUP, &RenderingSystem::handle_use_powerup, this);
 
     init_window();
 }
@@ -281,6 +282,52 @@ void RenderingSystem::handle_keypress(const Event& e) {
 
     if (key == SDLK_F11 && value == SDL_KEYDOWN) {
         asset_manager_.toggle_fullscreen();
+    }
+}
+
+void RenderingSystem::handle_use_powerup(const Event& e) {
+    PowerupType type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
+    PowerupTarget target = static_cast<PowerupTarget>(e.get_value<int>("target", true).first);
+    int player_id = e.get_value<int>("index", true).first;
+    const float overlay_intensity = 0.5f;
+    glm::vec3 overlay = glm::vec3(0.0f);
+
+    switch (type) {
+        case PowerupType::KETCHUP:
+            overlay[0] = overlay_intensity;
+            break;
+
+        case PowerupType::RELISH:
+            overlay[1] = overlay_intensity;
+            break;
+
+        case PowerupType::MUSTARD:
+            overlay[0] = overlay_intensity;
+            overlay[1] = overlay_intensity;
+            break;
+
+        default:
+            assert(false);
+            break;
+    }
+
+    switch (target) {
+        case PowerupTarget::SELF:
+            example_objects_[player_id].set_colour_overlay(overlay);
+            break;
+
+        case PowerupTarget::OTHERS:
+            for (int i = 0; i < 4; ++i) {
+                if (i != player_id) {
+                    example_objects_[i].set_colour_overlay(overlay);
+                }
+            }
+
+            break;
+
+        default:
+            assert(false);
+            break;
     }
 }
 
