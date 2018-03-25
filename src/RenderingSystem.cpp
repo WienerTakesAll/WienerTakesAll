@@ -25,6 +25,7 @@ namespace {
     const std::string RELISH_MESH_PATH = "assets/models/Pickle.obj";
     const std::string MUSTARD_MESH_PATH = "assets/models/HotSauce.obj";
     const std::string CHARCOAL_MESH_PATH = "assets/models/Mound.obj";
+    const std::string CHARCOAL_TEXTURE_PATH = "assets/textures/smouldering-charcoal.png";
 
     const int CAMERA_LAG_FRAMES = 5;
 }
@@ -113,7 +114,7 @@ void RenderingSystem::handle_add_charcoal(const Event& e) {
 
     MeshAsset* mesh = asset_manager_.get_mesh_asset(CHARCOAL_MESH_PATH);
     ShaderAsset* shader = asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH);
-    TextureAsset* texture = asset_manager_.get_texture_asset(SKYBOX_TEXTURE_PATH);
+    TextureAsset* texture = asset_manager_.get_texture_asset(CHARCOAL_TEXTURE_PATH);
 
     // Store terrain
     example_objects_.emplace_back();
