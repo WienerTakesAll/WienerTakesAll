@@ -26,6 +26,7 @@ namespace {
     const std::string RELISH_MESH_PATH = "assets/models/Pickle.obj";
     const std::string MUSTARD_MESH_PATH = "assets/models/HotSauce.obj";
     const std::string CHARCOAL_MESH_PATH = "assets/models/Mound.obj";
+    const std::string CHARCOAL_TEXTURE_PATH = "assets/textures/smouldering-charcoal.png";
 
     const int CAMERA_LAG_FRAMES = 5;
 }
@@ -46,6 +47,7 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::ADD_SKYBOX, &RenderingSystem::handle_add_skybox, this);
     EventSystem::add_event_handler(EventType::ADD_POWERUP, &RenderingSystem::handle_add_powerup, this);
     EventSystem::add_event_handler(EventType::CHANGE_POWERUP, &RenderingSystem::handle_change_powerup, this);
+    EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_keypress, this);
 
     init_window();
 }
@@ -59,7 +61,9 @@ void RenderingSystem::load(const Event& e) {
 
     shadow_shader_ = asset_manager_.get_shader_asset(SHADOW_SHADER_PATH);
 
+
     particle_subsystem_.handle_load(e);
+	asset_manager_.toggle_fullscreen();
 }
 
 void RenderingSystem::handle_add_vehicle(const Event& e) {
@@ -118,7 +122,7 @@ void RenderingSystem::handle_add_charcoal(const Event& e) {
 
     MeshAsset* mesh = asset_manager_.get_mesh_asset(CHARCOAL_MESH_PATH);
     ShaderAsset* shader = asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH);
-    TextureAsset* texture = asset_manager_.get_texture_asset(SKYBOX_TEXTURE_PATH);
+    TextureAsset* texture = asset_manager_.get_texture_asset(CHARCOAL_TEXTURE_PATH);
 
     // Store terrain
     example_objects_.emplace_back();
@@ -272,6 +276,15 @@ void RenderingSystem::handle_change_powerup(const Event& e) {
     }
 
     example_objects_[object_id].set_mesh(mesh);
+}
+
+void RenderingSystem::handle_keypress(const Event& e) {
+	int key = e.get_value<int>("key", true).first;
+	int value = e.get_value<int>("value", true).first;
+
+	if (key == SDLK_F11 && value == SDL_KEYDOWN) {
+		asset_manager_.toggle_fullscreen();
+	}
 }
 
 void RenderingSystem::render() {
