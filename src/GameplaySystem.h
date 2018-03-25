@@ -45,7 +45,7 @@ private:
     {
         float ketchup;
     };
-    std::map<int, player_powerup_data> powerup_datas;
+    std::map<int, player_powerup_data> powerup_datas_;
 
     PowerupSubsystem powerup_subsystem_;
     ScoringSubsystem scoring_subsystem_;

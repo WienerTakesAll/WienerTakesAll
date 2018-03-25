@@ -1,6 +1,7 @@
 #include <stdlib.h> /* srand, rand */
 #include <time.h> /* time */
 #include <algorithm>
+#include <vector>
 
 #include "SDL.h"
 #include <glm/gtx/vector_angle.hpp>
@@ -63,22 +64,20 @@ void PowerupSubsystem::pickup_powerup(const int object_id) {
     frame_counter_ = 0;
 }
 
-PowerupType PowerupSubsystem::use_powerup(const int object_id) {
-    // Check if object_id has a pre-existing powerup. If so, return that. Else, return NONE.
-    PowerupType type = object_powerups_.find(object_id) == object_powerups_.end()
-                       ? PowerupType::POWERUP_COUNT
-                       : object_powerups_[object_id];
-
+void PowerupSubsystem::spend_powerup(const int object_id) {
     // Clear powerup entry.
     object_powerups_[object_id] = PowerupType::POWERUP_COUNT;
-
-    return type;
 }
 
 const bool PowerupSubsystem::can_use_powerup(const int object_id) const {
     return
         object_powerups_.find(object_id) != object_powerups_.end() &&
         object_powerups_.at(object_id) != PowerupType::POWERUP_COUNT;
+}
+
+const PowerupType PowerupSubsystem::get_player_powerup_type(const int object_id) const {
+    assert(can_use_powerup(object_id));
+    return object_powerups_.at(object_id);
 }
 
 const bool PowerupSubsystem::is_powerup(const int object_id) const {

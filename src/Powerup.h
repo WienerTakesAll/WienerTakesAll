@@ -1,9 +1,10 @@
 #pragma once
 
+//TODO: Add Relish/Pickle
 enum PowerupType {
     KETCHUP,
-    PICKLE,
-    HOT,
+    //RELISH,
+    MUSTARD,
     POWERUP_COUNT
 };
 

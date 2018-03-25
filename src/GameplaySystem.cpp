@@ -14,10 +14,11 @@ namespace {
     const int MAX_TRIGGER_VALUE = 32768;
     const float DRIVE_SPEED = 0.6f;
     const float BRAKE_SPEED = 0.8f;
-    const float KETCHUP_BOOST = 50000.0f;
+    const float KETCHUP_BOOST = 1500.0f;
     const float STEER_DAMPENING = 0.6f;
     const glm::vec3 HOT_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const float KEYBOARD_STEER_AMOUNT = 0.4f;
+    const glm::vec3 COLLISION_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
 }
 
 GameplaySystem::GameplaySystem()
@@ -32,6 +33,7 @@ GameplaySystem::GameplaySystem()
     add_event_handler(EventType::VEHICLE_COLLISION, &GameplaySystem::handle_vehicle_collision, this);
     add_event_handler(EventType::NEW_IT, &GameplaySystem::handle_new_it, this);
     add_event_handler(EventType::ADD_POWERUP, &GameplaySystem::handle_add_powerup, this);
+    add_event_handler(EventType::USE_POWERUP, &GameplaySystem::handle_use_powerup, this);
     add_event_handler(EventType::PICKUP_POWERUP, &GameplaySystem::handle_pickup_powerup, this);
     add_event_handler(EventType::CHANGE_POWERUP, &GameplaySystem::handle_change_powerup, this);
 
@@ -92,6 +94,27 @@ void GameplaySystem::update() {
                 "qua_z", 0.0f
             )
         );
+
+
+
+        for (auto& powerup_data : powerup_datas_)
+        {
+            if (powerup_data.second.ketchup > 0.f)
+            {
+                glm::vec3 boost_direction
+                    = object_rotations_[powerup_data.first] * glm::vec3(0.0f, 0.0f, powerup_data.second.ketchup * KETCHUP_BOOST);
+                EventSystem::queue_event(
+                    Event(
+                        EventType::OBJECT_APPLY_FORCE,
+                        "object_id", powerup_data.first,
+                        "x", boost_direction.x,
+                        "y", boost_direction.y,
+                        "z", boost_direction.z
+                    ));
+
+                powerup_data.second.ketchup -= 0.01f;
+            }
+        }
     }
 }
 
@@ -246,9 +269,13 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_u:
         case SDLK_RSHIFT:
         case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-            new_events.emplace_back(EventType::USE_POWERUP,
-                                    "target", PowerupTarget::SELF,
-                                    "index", player_id);
+            if (powerup_subsystem_.can_use_powerup(player_id)) {
+                new_events.emplace_back(EventType::USE_POWERUP,
+                                        "type", powerup_subsystem_.get_player_powerup_type(player_id),
+                                        "target", PowerupTarget::SELF,
+                                        "index", player_id);
+            }
+
             break;
 
         // others powerup
@@ -257,9 +284,13 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_o:
         case SDLK_RETURN:
         case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-            new_events.emplace_back(EventType::USE_POWERUP,
-                                    "target", PowerupTarget::OTHERS,
-                                    "index", player_id);
+            if (powerup_subsystem_.can_use_powerup(player_id)) {
+                new_events.emplace_back(EventType::USE_POWERUP,
+                                        "type", powerup_subsystem_.get_player_powerup_type(player_id),
+                                        "target", PowerupTarget::OTHERS,
+                                        "index", player_id);
+            }
+
             break;
 
         // Keyboard acceleration
@@ -371,6 +402,10 @@ void GameplaySystem::handle_key_press(const Event& e) {
 void GameplaySystem::handle_add_vehicle(const Event& e) {
     std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
     scoring_subsystem_.add_vehicle(object_id.first);
+
+    player_powerup_data data;
+    data.ketchup = 0.f;
+    powerup_datas_.emplace(object_id.first, data);
 
     // Temporary, set first vehicle to be added as first it.
     // Assumes first vehicle object_id = 0.
@@ -501,51 +536,73 @@ void GameplaySystem::handle_change_powerup(const Event& e) {
 
 void GameplaySystem::handle_use_powerup(const Event& e) {
     int object_id = e.get_value<int>("index", true).first;
+    int type = e.get_value<int>("type", true).first;
+    int target = e.get_value<int>("target", true).first;
 
-    if (!powerup_subsystem_.can_use_powerup(object_id)) {
-        return;
-    }
-
-    PowerupType type = powerup_subsystem_.use_powerup(object_id);
+    powerup_subsystem_.spend_powerup(object_id);
 
     switch (type) {
         case PowerupType::KETCHUP: {
-            glm::vec3 boost_direction = object_rotations_[object_id] * glm::vec3(0.0f, 0.0f, KETCHUP_BOOST);
-            EventSystem::queue_event(
-                Event(
-                    EventType::OBJECT_APPLY_FORCE,
-                    "object_id", object_id,
-                    "x", boost_direction.x,
-                    "y", boost_direction.y,
-                    "z", boost_direction.z
-                )
-            );
-            break;
-        }
-
-        case PowerupType::PICKLE:
-            std::cout << "PICKLE used by player " << object_id << std::endl;
-            break;
-
-        case PowerupType::HOT:
-            for (int i = 0; i < 4; ++i) {
-                if (i == object_id) {
-                    continue;
+            std::cout << "KETCHUP used by player " << object_id << std::endl;
+            if (target == PowerupTarget::SELF)
+            {
+                powerup_datas_[object_id].ketchup = 1.0f;
+            }
+            else
+            {
+                for (auto& powerup_data : powerup_datas_)
+                {
+                    if (powerup_data.first != object_id)
+                    {
+                        powerup_data.second.ketchup = 2.5f;
+                    }
                 }
-
-                EventSystem::queue_event(
-                    Event(
-                        EventType::OBJECT_APPLY_FORCE,
-                        "object_id", i,
-                        // TODO: Pass glm::vec3 in events
-                        "x", HOT_KNOCK_BACK_FORCE.x,
-                        "y", HOT_KNOCK_BACK_FORCE.y,
-                        "z", HOT_KNOCK_BACK_FORCE.z
-                    )
-                );
             }
 
             break;
+        }
+
+        case PowerupType::MUSTARD:
+            std::cout << "MUSTARD used by player " << object_id << std::endl;
+
+            if (target == PowerupTarget::SELF)
+            {
+                EventSystem::queue_event(
+                    Event(
+                        EventType::OBJECT_APPLY_FORCE,
+                        "object_id", object_id,
+                        // TODO: Pass glm::vec3 in events
+                        "x", HOT_KNOCK_BACK_FORCE.x*0.0f,
+                        "y", HOT_KNOCK_BACK_FORCE.y,
+                        "z", HOT_KNOCK_BACK_FORCE.z*0.f
+                    ));
+            }
+            else
+            {
+                for (int i = 0; i < 4; ++i) {
+                    if (i == object_id) {
+                        continue;
+                    }
+
+                    EventSystem::queue_event(
+                        Event(
+                            EventType::OBJECT_APPLY_FORCE,
+                            "object_id", i,
+                            // TODO: Pass glm::vec3 in events
+                            "x", HOT_KNOCK_BACK_FORCE.x,
+                            "y", HOT_KNOCK_BACK_FORCE.y,
+                            "z", HOT_KNOCK_BACK_FORCE.z
+                        ));
+                }
+            }
+
+        //TODO: Add Relish/Pickle
+        /*
+        case PowerupType::RELISH:
+
+
+            break;
+        */
 
         default:
             break;
@@ -567,9 +624,9 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
             EventType::OBJECT_APPLY_FORCE,
             "object_id", a_id,
             // TODO: Pass glm::vec3 in events
-            "x", v_dir[0] * HOT_KNOCK_BACK_FORCE.x,
-            "y", HOT_KNOCK_BACK_FORCE.y,
-            "z", v_dir[2] * HOT_KNOCK_BACK_FORCE.z
+            "x", v_dir[0] * COLLISION_KNOCK_BACK_FORCE.x,
+            "y", COLLISION_KNOCK_BACK_FORCE.y,
+            "z", v_dir[2] * COLLISION_KNOCK_BACK_FORCE.z
         )
     );
 
@@ -578,9 +635,9 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
             EventType::OBJECT_APPLY_FORCE,
             "object_id", b_id,
             // TODO: Pass glm::vec3 in events
-            "x", -v_dir[0] * HOT_KNOCK_BACK_FORCE.x,
-            "y", HOT_KNOCK_BACK_FORCE.y,
-            "z", -v_dir[2] * HOT_KNOCK_BACK_FORCE.z
+            "x", -v_dir[0] * COLLISION_KNOCK_BACK_FORCE.x,
+            "y", COLLISION_KNOCK_BACK_FORCE.y,
+            "z", -v_dir[2] * COLLISION_KNOCK_BACK_FORCE.z
         )
     );
 
@@ -609,13 +666,13 @@ bool GameplaySystem::should_update_score() const {
 }
 
 
-float GameplaySystem::calculatePlayerSpeed(int player)
-{
+float GameplaySystem::calculatePlayerSpeed(int player) {
     float averageScore = 0;
-    for (size_t i = 0; i < 4; i++)
-    {
+
+    for (size_t i = 0; i < 4; i++) {
         averageScore += scoring_subsystem_.get_player_score(i);
     }
+
     averageScore *= 0.25f;
     float playerScore = scoring_subsystem_.get_player_score(player);
     float speedPenalty = 1.f + ((averageScore - playerScore) * 0.02f);
