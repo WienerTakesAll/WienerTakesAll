@@ -290,8 +290,8 @@ void RenderingSystem::handle_use_powerup(const Event& e) {
     PowerupType type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
     PowerupTarget target = static_cast<PowerupTarget>(e.get_value<int>("target", true).first);
     int player_id = e.get_value<int>("index", true).first;
-    const float overlay_intensity = 0.5f;
-    glm::vec3 overlay = glm::vec3(0.0f);
+    const float overlay_intensity = 0.15f;
+    glm::vec4 overlay = glm::vec4(0.0f);
 
     switch (type) {
         case PowerupType::KETCHUP:
@@ -333,7 +333,7 @@ void RenderingSystem::handle_use_powerup(const Event& e) {
 void RenderingSystem::handle_finish_powerup(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
 
-    example_objects_[object_id].set_colour_overlay(glm::vec3());
+    example_objects_[object_id].set_colour_overlay(glm::vec4());
 }
 
 void RenderingSystem::render() {

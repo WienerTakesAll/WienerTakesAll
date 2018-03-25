@@ -67,7 +67,7 @@ void RenderingComponent::render(glm::mat4x4 camera, float ambient) const {
 
         glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(transform_matrix_));
         glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(camera));
-        glUniform3fv(uniform_overlay, 1, glm::value_ptr(colour_overlay_));
+        glUniform4fv(uniform_overlay, 1, glm::value_ptr(colour_overlay_));
         glUniform1f(uniform_ambient, ambient);
 
         glDrawElements(GL_TRIANGLES, mesh_->meshes_[i].indices_.size(), GL_UNSIGNED_INT, 0);
@@ -158,7 +158,7 @@ void RenderingComponent::set_transform(glm::mat4x4 transform) {
     transform_matrix_ = transform;
 }
 
-void RenderingComponent::set_colour_overlay(glm::vec3 colour) {
+void RenderingComponent::set_colour_overlay(glm::vec4 colour) {
     colour_overlay_ = colour;
 }
 

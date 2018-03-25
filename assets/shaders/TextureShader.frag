@@ -6,7 +6,7 @@ out vec4 color;
 
 uniform float Ambient;
 uniform sampler2D albedo;
-uniform vec3 Overlay;
+uniform vec4 Overlay;
 
 void main(){
 	float angle = dot(normalize(vec3(1,1,0)),normalize(normal));
