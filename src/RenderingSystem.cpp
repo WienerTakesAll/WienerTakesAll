@@ -297,14 +297,17 @@ void RenderingSystem::handle_use_powerup(const Event& e) {
 
     switch (type) {
         case PowerupType::KETCHUP:
-            overlay[0] = overlay_intensity;
+            overlay[0] = overlay_intensity; // red
             break;
 
         case PowerupType::RELISH:
-            overlay[1] = overlay_intensity;
+            overlay[1] = overlay_intensity; // green
             break;
 
         case PowerupType::MUSTARD:
+            // red + green = yellow
+            overlay[0] = overlay_intensity;
+            overlay[1] = overlay_intensity;
             break;
 
         default:

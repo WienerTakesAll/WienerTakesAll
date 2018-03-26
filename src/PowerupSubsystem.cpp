@@ -10,7 +10,7 @@
 
 namespace {
     const float POWERUP_DISTANCE_THRESHOLD = 2.5f;
-    const int POWERUP_LOCK_FRAMES = 120;
+    const int POWERUP_LOCK_FRAMES = 30;
     const glm::vec3 POWERUP_LOCATION_LIMITS = glm::vec3(10.0f, 1.5f, 10.0f);
 }
 
