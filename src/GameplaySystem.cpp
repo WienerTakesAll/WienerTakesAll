@@ -23,6 +23,7 @@ namespace {
     const float RELISH_KEYBOARD_STEER_AMOUNT = 4.0f;
     const glm::vec3 COLLISION_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const float RELISH_DURATION = 2.5f;
+    const int NUM_MOUNDS = 20;
 }
 
 GameplaySystem::GameplaySystem()
@@ -226,14 +227,14 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
         );
 
         //CHARCOAL_TEST
-        for (size_t i = 0; i < 10; i++) {
+        for (size_t i = 0; i < NUM_MOUNDS; i++) {
             EventSystem::queue_event(
                 Event(
                     EventType::ADD_CHARCOAL,
                     "object_id", gameobject_counter_->assign_id(),
                     // TODO: Pass glm::vec3 in events
                     "pos_x", (rand() % 140) - 70,
-                    "pos_y", (rand() % 2) + 1,
+                    "pos_y", (rand() % 3),
                     "pos_z", (rand() % 140) - 70
                 )
             );
