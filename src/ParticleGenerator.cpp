@@ -87,24 +87,24 @@ void ParticleGenerator::generate_particles(const bool& force) {
     }
 }
 
-glm::vec3 ParticleGenerator::generate_position() {
+glm::vec3 ParticleGenerator::generate_position() const {
     float x_factor = ((rand() % 100) / 50.0f) - 1.0f;
     float y_factor = ((rand() % 100) / 50.0f) - 1.0f;
     float z_factor = ((rand() % 100) / 50.0f) - 1.0f;
     return position_ + glm::vec3(spawn_distance_[0] * x_factor, spawn_distance_[1] * y_factor, spawn_distance_[2] * z_factor);
 }
 
-float ParticleGenerator::generate_rotation() {
+float ParticleGenerator::generate_rotation() const {
     float range = rotation_max_ - rotation_min_;
     return ((rand() % 100) / 100.0f) * range + rotation_min_;
 }
 
-float ParticleGenerator::generate_scale() {
+float ParticleGenerator::generate_scale() const {
     float range = scale_max_ - scale_min_;
     return ((rand() % 100) / 100.0f) * range + scale_min_;
 }
 
-glm::vec4 ParticleGenerator::generate_colour() {
+glm::vec4 ParticleGenerator::generate_colour() const {
     glm::vec4 range = colour_max_ - colour_min_;
     float r = ((rand() % 100) / 100.0f) * range[0] + colour_min_[0];
     float g = ((rand() % 100) / 100.0f) * range[1] + colour_min_[1];
@@ -114,7 +114,7 @@ glm::vec4 ParticleGenerator::generate_colour() {
     return glm::vec4(r, g, b, a);
 }
 
-void ParticleGenerator::render(const glm::mat4& camera) {
+void ParticleGenerator::render(const glm::mat4& camera) const {
     if (particles_.empty()) {
         return;
     }

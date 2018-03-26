@@ -7,7 +7,7 @@ class ParticleGenerator {
 public:
     ParticleGenerator();
     void update();
-    void render(const glm::mat4& camera);
+    void render(const glm::mat4& camera) const;
     bool init(RenderingComponent rendering_component);
     void set_active(const bool& active);
     void set_position(glm::vec3 position);
@@ -25,10 +25,10 @@ public:
 private:
     bool active_;
     void generate_particles(const bool& force = false);
-    glm::vec3 generate_position();
-    float generate_rotation();
-    float generate_scale();
-    glm::vec4 generate_colour();
+    glm::vec3 generate_position() const;
+    float generate_rotation() const;
+    float generate_scale() const;
+    glm::vec4 generate_colour() const;
 
     glm::vec3 position_;
     std::vector<Particle> particles_;
