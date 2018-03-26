@@ -33,12 +33,12 @@ namespace {
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
-    : asset_manager_(asset_manager)
-    , whos_it(0)
-    , car_speeds_( {
+    : car_speeds_( {
     0.f, 0.f, 0.f, 0.f
 })
-, particle_subsystem_(asset_manager) {
+, asset_manager_(asset_manager)
+, particle_subsystem_(asset_manager)
+, whos_it(0) {
     window_ = asset_manager.get_window();
 
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
@@ -52,6 +52,8 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::ADD_POWERUP, &RenderingSystem::handle_add_powerup, this);
     EventSystem::add_event_handler(EventType::CHANGE_POWERUP, &RenderingSystem::handle_change_powerup, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_keypress, this);
+    EventSystem::add_event_handler(EventType::USE_POWERUP, &RenderingSystem::handle_use_powerup, this);
+    EventSystem::add_event_handler(EventType::FINISH_POWERUP, &RenderingSystem::handle_finish_powerup, this);
 
     init_window();
 }
@@ -140,7 +142,9 @@ void RenderingSystem::handle_object_transform(const Event& e) {
 
     int object_id = e.get_value<int>("object_id", true).first;
 
-    if (example_objects_.size() <= object_id) {
+    assert(object_id >= 0);
+
+    if (example_objects_.size() <= static_cast<size_t>(object_id)) {
         return;
     }
 
@@ -160,7 +164,7 @@ void RenderingSystem::handle_object_transform(const Event& e) {
 
     if (e_vx.second && object_id < 4) {
         float vx = e_vx.first;
-        float vy = e.get_value<float>("vel_y", true).first;
+        // float vy = e.get_value<float>("vel_y", true).first;
         float vz = e.get_value<float>("vel_z", true).first;
 
         car_speeds_[object_id] = glm::length(glm::vec2(vx, vz));
@@ -280,6 +284,59 @@ void RenderingSystem::handle_keypress(const Event& e) {
     if (key == SDLK_F11 && value == SDL_KEYDOWN) {
         asset_manager_.toggle_fullscreen();
     }
+}
+
+void RenderingSystem::handle_use_powerup(const Event& e) {
+    particle_subsystem_.handle_use_powerup(e);
+
+    PowerupType type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
+    PowerupTarget target = static_cast<PowerupTarget>(e.get_value<int>("target", true).first);
+    int player_id = e.get_value<int>("index", true).first;
+    const float overlay_intensity = 0.15f;
+    glm::vec4 overlay = glm::vec4(0.0f);
+
+    switch (type) {
+        case PowerupType::KETCHUP:
+            overlay[0] = overlay_intensity;
+            break;
+
+        case PowerupType::RELISH:
+            overlay[1] = overlay_intensity;
+            break;
+
+        case PowerupType::MUSTARD:
+            break;
+
+        default:
+            assert(false);
+            break;
+    }
+
+    switch (target) {
+        case PowerupTarget::SELF:
+            example_objects_[player_id].set_colour_overlay(overlay);
+            break;
+
+        case PowerupTarget::OTHERS:
+            for (int i = 0; i < 4; ++i) {
+                if (i != player_id) {
+                    example_objects_[i].set_colour_overlay(overlay);
+                }
+            }
+
+            break;
+
+        default:
+            assert(false);
+            break;
+    }
+}
+
+void RenderingSystem::handle_finish_powerup(const Event& e) {
+    particle_subsystem_.handle_finish_powerup(e);
+
+    int object_id = e.get_value<int>("object_id", true).first;
+    example_objects_[object_id].set_colour_overlay(glm::vec4());
 }
 
 void RenderingSystem::render() {

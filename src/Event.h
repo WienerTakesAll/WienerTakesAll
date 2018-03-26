@@ -28,6 +28,7 @@ enum class EventType {
     USE_POWERUP,
     SET_CHASSIS_MASS,
     RESTORE_CHASSIS_MASS,
+    FINISH_POWERUP,
 
     // Keep at end of list
     EVENT_COUNT

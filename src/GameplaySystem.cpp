@@ -115,6 +115,15 @@ void GameplaySystem::update() {
                     ));
 
                 powerup_data.second.ketchup -= 0.01f;
+
+                if (powerup_data.second.ketchup <= 0.0f) {
+                    EventSystem::queue_event(
+                        Event(
+                            EventType::FINISH_POWERUP,
+                            "object_id", powerup_data.first
+                        )
+                    );
+                }
             }
 
 
@@ -129,6 +138,15 @@ void GameplaySystem::update() {
 
             if (powerup_data.second.relish > 0.f) {
                 powerup_data.second.relish -= 0.01f;
+
+                if (powerup_data.second.relish <= 0.0f) {
+                    EventSystem::queue_event(
+                        Event(
+                            EventType::FINISH_POWERUP,
+                            "object_id", powerup_data.first
+                        )
+                    );
+                }
             }
         }
     }

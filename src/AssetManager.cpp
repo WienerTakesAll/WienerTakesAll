@@ -255,7 +255,7 @@ void AssetManager::construct_shadow_volume(MeshAsset::MeshData& mesh) {
 }
 
 void AssetManager::toggle_fullscreen() {
-    if (SDL_SetWindowFullscreen(window_, is_window_fullscreen ? 0 : SDL_WINDOW_FULLSCREEN)) {
+    if (SDL_SetWindowFullscreen(window_, is_window_fullscreen ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP)) {
         std::cout << "failed to toggle fullscreen: " << SDL_GetError() << std::endl;
     }
 

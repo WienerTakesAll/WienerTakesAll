@@ -21,6 +21,7 @@ public:
     void apply_transform(glm::mat4x4 transform);
     // Sets current transform to new transform
     void set_transform(glm::mat4x4 transform);
+    void set_colour_overlay(glm::vec4 colour);
     void set_has_shadows(bool has_shadow);
     const glm::mat4x4& get_transform() const;
 
@@ -43,6 +44,7 @@ private:
     std::vector<GLuint> gl_shadow_index_buffers_;
 
     glm::mat4 transform_matrix_;
+    glm::vec4 colour_overlay_;
     MeshAsset* mesh_;
     MeshAsset* shadow_mesh_;
     TextureAsset* texture_;
