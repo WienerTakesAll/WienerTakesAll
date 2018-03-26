@@ -233,8 +233,8 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                     "object_id", gameobject_counter_->assign_id(),
                     // TODO: Pass glm::vec3 in events
                     "pos_x", (rand() % 140) - 70,
-                    "pos_y", 1,
-                    "pos_z", (rand() % 140) - 70//,
+                    "pos_y", (rand() % 2) + 1,
+                    "pos_z", (rand() % 140) - 70
                 )
             );
         }
