@@ -62,7 +62,7 @@ void RenderingSystem::update() {
 
 void RenderingSystem::load(const Event& e) {
     setup_cameras();
-
+    preload_assets();
     shadow_shader_ = asset_manager_.get_shader_asset(SHADOW_SHADER_PATH);
     particle_subsystem_.handle_load(e);
     asset_manager_.toggle_fullscreen();
@@ -428,4 +428,36 @@ void RenderingSystem::setup_cameras() {
 
 void RenderingSystem::end_render() const {
     //SDL_GL_SwapWindow(window_);
+}
+
+void RenderingSystem::preload_assets() const {
+    // Shaders
+    asset_manager_.get_texture_asset(STANDARD_SHADER_PATH);
+    asset_manager_.get_texture_asset(TEXTURE_SHADER_PATH);
+    asset_manager_.get_texture_asset(SKYBOX_SHADER_PATH);
+    asset_manager_.get_texture_asset(SHADOW_SHADER_PATH);
+
+    // Wiener
+    asset_manager_.get_texture_asset(CAR_MESH_PATH);
+    asset_manager_.get_texture_asset(CAR_SHADOW_MESH_PATH);
+    asset_manager_.get_texture_asset(WEINER_MESH_PATH);
+    asset_manager_.get_texture_asset(CAR_TEXTURE_PATH);
+
+    // Terrain
+    asset_manager_.get_texture_asset(TERRAIN_MESH_PATH);
+    asset_manager_.get_texture_asset(TERRAIN_TEXTURE_PATH);
+
+    // Skybox
+    asset_manager_.get_texture_asset(SKYBOX_MESH_PATH);
+    asset_manager_.get_texture_asset(SKYBOX_TEXTURE_PATH);
+
+    // Powerups
+    asset_manager_.get_texture_asset(PACKET_MESH_PATH);
+    asset_manager_.get_texture_asset(KETCHUP_TEXTURE_PATH);
+    asset_manager_.get_texture_asset(RELISH_TEXTURE_PATH);
+    asset_manager_.get_texture_asset(MUSTARD_TEXTURE_PATH);
+
+    // Obstacles
+    asset_manager_.get_texture_asset(CHARCOAL_MESH_PATH);
+    asset_manager_.get_texture_asset(CHARCOAL_TEXTURE_PATH);
 }

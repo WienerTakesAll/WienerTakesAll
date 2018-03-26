@@ -124,13 +124,13 @@ void GameplayHud::load() {
 
     for (unsigned int i = 0; i < powerup_holders_.size(); i++) {
         powerup_holders_[i] = UIObject(
-            player_holders_position[i],
-            glm::vec3(1.0),
-            glm::vec2(holder_size_x, holder_size_y),
-            square_mesh_,
-            powerup_holder_tex,
-            ui_shader_
-        );
+                                  player_holders_position[i],
+                                  glm::vec3(1.0),
+                                  glm::vec2(holder_size_x, holder_size_y),
+                                  square_mesh_,
+                                  powerup_holder_tex,
+                                  ui_shader_
+                              );
     }
 }
 
@@ -193,11 +193,9 @@ void GameplayHud::new_it(int it_id) {
 void GameplayHud::pickup_powerup(int player, int type) {
     if (type == PowerupType::KETCHUP) {
         powerup_holders_[player].set_texture(asset_manager_.get_texture_asset(KETCHUP_TEXTURE_PATH));
-    }
-    else if (type == PowerupType::MUSTARD) {
+    } else if (type == PowerupType::MUSTARD) {
         powerup_holders_[player].set_texture(asset_manager_.get_texture_asset(MUSTARD_TEXTURE_PATH));
-    }
-    else if (type == PowerupType::RELISH) {
+    } else if (type == PowerupType::RELISH) {
         powerup_holders_[player].set_texture(asset_manager_.get_texture_asset(RELISH_TEXTURE_PATH));
     }
 }

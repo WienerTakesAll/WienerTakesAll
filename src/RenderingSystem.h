@@ -40,6 +40,8 @@ private:
 
     bool init_window();
 
+    void preload_assets() const;
+
     SDL_Window* window_;
     GLuint vertex_array_id_;
     std::vector<RenderingComponent> example_objects_;
