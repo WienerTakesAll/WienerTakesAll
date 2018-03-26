@@ -656,6 +656,8 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                 }
             }
 
+            break;
+
         case PowerupType::RELISH:
             std::cout << "RELISH used by player " << object_id << std::endl;
 
