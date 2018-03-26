@@ -25,6 +25,7 @@ namespace {
     const float RELISH_DURATION = 2.5f;
     const float MUSTARD_DURATION = 0.2f;
     const float POWERUP_TICK = 0.01f;
+    const int NUM_MOUNDS = 20;
 }
 
 GameplaySystem::GameplaySystem()
@@ -184,7 +185,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "object_id", gameobject_counter_->assign_id(),
                 // TODO: Pass glm::vec3 in events
                 "pos_x", 4,
-                "pos_y", 2,
+                "pos_y", 10,
                 "pos_z", 0
             )
         );
@@ -206,7 +207,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "object_id", gameobject_counter_->assign_id(),
                 // TODO: Pass glm::vec3 in events
                 "pos_x", -4,
-                "pos_y", 2,
+                "pos_y", 10,
                 "pos_z", 0
             )
         );
@@ -217,7 +218,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "object_id", gameobject_counter_->assign_id(),
                 // TODO: Pass glm::vec3 in events
                 "pos_x", -10,
-                "pos_y", 2,
+                "pos_y", 10,
                 "pos_z", 0
             )
         );
@@ -239,15 +240,15 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
         );
 
         //CHARCOAL_TEST
-        for (size_t i = 0; i < 10; i++) {
+        for (size_t i = 0; i < NUM_MOUNDS; i++) {
             EventSystem::queue_event(
                 Event(
                     EventType::ADD_CHARCOAL,
                     "object_id", gameobject_counter_->assign_id(),
                     // TODO: Pass glm::vec3 in events
-                    "pos_x", (rand() % 150) - 75,
-                    "pos_y", 1,
-                    "pos_z", (rand() % 150) - 75//,
+                    "pos_x", (rand() % 140) - 70,
+                    "pos_y", (rand() % 3),
+                    "pos_z", (rand() % 140) - 70
                 )
             );
         }
