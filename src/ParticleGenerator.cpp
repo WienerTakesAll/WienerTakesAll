@@ -9,6 +9,7 @@
 #include "MeshAsset.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "glm/gtc/type_ptr.hpp"
+#include <glm/glm.hpp>
 #include <algorithm>
 #include <iostream>
 #include <cstdlib> // for rand
@@ -19,7 +20,8 @@ namespace {
 }
 
 ParticleGenerator::ParticleGenerator()
-    : position_()
+    : active_(true)
+    , position_()
     , particles_()
     , rendering_component_()
     , max_particle_life_(0)
@@ -29,6 +31,7 @@ ParticleGenerator::ParticleGenerator()
     , rotation_delta_(0.0f)
     , spawn_amount_max_(1)
     , spawn_amount_min_(1)
+    , spawn_distance_()
     , rotation_max_(0.0f)
     , rotation_min_(0.0f)
     , scale_max_(1.0f)
@@ -51,25 +54,44 @@ void ParticleGenerator::update() {
         particle.velocity += acceleration_;
         particle.position += particle.velocity;
         particle.rotation_rads += rotation_delta_;
-        particle.scale += scale_delta_;
+        particle.scale = glm::clamp(particle.scale + scale_delta_, scale_min_, scale_max_);
+        particle.colour = glm::clamp(particle.colour + colour_change_, glm::vec4(-1.0f), glm::vec4(1.0f));
     }
 
-    generate_particles();
+    if (!active_) {
+        return;
+    }
+
+    for (int i = 0; i < spawn_amount_min_; ++i) {
+        generate_particles(true);
+    }
+
+    for (int i = 0; i < spawn_amount_max_ - spawn_amount_min_; ++i) {
+        generate_particles();
+    }
 }
 
-void ParticleGenerator::generate_particles() {
-    bool do_spawn = ((rand() % 100) / 100.0f) < spawn_probability_;
+void ParticleGenerator::generate_particles(const bool& force) {
+    bool do_spawn = ((rand() % 1000) / 1000.0f) < spawn_probability_;
 
-    if (do_spawn) {
+    if (do_spawn || force) {
         particles_.emplace_back();
         auto& particle = particles_.back();
-        particle.position = position_;
+        particle.position = generate_position();
         particle.velocity = glm::vec3(0.0);
         particle.rotation_rads = generate_rotation();
         particle.scale = generate_scale();
         particle.fixed_size = false;
         particle.life = 0;
+        particle.colour = generate_colour();
     }
+}
+
+glm::vec3 ParticleGenerator::generate_position() {
+    float x_factor = ((rand() % 100) / 50.0f) - 1.0f;
+    float y_factor = ((rand() % 100) / 50.0f) - 1.0f;
+    float z_factor = ((rand() % 100) / 50.0f) - 1.0f;
+    return position_ + glm::vec3(spawn_distance_[0] * x_factor, spawn_distance_[1] * y_factor, spawn_distance_[2] * z_factor);
 }
 
 float ParticleGenerator::generate_rotation() {
@@ -82,7 +104,21 @@ float ParticleGenerator::generate_scale() {
     return ((rand() % 100) / 100.0f) * range + scale_min_;
 }
 
+glm::vec4 ParticleGenerator::generate_colour() {
+    glm::vec4 range = colour_max_ - colour_min_;
+    float r = ((rand() % 100) / 100.0f) * range[0] + colour_min_[0];
+    float g = ((rand() % 100) / 100.0f) * range[1] + colour_min_[1];
+    float b = ((rand() % 100) / 100.0f) * range[2] + colour_min_[2];
+    float a = ((rand() % 100) / 100.0f) * range[3] + colour_min_[3];
+
+    return glm::vec4(r, g, b, a);
+}
+
 void ParticleGenerator::render(const glm::mat4& camera) {
+    if (particles_.empty()) {
+        return;
+    }
+
     auto shader = rendering_component_.shader_;
 
     if (shader == nullptr || !shader->is_valid()) {
@@ -109,6 +145,7 @@ void ParticleGenerator::render(const glm::mat4& camera) {
 
     GLuint uniform_model = glGetUniformLocation(shader->get_program_id(), "Model");
     GLuint uniform_view = glGetUniformLocation(shader->get_program_id(), "View");
+    GLuint uniform_overlay = glGetUniformLocation(shader->get_program_id(), "Overlay");
 
     for (auto& particle : particles_) {
         glm::mat4 model = glm::translate(glm::mat4(), particle.position);
@@ -141,12 +178,13 @@ void ParticleGenerator::render(const glm::mat4& camera) {
                 float scale_value = std::sqrt(bottomRightVertex.z);
 
                 model = glm::scale(model, glm::vec3(scale_value, scale_value, 1.f));
-                model = glm::translate(model, glm::vec3(0.f, -0.1f * scale_value, 0.f));
+                model = glm::translate(model, glm::vec3(0.f, -0.15f * scale_value, 0.f));
             }
 
 
             glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
             glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(camera));
+            glUniform4fv(uniform_overlay, 1, glm::value_ptr(particle.colour));
 
             glDrawElements(GL_TRIANGLES, rendering_component_.mesh_->meshes_[i].indices_.size(), GL_UNSIGNED_INT, 0);
         }
@@ -157,6 +195,10 @@ bool ParticleGenerator::init(RenderingComponent rendering_component) {
     rendering_component_ = rendering_component;
 
     return true;
+}
+
+void ParticleGenerator::set_active(const bool& active) {
+    active_ = active;
 }
 
 void ParticleGenerator::set_position(glm::vec3 position) {
@@ -171,23 +213,32 @@ void ParticleGenerator::set_particle_lifetime(const unsigned int& lifetime) {
     max_particle_life_ = lifetime;
 }
 
+void ParticleGenerator::set_spawn_amount(int min, int max) {
+    spawn_amount_max_ = max;
+    spawn_amount_min_ = min;
+}
+
+void ParticleGenerator::set_spawn_range(float x, float y, float z) {
+    spawn_distance_ = glm::vec3(x, y, z);
+}
+
 void ParticleGenerator::set_particle_acceleration(glm::vec3 acceleration) {
     acceleration_ = acceleration;
 }
 
-void ParticleGenerator::set_particle_rotation_rads(float delta, float max, float min) {
+void ParticleGenerator::set_particle_rotation_rads(float delta, float min, float max) {
     rotation_delta_ = delta;
     rotation_max_ = max;
     rotation_min_ = min;
 }
 
-void ParticleGenerator::set_particle_rotation_degrees(float delta, float max, float min) {
+void ParticleGenerator::set_particle_rotation_degrees(float delta, float min, float max) {
     rotation_delta_ = delta * DEG_TO_RAD;
     rotation_max_ = max * DEG_TO_RAD;
     rotation_min_ = min * DEG_TO_RAD;
 }
 
-void ParticleGenerator::set_particle_scale(float delta, float max, float min) {
+void ParticleGenerator::set_particle_scale(float delta, float min, float max) {
     scale_delta_ = delta;
     scale_max_ = max;
     scale_min_ = (min < 0 ? 0 : min);
@@ -195,4 +246,10 @@ void ParticleGenerator::set_particle_scale(float delta, float max, float min) {
 
 void ParticleGenerator::set_particle_fixed_size(bool is_fixed_size) {
     fixed_size_ = is_fixed_size;
+}
+
+void ParticleGenerator::set_colour(glm::vec4 delta, glm::vec4 min, glm::vec4 max) {
+    colour_change_ = delta;
+    colour_max_ = max;
+    colour_min_ = min;
 }

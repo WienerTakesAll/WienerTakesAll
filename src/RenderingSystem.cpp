@@ -287,6 +287,8 @@ void RenderingSystem::handle_keypress(const Event& e) {
 }
 
 void RenderingSystem::handle_use_powerup(const Event& e) {
+    particle_subsystem_.handle_use_powerup(e);
+
     PowerupType type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
     PowerupTarget target = static_cast<PowerupTarget>(e.get_value<int>("target", true).first);
     int player_id = e.get_value<int>("index", true).first;
@@ -331,8 +333,9 @@ void RenderingSystem::handle_use_powerup(const Event& e) {
 }
 
 void RenderingSystem::handle_finish_powerup(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
+    particle_subsystem_.handle_finish_powerup(e);
 
+    int object_id = e.get_value<int>("object_id", true).first;
     example_objects_[object_id].set_colour_overlay(glm::vec4());
 }
 

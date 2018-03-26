@@ -115,6 +115,7 @@ void GameplaySystem::update() {
                     ));
 
                 powerup_data.second.ketchup -= 0.01f;
+
                 if (powerup_data.second.ketchup <= 0.0f) {
                     EventSystem::queue_event(
                         Event(
