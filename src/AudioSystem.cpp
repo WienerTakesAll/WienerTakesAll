@@ -7,6 +7,7 @@
 #include "AudioSystem.h"
 #include "AudioSettings.h"
 #include "GameState.h"
+#include "Powerup.h"
 
 AudioSystem::AudioSystem(const AudioSettings& settings)
     : init_successful_(false)
@@ -30,6 +31,8 @@ bool AudioSystem::init() {
     add_event_handler(EventType::VEHICLE_COLLISION, &AudioSystem::handle_vehicle_collision_event, this);
     add_event_handler(EventType::NEW_GAME_STATE, &AudioSystem::handle_new_game_state, this);
     add_event_handler(EventType::NEW_IT, &AudioSystem::handle_new_it, this);
+    add_event_handler(EventType::PICKUP_POWERUP, &AudioSystem::handle_pickup_powerup, this);
+    add_event_handler(EventType::USE_POWERUP, &AudioSystem::handle_use_powerup, this);
     init_successful_ = true;
     return init_successful_;
 }
@@ -198,3 +201,27 @@ void AudioSystem::handle_new_it(const Event& e) {
     }
 }
 
+void AudioSystem::handle_pickup_powerup(const Event& e) {
+    play_sound(SoundAsset::SQUISH);
+}
+
+void AudioSystem::handle_use_powerup(const Event& e) {
+    int type = e.get_value<int>("type", true).first;
+
+    switch (type) {
+        case PowerupType::KETCHUP:
+            play_sound(SoundAsset::DRILL);
+            break;
+
+        case PowerupType::MUSTARD:
+            play_sound(SoundAsset::BOING);
+            break;
+
+        case PowerupType::RELISH:
+            play_sound(SoundAsset::DOG_LAPPING_WATER);
+            break;
+
+        default:
+            break;
+    }
+}

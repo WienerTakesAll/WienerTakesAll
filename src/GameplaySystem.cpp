@@ -648,9 +648,9 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                         EventType::OBJECT_APPLY_FORCE,
                         "object_id", object_id,
                         // TODO: Pass glm::vec3 in events
-                        "x", HOT_KNOCK_BACK_FORCE.x * 0.0f,
+                        "x", 0.0f,
                         "y", HOT_KNOCK_BACK_FORCE.y,
-                        "z", HOT_KNOCK_BACK_FORCE.z * 0.f
+                        "z", 0.f
                     )
                 );
             } else {
@@ -673,6 +673,7 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                 }
             }
 
+            break;
 
         case PowerupType::RELISH:
             std::cout << "RELISH used by player " << object_id << std::endl;
