@@ -113,7 +113,12 @@ void ParticleSubsystem::handle_use_powerup(const Event& e) {
     switch (type) {
         case PowerupType::KETCHUP:
             min = glm::vec4(0.4f, 0.0f, 0.0f, -0.1f);
-            max = glm::vec4(1.00f, 0.0f, 0.0f, 0.0f);
+            max = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+            break;
+
+        case PowerupType::MUSTARD:
+            min = glm::vec4(0.4f, 0.4f, 0.0f, -0.1f);
+            max = glm::vec4(1.0f, 1.0f, 0.0f, 0.0f);
             break;
 
         case PowerupType::RELISH:

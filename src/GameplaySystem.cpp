@@ -23,6 +23,8 @@ namespace {
     const float RELISH_KEYBOARD_STEER_AMOUNT = 4.0f;
     const glm::vec3 COLLISION_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const float RELISH_DURATION = 2.5f;
+    const float MUSTARD_DURATION = 0.2f;
+    const float POWERUP_TICK = 0.01f;
 }
 
 GameplaySystem::GameplaySystem()
@@ -114,7 +116,7 @@ void GameplaySystem::update() {
                         "z", boost_direction.z
                     ));
 
-                powerup_data.second.ketchup -= 0.01f;
+                powerup_data.second.ketchup -= POWERUP_TICK;
 
                 if (powerup_data.second.ketchup <= 0.0f) {
                     EventSystem::queue_event(
@@ -126,20 +128,31 @@ void GameplaySystem::update() {
                 }
             }
 
+            if (powerup_data.second.mustard > 0.f) {
 
-            if (powerup_data.second.relish > 0.f && powerup_data.second.relish < 0.02f) {
-                EventSystem::queue_event(
-                    Event(
-                        EventType::RESTORE_CHASSIS_MASS,
-                        "object_id", powerup_data.first
-                    )
-                );
+                powerup_data.second.mustard -= POWERUP_TICK;
+
+                if (powerup_data.second.mustard <= 0.0f) {
+                    EventSystem::queue_event(
+                        Event(
+                            EventType::FINISH_POWERUP,
+                            "object_id", powerup_data.first
+                        )
+                    );
+                }
             }
 
             if (powerup_data.second.relish > 0.f) {
-                powerup_data.second.relish -= 0.01f;
+                powerup_data.second.relish -= POWERUP_TICK;
 
                 if (powerup_data.second.relish <= 0.0f) {
+                    EventSystem::queue_event(
+                        Event(
+                            EventType::RESTORE_CHASSIS_MASS,
+                            "object_id", powerup_data.first
+                        )
+                    );
+
                     EventSystem::queue_event(
                         Event(
                             EventType::FINISH_POWERUP,
@@ -629,6 +642,7 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
             std::cout << "MUSTARD used by player " << object_id << std::endl;
 
             if (target == PowerupTarget::SELF) {
+                powerup_datas_[object_id].mustard = MUSTARD_DURATION;
                 EventSystem::queue_event(
                     Event(
                         EventType::OBJECT_APPLY_FORCE,
@@ -637,13 +651,15 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                         "x", HOT_KNOCK_BACK_FORCE.x * 0.0f,
                         "y", HOT_KNOCK_BACK_FORCE.y,
                         "z", HOT_KNOCK_BACK_FORCE.z * 0.f
-                    ));
+                    )
+                );
             } else {
                 for (int i = 0; i < 4; ++i) {
                     if (i == object_id) {
                         continue;
                     }
 
+                    powerup_datas_[i].mustard = MUSTARD_DURATION;
                     EventSystem::queue_event(
                         Event(
                             EventType::OBJECT_APPLY_FORCE,
@@ -652,9 +668,11 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                             "x", HOT_KNOCK_BACK_FORCE.x,
                             "y", HOT_KNOCK_BACK_FORCE.y,
                             "z", HOT_KNOCK_BACK_FORCE.z
-                        ));
+                        )
+                    );
                 }
             }
+
 
         case PowerupType::RELISH:
             std::cout << "RELISH used by player " << object_id << std::endl;
