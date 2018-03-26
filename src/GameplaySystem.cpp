@@ -171,7 +171,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "object_id", gameobject_counter_->assign_id(),
                 // TODO: Pass glm::vec3 in events
                 "pos_x", 4,
-                "pos_y", 2,
+                "pos_y", 10,
                 "pos_z", 0
             )
         );
@@ -193,7 +193,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "object_id", gameobject_counter_->assign_id(),
                 // TODO: Pass glm::vec3 in events
                 "pos_x", -4,
-                "pos_y", 2,
+                "pos_y", 10,
                 "pos_z", 0
             )
         );
@@ -204,7 +204,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "object_id", gameobject_counter_->assign_id(),
                 // TODO: Pass glm::vec3 in events
                 "pos_x", -10,
-                "pos_y", 2,
+                "pos_y", 10,
                 "pos_z", 0
             )
         );
@@ -232,9 +232,9 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                     EventType::ADD_CHARCOAL,
                     "object_id", gameobject_counter_->assign_id(),
                     // TODO: Pass glm::vec3 in events
-                    "pos_x", (rand() % 150) - 75,
+                    "pos_x", (rand() % 140) - 70,
                     "pos_y", 1,
-                    "pos_z", (rand() % 150) - 75//,
+                    "pos_z", (rand() % 140) - 70//,
                 )
             );
         }
