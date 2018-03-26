@@ -58,16 +58,16 @@ void AiSystem::update() {
             }
 
             random = rand() % 40;
+
             if (random < 2) {
-              std::cout << "ai " << i << " using powerup" << std::endl;
-              EventSystem::queue_event(
-                  Event(
-                      EventType::KEYPRESS_EVENT,
-                      "player_id", i,
-                      "key", random == 0 ? SDL_CONTROLLER_BUTTON_LEFTSHOULDER : SDL_CONTROLLER_BUTTON_RIGHTSHOULDER,
-                      "value", SDL_CONTROLLERBUTTONDOWN
-                  )
-              );
+                EventSystem::queue_event(
+                    Event(
+                        EventType::KEYPRESS_EVENT,
+                        "player_id", i,
+                        "key", random == 0 ? SDL_CONTROLLER_BUTTON_LEFTSHOULDER : SDL_CONTROLLER_BUTTON_RIGHTSHOULDER,
+                        "value", SDL_CONTROLLERBUTTONDOWN
+                    )
+                );
             }
         }
 
