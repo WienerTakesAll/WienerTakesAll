@@ -203,3 +203,9 @@ void GameplayHud::pickup_powerup(int player, int type) {
 void GameplayHud::use_powerup(int player) {
     powerup_holders_[player].set_texture(asset_manager_.get_texture_asset(POWERUP_HOLDER_TEXTURE_PATH));
 }
+
+void GameplayHud::reset_powerups() {
+    for (auto& powerup_holder : powerup_holders_) {
+        powerup_holder.set_texture(asset_manager_.get_texture_asset(POWERUP_HOLDER_TEXTURE_PATH));
+    }
+}

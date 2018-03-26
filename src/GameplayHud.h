@@ -16,6 +16,7 @@ public:
     void new_it(int it_id);
     void pickup_powerup(int player, int type);
     void use_powerup(int player);
+    void reset_powerups();
 
 private:
     AssetManager& asset_manager_;

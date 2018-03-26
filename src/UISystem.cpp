@@ -160,6 +160,7 @@ void UISystem::handle_new_game_state(const Event& e) {
     switch (new_game_state) {
         case GameState::START_MENU:
             gameplay_hud_.reset_scores();
+            gameplay_hud_.reset_powerups();
             break;
 
         case GameState::IN_GAME:
