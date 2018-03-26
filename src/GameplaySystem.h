@@ -43,6 +43,7 @@ private:
 
     struct player_powerup_data {
         float ketchup;
+        float mustard;
         float relish;
     };
     std::map<int, player_powerup_data> powerup_datas_;
