@@ -10,6 +10,7 @@ namespace {
     const std::string HOTDOG_INDICATOR_TEXTURE_PATH = "assets/textures/pointer.png";
     const std::string PARTICLE_MESH_PATH = "assets/models/UIRect.obj";
     const std::string POWERUP_PARTICLE_TEXTURE_PATH = "assets/textures/powerup_drop.png";
+    const std::string INVINCIBILITY_PARTICLE_TEXTURE_PATH = "assets/textures/stardim.png";
 }
 
 ParticleSubsystem::ParticleSubsystem(AssetManager& asset_manager)
@@ -112,18 +113,29 @@ void ParticleSubsystem::handle_use_powerup(const Event& e) {
 
     switch (type) {
         case PowerupType::KETCHUP:
+            powerup_gens_[player_id].set_texture(asset_manager_.get_texture_asset(POWERUP_PARTICLE_TEXTURE_PATH));
+            powerup_gens_[player_id].set_probability(0.15f);
             min = glm::vec4(0.4f, 0.0f, 0.0f, -0.1f);
             max = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
             break;
 
         case PowerupType::MUSTARD:
+            powerup_gens_[player_id].set_texture(asset_manager_.get_texture_asset(POWERUP_PARTICLE_TEXTURE_PATH));
+            powerup_gens_[player_id].set_probability(0.15f);
             min = glm::vec4(0.4f, 0.4f, 0.0f, -0.1f);
             max = glm::vec4(1.0f, 1.0f, 0.0f, 0.0f);
             break;
 
         case PowerupType::RELISH:
+            powerup_gens_[player_id].set_texture(asset_manager_.get_texture_asset(POWERUP_PARTICLE_TEXTURE_PATH));
+            powerup_gens_[player_id].set_probability(0.15f);
             min = glm::vec4(0.0f, 0.4f, 0.0f, -0.1f);
             max = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+            break;
+
+        case PowerupType::INVINCIBILITY:
+            powerup_gens_[player_id].set_texture(asset_manager_.get_texture_asset(INVINCIBILITY_PARTICLE_TEXTURE_PATH));
+            powerup_gens_[player_id].set_probability(1.0f);
             break;
 
         default:
