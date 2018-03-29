@@ -4,6 +4,7 @@ enum PowerupType {
     KETCHUP,
     RELISH,
     MUSTARD,
+    INVINCIBILITY,
     POWERUP_COUNT
 };
 
