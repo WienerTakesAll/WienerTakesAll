@@ -828,8 +828,9 @@ float GameplaySystem::calculate_player_speed(int player) {
 
 void GameplaySystem::handle_player_fell_off_arena(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
+    bool invincible = powerup_datas_[object_id].invincibility > 0.f;
 
-    if (object_id != current_it_id_) {
+    if (object_id != current_it_id_ || invincible) {
         return;
     }
 
