@@ -9,6 +9,7 @@ public:
     void update();
     void render(const glm::mat4& camera) const;
     bool init(RenderingComponent rendering_component);
+    void clear();
     void set_active(const bool& active);
     void set_position(glm::vec3 position);
     void set_probability(const float& probability);

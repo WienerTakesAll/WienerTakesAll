@@ -197,6 +197,10 @@ bool ParticleGenerator::init(RenderingComponent rendering_component) {
     return true;
 }
 
+void ParticleGenerator::clear() {
+    particles_.clear();
+}
+
 void ParticleGenerator::set_active(const bool& active) {
     active_ = active;
 }

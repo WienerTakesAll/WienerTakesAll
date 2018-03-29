@@ -189,6 +189,7 @@ void RenderingSystem::handle_new_it(const Event& e) {
 
 void RenderingSystem::handle_new_game_state(const Event& e) {
     GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
+    particle_subsystem_.handle_new_game_state(e);
 
     if (new_game_state == GameState::START_MENU) {
         example_objects_.clear();
