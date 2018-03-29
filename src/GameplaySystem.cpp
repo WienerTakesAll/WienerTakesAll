@@ -24,6 +24,7 @@ namespace {
     const glm::vec3 COLLISION_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const float RELISH_DURATION = 2.5f;
     const float MUSTARD_DURATION = 0.2f;
+    const float INVINCIBILITY_DURATION = 2.0f;
     const float POWERUP_TICK = 0.01f;
     const int NUM_MOUNDS = 20;
 }
@@ -155,6 +156,19 @@ void GameplaySystem::update() {
                         )
                     );
 
+                    EventSystem::queue_event(
+                        Event(
+                            EventType::FINISH_POWERUP,
+                            "object_id", powerup_data.first
+                        )
+                    );
+                }
+            }
+
+            if (powerup_data.second.invincibility > 0.f) {
+                powerup_data.second.invincibility -= POWERUP_TICK;
+
+                if (powerup_data.second.invincibility <= 0.0f) {
                     EventSystem::queue_event(
                         Event(
                             EventType::FINISH_POWERUP,
@@ -561,9 +575,21 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
 }
 
 void GameplaySystem::handle_new_it(const Event& e) {
+    // Ensure to turn off invincibility of former it
+    powerup_datas_[current_it_id_].invincibility = 0.1f;
+
     int new_it_id = e.get_value<int>("object_id", true).first;
-    current_it_id_ = new_it_id;
     scoring_subsystem_.set_new_it_id(new_it_id);
+    current_it_id_ = new_it_id;
+
+    EventSystem::queue_event(
+        Event(
+            EventType::USE_POWERUP,
+            "type", PowerupType::INVINCIBILITY,
+            "target", PowerupTarget::SELF,
+            "index", new_it_id
+        )
+    );
 }
 
 void GameplaySystem::handle_add_powerup(const Event& e) {
@@ -708,6 +734,12 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
 
             break;
 
+        case PowerupType::INVINCIBILITY:
+            assert(target == PowerupTarget::SELF);
+            std::cout << "INVINCIBILITY used by player " << object_id << std::endl;
+            powerup_datas_[object_id].invincibility = INVINCIBILITY_DURATION;
+            break;
+
         default:
             break;
     }
@@ -718,32 +750,40 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
     int b_id = e.get_value<int>("b_id", true).first;
     std::cout << a_id << " collided with " << b_id << std::endl;
 
+    bool a_invincible = powerup_datas_[a_id].invincibility > 0.f;
+    bool b_invincible = powerup_datas_[b_id].invincibility > 0.f;
+    bool it_invincible = powerup_datas_[current_it_id_].invincibility > 0.f;
+
     glm::vec3 a_pos = object_positions_[a_id];
     glm::vec3 b_pos = object_positions_[b_id];
     glm::vec3 v_dir = glm::normalize(a_pos - b_pos);
 
     // Apply knockback
-    EventSystem::queue_event(
-        Event(
-            EventType::OBJECT_APPLY_FORCE,
-            "object_id", a_id,
-            // TODO: Pass glm::vec3 in events
-            "x", v_dir[0] * COLLISION_KNOCK_BACK_FORCE.x,
-            "y", COLLISION_KNOCK_BACK_FORCE.y,
-            "z", v_dir[2] * COLLISION_KNOCK_BACK_FORCE.z
-        )
-    );
+    if (!a_invincible) {
+        EventSystem::queue_event(
+            Event(
+                EventType::OBJECT_APPLY_FORCE,
+                "object_id", a_id,
+                // TODO: Pass glm::vec3 in events
+                "x", v_dir[0] * COLLISION_KNOCK_BACK_FORCE.x,
+                "y", COLLISION_KNOCK_BACK_FORCE.y,
+                "z", v_dir[2] * COLLISION_KNOCK_BACK_FORCE.z
+            )
+        );
+    }
 
-    EventSystem::queue_event(
-        Event(
-            EventType::OBJECT_APPLY_FORCE,
-            "object_id", b_id,
-            // TODO: Pass glm::vec3 in events
-            "x", -v_dir[0] * COLLISION_KNOCK_BACK_FORCE.x,
-            "y", COLLISION_KNOCK_BACK_FORCE.y,
-            "z", -v_dir[2] * COLLISION_KNOCK_BACK_FORCE.z
-        )
-    );
+    if (!b_invincible) {
+        EventSystem::queue_event(
+            Event(
+                EventType::OBJECT_APPLY_FORCE,
+                "object_id", b_id,
+                // TODO: Pass glm::vec3 in events
+                "x", -v_dir[0] * COLLISION_KNOCK_BACK_FORCE.x,
+                "y", COLLISION_KNOCK_BACK_FORCE.y,
+                "z", -v_dir[2] * COLLISION_KNOCK_BACK_FORCE.z
+            )
+        );
+    }
 
     // Check for new it
     int new_it = -1;
@@ -754,7 +794,7 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
         new_it = a_id;
     }
 
-    if (new_it != -1) {
+    if (!it_invincible && new_it != -1) {
         EventSystem::queue_event(
             Event(
                 EventType::NEW_IT,

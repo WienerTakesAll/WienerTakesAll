@@ -46,7 +46,9 @@ private:
         float ketchup;
         float mustard;
         float relish;
+        float invincibility;
     };
+
     std::map<int, player_powerup_data> powerup_datas_;
 
     PowerupSubsystem powerup_subsystem_;
