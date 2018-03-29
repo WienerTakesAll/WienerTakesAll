@@ -185,6 +185,13 @@ void PhysicsSystem::update() {
             transform.q.y = 0;
             transform.q.z = 0;
             object.get_actor()->setGlobalPose(transform);
+
+            EventSystem::queue_event(
+                Event(
+                    EventType::PLAYER_FELL_OFF_ARENA,
+                    "object_id", static_cast<int>(object.get_id())
+                )
+            );
         }
 
         EventSystem::queue_event(
