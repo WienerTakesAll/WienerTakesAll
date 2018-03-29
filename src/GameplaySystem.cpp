@@ -43,6 +43,7 @@ GameplaySystem::GameplaySystem()
     add_event_handler(EventType::USE_POWERUP, &GameplaySystem::handle_use_powerup, this);
     add_event_handler(EventType::PICKUP_POWERUP, &GameplaySystem::handle_pickup_powerup, this);
     add_event_handler(EventType::CHANGE_POWERUP, &GameplaySystem::handle_change_powerup, this);
+    add_event_handler(EventType::PLAYER_FELL_OFF_ARENA, &GameplaySystem::handle_player_fell_off_arena, this);
 
     EventSystem::queue_event(
         Event(
@@ -350,7 +351,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
                 new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                         "index", player_id,
                                         "type", VehicleControlType::FORWARD_DRIVE,
-                                        "value", calculatePlayerSpeed(player_id));
+                                        "value", calculate_player_speed(player_id));
                 new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                         "index", player_id,
                                         "type", VehicleControlType::BRAKE,
@@ -428,7 +429,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::FORWARD_DRIVE,
-                                    "value", (float)(value) / MAX_TRIGGER_VALUE * calculatePlayerSpeed(player_id));
+                                    "value", (float)(value) / MAX_TRIGGER_VALUE * calculate_player_speed(player_id));
             break;
 
         case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
@@ -769,18 +770,45 @@ bool GameplaySystem::should_update_score() const {
 }
 
 
-float GameplaySystem::calculatePlayerSpeed(int player) {
-    float averageScore = 0;
+float GameplaySystem::calculate_player_speed(int player) {
+    float average_score = 0;
 
     for (size_t i = 0; i < 4; i++) {
-        averageScore += scoring_subsystem_.get_player_score(i);
+        average_score += scoring_subsystem_.get_player_score(i);
     }
 
-    averageScore *= 0.25f;
-    float playerScore = scoring_subsystem_.get_player_score(player);
-    float speedPenalty = 1.f + ((averageScore - playerScore) * 0.02f);
-    speedPenalty = std::max(1.f, std::min(1.f, speedPenalty));
+    average_score *= 0.25f;
+    float player_score = scoring_subsystem_.get_player_score(player);
+    float speed_penalty = 1.f + ((average_score - player_score) * 0.02f);
+    speed_penalty = std::max(1.f, std::min(1.f, speed_penalty));
 
-    float totalSpeed = speedPenalty * DRIVE_SPEED * std::sqrt((4.f - object_velocities_[player].length())) * 0.25f;
-    return std::max(0.f, std::min(1.f, totalSpeed));
+    float total_speed = speed_penalty * DRIVE_SPEED * std::sqrt((4.f - object_velocities_[player].length())) * 0.25f;
+    return std::max(0.f, std::min(1.f, total_speed));
+}
+
+void GameplaySystem::handle_player_fell_off_arena(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    if (object_id != current_it_id_) {
+        return;
+    }
+
+    int losing_player = 0;
+    int losing_player_score = scoring_subsystem_.get_player_score(losing_player);
+
+    for (int i = 1; i < 4; i++) { // players 1-3
+        int player_score = scoring_subsystem_.get_player_score(i);
+
+        if (player_score < losing_player_score) {
+            losing_player = i;
+            losing_player_score = player_score;
+        }
+    }
+
+    EventSystem::queue_event(
+        Event(
+            EventType::NEW_IT,
+            "object_id", losing_player
+        )
+    );
 }

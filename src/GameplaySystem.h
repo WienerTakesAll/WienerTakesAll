@@ -28,10 +28,11 @@ private:
     void handle_pickup_powerup(const Event& e);
     void handle_change_powerup(const Event& e);
     void handle_use_powerup(const Event& e);
+    void handle_player_fell_off_arena(const Event& e);
 
     bool should_update_score() const;
 
-    float calculatePlayerSpeed(int player);
+    float calculate_player_speed(int player);
 
     GameObjectCounter* gameobject_counter_;
     GameState current_game_state_;
