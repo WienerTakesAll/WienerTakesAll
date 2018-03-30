@@ -752,7 +752,6 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
 
     bool a_invincible = powerup_datas_[a_id].invincibility > 0.f;
     bool b_invincible = powerup_datas_[b_id].invincibility > 0.f;
-    bool it_invincible = powerup_datas_[current_it_id_].invincibility > 0.f;
 
     glm::vec3 a_pos = object_positions_[a_id];
     glm::vec3 b_pos = object_positions_[b_id];
@@ -788,13 +787,13 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
     // Check for new it
     int new_it = -1;
 
-    if (current_it_id_ == a_id) {
+    if (current_it_id_ == a_id && !a_invincible) {
         new_it = b_id;
-    } else if (current_it_id_ == b_id) {
+    } else if (current_it_id_ == b_id && !b_invincible) {
         new_it = a_id;
     }
 
-    if (!it_invincible && new_it != -1) {
+    if (new_it != -1) {
         EventSystem::queue_event(
             Event(
                 EventType::NEW_IT,
