@@ -4,6 +4,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Powerup.h"
+#include "GameState.h"
 
 namespace {
     const std::string PARTICLE_SHADER_PATH = "assets/shaders/ParticleShader";
@@ -153,4 +154,20 @@ void ParticleSubsystem::handle_finish_powerup(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
 
     powerup_gens_[object_id].set_active(false);
+}
+
+void ParticleSubsystem::handle_new_game_state(const Event& e) {
+    GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
+
+    if (new_game_state == GameState::END_GAME || new_game_state == GameState::START_MENU) {
+        hotdog_indicator_gen_.clear();
+        hotdog_indicator_gen_.set_active(false);
+
+        for (auto& powerup_gen : powerup_gens_) {
+            powerup_gen.clear();
+            powerup_gen.set_active(false);
+        }
+    } else if (new_game_state == GameState::IN_GAME) {
+        hotdog_indicator_gen_.set_active(true);
+    }
 }

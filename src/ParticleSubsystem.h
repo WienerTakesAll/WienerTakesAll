@@ -16,6 +16,7 @@ public:
     void handle_object_transform(const Event& e);
     void handle_use_powerup(const Event& e);
     void handle_finish_powerup(const Event& e);
+    void handle_new_game_state(const Event& e);
 
 private:
     AssetManager& asset_manager_;

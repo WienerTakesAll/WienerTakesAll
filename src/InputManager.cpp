@@ -196,11 +196,11 @@ bool InputManager::process_keyboard(const int& key, int& player_id) {
             break;
 
         case SDLK_RETURN:
-            player_id = 0;
+            player_id = 3;
             break;
 
         case SDLK_RSHIFT:
-            player_id = 0;
+            player_id = 3;
             break;
 
         case SDLK_LEFT:
