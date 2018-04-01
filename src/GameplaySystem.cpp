@@ -83,28 +83,24 @@ void GameplaySystem::update() {
     if (current_game_state_ == GameState::IN_GAME) {
         powerup_subsystem_.update();
 
-        if (object_positions_.find(powerup_subsystem_.get_powerup_id()) == object_positions_.end() ||
-                !powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id())) {
-            return;
-        }
-
         // Move powerup here
-        glm::vec3 powerup_cur_loc = object_positions_[powerup_subsystem_.get_powerup_id()];
-        EventSystem::queue_event(
-            Event(
-                EventType::OBJECT_TRANSFORM_EVENT,
-                "object_id", powerup_subsystem_.get_powerup_id(),
-                "pos_x", powerup_cur_loc.x,
-                "pos_y", powerup_cur_loc.y,
-                "pos_z", powerup_cur_loc.z,
-                "qua_w", 1.0f,
-                "qua_x", 0.0f,
-                "qua_y", 0.0f,
-                "qua_z", 0.0f
-            )
-        );
-
-
+        if (object_positions_.find(powerup_subsystem_.get_powerup_id()) != object_positions_.end() &&
+                powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id())) {
+            glm::vec3 powerup_cur_loc = object_positions_[powerup_subsystem_.get_powerup_id()];
+            EventSystem::queue_event(
+                Event(
+                    EventType::OBJECT_TRANSFORM_EVENT,
+                    "object_id", powerup_subsystem_.get_powerup_id(),
+                    "pos_x", powerup_cur_loc.x,
+                    "pos_y", powerup_cur_loc.y,
+                    "pos_z", powerup_cur_loc.z,
+                    "qua_w", 1.0f,
+                    "qua_x", 0.0f,
+                    "qua_y", 0.0f,
+                    "qua_z", 0.0f
+                )
+            );
+        }
 
         for (auto& powerup_data : powerup_datas_) {
             if (powerup_data.second.ketchup > 0.f) {
@@ -576,7 +572,7 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
 
 void GameplaySystem::handle_new_it(const Event& e) {
     // Ensure to turn off invincibility of former it
-    powerup_datas_[current_it_id_].invincibility = 0.1f;
+    powerup_datas_[current_it_id_].invincibility = 0.f;
 
     int new_it_id = e.get_value<int>("object_id", true).first;
     scoring_subsystem_.set_new_it_id(new_it_id);
@@ -647,11 +643,10 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
     int type = e.get_value<int>("type", true).first;
     int target = e.get_value<int>("target", true).first;
 
-    powerup_subsystem_.spend_powerup(object_id);
-
     switch (type) {
         case PowerupType::KETCHUP: {
             std::cout << "KETCHUP used by player " << object_id << std::endl;
+            powerup_subsystem_.spend_powerup(object_id);
 
             if (target == PowerupTarget::SELF) {
                 powerup_datas_[object_id].ketchup = 1.0f;
@@ -662,12 +657,13 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                     }
                 }
             }
-
+            
             break;
         }
 
         case PowerupType::MUSTARD:
             std::cout << "MUSTARD used by player " << object_id << std::endl;
+            powerup_subsystem_.spend_powerup(object_id);
 
             if (target == PowerupTarget::SELF) {
                 powerup_datas_[object_id].mustard = MUSTARD_DURATION;
@@ -705,6 +701,7 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
 
         case PowerupType::RELISH:
             std::cout << "RELISH used by player " << object_id << std::endl;
+            powerup_subsystem_.spend_powerup(object_id);
 
             if (target == PowerupTarget::SELF) {
                 powerup_datas_[object_id].relish = RELISH_DURATION;
