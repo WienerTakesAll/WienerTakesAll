@@ -24,7 +24,7 @@ namespace {
     const glm::vec3 COLLISION_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const float RELISH_DURATION = 2.5f;
     const float MUSTARD_DURATION = 0.2f;
-    const float INVINCIBILITY_DURATION = 2.0f;
+    const float INVINCIBILITY_DURATION = 1.0f;
     const float POWERUP_TICK = 0.01f;
     const int NUM_MOUNDS = 20;
 }
