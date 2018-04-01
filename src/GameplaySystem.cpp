@@ -572,7 +572,9 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
 
 void GameplaySystem::handle_new_it(const Event& e) {
     // Ensure to turn off invincibility of former it
-    powerup_datas_[current_it_id_].invincibility = 0.f;
+    if (current_it_id_ != -1) {
+        powerup_datas_[current_it_id_].invincibility = 0.f;
+    }
 
     int new_it_id = e.get_value<int>("object_id", true).first;
     scoring_subsystem_.set_new_it_id(new_it_id);
@@ -657,7 +659,7 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                     }
                 }
             }
-            
+
             break;
         }
 
