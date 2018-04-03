@@ -111,31 +111,34 @@ void ParticleSubsystem::handle_use_powerup(const Event& e) {
     glm::vec4 min = glm::vec4();
     glm::vec4 max = glm::vec4();
 
+    TextureAsset* powerup_texture;
+    float particle_probability = 0.0f;
+
     switch (type) {
         case PowerupType::KETCHUP:
-            powerup_gens_[player_id].set_texture(asset_manager_.get_texture_asset(POWERUP_PARTICLE_TEXTURE_PATH));
-            powerup_gens_[player_id].set_probability(0.15f);
+            powerup_texture = asset_manager_.get_texture_asset(POWERUP_PARTICLE_TEXTURE_PATH);
+            particle_probability = 0.15f;
             min = glm::vec4(0.4f, 0.0f, 0.0f, -0.1f);
             max = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
             break;
 
         case PowerupType::MUSTARD:
-            powerup_gens_[player_id].set_texture(asset_manager_.get_texture_asset(POWERUP_PARTICLE_TEXTURE_PATH));
-            powerup_gens_[player_id].set_probability(0.15f);
+            powerup_texture = asset_manager_.get_texture_asset(POWERUP_PARTICLE_TEXTURE_PATH);
+            particle_probability = 0.15f;
             min = glm::vec4(0.4f, 0.4f, 0.0f, -0.1f);
             max = glm::vec4(1.0f, 1.0f, 0.0f, 0.0f);
             break;
 
         case PowerupType::RELISH:
-            powerup_gens_[player_id].set_texture(asset_manager_.get_texture_asset(POWERUP_PARTICLE_TEXTURE_PATH));
-            powerup_gens_[player_id].set_probability(0.15f);
+            powerup_texture = asset_manager_.get_texture_asset(POWERUP_PARTICLE_TEXTURE_PATH);
+            particle_probability = 0.15f;
             min = glm::vec4(0.0f, 0.4f, 0.0f, -0.1f);
             max = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
             break;
 
         case PowerupType::INVINCIBILITY:
-            powerup_gens_[player_id].set_texture(asset_manager_.get_texture_asset(INVINCIBILITY_PARTICLE_TEXTURE_PATH));
-            powerup_gens_[player_id].set_probability(1.0f);
+            powerup_texture = asset_manager_.get_texture_asset(INVINCIBILITY_PARTICLE_TEXTURE_PATH);
+            particle_probability = 1.0f;
             break;
 
         default:
@@ -147,6 +150,8 @@ void ParticleSubsystem::handle_use_powerup(const Event& e) {
         case PowerupTarget::SELF:
             powerup_gens_[player_id].set_active(true);
             powerup_gens_[player_id].set_colour(delta, min, max);
+            powerup_gens_[player_id].set_texture(powerup_texture);
+            powerup_gens_[player_id].set_probability(particle_probability);
             break;
 
         case PowerupTarget::OTHERS:
@@ -154,6 +159,8 @@ void ParticleSubsystem::handle_use_powerup(const Event& e) {
                 if (i != player_id) {
                     powerup_gens_[i].set_active(true);
                     powerup_gens_[i].set_colour(delta, min, max);
+                    powerup_gens_[i].set_texture(powerup_texture);
+                    powerup_gens_[i].set_probability(particle_probability);
                 }
             }
 
