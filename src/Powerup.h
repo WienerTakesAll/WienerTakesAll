@@ -1,8 +1,14 @@
 #pragma once
 
-enum class PowerupType {
+enum PowerupType {
     KETCHUP,
-    PICKLE,
-    HOT,
+    RELISH,
+    MUSTARD,
+    INVINCIBILITY,
     POWERUP_COUNT
+};
+
+enum PowerupTarget {
+    SELF,
+    OTHERS
 };

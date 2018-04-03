@@ -161,6 +161,14 @@ bool InputManager::process_keyboard(const int& key, int& player_id) {
 
     /* Check the SDLKey values and move change the coords */
     switch ( key ) {
+        case SDLK_q:
+            player_id = 0;
+            break;
+
+        case SDLK_e:
+            player_id = 0;
+            break;
+
         case SDLK_w:
             player_id = 0;
             break;
@@ -175,6 +183,14 @@ bool InputManager::process_keyboard(const int& key, int& player_id) {
 
         case SDLK_d:
             player_id = 0;
+            break;
+
+        case SDLK_r:
+            player_id = 1;
+            break;
+
+        case SDLK_y:
+            player_id = 1;
             break;
 
         case SDLK_t:
@@ -193,6 +209,14 @@ bool InputManager::process_keyboard(const int& key, int& player_id) {
             player_id = 1;
             break;
 
+        case SDLK_u:
+            player_id = 2;
+            break;
+
+        case SDLK_o:
+            player_id = 2;
+            break;
+
         case SDLK_i:
             player_id = 2;
             break;
@@ -209,8 +233,12 @@ bool InputManager::process_keyboard(const int& key, int& player_id) {
             player_id = 2;
             break;
 
-        case SDLK_SPACE:
-            player_id = 0;
+        case SDLK_RETURN:
+            player_id = 3;
+            break;
+
+        case SDLK_RSHIFT:
+            player_id = 3;
             break;
 
         case SDLK_LEFT:
@@ -232,7 +260,7 @@ bool InputManager::process_keyboard(const int& key, int& player_id) {
         case SDLK_F5:
             break;
 
-        case SDLK_RETURN:
+        case SDLK_F11:
             break;
 
         case SDLK_ESCAPE:

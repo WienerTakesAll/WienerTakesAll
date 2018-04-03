@@ -30,7 +30,6 @@ namespace {
     const Key KEY_PHYSICS_STEER_RIGHT_FALL = "steer_right_fall";
     const Key KEY_PHYSICS_STEER_VS_FORWARD_SPEED_DATA = "steer_vs_forward_speed_data";
     const Key KEY_PHYSICS_VEHICLE_MESH = "vehicle_mesh";
-    const Key KEY_PHYSICS_VEHICLE_MASS = "vehicle_mass";
     const Key KEY_PHYSICS_ARENA_MESH = "arena_mesh";
     const Key KEY_PHYSICS_ARENA_TIRE_FRICTION = "arena_tire_friction";
 
@@ -56,7 +55,6 @@ namespace {
     const Keys KEYS_STEER_RIGHT_FALL = {KEY_PHYSICS, KEY_PHYSICS_PAD_SMOOTHING_DATA, KEY_PHYSICS_STEER_RIGHT_FALL};
     const Keys KEYS_STEER_VS_FORWARD = {KEY_PHYSICS, KEY_PHYSICS_STEER_VS_FORWARD_SPEED_DATA};
     const Keys KEYS_VEHICLE_MESH = {KEY_PHYSICS, KEY_PHYSICS_VEHICLE_MESH};
-    const Keys KEYS_VEHICLE_MASS = {KEY_PHYSICS, KEY_PHYSICS_VEHICLE_MASS};
     const Keys KEYS_ARENA_MESH = {KEY_PHYSICS, KEY_PHYSICS_ARENA_MESH};
     const Keys KEYS_ARENA_TIRE_FRICTION = {KEY_PHYSICS, KEY_PHYSICS_ARENA_TIRE_FRICTION};
 }
@@ -204,7 +202,6 @@ bool SettingsSystem::reload_physics_settings() {
     physics_settings_.g_steer_vs_forward_speed_table = physx::PxFixedSizeLookupTable<8>(physics_settings_.g_steer_vs_forward_speed_data, 4);
 
     success &= load_key<std::string>(KEYS_VEHICLE_MESH, physics_settings_.vehicle_mesh_asset_path);
-    success &= load_key<float>(KEYS_VEHICLE_MASS, physics_settings_.vehicle_mass);
     success &= load_key<std::string>(KEYS_ARENA_MESH, physics_settings_.arena_mesh);
     success &= load_key<float>(KEYS_ARENA_TIRE_FRICTION, physics_settings_.arena_tire_friction);
 

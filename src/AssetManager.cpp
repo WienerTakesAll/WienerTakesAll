@@ -37,6 +37,7 @@ AssetManager::AssetManager() {
         std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
     }
 
+    is_window_fullscreen = false;
 }
 
 AssetManager::~AssetManager() {
@@ -58,11 +59,11 @@ MeshAsset* AssetManager::get_mesh_asset(const std::string& filepath) {
     return &asset->second;
 }
 
-TextureAsset* AssetManager::get_texture_asset(const std::string& file_path) {
+TextureAsset* AssetManager::get_texture_asset(const std::string& file_path, const bool& do_clamp) {
     auto asset = texture_assets_.find(file_path);
 
     if (asset == texture_assets_.end()) {
-        load_texture_from_file(file_path);
+        load_texture_from_file(file_path, do_clamp);
         asset = texture_assets_.find(file_path);
     }
 
@@ -164,7 +165,7 @@ void AssetManager::load_mesh_from_file(const std::string& file_path) {
     }
 }
 
-void AssetManager::load_texture_from_file(const std::string& file_path) {
+void AssetManager::load_texture_from_file(const std::string& file_path, const bool& do_clamp) {
     auto texture_map = texture_assets_.emplace(file_path, TextureAsset());
 
     if (!texture_map.second) {
@@ -173,7 +174,7 @@ void AssetManager::load_texture_from_file(const std::string& file_path) {
     }
 
     TextureAsset& texture_data = texture_map.first->second;
-    texture_data.load(file_path);
+    texture_data.load(file_path, do_clamp);
 }
 
 void AssetManager::load_shader_from_file(const std::string& file_path) {
@@ -251,4 +252,12 @@ void AssetManager::construct_shadow_volume(MeshAsset::MeshData& mesh) {
         make_face(mesh.indices_[i + 2], infVert, mesh.indices_[i]);
     }
 
+}
+
+void AssetManager::toggle_fullscreen() {
+    if (SDL_SetWindowFullscreen(window_, is_window_fullscreen ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP)) {
+        std::cout << "failed to toggle fullscreen: " << SDL_GetError() << std::endl;
+    }
+
+    is_window_fullscreen = !is_window_fullscreen;
 }

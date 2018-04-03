@@ -4,9 +4,14 @@
 #include <glm/gtx/vector_angle.hpp>
 
 #include "GameplayHud.h"
+#include "Powerup.h"
 
 namespace {
     const int MAX_SCORE = 2500;
+    const std::string POWERUP_HOLDER_TEXTURE_PATH = "assets/textures/powerup_holder_ui.png";
+    const std::string KETCHUP_TEXTURE_PATH = "assets/textures/ketchup_powerup_ui.png";
+    const std::string MUSTARD_TEXTURE_PATH = "assets/textures/mustard_powerup_ui.png";
+    const std::string RELISH_TEXTURE_PATH = "assets/textures/relish_powerup_ui.png";
 }
 
 GameplayHud::GameplayHud(AssetManager& asset_manager)
@@ -17,7 +22,7 @@ void GameplayHud::load() {
     square_mesh_ = asset_manager_.get_mesh_asset("assets/models/UIRect.obj");
     ui_shader_ = asset_manager_.get_shader_asset("assets/shaders/UIShader");
     TextureAsset* background_tex =
-        asset_manager_.get_texture_asset("assets/textures/score_bg.png");
+        asset_manager_.get_texture_asset("assets/textures/score_bg.png", true);
     scoreboard_ = UIObject(
                       glm::vec2(-0.25f, -0.33f),
                       glm::vec3(1.0f),
@@ -27,7 +32,7 @@ void GameplayHud::load() {
                       ui_shader_
                   );
 
-    TextureAsset* p1_tex = asset_manager_.get_texture_asset("assets/textures/score_1.png");
+    TextureAsset* p1_tex = asset_manager_.get_texture_asset("assets/textures/score_1.png", true);
     UIObject score_p1 = UIObject(
                             glm::vec2(-0.25f, 0.0f),
                             glm::vec3(1.0f),
@@ -37,7 +42,7 @@ void GameplayHud::load() {
                             ui_shader_
                         );
 
-    TextureAsset* p2_tex = asset_manager_.get_texture_asset("assets/textures/score_2.png");
+    TextureAsset* p2_tex = asset_manager_.get_texture_asset("assets/textures/score_2.png", true);
     UIObject score_p2 = UIObject(
                             glm::vec2(0.0f),
                             glm::vec3(1.0f),
@@ -47,7 +52,7 @@ void GameplayHud::load() {
                             ui_shader_
                         );
 
-    TextureAsset* p3_tex = asset_manager_.get_texture_asset("assets/textures/score_3.png");
+    TextureAsset* p3_tex = asset_manager_.get_texture_asset("assets/textures/score_3.png", true);
     UIObject score_p3 = UIObject(
                             glm::vec2(-0.25f, -0.33f),
                             glm::vec3(1.0f),
@@ -57,7 +62,7 @@ void GameplayHud::load() {
                             ui_shader_
                         );
 
-    TextureAsset* p4_tex = asset_manager_.get_texture_asset("assets/textures/score_4.png");
+    TextureAsset* p4_tex = asset_manager_.get_texture_asset("assets/textures/score_4.png", true);
     UIObject score_p4 = UIObject(
                             glm::vec2(0.0f, -0.33f),
                             glm::vec3(1.0f),
@@ -101,6 +106,32 @@ void GameplayHud::load() {
         it_pointers_[i].visible_ = false;
     }
 
+    // Pre-load powerups
+    asset_manager_.get_texture_asset(KETCHUP_TEXTURE_PATH);
+    asset_manager_.get_texture_asset(MUSTARD_TEXTURE_PATH);
+    asset_manager_.get_texture_asset(RELISH_TEXTURE_PATH);
+
+    TextureAsset* powerup_holder_tex = asset_manager_.get_texture_asset(POWERUP_HOLDER_TEXTURE_PATH);
+
+    float holder_size_x = 0.10f;
+    float holder_size_y = holder_size_x * 16.0f / 9.0f;
+    std::array<glm::vec2, 4> player_holders_position = {
+        glm::vec2(-1.0f + holder_size_x / 3.0, 1.0f - holder_size_y * 1.25f),
+        glm::vec2(1.0 - holder_size_x * 1.25f, 1.0f - holder_size_y * 1.25f),
+        glm::vec2(-1.0f + holder_size_x / 3.0, 0.0f - holder_size_y * 1.25f),
+        glm::vec2(1.0 - holder_size_x * 1.25f, 0.0f - holder_size_y * 1.25f)
+    };
+
+    for (unsigned int i = 0; i < powerup_holders_.size(); i++) {
+        powerup_holders_[i] = UIObject(
+                                  player_holders_position[i],
+                                  glm::vec3(1.0),
+                                  glm::vec2(holder_size_x, holder_size_y),
+                                  square_mesh_,
+                                  powerup_holder_tex,
+                                  ui_shader_
+                              );
+    }
 }
 
 void GameplayHud::render() const {
@@ -112,6 +143,10 @@ void GameplayHud::render() const {
 
     for (unsigned int i = 0; i < it_pointers_.size(); i++) {
         it_pointers_[i].render(it_pointer_transforms_[i]);
+    }
+
+    for (auto& holder : powerup_holders_) {
+        holder.render(glm::mat4());
     }
 }
 
@@ -153,4 +188,24 @@ void GameplayHud::update_it_pointer(int player_id, glm::vec3 vector_to_it) {
 
 void GameplayHud::new_it(int it_id) {
     current_it_ = it_id;
+}
+
+void GameplayHud::pickup_powerup(int player, int type) {
+    if (type == PowerupType::KETCHUP) {
+        powerup_holders_[player].set_texture(asset_manager_.get_texture_asset(KETCHUP_TEXTURE_PATH));
+    } else if (type == PowerupType::MUSTARD) {
+        powerup_holders_[player].set_texture(asset_manager_.get_texture_asset(MUSTARD_TEXTURE_PATH));
+    } else if (type == PowerupType::RELISH) {
+        powerup_holders_[player].set_texture(asset_manager_.get_texture_asset(RELISH_TEXTURE_PATH));
+    }
+}
+
+void GameplayHud::use_powerup(int player) {
+    powerup_holders_[player].set_texture(asset_manager_.get_texture_asset(POWERUP_HOLDER_TEXTURE_PATH));
+}
+
+void GameplayHud::reset_powerups() {
+    for (auto& powerup_holder : powerup_holders_) {
+        powerup_holder.set_texture(asset_manager_.get_texture_asset(POWERUP_HOLDER_TEXTURE_PATH));
+    }
 }

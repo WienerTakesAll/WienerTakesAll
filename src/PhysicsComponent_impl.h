@@ -84,11 +84,10 @@ template <bool static_actor>
 void PhysicsComponent<static_actor>::set_mesh(
     physx::PxPhysics* physics,
     physx::PxCooking* cooking,
-    MeshAsset* mesh
+    MeshAsset* mesh,
+    physx::PxTransform phys_transform
 ) {
     create_geometry(physics, cooking, mesh);
-
-    physx::PxTransform phys_transform(0, 0, 0);
 
     // default material
     g_material_ = physics->createMaterial(0.5f, 0.5f, 0.5f);

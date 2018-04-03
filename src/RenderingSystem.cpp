@@ -2,6 +2,7 @@
 
 #include "AssetManager.h"
 
+#include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
@@ -21,38 +22,52 @@ namespace {
     const std::string TERRAIN_TEXTURE_PATH = "assets/textures/texturePit.png";
     const std::string SKYBOX_MESH_PATH = "assets/models/Skybox.obj";
     const std::string SKYBOX_TEXTURE_PATH = "assets/textures/park.png";
-    const std::string KETCHUP_MESH_PATH = "assets/models/Ketchup.obj";
-    const std::string PICKLE_MESH_PATH = "assets/models/Pickle.obj";
-    const std::string HOT_SAUCE_MESH_PATH = "assets/models/HotSauce.obj";
+    const std::string PACKET_MESH_PATH = "assets/models/Packet.obj";
+    const std::string KETCHUP_TEXTURE_PATH = "assets/textures/KetchupPacket.png";
+    const std::string RELISH_TEXTURE_PATH = "assets/textures/RelishPacket.png";
+    const std::string MUSTARD_TEXTURE_PATH = "assets/textures/MustardPacket.png";
+    const std::string CHARCOAL_MESH_PATH = "assets/models/Mound.obj";
+    const std::string CHARCOAL_TEXTURE_PATH = "assets/textures/smouldering-charcoal.png";
 
     const int CAMERA_LAG_FRAMES = 5;
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
-    : asset_manager_(asset_manager)
-    , whos_it(0) {
+    : car_speeds_( {
+    0.f, 0.f, 0.f, 0.f
+})
+, asset_manager_(asset_manager)
+, particle_subsystem_(asset_manager)
+, whos_it(0) {
     window_ = asset_manager.get_window();
 
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &RenderingSystem::load, this);
     EventSystem::add_event_handler(EventType::ADD_VEHICLE, &RenderingSystem::handle_add_vehicle, this);
     EventSystem::add_event_handler(EventType::ADD_ARENA, &RenderingSystem::handle_add_terrain, this);
+    EventSystem::add_event_handler(EventType::ADD_CHARCOAL, &RenderingSystem::handle_add_charcoal, this);
     EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
     EventSystem::add_event_handler(EventType::NEW_IT, &RenderingSystem::handle_new_it, this);
     EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &RenderingSystem::handle_new_game_state, this);
     EventSystem::add_event_handler(EventType::ADD_SKYBOX, &RenderingSystem::handle_add_skybox, this);
     EventSystem::add_event_handler(EventType::ADD_POWERUP, &RenderingSystem::handle_add_powerup, this);
     EventSystem::add_event_handler(EventType::CHANGE_POWERUP, &RenderingSystem::handle_change_powerup, this);
+    EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_keypress, this);
+    EventSystem::add_event_handler(EventType::USE_POWERUP, &RenderingSystem::handle_use_powerup, this);
+    EventSystem::add_event_handler(EventType::FINISH_POWERUP, &RenderingSystem::handle_finish_powerup, this);
 
     init_window();
 }
 
 void RenderingSystem::update() {
+    particle_subsystem_.update();
 }
 
 void RenderingSystem::load(const Event& e) {
     setup_cameras();
-
+    preload_assets();
     shadow_shader_ = asset_manager_.get_shader_asset(SHADOW_SHADER_PATH);
+    particle_subsystem_.handle_load(e);
+    asset_manager_.toggle_fullscreen();
 }
 
 void RenderingSystem::handle_add_vehicle(const Event& e) {
@@ -89,19 +104,47 @@ void RenderingSystem::handle_add_vehicle(const Event& e) {
 void RenderingSystem::handle_add_terrain(const Event& e) {
     // Load game object parameters
     int object_id = e.get_value<int>("object_id", true).first;
+
     MeshAsset* mesh = asset_manager_.get_mesh_asset(TERRAIN_MESH_PATH);
+    ShaderAsset* shader = asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH);
+    TextureAsset* texture = asset_manager_.get_texture_asset(TERRAIN_TEXTURE_PATH);
+
+    // Store charcoal
+    example_objects_.emplace_back();
+    example_objects_[object_id].set_mesh(mesh);
+    example_objects_[object_id].set_shader(shader);
+    example_objects_[object_id].set_texture(texture);
+}
+
+void RenderingSystem::handle_add_charcoal(const Event& e) {
+    // Load game object parameters
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    std::pair<int, bool> x = e.get_value<int>("pos_x", true);
+    std::pair<int, bool> y = e.get_value<int>("pos_y", true);
+    std::pair<int, bool> z = e.get_value<int>("pos_z", true);
+
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(CHARCOAL_MESH_PATH);
+    ShaderAsset* shader = asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH);
+    TextureAsset* texture = asset_manager_.get_texture_asset(CHARCOAL_TEXTURE_PATH);
 
     // Store terrain
     example_objects_.emplace_back();
     example_objects_[object_id].set_mesh(mesh);
-    example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH));
-    example_objects_[object_id].set_texture(asset_manager_.get_texture_asset(TERRAIN_TEXTURE_PATH));
+    example_objects_[object_id].set_shader(shader);
+    example_objects_[object_id].set_texture(texture);
+    example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
+    example_objects_[object_id].set_has_shadows(false);
 }
 
 void RenderingSystem::handle_object_transform(const Event& e) {
+    particle_subsystem_.handle_object_transform(e);
+
     int object_id = e.get_value<int>("object_id", true).first;
 
-    if (example_objects_.size() <= object_id) {
+    assert(object_id >= 0);
+
+    if (example_objects_.size() <= static_cast<size_t>(object_id)) {
         return;
     }
 
@@ -116,10 +159,23 @@ void RenderingSystem::handle_object_transform(const Event& e) {
 
     example_objects_[object_id].set_transform(glm::translate(glm::mat4(), glm::vec3(x, y, z)));
     example_objects_[object_id].apply_transform(glm::toMat4(glm::quat(qw, qx, qy, qz)));
+
+    auto e_vx = e.get_value<float>("vel_x", false);
+
+    if (e_vx.second && object_id < 4) {
+        float vx = e_vx.first;
+        // float vy = e.get_value<float>("vel_y", true).first;
+        float vz = e.get_value<float>("vel_z", true).first;
+
+        car_speeds_[object_id] = glm::length(glm::vec2(vx, vz));
+    }
+
 }
 
 
 void RenderingSystem::handle_new_it(const Event& e) {
+    particle_subsystem_.handle_new_it(e);
+
     MeshAsset* bun_mesh = asset_manager_.get_mesh_asset(CAR_MESH_PATH);
     MeshAsset* dog_mesh = asset_manager_.get_mesh_asset(WEINER_MESH_PATH);
 
@@ -133,6 +189,7 @@ void RenderingSystem::handle_new_it(const Event& e) {
 
 void RenderingSystem::handle_new_game_state(const Event& e) {
     GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
+    particle_subsystem_.handle_new_game_state(e);
 
     if (new_game_state == GameState::START_MENU) {
         example_objects_.clear();
@@ -156,69 +213,141 @@ void RenderingSystem::handle_add_skybox(const Event& e) {
 void RenderingSystem::handle_add_powerup(const Event& e) {
     PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
 
-    if (powerup_type == PowerupType::POWERUP_COUNT) {
-        return;
-    }
+    assert(powerup_type != PowerupType::POWERUP_COUNT);
 
     int object_id = e.get_value<int>("object_id", true).first;
     float x = e.get_value<float>("pos_x", true).first;
     float y = e.get_value<float>("pos_y", true).first;
     float z = e.get_value<float>("pos_z", true).first;
 
-    MeshAsset* mesh;
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(PACKET_MESH_PATH);;
+    TextureAsset* texture;
 
     switch (powerup_type) {
         case PowerupType::KETCHUP:
-            mesh = asset_manager_.get_mesh_asset(KETCHUP_MESH_PATH);
+            texture = asset_manager_.get_texture_asset(KETCHUP_TEXTURE_PATH);
             break;
 
-        case PowerupType::PICKLE:
-            mesh = asset_manager_.get_mesh_asset(PICKLE_MESH_PATH);
+        case PowerupType::RELISH:
+            texture = asset_manager_.get_texture_asset(RELISH_TEXTURE_PATH);
             break;
 
-        case PowerupType::HOT:
-            mesh = asset_manager_.get_mesh_asset(HOT_SAUCE_MESH_PATH);
+        case PowerupType::MUSTARD:
+            texture = asset_manager_.get_texture_asset(MUSTARD_TEXTURE_PATH);
             break;
 
         default:
+            assert(false);
             break;
     }
 
     example_objects_.emplace_back();
     example_objects_[object_id].set_mesh(mesh);
-    example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(STANDARD_SHADER_PATH));
+    example_objects_[object_id].set_shader(asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH));
+    example_objects_[object_id].set_texture(texture);
     example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
-    // example_objects_[object_id].set_has_shadows(true);
+    example_objects_[object_id].set_has_shadows(true);
 }
 
 void RenderingSystem::handle_change_powerup(const Event& e) {
     PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
 
-    if (powerup_type == PowerupType::POWERUP_COUNT) {
-        return;
-    }
+    assert(powerup_type != PowerupType::POWERUP_COUNT);
 
     int object_id = e.get_value<int>("object_id", true).first;
-    MeshAsset* mesh;
+    TextureAsset* texture;
 
     switch (powerup_type) {
         case PowerupType::KETCHUP:
-            mesh = asset_manager_.get_mesh_asset(KETCHUP_MESH_PATH);
+            texture = asset_manager_.get_texture_asset(KETCHUP_TEXTURE_PATH);
             break;
 
-        case PowerupType::PICKLE:
-            mesh = asset_manager_.get_mesh_asset(PICKLE_MESH_PATH);
+        case PowerupType::RELISH:
+            texture = asset_manager_.get_texture_asset(RELISH_TEXTURE_PATH);
             break;
 
-        case PowerupType::HOT:
-            mesh = asset_manager_.get_mesh_asset(HOT_SAUCE_MESH_PATH);
+        case PowerupType::MUSTARD:
+            texture = asset_manager_.get_texture_asset(MUSTARD_TEXTURE_PATH);
             break;
 
         default:
+            assert(false);
             break;
     }
 
-    example_objects_[object_id].set_mesh(mesh);
+    example_objects_[object_id].set_texture(texture);
+}
+
+void RenderingSystem::handle_keypress(const Event& e) {
+    int key = e.get_value<int>("key", true).first;
+    int value = e.get_value<int>("value", true).first;
+
+    if (key == SDLK_F11 && value == SDL_KEYDOWN) {
+        asset_manager_.toggle_fullscreen();
+    }
+}
+
+void RenderingSystem::handle_use_powerup(const Event& e) {
+    particle_subsystem_.handle_use_powerup(e);
+
+    PowerupType type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
+    PowerupTarget target = static_cast<PowerupTarget>(e.get_value<int>("target", true).first);
+    int player_id = e.get_value<int>("index", true).first;
+    const float overlay_intensity = 0.15f;
+    glm::vec4 overlay = glm::vec4(0.0f);
+
+    switch (type) {
+        case PowerupType::KETCHUP:
+            overlay[0] = overlay_intensity; // red
+            break;
+
+        case PowerupType::RELISH:
+            overlay[1] = overlay_intensity; // green
+            break;
+
+        case PowerupType::MUSTARD:
+            // red + green = yellow
+            overlay[0] = overlay_intensity;
+            overlay[1] = overlay_intensity;
+            break;
+
+        case PowerupType::INVINCIBILITY:
+            // red + green + blue = white
+            overlay[0] = overlay_intensity;
+            overlay[1] = overlay_intensity;
+            overlay[2] = overlay_intensity;
+            break;
+
+        default:
+            assert(false);
+            break;
+    }
+
+    switch (target) {
+        case PowerupTarget::SELF:
+            example_objects_[player_id].set_colour_overlay(overlay);
+            break;
+
+        case PowerupTarget::OTHERS:
+            for (int i = 0; i < 4; ++i) {
+                if (i != player_id) {
+                    example_objects_[i].set_colour_overlay(overlay);
+                }
+            }
+
+            break;
+
+        default:
+            assert(false);
+            break;
+    }
+}
+
+void RenderingSystem::handle_finish_powerup(const Event& e) {
+    particle_subsystem_.handle_finish_powerup(e);
+
+    int object_id = e.get_value<int>("object_id", true).first;
+    example_objects_[object_id].set_colour_overlay(glm::vec4());
 }
 
 void RenderingSystem::render() {
@@ -228,6 +357,7 @@ void RenderingSystem::render() {
     auto cameras = cameras_queue_.front();
 
     for (size_t i = 0; i < cameras.size(); i++) {
+
         int window_w, window_h;
         SDL_GetWindowSize(asset_manager_.get_window(), &window_w, &window_h);
 
@@ -246,6 +376,8 @@ void RenderingSystem::render() {
         for (auto& object : example_objects_) {
             object.render(cameras[i], 0.3f);
         }
+
+        particle_subsystem_.render(cameras[i], i);
 
         for (auto& object : example_objects_) {
             object.render_lighting(cameras[i], glm::vec3(-0.4f, -1.0f, 0.f), shadow_shader_);
@@ -316,8 +448,6 @@ void RenderingSystem::start_render() const {
 
 void RenderingSystem::setup_cameras() {
     std::array<glm::mat4x4, 4> new_cameras;
-    glm::mat4 P = glm::perspective(glm::radians(60.f), 4.0f / 3.0f, 0.1f, 1000.0f);
-
     glm::mat4x4 transform;
 
     // get camera setup for all 4 car's current positioning
@@ -328,11 +458,29 @@ void RenderingSystem::setup_cameras() {
 
         auto camera_position = glm::translate(transform, glm::vec3(0, 2.5, -7));
 
-        if (camera_position[3].y < 1.5) {
-            camera_position[3].y = 1.5;
+        {
+            glm::vec3 bad_camera_pos(camera_position[3]);
+            glm::vec3 old_camera_pos(last_cameras_pos_[i]);
+            glm::vec3 smooth_camera_pos
+                = bad_camera_pos * 0.25f + old_camera_pos * 0.75f;
+
+            camera_position[3] = glm::vec4(smooth_camera_pos, 1.0);
         }
 
-        new_cameras[i] = P * glm::lookAt(glm::vec3(camera_position[3]), car_pos, glm::vec3(0, 1, 0));
+
+        if (camera_position[3].y < 4) {
+            camera_position[3].y = 4;
+        }
+
+        glm::vec3 lookAtPos(car_pos.x, camera_position[3][1], car_pos.z);
+
+
+        float FOV = 60.f + car_speeds_[i] * 5.f;
+        glm::mat4 P = glm::perspective(glm::radians(FOV), 4.0f / 3.0f, 0.1f, 1000.0f);
+
+        new_cameras[i] = P * glm::lookAt(glm::vec3(camera_position[3]), lookAtPos, glm::vec3(0, 1, 0));
+
+        last_cameras_pos_[i] = glm::vec3(camera_position[3]);
     }
 
     // push camera setup to back of queue
@@ -348,4 +496,36 @@ void RenderingSystem::setup_cameras() {
 
 void RenderingSystem::end_render() const {
     //SDL_GL_SwapWindow(window_);
+}
+
+void RenderingSystem::preload_assets() const {
+    // Shaders
+    asset_manager_.get_shader_asset(STANDARD_SHADER_PATH);
+    asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH);
+    asset_manager_.get_shader_asset(SKYBOX_SHADER_PATH);
+    asset_manager_.get_shader_asset(SHADOW_SHADER_PATH);
+
+    // Wiener
+    asset_manager_.get_mesh_asset(CAR_MESH_PATH);
+    asset_manager_.get_mesh_asset(CAR_SHADOW_MESH_PATH);
+    asset_manager_.get_mesh_asset(WEINER_MESH_PATH);
+    asset_manager_.get_texture_asset(CAR_TEXTURE_PATH);
+
+    // Terrain
+    asset_manager_.get_mesh_asset(TERRAIN_MESH_PATH);
+    asset_manager_.get_texture_asset(TERRAIN_TEXTURE_PATH);
+
+    // Skybox
+    asset_manager_.get_mesh_asset(SKYBOX_MESH_PATH);
+    asset_manager_.get_texture_asset(SKYBOX_TEXTURE_PATH);
+
+    // Powerups
+    asset_manager_.get_mesh_asset(PACKET_MESH_PATH);
+    asset_manager_.get_texture_asset(KETCHUP_TEXTURE_PATH);
+    asset_manager_.get_texture_asset(RELISH_TEXTURE_PATH);
+    asset_manager_.get_texture_asset(MUSTARD_TEXTURE_PATH);
+
+    // Obstacles
+    asset_manager_.get_mesh_asset(CHARCOAL_MESH_PATH);
+    asset_manager_.get_texture_asset(CHARCOAL_TEXTURE_PATH);
 }

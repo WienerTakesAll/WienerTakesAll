@@ -1,8 +1,10 @@
+#define PROFILING 0
+
 #include <chrono>
 #include <iostream>
 #include <stdlib.h>
 #include <thread>
-
+#include <stdio.h>
 
 #include "AssetManager.h"
 #include "EventSystem.h"
@@ -10,7 +12,6 @@
 
 #include "SDL.h"
 #include "SDL_image.h"
-
 
 #include "AssetManager.h"
 #include "AudioSystem.h"
@@ -31,6 +32,28 @@ namespace {
 
     // Length of one frame (60fps ~= 16.66 milliseconds per frame)
     const auto FRAME_DURATION_MS = std::chrono::milliseconds( 16 );
+
+    template <bool Profile, typename C>
+    void runProfiledUpdate(C& runner, std::chrono::duration<double>& time) {
+        if (Profile) {
+            auto func_start = std::chrono::steady_clock::now();
+            runner.update();
+            time = std::chrono::steady_clock::now() - func_start;
+        } else {
+            runner.update();
+        }
+    }
+
+    template <bool Profile, typename C>
+    void runProfiledRender(C& runner, std::chrono::duration<double>& time) {
+        if (Profile) {
+            auto func_start = std::chrono::steady_clock::now();
+            runner.render();
+            time = std::chrono::steady_clock::now() - func_start;
+        } else {
+            runner.render();
+        }
+    }
 }
 
 int main(int argc, char* args[]) {
@@ -81,7 +104,7 @@ int main(int argc, char* args[]) {
         }
 
 
-
+        auto events_start = std::chrono::steady_clock::now();
         // Send Events
         input_manager.send_events(events);
         gameplay_system.send_events(events);
@@ -103,25 +126,48 @@ int main(int argc, char* args[]) {
 
         // Clear events
         events.clear();
+        std::chrono::duration<double> events_elapsed = std::chrono::steady_clock::now() - events_start;
 
         // Update
-        ai_system.update();
-        gameplay_system.update();
-        physics_system.update();
-        rendering_system.update();
-        ui_system.update();
+        std::chrono::duration<double> ai_elapsed_update;
+        runProfiledUpdate<PROFILING>(ai_system, ai_elapsed_update);
+
+        std::chrono::duration<double> gameplay_elapsed_update;
+        runProfiledUpdate<PROFILING>(gameplay_system, gameplay_elapsed_update);
+
+        std::chrono::duration<double> physics_elapsed_update;
+        runProfiledUpdate<PROFILING>(physics_system, physics_elapsed_update);
+
+        std::chrono::duration<double> rendering_elapsed_update;
+        runProfiledUpdate<PROFILING>(rendering_system, rendering_elapsed_update);
+
+        std::chrono::duration<double> ui_elapsed_update;
+        runProfiledUpdate<PROFILING>(ui_system, ui_elapsed_update);
+
 
         // Render
-        rendering_system.render();
-        ui_system.render();
+        std::chrono::duration<double> rendering_elapsed_render;
+        runProfiledRender<PROFILING>(rendering_system, rendering_elapsed_render);
+
+        std::chrono::duration<double> ui_elapsed_render;
+        runProfiledRender<PROFILING>(ui_system, ui_elapsed_render);
 
         // Maintain a maximum frame rate of 60fps
         if ( game_is_running ) {
             std::chrono::duration<double> diff =
                 std::chrono::steady_clock::now() - frame_end_time;
 
-            if (diff.count() > 0) {
-                std::cout << "Missed update by " << diff.count() << "s" << std::endl;
+            if (PROFILING) {
+                printf("E:%f%%, AU:%f%%, GU:%f%%, PU:%f%%, RU:%f%%, UU:%f%%, RR:%f%%, UR:%f%%, I:%f%%\n",
+                       events_elapsed.count() * 60.f * 100,
+                       ai_elapsed_update.count() * 60.f * 100,
+                       gameplay_elapsed_update.count() * 60.f * 100,
+                       physics_elapsed_update.count() * 60.f * 100,
+                       rendering_elapsed_update.count() * 60.f * 100,
+                       ui_elapsed_update.count() * 60.f * 100,
+                       rendering_elapsed_render.count() * 60.f * 100,
+                       ui_elapsed_render.count() * 60.f * 100,
+                       -diff.count() * 60.f * 100);
             }
 
             std::this_thread::sleep_until( frame_end_time );

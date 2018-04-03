@@ -8,6 +8,7 @@ enum class EventType {
     NEW_GAME_STATE,
     ADD_VEHICLE,
     ADD_ARENA,
+    ADD_CHARCOAL,
     LOAD_EVENT,
     DUMMY_EVENT,
     OBJECT_TRANSFORM_EVENT,
@@ -17,6 +18,7 @@ enum class EventType {
     VEHICLE_CONTROL,
     VEHICLE_COLLISION,
     ACTIVATE_AI,
+    PLAYER_FELL_OFF_ARENA,
     UPDATE_SCORE,
     NEW_IT,
     UPDATE_DIRECTION_TO_IT,
@@ -25,6 +27,9 @@ enum class EventType {
     PICKUP_POWERUP,
     CHANGE_POWERUP,
     USE_POWERUP,
+    SET_CHASSIS_MASS,
+    RESTORE_CHASSIS_MASS,
+    FINISH_POWERUP,
 
     // Keep at end of list
     EVENT_COUNT

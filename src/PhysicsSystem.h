@@ -28,18 +28,18 @@ public:
 private:
     void handle_add_vehicle(const Event& e);
     void handle_add_arena(const Event& e);
+    void handle_add_charcoal(const Event& e);
     void handle_vehicle_control(const Event& e);
     void handle_reload_settings(const Event& e);
     void handle_object_apply_force(const Event& e);
     void handle_new_game_state(const Event& e);
+    void handle_set_chassis_mass(const Event& e);
+    void handle_restore_chassis_mass(const Event& e);
 
     void create_4w_vehicle(
         const physx::PxMaterial& material,
-        const physx::PxF32 chassisMass,
-        const physx::PxVec3* wheelCentreOffsets4,
         physx::PxConvexMesh* chassisConvexMesh,
-        physx::PxConvexMesh** wheelConvexMeshes4,
-        bool useAutoGearFlag
+        physx::PxConvexMesh** wheelConvexMeshes4
     );
 
     std::vector<PhysicsComponent<false>> dynamic_objects_;

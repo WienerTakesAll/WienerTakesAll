@@ -6,5 +6,9 @@ enum class SoundAsset {
     PLAYER_2_HAS_THE_WIENER,
     PLAYER_3_HAS_THE_WIENER,
     PLAYER_4_HAS_THE_WIENER,
-    CHEERING
+    CHEERING,
+    SQUISH,
+    DRILL,
+    DOG_LAPPING_WATER,
+    BRIGHT
 };

@@ -35,4 +35,6 @@ private:
     void handle_vehicle_collision_event(const Event& e);
     void handle_new_game_state(const Event& e);
     void handle_new_it(const Event& e);
+    void handle_pickup_powerup(const Event& e);
+    void handle_use_powerup(const Event& e);
 };

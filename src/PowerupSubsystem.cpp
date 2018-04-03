@@ -1,6 +1,7 @@
 #include <stdlib.h> /* srand, rand */
 #include <time.h> /* time */
 #include <algorithm>
+#include <vector>
 
 #include "SDL.h"
 #include <glm/gtx/vector_angle.hpp>
@@ -9,8 +10,11 @@
 
 namespace {
     const float POWERUP_DISTANCE_THRESHOLD = 2.5f;
-    const int POWERUP_LOCK_FRAMES = 120;
+    const int POWERUP_LOCK_FRAMES = 30;
     const glm::vec3 POWERUP_LOCATION_LIMITS = glm::vec3(10.0f, 1.5f, 10.0f);
+
+    // Subtract 1 from POWERUP_COUNT to prevent PowerupType::INVINCIBILITY from dropping
+    const int POWERUP_INDEX_RANGE = ((int) PowerupType::POWERUP_COUNT) - 1;
 }
 
 PowerupSubsystem::PowerupSubsystem()
@@ -63,22 +67,20 @@ void PowerupSubsystem::pickup_powerup(const int object_id) {
     frame_counter_ = 0;
 }
 
-PowerupType PowerupSubsystem::use_powerup(const int object_id) {
-    // Check if object_id has a pre-existing powerup. If so, return that. Else, return NONE.
-    PowerupType type = object_powerups_.find(object_id) == object_powerups_.end()
-                       ? PowerupType::POWERUP_COUNT
-                       : object_powerups_[object_id];
-
+void PowerupSubsystem::spend_powerup(const int object_id) {
     // Clear powerup entry.
     object_powerups_[object_id] = PowerupType::POWERUP_COUNT;
-
-    return type;
 }
 
 const bool PowerupSubsystem::can_use_powerup(const int object_id) const {
     return
         object_powerups_.find(object_id) != object_powerups_.end() &&
         object_powerups_.at(object_id) != PowerupType::POWERUP_COUNT;
+}
+
+const PowerupType PowerupSubsystem::get_player_powerup_type(const int object_id) const {
+    assert(can_use_powerup(object_id));
+    return object_powerups_.at(object_id);
 }
 
 const bool PowerupSubsystem::is_powerup(const int object_id) const {
@@ -94,8 +96,13 @@ glm::vec3 PowerupSubsystem::get_next_powerup_position() const {
 
 PowerupType PowerupSubsystem::get_next_powerup_type() const {
     // Random powerup type
-    PowerupType new_type = static_cast<PowerupType>(rand() % (int) PowerupType::POWERUP_COUNT);
+    PowerupType new_type = static_cast<PowerupType>(rand() % POWERUP_INDEX_RANGE);
+    assert(new_type != PowerupType::INVINCIBILITY);
     return new_type;
+}
+
+PowerupType PowerupSubsystem::get_powerup_type() const {
+    return powerup_type_;
 }
 
 const int PowerupSubsystem::get_powerup_id() const {
