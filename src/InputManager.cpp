@@ -1,6 +1,8 @@
 #include <algorithm>
+#include <cassert>
 #include <iostream>
 #include <vector>
+
 #include "EventSystem.h"
 #include "InputManager.h"
 #include "InputSettings.h"
@@ -39,7 +41,7 @@ void InputManager::process_input(SDL_Event* event) {
 
         case SDL_CONTROLLERBUTTONUP: {
             value = SDL_CONTROLLERBUTTONUP;
-            player_id = event->cbutton.which; // Joystick ID of event sender
+            player_id = get_player_id_from_joystick_index(event->cbutton.which); // Joystick ID of event sender
             key = event->cbutton.button;
             std::cout << "[Player " << player_id << "] ";
             should_queue_event = process_controller_button(key);
@@ -48,7 +50,7 @@ void InputManager::process_input(SDL_Event* event) {
 
         case SDL_CONTROLLERBUTTONDOWN: {
             value = SDL_CONTROLLERBUTTONDOWN;
-            player_id = event->cbutton.which; // Joystick ID of event sender
+            player_id = get_player_id_from_joystick_index(event->cbutton.which); // Joystick ID of event sender
             key = event->cbutton.button;
             std::cout << "[Player " << player_id << "] ";
             should_queue_event = process_controller_button(key);
@@ -59,7 +61,7 @@ void InputManager::process_input(SDL_Event* event) {
         case SDL_CONTROLLERAXISMOTION: {
             key = event->caxis.axis;
             value = event->caxis.value; // Current displacement of joystick
-            player_id = event->caxis.which; // Joystick ID of event sender
+            player_id = get_player_id_from_joystick_index(event->caxis.which); // Joystick ID of event sender
             std::cout << "[Player " << player_id << "] ";
             should_queue_event = process_controller_axis(key, value);
             std::cout << " value: " << value << std::endl;
@@ -152,9 +154,6 @@ void InputManager::handle_load_event(const Event& e) {
             std::cout << "Haptic rumble for player " << player_id << " also initialized" << std::endl;
         }
     }
-
-    // Why, SDL2, why?
-    std::reverse(haptics_.begin(), haptics_.end());
 }
 
 bool InputManager::process_keyboard(const int& key, int& player_id) {
@@ -378,4 +377,10 @@ void InputManager::rumble_controller(const int id) const {
     }
 
     SDL_HapticRumblePlay(haptics_[id], 0.5f, 500);
+}
+
+const int InputManager::get_player_id_from_joystick_index(const int joystick_index) const {
+	int player_id = SDL_NumJoysticks() - joystick_index - 1;
+	assert(player_id >= 0 && player_id < SDL_NumJoysticks());
+	return player_id;
 }
