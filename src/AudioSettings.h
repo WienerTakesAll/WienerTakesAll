@@ -20,7 +20,8 @@ struct AudioSettings {
         {SoundAsset::CHEERING, "assets/audio/cheering.wav"},
         {SoundAsset::SQUISH, "assets/audio/squish.wav"},
         {SoundAsset::DRILL, "assets/audio/drill.wav"},
-        {SoundAsset::DOG_LAPPING_WATER, "assets/audio/dog_lapping_water.wav"}
+        {SoundAsset::DOG_LAPPING_WATER, "assets/audio/dog_lapping_water.wav"},
+        {SoundAsset::BRIGHT, "assets/audio/powerup_bright.wav"}
     };
     // Information for loading music assets. First value is the key, second is the path.
     std::vector<std::pair<const MusicAsset, const std::string>> music_assets_info = {

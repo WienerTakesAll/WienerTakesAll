@@ -221,6 +221,10 @@ void AudioSystem::handle_use_powerup(const Event& e) {
             play_sound(SoundAsset::DOG_LAPPING_WATER);
             break;
 
+        case PowerupType::INVINCIBILITY:
+            play_sound(SoundAsset::BRIGHT);
+            break;
+
         default:
             break;
     }
