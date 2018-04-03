@@ -30,6 +30,6 @@ private:
 
     void rumble_controller(const int id) const;
 
-	// Returns appropriate player_id from SDL2 Joystick index
-	const int get_player_id_from_joystick_index(const int joystick_index) const;
+    // Returns appropriate player_id from SDL2 Joystick index
+    const int get_player_id_from_joystick_index(const int joystick_index) const;
 };

@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -396,11 +395,8 @@ bool InputManager::process_controller_axis(const int& axis, const int& value) {
 }
 
 void InputManager::rumble_controller(const int id) const {
-    if (id >= haptics_.size()) {
-        return;
-    }
-
-    if (haptics_[id] == nullptr) {
+    if (    id >= haptics_.size() ||
+            haptics_[id] == nullptr ) {
         return;
     }
 
@@ -408,7 +404,7 @@ void InputManager::rumble_controller(const int id) const {
 }
 
 const int InputManager::get_player_id_from_joystick_index(const int joystick_index) const {
-	int player_id = SDL_NumJoysticks() - joystick_index - 1;
-	assert(player_id >= 0 && player_id < SDL_NumJoysticks());
-	return player_id;
+    int player_id = SDL_NumJoysticks() - joystick_index - 1;
+    assert(player_id >= 0 && player_id < SDL_NumJoysticks());
+    return player_id;
 }
