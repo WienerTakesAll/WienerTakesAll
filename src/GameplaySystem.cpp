@@ -24,6 +24,7 @@ namespace {
     const glm::vec3 COLLISION_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const float RELISH_DURATION = 2.5f;
     const float MUSTARD_DURATION = 0.2f;
+    const float INVINCIBILITY_DURATION = 1.0f;
     const float POWERUP_TICK = 0.01f;
     const int NUM_MOUNDS = 20;
 }
@@ -82,28 +83,24 @@ void GameplaySystem::update() {
     if (current_game_state_ == GameState::IN_GAME) {
         powerup_subsystem_.update();
 
-        if (object_positions_.find(powerup_subsystem_.get_powerup_id()) == object_positions_.end() ||
-                !powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id())) {
-            return;
-        }
-
         // Move powerup here
-        glm::vec3 powerup_cur_loc = object_positions_[powerup_subsystem_.get_powerup_id()];
-        EventSystem::queue_event(
-            Event(
-                EventType::OBJECT_TRANSFORM_EVENT,
-                "object_id", powerup_subsystem_.get_powerup_id(),
-                "pos_x", powerup_cur_loc.x,
-                "pos_y", powerup_cur_loc.y,
-                "pos_z", powerup_cur_loc.z,
-                "qua_w", 1.0f,
-                "qua_x", 0.0f,
-                "qua_y", 0.0f,
-                "qua_z", 0.0f
-            )
-        );
-
-
+        if (object_positions_.find(powerup_subsystem_.get_powerup_id()) != object_positions_.end() &&
+                powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id())) {
+            glm::vec3 powerup_cur_loc = object_positions_[powerup_subsystem_.get_powerup_id()];
+            EventSystem::queue_event(
+                Event(
+                    EventType::OBJECT_TRANSFORM_EVENT,
+                    "object_id", powerup_subsystem_.get_powerup_id(),
+                    "pos_x", powerup_cur_loc.x,
+                    "pos_y", powerup_cur_loc.y,
+                    "pos_z", powerup_cur_loc.z,
+                    "qua_w", 1.0f,
+                    "qua_x", 0.0f,
+                    "qua_y", 0.0f,
+                    "qua_z", 0.0f
+                )
+            );
+        }
 
         for (auto& powerup_data : powerup_datas_) {
             if (powerup_data.second.ketchup > 0.f) {
@@ -155,6 +152,19 @@ void GameplaySystem::update() {
                         )
                     );
 
+                    EventSystem::queue_event(
+                        Event(
+                            EventType::FINISH_POWERUP,
+                            "object_id", powerup_data.first
+                        )
+                    );
+                }
+            }
+
+            if (powerup_data.second.invincibility > 0.f) {
+                powerup_data.second.invincibility -= POWERUP_TICK;
+
+                if (powerup_data.second.invincibility <= 0.0f) {
                     EventSystem::queue_event(
                         Event(
                             EventType::FINISH_POWERUP,
@@ -561,9 +571,23 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
 }
 
 void GameplaySystem::handle_new_it(const Event& e) {
+    // Ensure to turn off invincibility of former it
+    if (current_it_id_ != -1) {
+        powerup_datas_[current_it_id_].invincibility = 0.f;
+    }
+
     int new_it_id = e.get_value<int>("object_id", true).first;
-    current_it_id_ = new_it_id;
     scoring_subsystem_.set_new_it_id(new_it_id);
+    current_it_id_ = new_it_id;
+
+    EventSystem::queue_event(
+        Event(
+            EventType::USE_POWERUP,
+            "type", PowerupType::INVINCIBILITY,
+            "target", PowerupTarget::SELF,
+            "index", new_it_id
+        )
+    );
 }
 
 void GameplaySystem::handle_add_powerup(const Event& e) {
@@ -621,11 +645,10 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
     int type = e.get_value<int>("type", true).first;
     int target = e.get_value<int>("target", true).first;
 
-    powerup_subsystem_.spend_powerup(object_id);
-
     switch (type) {
         case PowerupType::KETCHUP: {
             std::cout << "KETCHUP used by player " << object_id << std::endl;
+            powerup_subsystem_.spend_powerup(object_id);
 
             if (target == PowerupTarget::SELF) {
                 powerup_datas_[object_id].ketchup = 1.0f;
@@ -642,6 +665,7 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
 
         case PowerupType::MUSTARD:
             std::cout << "MUSTARD used by player " << object_id << std::endl;
+            powerup_subsystem_.spend_powerup(object_id);
 
             if (target == PowerupTarget::SELF) {
                 powerup_datas_[object_id].mustard = MUSTARD_DURATION;
@@ -679,6 +703,7 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
 
         case PowerupType::RELISH:
             std::cout << "RELISH used by player " << object_id << std::endl;
+            powerup_subsystem_.spend_powerup(object_id);
 
             if (target == PowerupTarget::SELF) {
                 powerup_datas_[object_id].relish = RELISH_DURATION;
@@ -708,6 +733,12 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
 
             break;
 
+        case PowerupType::INVINCIBILITY:
+            assert(target == PowerupTarget::SELF);
+            std::cout << "INVINCIBILITY used by player " << object_id << std::endl;
+            powerup_datas_[object_id].invincibility = INVINCIBILITY_DURATION;
+            break;
+
         default:
             break;
     }
@@ -718,39 +749,46 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
     int b_id = e.get_value<int>("b_id", true).first;
     std::cout << a_id << " collided with " << b_id << std::endl;
 
+    bool a_invincible = powerup_datas_[a_id].invincibility > 0.f;
+    bool b_invincible = powerup_datas_[b_id].invincibility > 0.f;
+
     glm::vec3 a_pos = object_positions_[a_id];
     glm::vec3 b_pos = object_positions_[b_id];
     glm::vec3 v_dir = glm::normalize(a_pos - b_pos);
 
     // Apply knockback
-    EventSystem::queue_event(
-        Event(
-            EventType::OBJECT_APPLY_FORCE,
-            "object_id", a_id,
-            // TODO: Pass glm::vec3 in events
-            "x", v_dir[0] * COLLISION_KNOCK_BACK_FORCE.x,
-            "y", COLLISION_KNOCK_BACK_FORCE.y,
-            "z", v_dir[2] * COLLISION_KNOCK_BACK_FORCE.z
-        )
-    );
+    if (!a_invincible) {
+        EventSystem::queue_event(
+            Event(
+                EventType::OBJECT_APPLY_FORCE,
+                "object_id", a_id,
+                // TODO: Pass glm::vec3 in events
+                "x", v_dir[0] * COLLISION_KNOCK_BACK_FORCE.x,
+                "y", COLLISION_KNOCK_BACK_FORCE.y,
+                "z", v_dir[2] * COLLISION_KNOCK_BACK_FORCE.z
+            )
+        );
+    }
 
-    EventSystem::queue_event(
-        Event(
-            EventType::OBJECT_APPLY_FORCE,
-            "object_id", b_id,
-            // TODO: Pass glm::vec3 in events
-            "x", -v_dir[0] * COLLISION_KNOCK_BACK_FORCE.x,
-            "y", COLLISION_KNOCK_BACK_FORCE.y,
-            "z", -v_dir[2] * COLLISION_KNOCK_BACK_FORCE.z
-        )
-    );
+    if (!b_invincible) {
+        EventSystem::queue_event(
+            Event(
+                EventType::OBJECT_APPLY_FORCE,
+                "object_id", b_id,
+                // TODO: Pass glm::vec3 in events
+                "x", -v_dir[0] * COLLISION_KNOCK_BACK_FORCE.x,
+                "y", COLLISION_KNOCK_BACK_FORCE.y,
+                "z", -v_dir[2] * COLLISION_KNOCK_BACK_FORCE.z
+            )
+        );
+    }
 
     // Check for new it
     int new_it = -1;
 
-    if (current_it_id_ == a_id) {
+    if (current_it_id_ == a_id && !a_invincible) {
         new_it = b_id;
-    } else if (current_it_id_ == b_id) {
+    } else if (current_it_id_ == b_id && !b_invincible) {
         new_it = a_id;
     }
 
@@ -788,8 +826,9 @@ float GameplaySystem::calculate_player_speed(int player) {
 
 void GameplaySystem::handle_player_fell_off_arena(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
+    bool invincible = powerup_datas_[object_id].invincibility > 0.f;
 
-    if (object_id != current_it_id_) {
+    if (object_id != current_it_id_ || invincible) {
         return;
     }
 

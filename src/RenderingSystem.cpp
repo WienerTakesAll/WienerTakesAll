@@ -311,6 +311,13 @@ void RenderingSystem::handle_use_powerup(const Event& e) {
             overlay[1] = overlay_intensity;
             break;
 
+        case PowerupType::INVINCIBILITY:
+            // red + green + blue = white
+            overlay[0] = overlay_intensity;
+            overlay[1] = overlay_intensity;
+            overlay[2] = overlay_intensity;
+            break;
+
         default:
             assert(false);
             break;

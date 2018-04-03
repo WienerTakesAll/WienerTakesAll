@@ -22,6 +22,7 @@ public:
     void set_particle_scale(float delta, float min, float max);
     void set_particle_fixed_size(bool is_fixed_size);
     void set_colour(glm::vec4 delta, glm::vec4 min, glm::vec4 max);
+    void set_texture(TextureAsset* texture);
 
 private:
     bool active_;

@@ -257,3 +257,7 @@ void ParticleGenerator::set_colour(glm::vec4 delta, glm::vec4 min, glm::vec4 max
     colour_max_ = max;
     colour_min_ = min;
 }
+
+void ParticleGenerator::set_texture(TextureAsset* texture) {
+    rendering_component_.set_texture(texture);
+}
