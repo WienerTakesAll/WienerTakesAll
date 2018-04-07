@@ -222,6 +222,13 @@ void PhysicsSystem::handle_add_vehicle(const Event& e) {
     transform.p.x = e.get_value<int>("pos_x", true).first;
     transform.p.y = e.get_value<int>("pos_y", true).first;
     transform.p.z = e.get_value<int>("pos_z", true).first;
+    float rotation = e.get_value<float>("rotation", true).first;
+    glm::quat rotation_quat = glm::rotate(glm::quat(), glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+    transform.q.w = rotation_quat.w;
+    transform.q.x = rotation_quat.x;
+    transform.q.y = rotation_quat.y;
+    transform.q.z = rotation_quat.z;
+
     MeshAsset* mesh = asset_manager_.get_mesh_asset(settings_.vehicle_mesh_asset_path);
 
     // Construct new PhysicsComponent and add to list

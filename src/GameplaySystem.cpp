@@ -196,9 +196,10 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 EventType::ADD_VEHICLE,
                 "object_id", first_player_id,
                 // TODO: Pass glm::vec3 in events
-                "pos_x", 4,
+                "pos_x", 0,
                 "pos_y", 10,
-                "pos_z", 0
+                "pos_z", -40,
+                "rotation", 0.0f
             )
         );
 
@@ -207,9 +208,10 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 EventType::ADD_VEHICLE,
                 "object_id", gameobject_counter_->assign_id(),
                 // TODO: Pass glm::vec3 in events
-                "pos_x", 10,
+                "pos_x", -40,
                 "pos_y", 10,
-                "pos_z", 0//,
+                "pos_z", 0,
+                "rotation", 90.0f
             )
         );
 
@@ -218,9 +220,10 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 EventType::ADD_VEHICLE,
                 "object_id", gameobject_counter_->assign_id(),
                 // TODO: Pass glm::vec3 in events
-                "pos_x", -4,
+                "pos_x", 0,
                 "pos_y", 10,
-                "pos_z", 0
+                "pos_z", 40,
+                "rotation", 180.0f
             )
         );
 
@@ -230,9 +233,10 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 EventType::ADD_VEHICLE,
                 "object_id", last_player_id,
                 // TODO: Pass glm::vec3 in events
-                "pos_x", -10,
+                "pos_x", 40,
                 "pos_y", 10,
-                "pos_z", 0
+                "pos_z", 0,
+                "rotation", 270.0f
             )
         );
 
