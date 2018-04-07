@@ -10,7 +10,7 @@ public:
     GameplayHud(AssetManager& asset_manager);
     void load();
     void render() const;
-    void update_score(const int& player, const int& value);
+    void update_score(const int& player, const int& value, const int& lock_frames);
     void reset_scores();
     void update_it_pointer(int player_id, glm::vec3 vector_to_it);
     void new_it(int it_id);
@@ -31,4 +31,7 @@ private:
     std::array<glm::mat4, 4> it_pointer_transforms_;
 
     std::array<UIObject, 4> powerup_holders_;
+
+    UIObject countdown_;
+    int countdown_value_;
 };

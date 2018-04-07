@@ -60,13 +60,15 @@ void GameplaySystem::update() {
         scoring_subsystem_.update();
 
         int score_value = scoring_subsystem_.get_current_it_score();
+        int score_lock = scoring_subsystem_.get_current_lock_frames();
 
         if (score_value < MAX_SCORE) {
             EventSystem::queue_event(
                 Event(
                     EventType::UPDATE_SCORE,
                     "object_id", current_it_id_,
-                    "score", score_value
+                    "score", score_value,
+                    "lock_frames", score_lock
                 )
             );
         } else {
