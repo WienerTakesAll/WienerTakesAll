@@ -9,6 +9,7 @@ enum class EventType {
     ADD_VEHICLE,
     ADD_ARENA,
     ADD_CHARCOAL,
+    ADD_FRUIT,
     LOAD_EVENT,
     DUMMY_EVENT,
     OBJECT_TRANSFORM_EVENT,
@@ -30,6 +31,8 @@ enum class EventType {
     SET_CHASSIS_MASS,
     RESTORE_CHASSIS_MASS,
     FINISH_POWERUP,
+    ADD_CHEESE,
+    ADD_BASKET,
 
     // Keep at end of list
     EVENT_COUNT

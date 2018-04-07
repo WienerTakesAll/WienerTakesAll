@@ -18,8 +18,18 @@ namespace {
     const std::string CAR_SHADOW_MESH_PATH = "assets/models/CarShadowModel.obj";
     const std::string WEINER_MESH_PATH = "assets/models/WienerCarModel.obj";
     const std::string CAR_TEXTURE_PATH = "assets/textures/textureCar.png";
-    const std::string TERRAIN_MESH_PATH = "assets/models/Arena.obj";
-    const std::string TERRAIN_TEXTURE_PATH = "assets/textures/texturePit.png";
+    const std::string TERRAIN_MESH_PATH = "assets/models/TableMap.obj";
+    const std::string TERRAIN_TEXTURE_PATH = "assets/textures/TableText.png";
+
+    const std::string BASKET_MESH_PATH = "assets/models/basket.obj";
+    const std::string BASKET_TEXTURE_PATH = "assets/textures/basketText.png";
+
+    const std::string FRUIT_MESH_PATH = "assets/models/fruit.obj";
+    const std::string FRUIT_TEXTURE_PATH = "assets/textures/fruitText.png";
+
+    const std::string CHEESE_MESH_PATH = "assets/models/cheese.obj";
+    const std::string CHEESE_TEXTURE_PATH = "assets/textures/cheeseText.png";
+
     const std::string SKYBOX_MESH_PATH = "assets/models/Skybox.obj";
     const std::string SKYBOX_TEXTURE_PATH = "assets/textures/park.png";
     const std::string PACKET_MESH_PATH = "assets/models/Packet.obj";
@@ -45,6 +55,11 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::ADD_VEHICLE, &RenderingSystem::handle_add_vehicle, this);
     EventSystem::add_event_handler(EventType::ADD_ARENA, &RenderingSystem::handle_add_terrain, this);
     EventSystem::add_event_handler(EventType::ADD_CHARCOAL, &RenderingSystem::handle_add_charcoal, this);
+
+    EventSystem::add_event_handler(EventType::ADD_BASKET, &RenderingSystem::handle_add_basket, this);
+    EventSystem::add_event_handler(EventType::ADD_FRUIT, &RenderingSystem::handle_add_fruit, this);
+    EventSystem::add_event_handler(EventType::ADD_CHEESE, &RenderingSystem::handle_add_cheese, this);
+
     EventSystem::add_event_handler(EventType::OBJECT_TRANSFORM_EVENT, &RenderingSystem::handle_object_transform, this);
     EventSystem::add_event_handler(EventType::NEW_IT, &RenderingSystem::handle_new_it, this);
     EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &RenderingSystem::handle_new_game_state, this);
@@ -114,6 +129,55 @@ void RenderingSystem::handle_add_terrain(const Event& e) {
     example_objects_[object_id].set_mesh(mesh);
     example_objects_[object_id].set_shader(shader);
     example_objects_[object_id].set_texture(texture);
+}
+
+void RenderingSystem::handle_add_basket(const Event& e) {
+    // Load game object parameters
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(BASKET_MESH_PATH);
+    ShaderAsset* shader = asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH);
+    TextureAsset* texture = asset_manager_.get_texture_asset(BASKET_TEXTURE_PATH);
+
+    // Store charcoal
+    example_objects_.emplace_back();
+    example_objects_[object_id].set_mesh(mesh);
+    example_objects_[object_id].set_shader(shader);
+    example_objects_[object_id].set_texture(texture);
+    //example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(40.0, 1.0, 10.0)));
+    example_objects_[object_id].set_has_shadows(false);
+}
+void RenderingSystem::handle_add_fruit(const Event& e) {
+    // Load game object parameters
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(FRUIT_MESH_PATH);
+    ShaderAsset* shader = asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH);
+    TextureAsset* texture = asset_manager_.get_texture_asset(FRUIT_TEXTURE_PATH);
+
+    // Store terrain
+    example_objects_.emplace_back();
+    example_objects_[object_id].set_mesh(mesh);
+    example_objects_[object_id].set_shader(shader);
+    example_objects_[object_id].set_texture(texture);
+    //example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, 0.0, z.first)));
+    example_objects_[object_id].set_has_shadows(false);
+}
+void RenderingSystem::handle_add_cheese(const Event& e) {
+    // Load game object parameters
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    MeshAsset* mesh = asset_manager_.get_mesh_asset(CHEESE_MESH_PATH);
+    ShaderAsset* shader = asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH);
+    TextureAsset* texture = asset_manager_.get_texture_asset(CHEESE_TEXTURE_PATH);
+
+    // Store terrain
+    example_objects_.emplace_back();
+    example_objects_[object_id].set_mesh(mesh);
+    example_objects_[object_id].set_shader(shader);
+    example_objects_[object_id].set_texture(texture);
+    example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(10.0, 0.0, 20.0)));
+    example_objects_[object_id].set_has_shadows(false);
 }
 
 void RenderingSystem::handle_add_charcoal(const Event& e) {
@@ -284,6 +348,10 @@ void RenderingSystem::handle_keypress(const Event& e) {
 
     if (key == SDLK_F11 && value == SDL_KEYDOWN) {
         asset_manager_.toggle_fullscreen();
+    }
+
+    if (key == SDLK_F5 && value == SDL_KEYDOWN) {
+        assert(false);
     }
 }
 

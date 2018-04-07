@@ -17,6 +17,7 @@ public:
     float vehicle_mass;
     float wheel_mass;
     std::string arena_mesh;
+    std::string basket_mesh;
     std::string charcoal_mesh;
     float arena_tire_friction;
     physx::PxVec3 wheel_center_offsets[4];

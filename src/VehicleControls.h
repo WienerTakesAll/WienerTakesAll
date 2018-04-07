@@ -4,7 +4,7 @@ enum VehicleControlType {
     FORWARD_DRIVE,
     BRAKE,
     STEER,
-    HAND_BRAKE
+    HAND_BRAKE,
 };
 
 struct VehicleControls {

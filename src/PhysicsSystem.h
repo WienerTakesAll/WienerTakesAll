@@ -29,6 +29,8 @@ private:
     void handle_add_vehicle(const Event& e);
     void handle_add_arena(const Event& e);
     void handle_add_charcoal(const Event& e);
+    void handle_add_basket(const Event& e);
+    void handle_add_fruit(const Event& e);
     void handle_vehicle_control(const Event& e);
     void handle_reload_settings(const Event& e);
     void handle_object_apply_force(const Event& e);

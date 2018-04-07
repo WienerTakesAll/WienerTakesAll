@@ -231,6 +231,28 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "object_id", gameobject_counter_->assign_id()
             )
         );
+        // Basket
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_BASKET,
+                "object_id", gameobject_counter_->assign_id()
+            )
+        );
+
+        // Fruit
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_FRUIT,
+                "object_id", gameobject_counter_->assign_id()
+            )
+        );
+        // Fruit
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_CHEESE,
+                "object_id", gameobject_counter_->assign_id()
+            )
+        );
 
         // Skybox
         EventSystem::queue_event(
@@ -239,7 +261,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "object_id", gameobject_counter_->assign_id()
             )
         );
-
+        /*
         //CHARCOAL_TEST
         for (size_t i = 0; i < NUM_MOUNDS; i++) {
             EventSystem::queue_event(
@@ -253,6 +275,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 )
             );
         }
+        */
 
         // AI
         EventSystem::queue_event(
@@ -377,7 +400,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
             new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                     "index", player_id,
                                     "type", VehicleControlType::BRAKE,
-                                    "value", BRAKE_SPEED);
+                                    "value", 0.0f);
             break;
 
         // keyboard left steer
