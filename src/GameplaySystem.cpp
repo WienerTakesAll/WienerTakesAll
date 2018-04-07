@@ -511,6 +511,8 @@ void GameplaySystem::handle_add_vehicle(const Event& e) {
     player_powerup_data data;
     data.ketchup = 0.f;
     data.relish = 0.f;
+    data.invincibility = 0.0f;
+    data.mustard = 0.0f;
     powerup_datas_.emplace(object_id.first, data);
 }
 void GameplaySystem::handle_object_transform_event(const Event& e) {
