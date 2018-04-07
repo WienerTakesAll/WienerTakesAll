@@ -190,10 +190,11 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
     if (new_game_state == GameState::IN_GAME) {
         int num_humans = e.get_value<int>("num_players", true).first;
         std::cout << "starting game with " << num_humans << " human players" << std::endl;
+        int first_player_id = gameobject_counter_->assign_id();
         EventSystem::queue_event(
             Event(
                 EventType::ADD_VEHICLE,
-                "object_id", gameobject_counter_->assign_id(),
+                "object_id", first_player_id,
                 // TODO: Pass glm::vec3 in events
                 "pos_x", 4,
                 "pos_y", 10,
@@ -223,14 +224,22 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
             )
         );
 
+        int last_player_id = gameobject_counter_->assign_id();
         EventSystem::queue_event(
             Event(
                 EventType::ADD_VEHICLE,
-                "object_id", gameobject_counter_->assign_id(),
+                "object_id", last_player_id,
                 // TODO: Pass glm::vec3 in events
                 "pos_x", -10,
                 "pos_y", 10,
                 "pos_z", 0
+            )
+        );
+
+        EventSystem::queue_event(
+            Event(
+                EventType::NEW_IT,
+                "object_id", (rand() % (last_player_id - first_player_id + 1)) + first_player_id
             )
         );
 
@@ -497,17 +506,6 @@ void GameplaySystem::handle_add_vehicle(const Event& e) {
     data.ketchup = 0.f;
     data.relish = 0.f;
     powerup_datas_.emplace(object_id.first, data);
-
-    // Temporary, set first vehicle to be added as first it.
-    // Assumes first vehicle object_id = 0.
-    if (object_id.first == 0) {
-        EventSystem::queue_event(
-            Event(
-                EventType::NEW_IT,
-                "object_id", object_id.first
-            )
-        );
-    }
 }
 void GameplaySystem::handle_object_transform_event(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
