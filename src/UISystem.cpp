@@ -92,14 +92,21 @@ void UISystem::handle_key_press(const Event& e) {
             case SDL_CONTROLLER_BUTTON_A:
             case SDL_CONTROLLER_BUTTON_START:
             case SDLK_RETURN:
-                EventSystem::queue_event(
-                    Event(
-                        EventType::NEW_GAME_STATE,
-                        "state", GameState::IN_GAME,
-                        "num_players", start_menu_.selected_num_of_players()
-                    )
-                );
-                loading_frames_counter_ = 0;
+                if (start_menu_.selected_exit()) {
+                    SDL_Event quit_event;
+                    quit_event.type = SDL_QUIT;
+                    SDL_PushEvent(&quit_event);
+                }
+                else {
+                    EventSystem::queue_event(
+                        Event(
+                            EventType::NEW_GAME_STATE,
+                            "state", GameState::IN_GAME,
+                            "num_players", start_menu_.selected_num_of_players()
+                        )
+                    );
+                    loading_frames_counter_ = 0;
+                }
                 break;
 
             case SDLK_UP:

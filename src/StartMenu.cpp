@@ -3,7 +3,10 @@
 #include "StartMenu.h"
 
 namespace {
-
+    const float MENU_ITEM_SCALE = 0.7f;
+    const float MENU_TEXT_X_POS = -0.35f;
+    const float MENU_TEXT_Y_BASE = -0.42f;
+    const float MENU_TEXT_SPACING = -0.195f;
 }
 
 StartMenu::StartMenu(AssetManager& asset_manager)
@@ -36,12 +39,17 @@ void StartMenu::load() {
                 ui_shader_
             );
 
+    float menu_y[5] = { MENU_TEXT_Y_BASE };
+    for (int i = 1; i < 5; ++i) {
+        menu_y[i] = menu_y[i - 1] + MENU_TEXT_SPACING;
+    }
+
     TextureAsset* one_players_tex =
         asset_manager_.get_texture_asset("assets/textures/one_players.png");
     one_players_ = UIObject( // top middle
-                       glm::vec2(-.475f, -0.55f),
+                       glm::vec2(MENU_TEXT_X_POS, menu_y[0]),
                        glm::vec3(1.0f),
-                       glm::vec2(.95f),
+                       glm::vec2(MENU_ITEM_SCALE),
                        square_mesh_,
                        one_players_tex,
                        ui_shader_
@@ -50,9 +58,9 @@ void StartMenu::load() {
     TextureAsset* two_players_tex =
         asset_manager_.get_texture_asset("assets/textures/two_players.png");
     two_players_ = UIObject( // top middle
-                       glm::vec2(-.475f, -.8f),
+                       glm::vec2(MENU_TEXT_X_POS, menu_y[1]),
                        glm::vec3(1.0f),
-                       glm::vec2(.95f),
+                       glm::vec2(MENU_ITEM_SCALE),
                        square_mesh_,
                        two_players_tex,
                        ui_shader_
@@ -61,9 +69,9 @@ void StartMenu::load() {
     TextureAsset* three_players_tex =
         asset_manager_.get_texture_asset("assets/textures/three_players.png");
     three_players_ = UIObject( // top middle
-                         glm::vec2(-.475f, -1.05f),
+                         glm::vec2(MENU_TEXT_X_POS, menu_y[2]),
                          glm::vec3(1.0f),
-                         glm::vec2(.95f),
+                         glm::vec2(MENU_ITEM_SCALE),
                          square_mesh_,
                          three_players_tex,
                          ui_shader_
@@ -72,23 +80,34 @@ void StartMenu::load() {
     TextureAsset* four_players_tex =
         asset_manager_.get_texture_asset("assets/textures/four_players.png");
     four_players_ = UIObject( // top middle
-                        glm::vec2(-.475f, -1.3f),
+                        glm::vec2(MENU_TEXT_X_POS, menu_y[3]),
                         glm::vec3(1.0f),
-                        glm::vec2(.95f),
+                        glm::vec2(MENU_ITEM_SCALE),
                         square_mesh_,
                         four_players_tex,
                         ui_shader_
                     );
 
+    TextureAsset* exit_game_tex =
+        asset_manager_.get_texture_asset("assets/textures/exit_game.png");
+    exit_game_ = UIObject( // top middle
+        glm::vec2(MENU_TEXT_X_POS, menu_y[4]),
+        glm::vec3(1.0f),
+        glm::vec2(MENU_ITEM_SCALE),
+        square_mesh_,
+        exit_game_tex,
+        ui_shader_
+    );
+
 
     TextureAsset* unselected_tex =
         asset_manager_.get_texture_asset("assets/textures/raw_sausage.png");
 
-    for (int i = 0; i < 4; i++) { // 4 selections
+    for (int i = 0; i < 5; i++) { // 4 selections
         selection_indicators_.emplace_back(
             glm::vec2(), // garbage
             glm::vec3(1.0f),
-            glm::vec2(1.15f),
+            glm::vec2(0.9f),
             square_mesh_,
             unselected_tex,
             ui_shader_
@@ -104,7 +123,7 @@ void StartMenu::load() {
     selection_indicators_[1].set_origin(glm::vec2(-.5f, -.72f));
     selection_indicators_[2].set_origin(glm::vec2(-.5f, -.94f));
     selection_indicators_[3].set_origin(glm::vec2(-.5f, -1.16f));
-
+    selection_indicators_[4].set_origin(glm::vec2(-.5f, -1.38f));
 }
 
 void StartMenu::move_selection_up() {
@@ -143,6 +162,10 @@ int StartMenu::selected_num_of_players() {
     return active_selection + 1;
 }
 
+bool StartMenu::selected_exit() {
+    return active_selection == 4;
+}
+
 void StartMenu::render() const {
     background_.render(glm::mat4());
     logo_.render(glm::mat4());
@@ -155,5 +178,6 @@ void StartMenu::render() const {
     two_players_.render(glm::mat4());
     three_players_.render(glm::mat4());
     four_players_.render(glm::mat4());
+    exit_game_.render(glm::mat4());
 }
 
