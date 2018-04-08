@@ -90,11 +90,15 @@ void InputManager::process_input(SDL_Event* event) {
 
 void InputManager::quit() {
     for (SDL_GameController* game_controller : controllers_) {
-        SDL_GameControllerClose(game_controller);
+        if(game_controller != nullptr) {
+            SDL_GameControllerClose(game_controller);
+        }
     }
 
     for (SDL_Haptic* haptic : haptics_) {
-        SDL_HapticClose(haptic);
+        if(haptic == nullptr) {
+            SDL_HapticClose(haptic);
+        }
     }
 
     std::cout << "All controllers_ closed" << std::endl;
