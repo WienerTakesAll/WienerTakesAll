@@ -11,6 +11,7 @@
 #include "ShaderAsset.h"
 #include "TextureAsset.h"
 #include "ParticleSubsystem.h"
+#include <functional>
 
 class AssetManager;
 
@@ -58,5 +59,6 @@ private:
     ShaderAsset* shadow_shader_;
     ParticleSubsystem particle_subsystem_;
     unsigned int whos_it;
+    std::vector<std::function<void()>> animation_callbacks_;
 };
 
