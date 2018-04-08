@@ -32,6 +32,7 @@ enum class EventType {
     FINISH_POWERUP,
     DOMINATE_CONTROLS,
     RESTORE_CONTROLS,
+    REVERSE_CONTROLS,
 
     // Keep at end of list
     EVENT_COUNT

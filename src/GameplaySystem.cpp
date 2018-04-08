@@ -719,10 +719,8 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                         powerup_data.second.relish = RELISH_DURATION;
                         EventSystem::queue_event(
                             Event(
-                                EventType::SET_CHASSIS_MASS,
-                                "object_id", powerup_data.first,
-                                "mass", RELISH_MASS
-
+                                EventType::REVERSE_CONTROLS,
+                                "object_id", powerup_data.first
                             )
                         );
                     }
