@@ -6,17 +6,13 @@
 #include "SDL.h"
 #include <glm/gtx/vector_angle.hpp>
 
-#include "AssetManager.h"
 #include "PowerupSubsystem.h"
-//#include "RenderingSystem.cpp"
-#include "GameplaySystem.h"
 
 namespace {
     const float POWERUP_DISTANCE_THRESHOLD = 2.5f;
     const int POWERUP_LOCK_FRAMES = 30;
     const glm::vec3 POWERUP_LOCATION_LIMITS = glm::vec3(10.0f, 1.5f, 10.0f);
     glm::vec3 charcoal_locations[20];
-    //const int NUM_MOUNDS = 20;
     int mound_index = 0;
     int power_loc = 1;
     // Subtract 1 from POWERUP_COUNT to prevent PowerupType::INVINCIBILITY from dropping
@@ -45,9 +41,7 @@ void PowerupSubsystem::add_mound_location(const int x, int y, const int z) {
     if (mound_index >= 20) {
         mound_index = 0;
     }
-
 }
-
 
 void PowerupSubsystem::set_new_game_state(const GameState new_game_state) {
     if (new_game_state == GameState::IN_GAME) {

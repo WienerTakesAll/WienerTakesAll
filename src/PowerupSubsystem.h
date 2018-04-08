@@ -15,7 +15,6 @@ public:
     void set_new_game_state(const GameState new_game_state);
     void add_mound_location(const int x, int y, const int z);
     void create_powerup(const int object_id, const PowerupType type, glm::vec3 pos);
-    void handle_add_charcoal(const Event& e);
     // Modifiers
     void change_powerup_position(const int player_id, glm::vec3 pos);
     void change_powerup_type(const PowerupType new_type);

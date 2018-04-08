@@ -46,6 +46,7 @@ GameplaySystem::GameplaySystem()
     add_event_handler(EventType::CHANGE_POWERUP, &GameplaySystem::handle_change_powerup, this);
     add_event_handler(EventType::PLAYER_FELL_OFF_ARENA, &GameplaySystem::handle_player_fell_off_arena, this);
     add_event_handler(EventType::ADD_CHARCOAL, &GameplaySystem::handle_add_charcoal, this);
+    
     EventSystem::queue_event(
         Event(
             EventType::NEW_GAME_STATE,
@@ -183,8 +184,8 @@ void GameplaySystem::handle_load(const Event& e) {
 
 void GameplaySystem::handle_new_game_state(const Event& e) {
     GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
-    scoring_subsystem_.set_new_game_state(new_game_state);
     powerup_subsystem_.set_new_game_state(new_game_state);
+    scoring_subsystem_.set_new_game_state(new_game_state);
 
     if (new_game_state == GameState::IN_GAME) {
         int num_humans = e.get_value<int>("num_players", true).first;
@@ -263,7 +264,6 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
             );
         }
 
-
         // AI
         EventSystem::queue_event(
             Event(
@@ -271,7 +271,6 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 "num_ai", 4 - num_humans
             )
         );
-
 
         // Powerup
         glm::vec3 powerup_loc = powerup_subsystem_.get_next_powerup_position();
@@ -286,11 +285,9 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
             )
         );
 
-
     } else if (new_game_state == GameState::START_MENU) {
         gameobject_counter_->reset_counter();
     }
-
 
     else if (new_game_state == GameState::END_GAME) {
 
@@ -591,6 +588,7 @@ void GameplaySystem::handle_new_it(const Event& e) {
         )
     );
 }
+
 void GameplaySystem::handle_add_charcoal(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
 
@@ -600,6 +598,7 @@ void GameplaySystem::handle_add_charcoal(const Event& e) {
 
     powerup_subsystem_.add_mound_location(x.first, y.first, z.first);
 }
+
 void GameplaySystem::handle_add_powerup(const Event& e) {
     int powerup_id = e.get_value<int>("object_id", true).first;
     PowerupType new_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
