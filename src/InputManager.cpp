@@ -9,6 +9,8 @@
 
 InputManager::InputManager(const InputSettings& settings)
     : settings_(settings)
+    , controllers_(std::array<SDL_GameController*, 4>())
+    , haptics_(std::array<SDL_Haptic*, 4>())
     , num_players_(4) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &InputManager::handle_load_event, this);
     EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &InputManager::handle_reload_settings_event, this);
