@@ -361,12 +361,9 @@ void RenderingSystem::render() {
 
     auto cameras = cameras_queue_.front();
 
-    if (num_ai_ == 3)
-    {
+    if (num_ai_ == 3) {
         render_single_player();
-    }
-    else
-    {
+    } else {
         for (size_t i = 0; i < cameras.size(); i++) {
 
             int window_w, window_h;
@@ -422,8 +419,7 @@ void RenderingSystem::render() {
     end_render();
 }
 
-void RenderingSystem::render_single_player()
-{
+void RenderingSystem::render_single_player() {
     auto cameras = cameras_queue_.front();
 
     int window_w, window_h;

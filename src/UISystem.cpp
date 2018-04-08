@@ -172,13 +172,11 @@ void UISystem::handle_new_game_state(const Event& e) {
         case GameState::END_GAME:
             if (e.get_value<int>("winner", false).second) {
                 int winner_id = e.get_value<int>("winner", false).first;
-                if (num_ai_ == 3 && winner_id != 0)
-                {
+
+                if (num_ai_ == 3 && winner_id != 0) {
                     //A special case was added where -2 makes the crown invisible.
                     end_game_screen_.set_winner(-2);
-                }
-                else
-                {
+                } else {
                     end_game_screen_.set_winner(winner_id);
                 }
 
@@ -233,7 +231,7 @@ void UISystem::handle_use_powerup(const Event& e) {
     gameplay_hud_.use_powerup(object_id);
 }
 
-void UISystem::handle_activate_ai(const Event & e){
+void UISystem::handle_activate_ai(const Event& e) {
     num_ai_ = e.get_value<int>("num_ai", true).first;
     gameplay_hud_.set_num_ai(num_ai_);
 }
