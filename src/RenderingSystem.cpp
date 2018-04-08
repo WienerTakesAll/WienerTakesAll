@@ -456,13 +456,13 @@ void RenderingSystem::setup_cameras() {
 
         glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
 
-        auto camera_position = glm::translate(transform, glm::vec3(0, 2.5, -7));
+        auto camera_position = glm::translate(transform, glm::vec3(0, 3, -8));
 
         {
             glm::vec3 bad_camera_pos(camera_position[3]);
             glm::vec3 old_camera_pos(last_cameras_pos_[i]);
             glm::vec3 smooth_camera_pos
-                = bad_camera_pos * 0.25f + old_camera_pos * 0.75f;
+                = bad_camera_pos * 0.75f + old_camera_pos * 0.25f;
 
             camera_position[3] = glm::vec4(smooth_camera_pos, 1.0);
         }
@@ -475,7 +475,7 @@ void RenderingSystem::setup_cameras() {
         glm::vec3 lookAtPos(car_pos.x, camera_position[3][1], car_pos.z);
 
 
-        float FOV = 60.f + car_speeds_[i] * 5.f;
+        float FOV = 60.f + car_speeds_[i] * 5.5f;
         glm::mat4 P = glm::perspective(glm::radians(FOV), 4.0f / 3.0f, 0.1f, 1000.0f);
 
         new_cameras[i] = P * glm::lookAt(glm::vec3(camera_position[3]), lookAtPos, glm::vec3(0, 1, 0));
