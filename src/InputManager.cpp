@@ -11,17 +11,11 @@ InputManager::InputManager(const InputSettings& settings)
     : settings_(settings)
     , controllers_(std::array<SDL_GameController *, 4>())
     , haptics_(std::array<SDL_Haptic *, 4>())
-    , num_players_(4)
-    , dom_(-1) {
+    , num_players_(4) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &InputManager::handle_load_event, this);
     EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &InputManager::handle_reload_settings_event, this);
     EventSystem::add_event_handler(EventType::VEHICLE_COLLISION, &InputManager::handle_vehicle_collision, this);
     EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &InputManager::handle_new_game_state, this);
-    EventSystem::add_event_handler(EventType::DOMINATE_CONTROLS, &InputManager::handle_dominate_controls, this);
-    EventSystem::add_event_handler(EventType::RESTORE_CONTROLS, &InputManager::handle_restore_controls, this);
-    EventSystem::add_event_handler(EventType::REVERSE_CONTROLS, &InputManager::handle_reverse_controls, this);
-
-    controllers_reversed_ = {false, false, false, false};
 }
 
 void InputManager::process_input(SDL_Event* event) {
@@ -91,34 +85,14 @@ void InputManager::process_input(SDL_Event* event) {
         return;
     }
 
-    if (controllers_reversed_[player_id]) {
-        key = get_reverse_key(key);
-    }
-
-    if (dom_ == -1) {
-        EventSystem::queue_event(
-            Event(
-                EventType::KEYPRESS_EVENT,
-                "player_id", player_id,
-                "key", key,
-                "value", value
-            )
-        );
-    }
-
-    else if (player_id == dom_) {
-        for (int i = 0; i < 4; ++i) {
-            EventSystem::queue_event(
-                Event(
-                    EventType::KEYPRESS_EVENT,
-                    "player_id", i,
-                    "key", key,
-                    "value", value
-                )
-            );
-        }
-    }
-
+    EventSystem::queue_event(
+        Event(
+            EventType::KEYPRESS_EVENT,
+            "player_id", player_id,
+            "key", key,
+            "value", value
+        )
+    );
 }
 
 void InputManager::quit() {
@@ -154,7 +128,6 @@ void InputManager::handle_new_game_state(const Event& e) {
 
     switch (state) {
         case GameState::START_MENU:
-            dom_ = -1;
             break;
 
         case GameState::IN_GAME:
@@ -164,28 +137,6 @@ void InputManager::handle_new_game_state(const Event& e) {
         default:
             break;
     }
-}
-
-void InputManager::handle_dominate_controls(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
-    dom_ = object_id;
-}
-
-void InputManager::handle_restore_controls(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
-
-    // Case 1: Restore controls after domination
-    if (object_id == dom_) {
-        dom_ = -1;
-    }
-
-    // Case 2: Restore controls after reversal
-    controllers_reversed_[object_id] = false;
-}
-
-void InputManager::handle_reverse_controls(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
-    controllers_reversed_[object_id] = true;
 }
 
 void InputManager::handle_load_event(const Event& e) {
@@ -494,78 +445,4 @@ const int InputManager::get_player_id_from_joystick_index(const int joystick_ind
 
     assert(player_id >= 0 && player_id < SDL_NumJoysticks());
     return player_id;
-}
-
-const int InputManager::get_reverse_key(const int key) const {
-    int ret = -1;
-
-    switch (key) {
-        // self powerup
-        case SDLK_q:
-        case SDLK_r:
-        case SDLK_u:
-        case SDLK_RSHIFT:
-        case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-            ret = SDL_CONTROLLER_BUTTON_RIGHTSHOULDER;
-            break;
-
-        // others powerup
-        case SDLK_e:
-        case SDLK_y:
-        case SDLK_o:
-        case SDLK_RETURN:
-        case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-            ret = SDL_CONTROLLER_BUTTON_LEFTSHOULDER;
-            break;
-
-        // Keyboard acceleration
-        case SDLK_w:
-        case SDLK_t:
-        case SDLK_i:
-        case SDLK_UP:
-            ret = SDLK_DOWN;
-            break;
-
-        // keyboard braking
-        case SDLK_s:
-        case SDLK_g:
-        case SDLK_k:
-        case SDLK_DOWN:
-            ret = SDLK_UP;
-            break;
-
-        // keyboard left steer
-        case SDLK_a:
-        case SDLK_f:
-        case SDLK_j:
-        case SDLK_LEFT:
-            ret = SDLK_RIGHT;
-            break;
-
-        // keyboard right steer
-        case SDLK_d:
-        case SDLK_h:
-        case SDLK_l:
-        case SDLK_RIGHT:
-            ret = SDLK_LEFT;
-            break;
-
-        case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-            ret = SDL_CONTROLLER_AXIS_TRIGGERLEFT;
-            break;
-
-        case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
-            ret = SDL_CONTROLLER_AXIS_TRIGGERRIGHT;
-            break;
-
-        case SDL_CONTROLLER_AXIS_LEFTX: {
-            ret = SDL_CONTROLLER_AXIS_RIGHTX;
-            break;
-        }
-
-        default:
-            ret = -1;
-    }
-
-    return ret;
 }

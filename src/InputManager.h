@@ -18,9 +18,7 @@ private:
     const InputSettings& settings_;
     std::array<SDL_GameController*, 4> controllers_;
     std::array<SDL_Haptic*, 4> haptics_;
-    std::array<bool, 4> controllers_reversed_;
     int num_players_;
-    int dom_;
 
     void handle_load_event(const Event& e);
     void handle_reload_settings_event(const Event& event);
@@ -38,7 +36,4 @@ private:
 
     // Returns appropriate player_id from SDL2 Joystick index
     const int get_player_id_from_joystick_index(const int joystick_index) const;
-
-    // Returns appropriate "opposite" key
-    const int get_reverse_key(const int key) const;
 };
