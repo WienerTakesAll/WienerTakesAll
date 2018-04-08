@@ -197,6 +197,7 @@ void RenderingSystem::handle_new_game_state(const Event& e) {
     if (new_game_state == GameState::START_MENU) {
         example_objects_.clear();
         car_indices_.clear();
+        animation_callbacks_.clear();
     }
 }
 
@@ -250,12 +251,12 @@ void RenderingSystem::handle_add_powerup(const Event& e) {
     example_objects_[object_id].set_texture(texture);
     example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
     example_objects_[object_id].set_has_shadows(true);
-    animation_callbacks_.push_back(std::bind([](RenderingComponent* r) {
+    animation_callbacks_.push_back([this, object_id]() {
         static int frames = 0;
         frames = (frames + 1) % 360;
-        r->apply_transform(glm::rotate(glm::mat4(), glm::radians(2.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
-        r->apply_transform(glm::translate(glm::mat4(), glm::vec3(0.0f, sin(glm::radians(static_cast<float>(frames))) * 0.005f, 0.0f)));
-    }, &example_objects_[object_id]));
+        example_objects_[object_id].apply_transform(glm::rotate(glm::mat4(), glm::radians(2.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+        example_objects_[object_id].apply_transform(glm::translate(glm::mat4(), glm::vec3(0.0f, sin(glm::radians(static_cast<float>(frames))) * 0.005f, 0.0f)));
+    });
 }
 
 void RenderingSystem::handle_change_powerup(const Event& e) {

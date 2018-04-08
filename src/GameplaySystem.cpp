@@ -84,22 +84,23 @@ void GameplaySystem::update() {
         powerup_subsystem_.update();
 
         // Move powerup here
-        if (object_positions_.find(powerup_subsystem_.get_powerup_id()) != object_positions_.end() &&
-                powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id())) {
+        if (object_positions_.find(powerup_subsystem_.get_powerup_id()) != object_positions_.end()) {
             glm::vec3 powerup_cur_loc = object_positions_[powerup_subsystem_.get_powerup_id()];
-            EventSystem::queue_event(
-                Event(
-                    EventType::OBJECT_TRANSFORM_EVENT,
-                    "object_id", powerup_subsystem_.get_powerup_id(),
-                    "pos_x", powerup_cur_loc.x,
-                    "pos_y", powerup_cur_loc.y,
-                    "pos_z", powerup_cur_loc.z,
-                    "qua_w", 1.0f,
-                    "qua_x", 0.0f,
-                    "qua_y", 0.0f,
-                    "qua_z", 0.0f
-                )
-            );
+            if (powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id(), powerup_cur_loc)) {
+                EventSystem::queue_event(
+                    Event(
+                        EventType::OBJECT_TRANSFORM_EVENT,
+                        "object_id", powerup_subsystem_.get_powerup_id(),
+                        "pos_x", powerup_cur_loc.x,
+                        "pos_y", powerup_cur_loc.y,
+                        "pos_z", powerup_cur_loc.z,
+                        "qua_w", 1.0f,
+                        "qua_x", 0.0f,
+                        "qua_y", 0.0f,
+                        "qua_z", 0.0f
+                    )
+                );
+            }
         }
 
         for (auto& powerup_data : powerup_datas_) {
