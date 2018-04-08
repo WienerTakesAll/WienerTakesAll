@@ -328,7 +328,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_u:
         case SDLK_RSHIFT:
         case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-            if (powerup_subsystem_.can_use_powerup(player_id)) {
+            if (value == SDL_KEYDOWN && powerup_subsystem_.can_use_powerup(player_id)) {
                 new_events.emplace_back(EventType::USE_POWERUP,
                                         "type", powerup_subsystem_.get_player_powerup_type(player_id),
                                         "target", PowerupTarget::SELF,
@@ -343,7 +343,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_o:
         case SDLK_RETURN:
         case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-            if (powerup_subsystem_.can_use_powerup(player_id)) {
+            if (value == SDL_KEYDOWN && powerup_subsystem_.can_use_powerup(player_id)) {
                 new_events.emplace_back(EventType::USE_POWERUP,
                                         "type", powerup_subsystem_.get_player_powerup_type(player_id),
                                         "target", PowerupTarget::OTHERS,
@@ -709,10 +709,8 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                 powerup_datas_[object_id].relish = RELISH_DURATION;
                 EventSystem::queue_event(
                     Event(
-                        EventType::SET_CHASSIS_MASS,
-                        "object_id", object_id,
-                        "mass", RELISH_MASS
-
+                        EventType::DOMINATE_CONTROLS,
+                        "object_id", object_id
                     )
                 );
             } else {
