@@ -6,13 +6,10 @@
 
 #include "AiSystem.h"
 
-namespace
-{
+namespace {
     const float AVOID_DISTANCE = 5.f;
     const float CUTOFF_MAX_RADIUS = 30.f;
 }
-
-
 
 AiSystem::AiSystem()
     : num_ai_(0)
@@ -78,87 +75,70 @@ void AiSystem::handle_new_it(const Event& e) {
     whos_it_ = e.get_value<int>("object_id", true).first;
 }
 
-
-void AiSystem::choose_ai_state(int car)
-{
-    if (car == whos_it_)
-    {
+void AiSystem::choose_ai_state(int car) {
+    if (car == whos_it_) {
         int closest_car = -1;
         float closest_car_distance = FLT_MAX;
-        for (size_t i = 0; i < 4; i++)
-        {
-            if (car == i)
+
+        for (size_t i = 0; i < 4; i++) {
+            if (car == i) {
                 continue;
+            }
 
             float distance = glm::distance(cars_[car].position_, cars_[i].position_);
-            if (distance < closest_car_distance)
-            {
+
+            if (distance < closest_car_distance) {
                 closest_car = i;
                 closest_car_distance = distance;
             }
         }
 
-        if (closest_car_distance < AVOID_DISTANCE)
-        {
+        if (closest_car_distance < AVOID_DISTANCE) {
             avoid_car(car, closest_car);
-        }
-        else
-        {
+        } else {
             random_car(car);
         }
-    }
-    else
-    {
+    } else {
         auto pos1 = cars_[car].position_;
         auto pos2 = cars_[whos_it_].position_;
 
         cars_[car].cutoff_cooldown_--;
 
-        if (counter_ == 0)
-        {
-            if (glm::distance(pos1, pos2*.75f) > 2.5f && cars_[car].cutoff_cooldown_ > 0)
-            {
+        if (counter_ == 0) {
+            if (glm::distance(pos1, pos2 * .75f) > 2.5f && cars_[car].cutoff_cooldown_ > 0) {
                 cars_[car].state_ = AiState::Cutoff;
                 cars_[car].cutoff_cooldown_ = 300;
             }
         }
 
-        if (glm::distance(pos1, pos2*.75f) < 2.5f && cars_[car].state_ == AiState::Cutoff)
-        {
+        if (glm::distance(pos1, pos2 * .75f) < 2.5f && cars_[car].state_ == AiState::Cutoff) {
             cars_[car].cutoff_cooldown_ = 300;
             cars_[car].state_ = AiState::Pursue;
         }
 
-
-
-        if(cars_[car].state_ == AiState::Cutoff)
+        if (cars_[car].state_ == AiState::Cutoff) {
             cutoff_car(car, whos_it_);
-        else
+        } else {
             pursue_car(car, whos_it_);
+        }
     }
-
-
-
 }
 
-void AiSystem::avoid_car(int car, int to_avoid)
-{
+void AiSystem::avoid_car(int car, int to_avoid) {
     glm::vec3 diff = cars_[to_avoid].position_ - cars_[car].position_;
     glm::vec3 target = glm::rotate(diff, glm::radians(90.f), glm::vec3(0, 1, 0));
 
     path_to(car, target);
 }
 
-void AiSystem::pursue_car(int car, int to_pursue)
-{
+void AiSystem::pursue_car(int car, int to_pursue) {
     float aheadness = glm::distance(cars_[to_pursue].position_, cars_[car].position_);
     glm::vec3 target = cars_[to_pursue].position_ + cars_[to_pursue].rotation_ * glm::vec3(0, 0, 0.5f + aheadness);
 
     path_to(car, target);
 }
 
-void AiSystem::random_car(int car)
-{
+void AiSystem::random_car(int car) {
     if (counter_ % 10 == 0) {
         unsigned int random = rand() % 20;
 
@@ -171,8 +151,7 @@ void AiSystem::random_car(int car)
                     "value", -32768
                 )
             );
-        }
-        else if (random == 1) {
+        } else if (random == 1) {
             EventSystem::queue_event(
                 Event(
                     EventType::KEYPRESS_EVENT,
@@ -181,8 +160,7 @@ void AiSystem::random_car(int car)
                     "value", 32768
                 )
             );
-        }
-        else {
+        } else {
             EventSystem::queue_event(
                 Event(
                     EventType::KEYPRESS_EVENT,
@@ -195,8 +173,7 @@ void AiSystem::random_car(int car)
     }
 }
 
-void AiSystem::cutoff_car(int car, int to_catch)
-{
+void AiSystem::cutoff_car(int car, int to_catch) {
     glm::vec3 target = cars_[to_catch].position_;
     target *= 0.75f;
 
@@ -215,7 +192,7 @@ void AiSystem::path_to(int car, const glm::vec3& point_) {
 
     float angle = glm::orientedAngle(vec2_facing, vec2_to);
 
-    int axis = std::min(SHRT_MAX, (int)(SHRT_MAX * (abs(angle*2.5f) - 0.05)));
+    int axis = std::min(SHRT_MAX, (int)(SHRT_MAX * (abs(angle * 2.5f) - 0.05)));
 
     if (angle < -0.05) {
         EventSystem::queue_event(
@@ -246,7 +223,6 @@ void AiSystem::path_to(int car, const glm::vec3& point_) {
         );
     }
 
-
     EventSystem::queue_event(
         Event(
             EventType::KEYPRESS_EVENT,
@@ -255,5 +231,4 @@ void AiSystem::path_to(int car, const glm::vec3& point_) {
             "value", SHRT_MAX
         )
     );
-
 }

@@ -21,8 +21,6 @@ private:
     void pursue_car(int car, int to_pursue);
     void random_car(int car);
     void cutoff_car(int car, int to_catch);
-
-
     void path_to(int car, const glm::vec3& point_);
 
     int num_ai_;
