@@ -31,6 +31,7 @@ enum class EventType {
     RESTORE_CHASSIS_MASS,
     FINISH_POWERUP,
     DOMINATE_CONTROLS,
+    RESTORE_CONTROLS,
 
     // Keep at end of list
     EVENT_COUNT

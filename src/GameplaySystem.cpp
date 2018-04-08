@@ -147,7 +147,7 @@ void GameplaySystem::update() {
                 if (powerup_data.second.relish <= 0.0f) {
                     EventSystem::queue_event(
                         Event(
-                            EventType::RESTORE_CHASSIS_MASS,
+                            EventType::RESTORE_CONTROLS,
                             "object_id", powerup_data.first
                         )
                     );

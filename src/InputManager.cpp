@@ -18,6 +18,7 @@ InputManager::InputManager(const InputSettings& settings)
     EventSystem::add_event_handler(EventType::VEHICLE_COLLISION, &InputManager::handle_vehicle_collision, this);
     EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &InputManager::handle_new_game_state, this);
     EventSystem::add_event_handler(EventType::DOMINATE_CONTROLS, &InputManager::handle_dominate_controls, this);
+    EventSystem::add_event_handler(EventType::RESTORE_CONTROLS, &InputManager::handle_restore_controls, this);
 }
 
 void InputManager::process_input(SDL_Event* event) {
@@ -161,6 +162,17 @@ void InputManager::handle_new_game_state(const Event& e) {
 void InputManager::handle_dominate_controls(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
     dom_ = object_id;
+}
+
+void InputManager::handle_restore_controls(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    // Case 1: Restore controls after domination
+    if (object_id == dom_) {
+        dom_ = -1;
+    }
+
+    // Case 2: Restore controls after reversal
 }
 
 void InputManager::handle_load_event(const Event& e) {
