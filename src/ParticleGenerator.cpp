@@ -203,6 +203,10 @@ void ParticleGenerator::set_position(glm::vec3 position) {
     position_ = position;
 }
 
+glm::vec3 ParticleGenerator::get_position() const {
+    return position_;
+}
+
 void ParticleGenerator::set_probability(const float& probability) {
     spawn_probability_ = probability;
 }

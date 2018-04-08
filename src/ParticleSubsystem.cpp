@@ -12,12 +12,14 @@ namespace {
     const std::string PARTICLE_MESH_PATH = "assets/models/UIRect.obj";
     const std::string POWERUP_PARTICLE_TEXTURE_PATH = "assets/textures/powerup_drop.png";
     const std::string INVINCIBILITY_PARTICLE_TEXTURE_PATH = "assets/textures/stardim.png";
+    const std::string POWERUP_PICKUP_PARTICLE_TEXTURE_PATH = "assets/textures/pickup.png";
 }
 
 ParticleSubsystem::ParticleSubsystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager)
     , hotdog_indicator_gen_()
     , powerup_gens_()
+    , powerup_pickup_gen_()
     , whos_it(0) {
 }
 
@@ -27,6 +29,9 @@ void ParticleSubsystem::update() {
     for (auto& powerup_gen : powerup_gens_) {
         powerup_gen.update();
     }
+
+    powerup_pickup_gen_.update();
+    powerup_pickup_gen_.set_active(false);
 }
 
 void ParticleSubsystem::render(const glm::mat4& camera, int camera_number) {
@@ -37,6 +42,8 @@ void ParticleSubsystem::render(const glm::mat4& camera, int camera_number) {
     for (auto& powerup_gen : powerup_gens_) {
         powerup_gen.render(camera);
     }
+
+    powerup_pickup_gen_.render(camera);
 }
 
 void ParticleSubsystem::handle_load(const Event& e) {
@@ -72,6 +79,21 @@ void ParticleSubsystem::handle_load(const Event& e) {
         powerup_gen.set_spawn_amount(0, 1);
         powerup_gen.set_spawn_range(2.0f, 1.0f, 2.0f);
     }
+
+    RenderingComponent pickup_component;
+    pickup_component.set_mesh(mesh);
+    pickup_component.set_shader(asset_manager_.get_shader_asset(PARTICLE_SHADER_PATH));
+    pickup_component.set_texture(asset_manager_.get_texture_asset(POWERUP_PICKUP_PARTICLE_TEXTURE_PATH));
+    powerup_pickup_gen_.init(pickup_component);
+    powerup_pickup_gen_.set_active(false);
+    powerup_pickup_gen_.set_probability(1.0f);
+    powerup_pickup_gen_.set_particle_lifetime(120);
+    powerup_pickup_gen_.set_particle_rotation_degrees(10.0f, 0.0f, 359.0f);
+    powerup_pickup_gen_.set_position(glm::vec3(100.0f, 100.0f, 100.0f));
+    powerup_pickup_gen_.set_particle_scale(-0.01f, 0.0f, 0.9f);
+    powerup_pickup_gen_.set_particle_acceleration(glm::vec3(0.0f, -0.02f, 0.0f));
+    powerup_pickup_gen_.set_spawn_amount(10, 100);
+    powerup_pickup_gen_.set_spawn_range(2.0f, 1.0f, 2.0f);
 }
 
 void ParticleSubsystem::handle_new_it(const Event& e) {
@@ -189,4 +211,13 @@ void ParticleSubsystem::handle_new_game_state(const Event& e) {
     } else if (new_game_state == GameState::IN_GAME) {
         hotdog_indicator_gen_.set_active(true);
     }
+}
+
+void ParticleSubsystem::handle_pickup_powerup(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+    PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("powerup_type", true).first);
+    std::cout << "picked up" << std::endl;
+
+    powerup_pickup_gen_.set_position(powerup_gens_[object_id].get_position());
+    powerup_pickup_gen_.set_active(true);
 }

@@ -54,6 +54,7 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_keypress, this);
     EventSystem::add_event_handler(EventType::USE_POWERUP, &RenderingSystem::handle_use_powerup, this);
     EventSystem::add_event_handler(EventType::FINISH_POWERUP, &RenderingSystem::handle_finish_powerup, this);
+    EventSystem::add_event_handler(EventType::PICKUP_POWERUP, &RenderingSystem::handle_pickup_powerup, this);
 
     init_window();
 }
@@ -358,6 +359,10 @@ void RenderingSystem::handle_finish_powerup(const Event& e) {
 
     int object_id = e.get_value<int>("object_id", true).first;
     example_objects_[object_id].set_colour_overlay(glm::vec4());
+}
+
+void RenderingSystem::handle_pickup_powerup(const Event& e) {
+    particle_subsystem_.handle_pickup_powerup(e);
 }
 
 void RenderingSystem::render() {
