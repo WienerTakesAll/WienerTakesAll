@@ -7,7 +7,9 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "GameState.h"
+#include "GameplaySystem.h"
 #include "Powerup.h"
+#include "PowerupSubsystem.h"
 
 namespace {
     const std::string STANDARD_SHADER_PATH = "assets/shaders/SimpleShader";
@@ -29,6 +31,7 @@ namespace {
     const std::string CHARCOAL_MESH_PATH = "assets/models/Mound.obj";
     const std::string CHARCOAL_TEXTURE_PATH = "assets/textures/smouldering-charcoal.png";
 
+    //glm::vec3 charcoal_locations[20];
     const int CAMERA_LAG_FRAMES = 5;
 }
 

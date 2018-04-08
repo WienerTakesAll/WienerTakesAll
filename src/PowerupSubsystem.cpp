@@ -6,13 +6,19 @@
 #include "SDL.h"
 #include <glm/gtx/vector_angle.hpp>
 
+#include "AssetManager.h"
 #include "PowerupSubsystem.h"
+//#include "RenderingSystem.cpp"
+#include "GameplaySystem.h"
 
 namespace {
     const float POWERUP_DISTANCE_THRESHOLD = 2.5f;
     const int POWERUP_LOCK_FRAMES = 30;
     const glm::vec3 POWERUP_LOCATION_LIMITS = glm::vec3(10.0f, 1.5f, 10.0f);
-
+    glm::vec3 charcoal_locations[20];
+    //const int NUM_MOUNDS = 20;
+    int mound_index = 0;
+    int power_loc = 1;
     // Subtract 1 from POWERUP_COUNT to prevent PowerupType::INVINCIBILITY from dropping
     const int POWERUP_INDEX_RANGE = ((int) PowerupType::POWERUP_COUNT) - 1;
 }
@@ -22,7 +28,6 @@ PowerupSubsystem::PowerupSubsystem()
     , frame_counter_(0)
     , powerup_type_(PowerupType::POWERUP_COUNT) {
 }
-
 void PowerupSubsystem::load() {
     // Initialize random seed
     srand(time(NULL));
@@ -32,12 +37,26 @@ void PowerupSubsystem::update() {
     frame_counter_ = std::min(POWERUP_LOCK_FRAMES, frame_counter_ + 1);
 }
 
+void PowerupSubsystem::add_mound_location(const int x, int y, const int z) {
+    charcoal_locations[mound_index] = glm::vec3(x, y + 2.7, z);
+
+    mound_index++;
+
+    if (mound_index >= 20) {
+        mound_index = 0;
+    }
+
+}
+
+
 void PowerupSubsystem::set_new_game_state(const GameState new_game_state) {
     if (new_game_state == GameState::IN_GAME) {
         object_powerups_.clear();
     }
 
     game_state_ = new_game_state;
+    mound_index = 0;
+    power_loc = 1;
 }
 
 void PowerupSubsystem::create_powerup(const int object_id, const PowerupType type, glm::vec3 pos) {
@@ -88,10 +107,19 @@ const bool PowerupSubsystem::is_powerup(const int object_id) const {
 }
 
 glm::vec3 PowerupSubsystem::get_next_powerup_position() const {
-    float x = (rand() % (2 * (int) POWERUP_LOCATION_LIMITS.x)) - (int) POWERUP_LOCATION_LIMITS.x;
-    float y = 1.5f;
-    float z = (rand() % (2 * (int) POWERUP_LOCATION_LIMITS.z)) - (int) POWERUP_LOCATION_LIMITS.z;
-    return glm::vec3(x, y, z);
+
+    if (power_loc >= 20) {
+        power_loc = 0;
+    }
+
+    glm::vec3 location = charcoal_locations[power_loc];
+    power_loc++;
+
+    if (location[1] == 0) {
+        location[1] = 2;
+    }
+
+    return location;
 }
 
 PowerupType PowerupSubsystem::get_next_powerup_type() const {
