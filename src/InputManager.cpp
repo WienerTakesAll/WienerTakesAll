@@ -9,7 +9,7 @@
 
 InputManager::InputManager(const InputSettings& settings)
     : settings_(settings)
-    , num_players_(1) {
+    , num_players_(4) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &InputManager::handle_load_event, this);
     EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &InputManager::handle_reload_settings_event, this);
     EventSystem::add_event_handler(EventType::VEHICLE_COLLISION, &InputManager::handle_vehicle_collision, this);
