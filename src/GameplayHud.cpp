@@ -147,13 +147,13 @@ void GameplayHud::load() {
     }
 
     countdown_ = UIObject(
-        glm::vec2(-0.125, -0.175),
-        glm::vec3(1.0),
-        glm::vec2(0.25, 0.33),
-        square_mesh_,
-        asset_manager_.get_texture_asset(COUNTDOWN_TEXTURE_PATHS[4]),
-        ui_shader_
-    );
+                     glm::vec2(-0.125, -0.175),
+                     glm::vec3(1.0),
+                     glm::vec2(0.25, 0.33),
+                     square_mesh_,
+                     asset_manager_.get_texture_asset(COUNTDOWN_TEXTURE_PATHS[4]),
+                     ui_shader_
+                 );
     countdown_value_ = 5;
 }
 
@@ -179,8 +179,9 @@ void GameplayHud::render() const {
 
 void GameplayHud::update_score(const int& player, const int& score, const int& lock_frames) {
     int new_value = static_cast<int>(ceil(lock_frames / 60.0f));
+
     if (new_value >= 0 && new_value != countdown_value_) {
-        countdown_.set_texture(asset_manager_.get_texture_asset(COUNTDOWN_TEXTURE_PATHS[std::max(new_value-1, 0)]));
+        countdown_.set_texture(asset_manager_.get_texture_asset(COUNTDOWN_TEXTURE_PATHS[std::max(new_value - 1, 0)]));
         countdown_value_ = new_value;
     }
 

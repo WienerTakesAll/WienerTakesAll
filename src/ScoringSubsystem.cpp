@@ -23,8 +23,7 @@ void ScoringSubsystem::update() {
     // Update score of current it
     if (lock_frames_ > 0) {
         --lock_frames_;
-    }
-    else {
+    } else {
         ++scores_[current_it_id_];
     }
 }
@@ -32,8 +31,7 @@ void ScoringSubsystem::update() {
 void ScoringSubsystem::set_new_game_state(const GameState new_game_state) {
     if (new_game_state == GameState::START_MENU) {
         scores_.clear();
-    }
-    else if (new_game_state == GameState::IN_GAME) {
+    } else if (new_game_state == GameState::IN_GAME) {
         lock_frames_ = LOCK_FRAMES_START;
     }
 
