@@ -103,7 +103,7 @@ void InputManager::quit() {
     }
 
     for (SDL_Haptic* haptic : haptics_) {
-        if (haptic == nullptr) {
+        if (haptic != nullptr) {
             SDL_HapticClose(haptic);
         }
     }
