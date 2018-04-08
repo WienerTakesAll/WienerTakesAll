@@ -96,8 +96,7 @@ void UISystem::handle_key_press(const Event& e) {
                     SDL_Event quit_event;
                     quit_event.type = SDL_QUIT;
                     SDL_PushEvent(&quit_event);
-                }
-                else {
+                } else {
                     EventSystem::queue_event(
                         Event(
                             EventType::NEW_GAME_STATE,
@@ -107,6 +106,7 @@ void UISystem::handle_key_press(const Event& e) {
                     );
                     loading_frames_counter_ = 0;
                 }
+
                 break;
 
             case SDLK_UP:

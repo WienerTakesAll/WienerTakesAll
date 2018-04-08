@@ -40,6 +40,7 @@ void StartMenu::load() {
             );
 
     float menu_y[5] = { MENU_TEXT_Y_BASE };
+
     for (int i = 1; i < 5; ++i) {
         menu_y[i] = menu_y[i - 1] + MENU_TEXT_SPACING;
     }
@@ -91,13 +92,13 @@ void StartMenu::load() {
     TextureAsset* exit_game_tex =
         asset_manager_.get_texture_asset("assets/textures/exit_game.png");
     exit_game_ = UIObject( // top middle
-        glm::vec2(MENU_TEXT_X_POS, menu_y[4]),
-        glm::vec3(1.0f),
-        glm::vec2(MENU_ITEM_SCALE),
-        square_mesh_,
-        exit_game_tex,
-        ui_shader_
-    );
+                     glm::vec2(MENU_TEXT_X_POS, menu_y[4]),
+                     glm::vec3(1.0f),
+                     glm::vec2(MENU_ITEM_SCALE),
+                     square_mesh_,
+                     exit_game_tex,
+                     ui_shader_
+                 );
 
 
     TextureAsset* unselected_tex =
