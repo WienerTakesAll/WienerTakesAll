@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <array>
 
 #include "EventSystem.h"
 #include "SDL.h"
@@ -16,8 +16,8 @@ public:
 
 private:
     const InputSettings& settings_;
-    std::vector<SDL_GameController*> controllers_;
-    std::vector<SDL_Haptic*> haptics_;
+    std::array<SDL_GameController*, 4> controllers_;
+    std::array<SDL_Haptic*, 4> haptics_;
     int num_players_;
 
     void handle_load_event(const Event& e);
