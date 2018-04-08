@@ -412,7 +412,7 @@ bool InputManager::process_controller_axis(const int& axis, const int& value) {
 
 void InputManager::rumble_controller(const int id) const {
     if (    id >= haptics_.size()   ||
-            // id >= num_players_      ||
+            id >= num_players_      ||
             haptics_[id] == nullptr ) {
         return;
     }
