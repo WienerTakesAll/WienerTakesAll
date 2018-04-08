@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <memory>
 
 #include "EventSystem.h"
 #include "SDL.h"
@@ -19,10 +18,12 @@ private:
     const InputSettings& settings_;
     std::vector<SDL_GameController*> controllers_;
     std::vector<SDL_Haptic*> haptics_;
+    int num_players_;
 
     void handle_load_event(const Event& e);
     void handle_reload_settings_event(const Event& event);
     void handle_vehicle_collision(const Event& e);
+    void handle_new_game_state(const Event& e);
 
     bool process_keyboard(const int& key, int& player_id);
     bool process_controller_button(const int& button);
