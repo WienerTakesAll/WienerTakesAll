@@ -54,6 +54,7 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_keypress, this);
     EventSystem::add_event_handler(EventType::USE_POWERUP, &RenderingSystem::handle_use_powerup, this);
     EventSystem::add_event_handler(EventType::FINISH_POWERUP, &RenderingSystem::handle_finish_powerup, this);
+    EventSystem::add_event_handler(EventType::ACTIVATE_AI, &RenderingSystem::handle_activate_ai, this);
 
     init_window();
 }
@@ -350,65 +351,126 @@ void RenderingSystem::handle_finish_powerup(const Event& e) {
     example_objects_[object_id].set_colour_overlay(glm::vec4());
 }
 
+void RenderingSystem::handle_activate_ai(const Event& e) {
+    num_ai_ = e.get_value<int>("num_ai", true).first;
+}
+
 void RenderingSystem::render() {
     start_render();
     setup_cameras();
 
     auto cameras = cameras_queue_.front();
 
-    for (size_t i = 0; i < cameras.size(); i++) {
+    if (num_ai_ == 3)
+    {
+        render_single_player();
+    }
+    else
+    {
+        for (size_t i = 0; i < cameras.size(); i++) {
 
-        int window_w, window_h;
-        SDL_GetWindowSize(asset_manager_.get_window(), &window_w, &window_h);
+            int window_w, window_h;
+            SDL_GetWindowSize(asset_manager_.get_window(), &window_w, &window_h);
 
 
-        int vx = (window_w / 2) * (i % 2);
-        int vy = (window_h / 2) * (i < 2);
+            int vx = (window_w / 2) * (i % 2);
+            int vy = (window_h / 2) * (i < 2);
 
-        glViewport(vx, vy, (window_w / 2), (window_h / 2));
+            glViewport(vx, vy, (window_w / 2), (window_h / 2));
 
 
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_MULTISAMPLE);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
+            glEnable(GL_DEPTH_TEST);
+            glEnable(GL_MULTISAMPLE);
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
 
-        for (auto& object : example_objects_) {
-            object.render(cameras[i], 0.3f);
+            for (auto& object : example_objects_) {
+                object.render(cameras[i], 0.3f);
+            }
+
+            particle_subsystem_.render(cameras[i], i);
+
+            for (auto& object : example_objects_) {
+                object.render_lighting(cameras[i], glm::vec3(-0.4f, -1.0f, 0.f), shadow_shader_);
+            }
+
+            glEnable(GL_BLEND);
+            glEnable(GL_CULL_FACE);
+            glDepthFunc(GL_EQUAL);
+            glBlendFunc(GL_ONE, GL_ONE);
+            glBlendEquation(GL_FUNC_ADD);
+
+            glEnable(GL_STENCIL_TEST);
+            glStencilFunc(GL_EQUAL, 0, ~0);
+            glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+            glStencilMask(0);
+
+            glDepthMask(GL_FALSE);
+
+            for (auto& object : example_objects_) {
+                object.render(cameras[i], 0.f);
+            }
+
+            glDepthFunc(GL_LESS);
+            glDepthMask(GL_TRUE);
+            glDisable(GL_BLEND);
+            glDisable(GL_STENCIL_TEST);
+
         }
-
-        particle_subsystem_.render(cameras[i], i);
-
-        for (auto& object : example_objects_) {
-            object.render_lighting(cameras[i], glm::vec3(-0.4f, -1.0f, 0.f), shadow_shader_);
-        }
-
-        glEnable(GL_BLEND);
-        glEnable(GL_CULL_FACE);
-        glDepthFunc(GL_EQUAL);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glBlendEquation(GL_FUNC_ADD);
-
-        glEnable(GL_STENCIL_TEST);
-        glStencilFunc(GL_EQUAL, 0, ~0);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        glStencilMask(0);
-
-        glDepthMask(GL_FALSE);
-
-        for (auto& object : example_objects_) {
-            object.render(cameras[i], 0.f);
-        }
-
-        glDepthFunc(GL_LESS);
-        glDepthMask(GL_TRUE);
-        glDisable(GL_BLEND);
-        glDisable(GL_STENCIL_TEST);
-
     }
 
     end_render();
 }
+
+void RenderingSystem::render_single_player()
+{
+    auto cameras = cameras_queue_.front();
+
+    int window_w, window_h;
+    SDL_GetWindowSize(asset_manager_.get_window(), &window_w, &window_h);
+
+    glViewport(0, 0, window_w, window_h);
+
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
+    for (auto& object : example_objects_) {
+        object.render(cameras[0], 0.3f);
+    }
+
+    particle_subsystem_.render(cameras[0], 0);
+
+    for (auto& object : example_objects_) {
+        object.render_lighting(cameras[0], glm::vec3(-0.4f, -1.0f, 0.f), shadow_shader_);
+    }
+
+    glEnable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
+    glDepthFunc(GL_EQUAL);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBlendEquation(GL_FUNC_ADD);
+
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_EQUAL, 0, ~0);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    glStencilMask(0);
+
+    glDepthMask(GL_FALSE);
+
+    for (auto& object : example_objects_) {
+        object.render(cameras[0], 0.f);
+    }
+
+    glDepthFunc(GL_LESS);
+    glDepthMask(GL_TRUE);
+    glDisable(GL_BLEND);
+    glDisable(GL_STENCIL_TEST);
+}
+
+
 
 
 bool RenderingSystem::init_window() {

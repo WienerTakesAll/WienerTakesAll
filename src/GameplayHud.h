@@ -18,6 +18,8 @@ public:
     void use_powerup(int player);
     void reset_powerups();
 
+    void set_num_ai(int num_ai);
+
 private:
     AssetManager& asset_manager_;
     MeshAsset* square_mesh_;
@@ -31,4 +33,5 @@ private:
     std::array<glm::mat4, 4> it_pointer_transforms_;
 
     std::array<UIObject, 4> powerup_holders_;
+    int num_ai_;
 };

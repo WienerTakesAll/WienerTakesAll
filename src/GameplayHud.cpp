@@ -135,18 +135,42 @@ void GameplayHud::load() {
 }
 
 void GameplayHud::render() const {
-    scoreboard_.render(glm::mat4());
+
+    if (num_ai_ == 3)
+    {
+        auto transform = glm::translate(glm::mat4(1.f), glm::vec3(0.7f, -.6f, 0.f));
+        scoreboard_.render(transform);
+    }
+    else
+    {
+        scoreboard_.render(glm::mat4());
+    }
 
     for (auto& score : scores_) {
-        score.render(glm::mat4());
+ 
+        if (num_ai_ == 3)
+        {
+            auto transform = glm::translate(glm::mat4(1.f), glm::vec3(0.7f, -.6f, 0.f));
+            score.render(transform);
+        }
+        else
+            score.render(glm::mat4());
     }
 
     for (unsigned int i = 0; i < it_pointers_.size(); i++) {
         it_pointers_[i].render(it_pointer_transforms_[i]);
+
+        //If singleplayer, only render the first pointer
+        if (num_ai_ == 3)
+            break;
     }
 
     for (auto& holder : powerup_holders_) {
         holder.render(glm::mat4());
+
+        //If singleplayer, only render the first holder
+        if (num_ai_ == 3)
+            break;
     }
 }
 
@@ -173,6 +197,16 @@ void GameplayHud::update_it_pointer(int player_id, glm::vec3 vector_to_it) {
     it_pointer_transforms_[player_id] =
         glm::translate(glm::mat4(), glm::vec3(origin_translate[0] / -4.f, origin_translate[1] / 4.f, 0.f));
 
+    if (num_ai_ == 3 && player_id == 0)
+    {
+        it_pointer_transforms_[player_id][3][0] *= 3.f;
+        it_pointer_transforms_[player_id][3][1] *= 3.f;
+
+        it_pointer_transforms_[player_id]
+            = glm::translate(it_pointer_transforms_[player_id], glm::vec3(.5f, -.5f, 0.f));
+    }
+
+
     float angle = glm::orientedAngle(origin_translate, glm::vec2(0, 1));
 
     const float PI = 3.14159;
@@ -183,6 +217,8 @@ void GameplayHud::update_it_pointer(int player_id, glm::vec3 vector_to_it) {
     } else {
         it_pointers_[player_id].visible_ = false;
     }
+
+
 
 }
 
@@ -208,4 +244,8 @@ void GameplayHud::reset_powerups() {
     for (auto& powerup_holder : powerup_holders_) {
         powerup_holder.set_texture(asset_manager_.get_texture_asset(POWERUP_HOLDER_TEXTURE_PATH));
     }
+}
+
+void GameplayHud::set_num_ai(int num_ai) {
+    num_ai_ = num_ai;
 }
