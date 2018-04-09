@@ -472,8 +472,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
                                                 "index", i,
                                                 "type", VehicleControlType::BRAKE,
                                                 "value", BRAKE_SPEED);
-                    }
-                    else if (value == SDL_KEYUP) {
+                    } else if (value == SDL_KEYUP) {
                         new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                                 "index", i,
                                                 "type", VehicleControlType::BRAKE,
@@ -486,8 +485,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
                                             "index", player_id,
                                             "type", VehicleControlType::BRAKE,
                                             "value", BRAKE_SPEED);
-                }
-                else if (value == SDL_KEYUP) {
+                } else if (value == SDL_KEYUP) {
                     new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                             "index", player_id,
                                             "type", VehicleControlType::BRAKE,

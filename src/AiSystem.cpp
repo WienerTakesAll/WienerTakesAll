@@ -35,6 +35,7 @@ void AiSystem::update() {
 
         //Randomly use powerups
         unsigned int random = rand() % POWERUP_CHANCE;
+
         if (random == 0) {
             EventSystem::queue_event(
                 Event(
@@ -45,7 +46,7 @@ void AiSystem::update() {
                 )
             );
         }
-        
+
         //We want to make sure the AI is never braking.
         EventSystem::queue_event(
             Event(
@@ -139,8 +140,7 @@ void AiSystem::perform_ai(int car) {
 }
 
 void AiSystem::avoid_car(int car, int to_avoid) {
-    if (counter_ == 0)
-    {
+    if (counter_ == 0) {
         //Make random dir -1 or 1
         cars_[car].random_dir_ = (rand() % 2) * 2 - 1;
     }
