@@ -61,6 +61,7 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
 
 void RenderingSystem::update() {
     particle_subsystem_.update();
+
     for (auto animation : animation_callbacks_) {
         animation();
     }

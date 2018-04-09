@@ -86,14 +86,15 @@ void ParticleSubsystem::handle_load(const Event& e) {
     pickup_component.set_texture(asset_manager_.get_texture_asset(POWERUP_PICKUP_PARTICLE_TEXTURE_PATH));
     powerup_pickup_gen_.init(pickup_component);
     powerup_pickup_gen_.set_active(false);
-    powerup_pickup_gen_.set_probability(1.0f);
+    powerup_pickup_gen_.set_probability(0.5f);
     powerup_pickup_gen_.set_particle_lifetime(120);
     powerup_pickup_gen_.set_particle_rotation_degrees(10.0f, 0.0f, 359.0f);
     powerup_pickup_gen_.set_position(glm::vec3(100.0f, 100.0f, 100.0f));
-    powerup_pickup_gen_.set_particle_scale(-0.01f, 0.0f, 0.9f);
-    powerup_pickup_gen_.set_particle_acceleration(glm::vec3(0.0f, -0.02f, 0.0f));
-    powerup_pickup_gen_.set_spawn_amount(10, 100);
+    powerup_pickup_gen_.set_particle_scale(-0.05f, 0.15f, 1.5f);
+    powerup_pickup_gen_.set_particle_acceleration(glm::vec3(0.0f, -0.005f, 0.0f));
+    powerup_pickup_gen_.set_spawn_amount(10, 40);
     powerup_pickup_gen_.set_spawn_range(2.0f, 1.0f, 2.0f);
+    powerup_pickup_gen_.set_particle_fixed_size(false);
 }
 
 void ParticleSubsystem::handle_new_it(const Event& e) {
@@ -216,8 +217,31 @@ void ParticleSubsystem::handle_new_game_state(const Event& e) {
 void ParticleSubsystem::handle_pickup_powerup(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
     PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("powerup_type", true).first);
-    std::cout << "picked up" << std::endl;
 
     powerup_pickup_gen_.set_position(powerup_gens_[object_id].get_position());
     powerup_pickup_gen_.set_active(true);
+
+    glm::vec4 delta(0.0f, 0.0f, 0.0f, -0.05f);
+    glm::vec4 min(0.0f, 0.0f, 0.0f, 0.0f);
+    glm::vec4 max(1.0f, 1.0f, 1.0f, 0.0f);
+
+    if (powerup_type == PowerupType::KETCHUP) {
+        delta[0] = 0.3f;
+        delta[1] = 0.10f;
+        delta[2] = 0.10f;
+        min[0] = 0.6f;
+    } else if (powerup_type == PowerupType::MUSTARD) {
+        delta[0] = 0.3f;
+        delta[1] = 0.3f;
+        delta[2] = 0.05f;
+        min[0] = 0.6f;
+        min[1] = 0.6f;
+    } else if (powerup_type == PowerupType::RELISH) {
+        delta[0] = 0.10f;
+        delta[1] = 0.3f;
+        delta[2] = 0.10f;
+        min[1] = 0.6f;
+    }
+
+    powerup_pickup_gen_.set_colour(delta, min, max);
 }
