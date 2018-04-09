@@ -2,6 +2,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/vector_angle.hpp>
+#include <algorithm>
 
 #include "GameplayHud.h"
 #include "Powerup.h"
@@ -12,6 +13,13 @@ namespace {
     const std::string KETCHUP_TEXTURE_PATH = "assets/textures/ketchup_powerup_ui.png";
     const std::string MUSTARD_TEXTURE_PATH = "assets/textures/mustard_powerup_ui.png";
     const std::string RELISH_TEXTURE_PATH = "assets/textures/relish_powerup_ui.png";
+    const std::string COUNTDOWN_TEXTURE_PATHS[5] = {
+        "assets/textures/countdown1.png"
+        , "assets/textures/countdown2.png"
+        , "assets/textures/countdown3.png"
+        , "assets/textures/countdown4.png"
+        , "assets/textures/countdown5.png"
+    };
 }
 
 GameplayHud::GameplayHud(AssetManager& asset_manager)
@@ -132,6 +140,21 @@ void GameplayHud::load() {
                                   ui_shader_
                               );
     }
+
+    for (auto path : COUNTDOWN_TEXTURE_PATHS) {
+        // preload texture
+        asset_manager_.get_texture_asset(path);
+    }
+
+    countdown_ = UIObject(
+                     glm::vec2(-0.125, -0.175),
+                     glm::vec3(1.0),
+                     glm::vec2(0.25, 0.33),
+                     square_mesh_,
+                     asset_manager_.get_texture_asset(COUNTDOWN_TEXTURE_PATHS[4]),
+                     ui_shader_
+                 );
+    countdown_value_ = 5;
 }
 
 void GameplayHud::render() const {
@@ -141,6 +164,10 @@ void GameplayHud::render() const {
         scoreboard_.render(transform);
     } else {
         scoreboard_.render(glm::mat4());
+    }
+
+    if (countdown_value_ > 0) {
+        countdown_.render(glm::mat4());
     }
 
     for (auto& score : scores_) {
@@ -172,7 +199,14 @@ void GameplayHud::render() const {
     }
 }
 
-void GameplayHud::update_score(const int& player, const int& score) {
+void GameplayHud::update_score(const int& player, const int& score, const int& lock_frames) {
+    int new_value = static_cast<int>(ceil(lock_frames / 60.0f));
+
+    if (new_value >= 0 && new_value != countdown_value_) {
+        countdown_.set_texture(asset_manager_.get_texture_asset(COUNTDOWN_TEXTURE_PATHS[std::max(new_value - 1, 0)]));
+        countdown_value_ = new_value;
+    }
+
     scores_.at(player).set_scale(std::min((float) score / MAX_SCORE, 1.0f));
 }
 

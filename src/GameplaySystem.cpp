@@ -60,13 +60,15 @@ void GameplaySystem::update() {
         scoring_subsystem_.update();
 
         int score_value = scoring_subsystem_.get_current_it_score();
+        int score_lock = scoring_subsystem_.get_current_score_lock_frames();
 
         if (score_value < MAX_SCORE) {
             EventSystem::queue_event(
                 Event(
                     EventType::UPDATE_SCORE,
                     "object_id", current_it_id_,
-                    "score", score_value
+                    "score", score_value,
+                    "lock_frames", score_lock
                 )
             );
         } else {
@@ -190,14 +192,16 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
     if (new_game_state == GameState::IN_GAME) {
         int num_humans = e.get_value<int>("num_players", true).first;
         std::cout << "starting game with " << num_humans << " human players" << std::endl;
+        int first_player_id = gameobject_counter_->assign_id();
         EventSystem::queue_event(
             Event(
                 EventType::ADD_VEHICLE,
-                "object_id", gameobject_counter_->assign_id(),
+                "object_id", first_player_id,
                 // TODO: Pass glm::vec3 in events
-                "pos_x", 4,
+                "pos_x", 0,
                 "pos_y", 10,
-                "pos_z", 0
+                "pos_z", -40,
+                "rotation", 0.0f
             )
         );
 
@@ -206,9 +210,10 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 EventType::ADD_VEHICLE,
                 "object_id", gameobject_counter_->assign_id(),
                 // TODO: Pass glm::vec3 in events
-                "pos_x", 10,
+                "pos_x", -40,
                 "pos_y", 10,
-                "pos_z", 0//,
+                "pos_z", 0,
+                "rotation", 90.0f
             )
         );
 
@@ -217,20 +222,30 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 EventType::ADD_VEHICLE,
                 "object_id", gameobject_counter_->assign_id(),
                 // TODO: Pass glm::vec3 in events
-                "pos_x", -4,
+                "pos_x", 0,
                 "pos_y", 10,
-                "pos_z", 0
+                "pos_z", 40,
+                "rotation", 180.0f
+            )
+        );
+
+        int last_player_id = gameobject_counter_->assign_id();
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_VEHICLE,
+                "object_id", last_player_id,
+                // TODO: Pass glm::vec3 in events
+                "pos_x", 40,
+                "pos_y", 10,
+                "pos_z", 0,
+                "rotation", 270.0f
             )
         );
 
         EventSystem::queue_event(
             Event(
-                EventType::ADD_VEHICLE,
-                "object_id", gameobject_counter_->assign_id(),
-                // TODO: Pass glm::vec3 in events
-                "pos_x", -10,
-                "pos_y", 10,
-                "pos_z", 0
+                EventType::NEW_IT,
+                "object_id", (rand() % (last_player_id - first_player_id + 1)) + first_player_id
             )
         );
 
@@ -500,18 +515,9 @@ void GameplaySystem::handle_add_vehicle(const Event& e) {
     player_powerup_data data;
     data.ketchup = 0.f;
     data.relish = 0.f;
+    data.invincibility = 0.0f;
+    data.mustard = 0.0f;
     powerup_datas_.emplace(object_id.first, data);
-
-    // Temporary, set first vehicle to be added as first it.
-    // Assumes first vehicle object_id = 0.
-    if (object_id.first == 0) {
-        EventSystem::queue_event(
-            Event(
-                EventType::NEW_IT,
-                "object_id", object_id.first
-            )
-        );
-    }
 }
 void GameplaySystem::handle_object_transform_event(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;

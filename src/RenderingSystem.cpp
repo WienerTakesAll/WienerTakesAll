@@ -85,6 +85,7 @@ void RenderingSystem::handle_add_vehicle(const Event& e) {
     std::pair<int, bool> z = e.get_value<int>("pos_z", true);
     assert(z.second);
 
+    float rotation = e.get_value<float>("rotation", true).first;
 
     MeshAsset* mesh = asset_manager_.get_mesh_asset(CAR_MESH_PATH);
     MeshAsset* shadow_mesh = asset_manager_.get_mesh_asset(CAR_SHADOW_MESH_PATH);
@@ -97,6 +98,7 @@ void RenderingSystem::handle_add_vehicle(const Event& e) {
     example_objects_[object_id.first].set_shader(asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH));
     example_objects_[object_id.first].set_texture(asset_manager_.get_texture_asset(CAR_TEXTURE_PATH));
     example_objects_[object_id.first].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x.first, y.first, z.first)));
+    example_objects_[object_id.first].apply_transform(glm::rotate(glm::mat4x4(), glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f)));
     example_objects_[object_id.first].set_has_shadows(true);
     car_indices_.push_back(object_id.first);
 
