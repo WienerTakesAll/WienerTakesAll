@@ -29,7 +29,7 @@ namespace {
     const std::string CHARCOAL_MESH_PATH = "assets/models/Mound.obj";
     const std::string CHARCOAL_TEXTURE_PATH = "assets/textures/smouldering-charcoal.png";
 
-    const int CAMERA_LAG_FRAMES = 5;
+    const int CAMERA_LAG_FRAMES = 6;
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
@@ -158,7 +158,7 @@ void RenderingSystem::handle_object_transform(const Event& e) {
     float qy = e.get_value<float>("qua_y", true).first;
     float qz = e.get_value<float>("qua_z", true).first;
 
-    example_objects_[object_id].set_transform(glm::translate(glm::mat4(), glm::vec3(x, y, z)));
+    example_objects_[object_id].set_transform(glm::translate(glm::mat4(), glm::vec3(x, y-.8f, z)));
     example_objects_[object_id].apply_transform(glm::toMat4(glm::quat(qw, qx, qy, qz)));
 
     auto e_vx = e.get_value<float>("vel_x", false);
@@ -514,15 +514,30 @@ void RenderingSystem::setup_cameras() {
 
         glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
 
-        auto camera_position = glm::translate(transform, glm::vec3(0, 2.5, -7));
+        auto camera_position = glm::translate(transform, glm::vec3(0, 3, -8));
 
         {
-            glm::vec3 bad_camera_pos(camera_position[3]);
+            glm::vec3 new_camera_pos(camera_position[3]);
             glm::vec3 old_camera_pos(last_cameras_pos_[i]);
-            glm::vec3 smooth_camera_pos
-                = bad_camera_pos * 0.25f + old_camera_pos * 0.75f;
+            glm::vec3 camera_delta = new_camera_pos - old_camera_pos;
 
-            camera_position[3] = glm::vec4(smooth_camera_pos, 1.0);
+            if (camera_delta.x > 2) {
+                camera_position[3].x = old_camera_pos.x + 2;
+            } else if (camera_delta.x < -2) {
+                camera_position[3].x = old_camera_pos.x - 2;
+            }
+
+            if (camera_delta.y > 0.5) {
+                camera_position[3].y = old_camera_pos.y + 0.5;
+            } else if (camera_delta.y < -0.5) {
+                camera_position[3].y = old_camera_pos.y - 0.5;
+            }
+
+            if (camera_delta.z > 2) {
+                camera_position[3].z = old_camera_pos.z + 2;
+            } else if (camera_delta.z < -2) {
+                camera_position[3].z = old_camera_pos.z - 2;
+            }
         }
 
 
@@ -533,7 +548,7 @@ void RenderingSystem::setup_cameras() {
         glm::vec3 lookAtPos(car_pos.x, camera_position[3][1], car_pos.z);
 
 
-        float FOV = 60.f + car_speeds_[i] * 5.f;
+        float FOV = 60.f + car_speeds_[i] * 5.5f;
         glm::mat4 P = glm::perspective(glm::radians(FOV), 4.0f / 3.0f, 0.1f, 1000.0f);
 
         new_cameras[i] = P * glm::lookAt(glm::vec3(camera_position[3]), lookAtPos, glm::vec3(0, 1, 0));
