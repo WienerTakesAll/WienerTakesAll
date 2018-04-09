@@ -193,8 +193,9 @@ void UISystem::handle_new_game_state(const Event& e) {
 void UISystem::handle_update_score(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
     int score = e.get_value<int>("score", true).first;
+    int lock_frames = e.get_value<int>("lock_frames", true).first;
 
-    gameplay_hud_.update_score(object_id, score);
+    gameplay_hud_.update_score(object_id, score, lock_frames);
 }
 
 void UISystem::handle_update_direction_to_it(const Event& e) {
