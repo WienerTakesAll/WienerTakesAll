@@ -257,9 +257,9 @@ void RenderingSystem::handle_add_powerup(const Event& e) {
     example_objects_[object_id].set_has_shadows(true);
     animation_callbacks_.push_back([this, object_id]() {
         static int frames = 0;
-        frames = (frames + 1) % 360;
         example_objects_[object_id].apply_transform(glm::rotate(glm::mat4(), glm::radians(2.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
-        example_objects_[object_id].apply_transform(glm::translate(glm::mat4(), glm::vec3(0.0f, sin(glm::radians(static_cast<float>(frames))) * 0.005f, 0.0f)));
+        example_objects_[object_id].apply_transform(glm::translate(glm::mat4(), glm::vec3(0.0f, sin(glm::radians(static_cast<float>(frames) * 3.0f)) * 0.003f, 0.0f)));
+        frames = (frames + 1) % 360;
     });
 }
 
