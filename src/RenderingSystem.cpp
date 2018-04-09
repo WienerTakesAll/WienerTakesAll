@@ -456,7 +456,7 @@ void RenderingSystem::setup_cameras() {
 
         glm::vec3 car_pos(transform[3][0], transform[3][1] + 0.5, transform[3][2]);
 
-        auto camera_position = glm::translate(transform, glm::vec3(0, 5, -12));
+        auto camera_position = glm::translate(transform, glm::vec3(0, 3, -8));
 
         {
             glm::vec3 new_camera_pos(camera_position[3]);
