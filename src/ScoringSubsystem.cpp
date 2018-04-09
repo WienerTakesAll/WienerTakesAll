@@ -3,7 +3,7 @@
 #include "ScoringSubsystem.h"
 
 namespace {
-    const int LOCK_FRAMES_START = 300;
+    const int SCORE_LOCK_FRAMES_START = 300;
 }
 
 ScoringSubsystem::ScoringSubsystem()
@@ -21,8 +21,8 @@ void ScoringSubsystem::add_vehicle(const int object_id) {
 
 void ScoringSubsystem::update() {
     // Update score of current it
-    if (lock_frames_ > 0) {
-        --lock_frames_;
+    if (score_lock_frames_ > 0) {
+        --score_lock_frames_;
     } else {
         ++scores_[current_it_id_];
     }
@@ -32,7 +32,7 @@ void ScoringSubsystem::set_new_game_state(const GameState new_game_state) {
     if (new_game_state == GameState::START_MENU) {
         scores_.clear();
     } else if (new_game_state == GameState::IN_GAME) {
-        lock_frames_ = LOCK_FRAMES_START;
+        score_lock_frames_ = SCORE_LOCK_FRAMES_START;
     }
 
     game_state_ = new_game_state;
@@ -57,6 +57,6 @@ int ScoringSubsystem::get_player_score(int player) {
     return score->second;
 }
 
-int ScoringSubsystem::get_current_lock_frames() {
-    return lock_frames_;
+int ScoringSubsystem::get_current_score_lock_frames() {
+    return score_lock_frames_;
 }
