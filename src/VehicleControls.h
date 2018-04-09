@@ -11,5 +11,6 @@ struct VehicleControls {
     float forward_drive;
     float horizontal_drive;
     float braking_force;
+    bool startedReversing;
     bool hand_break;
 };

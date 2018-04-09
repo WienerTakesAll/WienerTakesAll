@@ -10,6 +10,7 @@ public:
     void move_selection_up();
     void move_selection_down();
     int selected_num_of_players();
+    bool selected_exit();
     void render() const;
 
 private:
@@ -24,6 +25,7 @@ private:
     UIObject two_players_;
     UIObject three_players_;
     UIObject four_players_;
+    UIObject exit_game_;
     std::vector<UIObject> selection_indicators_;
     unsigned int active_selection;
 };

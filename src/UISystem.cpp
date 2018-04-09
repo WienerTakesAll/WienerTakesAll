@@ -92,14 +92,21 @@ void UISystem::handle_key_press(const Event& e) {
             case SDL_CONTROLLER_BUTTON_A:
             case SDL_CONTROLLER_BUTTON_START:
             case SDLK_RETURN:
-                EventSystem::queue_event(
-                    Event(
-                        EventType::NEW_GAME_STATE,
-                        "state", GameState::IN_GAME,
-                        "num_players", start_menu_.selected_num_of_players()
-                    )
-                );
-                loading_frames_counter_ = 0;
+                if (start_menu_.selected_exit()) {
+                    SDL_Event quit_event;
+                    quit_event.type = SDL_QUIT;
+                    SDL_PushEvent(&quit_event);
+                } else {
+                    EventSystem::queue_event(
+                        Event(
+                            EventType::NEW_GAME_STATE,
+                            "state", GameState::IN_GAME,
+                            "num_players", start_menu_.selected_num_of_players()
+                        )
+                    );
+                    loading_frames_counter_ = 0;
+                }
+
                 break;
 
             case SDLK_UP:
@@ -186,8 +193,9 @@ void UISystem::handle_new_game_state(const Event& e) {
 void UISystem::handle_update_score(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
     int score = e.get_value<int>("score", true).first;
+    int lock_frames = e.get_value<int>("lock_frames", true).first;
 
-    gameplay_hud_.update_score(object_id, score);
+    gameplay_hud_.update_score(object_id, score, lock_frames);
 }
 
 void UISystem::handle_update_direction_to_it(const Event& e) {
