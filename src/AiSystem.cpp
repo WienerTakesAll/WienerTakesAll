@@ -26,7 +26,6 @@ AiSystem::AiSystem()
 }
 
 void AiSystem::update() {
-    // only update every 10 frames
     if (++counter_ == MAX_COUNTER) {
         counter_ = 0;
     }
@@ -140,8 +139,14 @@ void AiSystem::perform_ai(int car) {
 }
 
 void AiSystem::avoid_car(int car, int to_avoid) {
+    if (counter_ == 0)
+    {
+        //Make random dir -1 or 1
+        cars_[car].random_dir_ = (rand() % 2) * 2 - 1;
+    }
+
     glm::vec3 diff = cars_[to_avoid].position_ - cars_[car].position_;
-    glm::vec3 target = glm::rotate(diff, glm::radians(90.f), glm::vec3(0, 1, 0));
+    glm::vec3 target = glm::rotate(diff, glm::radians(cars_[car].random_dir_ * 90.f), glm::vec3(0, 1, 0));
 
     path_to(car, target);
 }

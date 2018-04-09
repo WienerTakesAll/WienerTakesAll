@@ -32,6 +32,7 @@ private:
         glm::quat rotation_;
         ChaseState state_;
         int cutoff_cooldown_;
+        int random_dir_;
     };
 
     std::array<car_data, 4> cars_;
