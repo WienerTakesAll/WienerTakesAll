@@ -159,7 +159,7 @@ void RenderingSystem::handle_object_transform(const Event& e) {
     float qy = e.get_value<float>("qua_y", true).first;
     float qz = e.get_value<float>("qua_z", true).first;
 
-    example_objects_[object_id].set_transform(glm::translate(glm::mat4(), glm::vec3(x, y-.8f, z)));
+    example_objects_[object_id].set_transform(glm::translate(glm::mat4(), glm::vec3(x, y - .8f, z)));
     example_objects_[object_id].apply_transform(glm::toMat4(glm::quat(qw, qx, qy, qz)));
 
     auto e_vx = e.get_value<float>("vel_x", false);

@@ -24,6 +24,9 @@ private:
     void handle_reload_settings_event(const Event& event);
     void handle_vehicle_collision(const Event& e);
     void handle_new_game_state(const Event& e);
+    void handle_dominate_controls(const Event& e);
+    void handle_restore_controls(const Event& e);
+    void handle_reverse_controls(const Event& e);
 
     bool process_keyboard(const int& key, int& player_id);
     bool process_controller_button(const int& button);

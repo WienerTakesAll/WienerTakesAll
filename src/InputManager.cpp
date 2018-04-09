@@ -78,16 +78,21 @@ void InputManager::process_input(SDL_Event* event) {
 
     }
 
-    if (should_queue_event && player_id != -1) {
-        EventSystem::queue_event(
-            Event(
-                EventType::KEYPRESS_EVENT,
-                "player_id", player_id,
-                "key", key,
-                "value", value
-            )
-        );
+    should_queue_event =    should_queue_event  &&
+                            player_id != -1;
+
+    if (!should_queue_event) {
+        return;
     }
+
+    EventSystem::queue_event(
+        Event(
+            EventType::KEYPRESS_EVENT,
+            "player_id", player_id,
+            "key", key,
+            "value", value
+        )
+    );
 }
 
 void InputManager::quit() {
@@ -98,7 +103,7 @@ void InputManager::quit() {
     }
 
     for (SDL_Haptic* haptic : haptics_) {
-        if (haptic == nullptr) {
+        if (haptic != nullptr) {
             SDL_HapticClose(haptic);
         }
     }
@@ -121,12 +126,17 @@ void InputManager::handle_vehicle_collision(const Event& e) {
 void InputManager::handle_new_game_state(const Event& e) {
     GameState state = static_cast<GameState>(e.get_value<int>("state", true).first);
 
-    if (state != GameState::IN_GAME) {
-        return;
-    }
+    switch (state) {
+        case GameState::START_MENU:
+            break;
 
-    int n = e.get_value<int>("num_players", true).first;
-    num_players_ = n;
+        case GameState::IN_GAME:
+            num_players_ = e.get_value<int>("num_players", true).first;
+            break;
+
+        default:
+            break;
+    }
 }
 
 void InputManager::handle_load_event(const Event& e) {
