@@ -45,17 +45,17 @@ void AiSystem::update() {
                     "value", SDL_CONTROLLERBUTTONDOWN
                 )
             );
-
-            //We want to make sure the AI is never braking.
-            EventSystem::queue_event(
-                Event(
-                    EventType::KEYPRESS_EVENT,
-                    "player_id", i,
-                    "key", SDL_CONTROLLER_AXIS_TRIGGERLEFT,
-                    "value", 0
-                )
-            );
         }
+        
+        //We want to make sure the AI is never braking.
+        EventSystem::queue_event(
+            Event(
+                EventType::KEYPRESS_EVENT,
+                "player_id", i,
+                "key", SDL_CONTROLLER_AXIS_TRIGGERLEFT,
+                "value", 0
+            )
+        );
 
     }
 }
