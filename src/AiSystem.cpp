@@ -9,6 +9,10 @@
 namespace {
     const float AVOID_DISTANCE = 5.f;
     const float CUTOFF_MAX_RADIUS = 30.f;
+    const float CUTOFF_TIGHTNESS = 0.875f;
+    const unsigned int MAX_COUNTER = 120;
+    const int CUTOFF_COOLDOWN = 300;
+    const int POWERUP_CHANCE = 240;
 }
 
 AiSystem::AiSystem()
@@ -23,22 +27,32 @@ AiSystem::AiSystem()
 
 void AiSystem::update() {
     // only update every 10 frames
-    if (++counter_ == 120) {
+    if (++counter_ == MAX_COUNTER) {
         counter_ = 0;
     }
 
     for (int i = 3; i >= 4 - num_ai_; i--) {
-        choose_ai_state(i);
+        perform_ai(i);
 
-        unsigned int random = rand() % 400;
-
-        if (random < 2) {
+        //Randomly use powerups
+        unsigned int random = rand() % POWERUP_CHANCE;
+        if (random == 0) {
             EventSystem::queue_event(
                 Event(
                     EventType::KEYPRESS_EVENT,
                     "player_id", i,
                     "key", random == 0 ? SDL_CONTROLLER_BUTTON_LEFTSHOULDER : SDL_CONTROLLER_BUTTON_RIGHTSHOULDER,
                     "value", SDL_CONTROLLERBUTTONDOWN
+                )
+            );
+
+            //We want to make sure the AI is never braking.
+            EventSystem::queue_event(
+                Event(
+                    EventType::KEYPRESS_EVENT,
+                    "player_id", i,
+                    "key", SDL_CONTROLLER_AXIS_TRIGGERLEFT,
+                    "value", 0
                 )
             );
         }
@@ -75,7 +89,7 @@ void AiSystem::handle_new_it(const Event& e) {
     whos_it_ = e.get_value<int>("object_id", true).first;
 }
 
-void AiSystem::choose_ai_state(int car) {
+void AiSystem::perform_ai(int car) {
     if (car == whos_it_) {
         int closest_car = -1;
         float closest_car_distance = FLT_MAX;
@@ -96,7 +110,7 @@ void AiSystem::choose_ai_state(int car) {
         if (closest_car_distance < AVOID_DISTANCE) {
             avoid_car(car, closest_car);
         } else {
-            random_car(car);
+            random_movement(car);
         }
     } else {
         auto pos1 = cars_[car].position_;
@@ -105,18 +119,19 @@ void AiSystem::choose_ai_state(int car) {
         cars_[car].cutoff_cooldown_--;
 
         if (counter_ == 0) {
-            if (glm::distance(pos1, pos2 * .75f) > 2.5f && cars_[car].cutoff_cooldown_ > 0) {
-                cars_[car].state_ = AiState::Cutoff;
+            //Check if the position of our car is approximately perpendicular to the other car relative to the arena's radius.
+            if (glm::distance(pos1, pos2 * CUTOFF_TIGHTNESS) > 2.5f && cars_[car].cutoff_cooldown_ > 0) {
+                cars_[car].state_ = ChaseState::CUTOFF;
                 cars_[car].cutoff_cooldown_ = 300;
             }
         }
 
-        if (glm::distance(pos1, pos2 * .75f) < 2.5f && cars_[car].state_ == AiState::Cutoff) {
-            cars_[car].cutoff_cooldown_ = 300;
-            cars_[car].state_ = AiState::Pursue;
+        if (glm::distance(pos1, pos2 * CUTOFF_TIGHTNESS) < 2.5f && cars_[car].state_ == ChaseState::CUTOFF) {
+            cars_[car].cutoff_cooldown_ = CUTOFF_COOLDOWN;
+            cars_[car].state_ = ChaseState::PURSUE;
         }
 
-        if (cars_[car].state_ == AiState::Cutoff) {
+        if (cars_[car].state_ == ChaseState::CUTOFF) {
             cutoff_car(car, whos_it_);
         } else {
             pursue_car(car, whos_it_);
@@ -138,7 +153,7 @@ void AiSystem::pursue_car(int car, int to_pursue) {
     path_to(car, target);
 }
 
-void AiSystem::random_car(int car) {
+void AiSystem::random_movement(int car) {
     if (counter_ % 10 == 0) {
         unsigned int random = rand() % 20;
 
@@ -175,7 +190,7 @@ void AiSystem::random_car(int car) {
 
 void AiSystem::cutoff_car(int car, int to_catch) {
     glm::vec3 target = cars_[to_catch].position_;
-    target *= 0.75f;
+    target *= CUTOFF_TIGHTNESS;
 
     path_to(car, target);
 }
