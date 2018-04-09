@@ -29,7 +29,7 @@ namespace {
     const std::string CHARCOAL_MESH_PATH = "assets/models/Mound.obj";
     const std::string CHARCOAL_TEXTURE_PATH = "assets/textures/smouldering-charcoal.png";
 
-    const int CAMERA_LAG_FRAMES = 5;
+    const int CAMERA_LAG_FRAMES = 6;
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
@@ -459,12 +459,27 @@ void RenderingSystem::setup_cameras() {
         auto camera_position = glm::translate(transform, glm::vec3(0, 3, -8));
 
         {
-            glm::vec3 bad_camera_pos(camera_position[3]);
+            glm::vec3 new_camera_pos(camera_position[3]);
             glm::vec3 old_camera_pos(last_cameras_pos_[i]);
-            glm::vec3 smooth_camera_pos
-                = bad_camera_pos * 0.75f + old_camera_pos * 0.25f;
+            glm::vec3 camera_delta = new_camera_pos - old_camera_pos;
 
-            camera_position[3] = glm::vec4(smooth_camera_pos, 1.0);
+            if (camera_delta.x > 2) {
+                camera_position[3].x = old_camera_pos.x + 2;
+            } else if (camera_delta.x < -2) {
+                camera_position[3].x = old_camera_pos.x - 2;
+            }
+
+            if (camera_delta.y > 0.5) {
+                camera_position[3].y = old_camera_pos.y + 0.5;
+            } else if (camera_delta.y < -0.5) {
+                camera_position[3].y = old_camera_pos.y - 0.5;
+            }
+
+            if (camera_delta.z > 2) {
+                camera_position[3].z = old_camera_pos.z + 2;
+            } else if (camera_delta.z < -2) {
+                camera_position[3].z = old_camera_pos.z - 2;
+            }
         }
 
 
