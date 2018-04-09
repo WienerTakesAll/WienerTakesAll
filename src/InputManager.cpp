@@ -9,8 +9,8 @@
 
 InputManager::InputManager(const InputSettings& settings)
     : settings_(settings)
-    , controllers_(std::array<SDL_GameController*, 4>())
-    , haptics_(std::array<SDL_Haptic*, 4>())
+    , controllers_(std::array<SDL_GameController *, 4>())
+    , haptics_(std::array<SDL_Haptic *, 4>())
     , num_players_(4) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &InputManager::handle_load_event, this);
     EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &InputManager::handle_reload_settings_event, this);
@@ -92,13 +92,13 @@ void InputManager::process_input(SDL_Event* event) {
 
 void InputManager::quit() {
     for (SDL_GameController* game_controller : controllers_) {
-        if(game_controller != nullptr) {
+        if (game_controller != nullptr) {
             SDL_GameControllerClose(game_controller);
         }
     }
 
     for (SDL_Haptic* haptic : haptics_) {
-        if(haptic == nullptr) {
+        if (haptic == nullptr) {
             SDL_HapticClose(haptic);
         }
     }

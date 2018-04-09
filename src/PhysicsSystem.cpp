@@ -115,34 +115,28 @@ void PhysicsSystem::update() {
             physx::PxVehicleDrive4WRawInputData g_vehicle_input_data;
             g_vehicle_input_data.setDigitalAccel(true);
 
-            float accelForce = std::max(vehicle_controls_[i].forward_drive, vehicle_controls_[i].braking_force* 0.85f);
+            float accelForce = std::max(vehicle_controls_[i].forward_drive, vehicle_controls_[i].braking_force * 0.85f);
             g_vehicle_input_data.setAnalogAccel(std::max(accelForce, 0.f));
 
             g_vehicle_input_data.setAnalogHandbrake(vehicle_controls_[i].hand_break * 1.0f);
             vehicle_controls_[i].hand_break = false;
             g_vehicle_input_data.setAnalogSteer(vehicle_controls_[i].horizontal_drive);
 
-            if (vehicle_controls_[i].braking_force*0.65f < vehicle_controls_[i].forward_drive)
-            {
+            if (vehicle_controls_[i].braking_force * 0.65f < vehicle_controls_[i].forward_drive) {
                 g_vehicle_input_data.setGearUp(1);
                 vehicle_controls_[i].startedReversing = false;
-            }
-            else
-            {
+            } else {
                 g_vehicle_input_data.setGearDown(1);
                 auto vel = vehicles_[i]->getRigidDynamicActor()->getLinearVelocity();
-                if (vel.magnitude() < 1.f)
-                {
+
+                if (vel.magnitude() < 1.f) {
                     vehicle_controls_[i].startedReversing = true;
                 }
             }
 
-            if (vehicle_controls_[i].startedReversing)
-            {
+            if (vehicle_controls_[i].startedReversing) {
                 g_vehicle_input_data.setGearDown(1);
-            }
-            else
-            {
+            } else {
                 g_vehicle_input_data.setAnalogBrake(vehicle_controls_[i].braking_force);
             }
 
