@@ -380,14 +380,18 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_g:
         case SDLK_k:
         case SDLK_DOWN:
-            new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", player_id,
-                                    "type", VehicleControlType::FORWARD_DRIVE,
-                                    "value", 0.0f);
-            new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                    "index", player_id,
-                                    "type", VehicleControlType::BRAKE,
-                                    "value", BRAKE_SPEED);
+            if (value == SDL_KEYDOWN) {
+                new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                        "index", player_id,
+                                        "type", VehicleControlType::BRAKE,
+                                        "value", BRAKE_SPEED);
+            }
+            else if (value == SDL_KEYUP) {
+                new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                        "index", player_id,
+                                        "type", VehicleControlType::BRAKE,
+                                        "value", 0.f);
+            }
             break;
 
         // keyboard left steer
