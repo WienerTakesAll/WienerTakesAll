@@ -30,6 +30,7 @@ namespace {
     const std::string CHARCOAL_TEXTURE_PATH = "assets/textures/smouldering-charcoal.png";
 
     const int CAMERA_LAG_FRAMES = 6;
+    const float OVERLAY_INTENSITY = 0.15f;
 }
 
 RenderingSystem::RenderingSystem(AssetManager& asset_manager)
@@ -55,6 +56,8 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::USE_POWERUP, &RenderingSystem::handle_use_powerup, this);
     EventSystem::add_event_handler(EventType::FINISH_POWERUP, &RenderingSystem::handle_finish_powerup, this);
     EventSystem::add_event_handler(EventType::PICKUP_POWERUP, &RenderingSystem::handle_pickup_powerup, this);
+    EventSystem::add_event_handler(EventType::DOMINATE_CONTROLS, &RenderingSystem::handle_dominate_controls, this);
+    EventSystem::add_event_handler(EventType::RESTORE_CONTROLS, &RenderingSystem::handle_restore_controls, this);
 
     init_window();
 }
@@ -307,29 +310,33 @@ void RenderingSystem::handle_use_powerup(const Event& e) {
     PowerupType type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
     PowerupTarget target = static_cast<PowerupTarget>(e.get_value<int>("target", true).first);
     int player_id = e.get_value<int>("index", true).first;
-    const float overlay_intensity = 0.15f;
     glm::vec4 overlay = glm::vec4(0.0f);
+
+    if (type == PowerupType::RELISH && target == PowerupTarget::OTHERS) {
+        // special case handled by handle_dominate_controls
+        return;
+    }
 
     switch (type) {
         case PowerupType::KETCHUP:
-            overlay[0] = overlay_intensity; // red
+            overlay[0] = OVERLAY_INTENSITY; // red
             break;
 
         case PowerupType::RELISH:
-            overlay[1] = overlay_intensity; // green
+            overlay[1] = OVERLAY_INTENSITY; // green
             break;
 
         case PowerupType::MUSTARD:
             // red + green = yellow
-            overlay[0] = overlay_intensity;
-            overlay[1] = overlay_intensity;
+            overlay[0] = OVERLAY_INTENSITY;
+            overlay[1] = OVERLAY_INTENSITY;
             break;
 
         case PowerupType::INVINCIBILITY:
             // red + green + blue = white
-            overlay[0] = overlay_intensity;
-            overlay[1] = overlay_intensity;
-            overlay[2] = overlay_intensity;
+            overlay[0] = OVERLAY_INTENSITY;
+            overlay[1] = OVERLAY_INTENSITY;
+            overlay[2] = OVERLAY_INTENSITY;
             break;
 
         default:
@@ -561,4 +568,29 @@ void RenderingSystem::preload_assets() const {
     // Obstacles
     asset_manager_.get_mesh_asset(CHARCOAL_MESH_PATH);
     asset_manager_.get_texture_asset(CHARCOAL_TEXTURE_PATH);
+}
+
+void RenderingSystem::handle_dominate_controls(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+    glm::vec4 overlay = glm::vec4(0.0f);
+
+    for (int i = 0; i < 4; ++i) {
+        if (i != object_id) {
+            overlay[0] = -OVERLAY_INTENSITY * 2.f;
+            overlay[1] = -OVERLAY_INTENSITY * 2.f;
+            overlay[2] = -OVERLAY_INTENSITY * 2.f;
+            overlay[3] = OVERLAY_INTENSITY * 2.f;
+            example_objects_[i].set_colour_overlay(overlay);
+        }
+    }
+}
+
+void RenderingSystem::handle_restore_controls(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    for (int i = 0; i < 4; ++i) {
+        if (i != object_id) {
+            example_objects_[i].set_colour_overlay(glm::vec4());
+        }
+    }
 }

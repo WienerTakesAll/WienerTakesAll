@@ -172,6 +172,7 @@ void UISystem::handle_new_game_state(const Event& e) {
             break;
 
         case GameState::IN_GAME:
+            gameplay_hud_.set_num_humans(e.get_value<int>("num_players", true).first);
             loading_screen_.render();
             break;
 
