@@ -271,7 +271,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
             )
         );
 
-        //CHARCOAL_TEST
+        // mounds
         for (size_t i = 0; i < NUM_MOUNDS; i++) {
             EventSystem::queue_event(
                 Event(
@@ -294,15 +294,15 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
         );
 
         // Powerup
-        glm::vec3 powerup_loc = powerup_subsystem_.get_next_powerup_position();
+        // glm::vec3 powerup_loc = powerup_subsystem_.get_next_powerup_position();
         EventSystem::queue_event(
             Event(
                 EventType::ADD_POWERUP,
                 "object_id", gameobject_counter_->assign_id(),
                 "type", static_cast<int>(powerup_subsystem_.get_next_powerup_type()),
-                "pos_x", powerup_loc.x,
-                "pos_y", powerup_loc.y,
-                "pos_z", powerup_loc.z
+                "pos_x", 0.f,
+                "pos_y", 2.7f,
+                "pos_z", 0.f
             )
         );
 

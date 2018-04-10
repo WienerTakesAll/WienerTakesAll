@@ -1,3 +1,4 @@
+#include <iostream>
 #include <stdlib.h> /* srand, rand */
 #include <time.h> /* time */
 #include <algorithm>
@@ -92,7 +93,6 @@ const bool PowerupSubsystem::is_powerup(const int object_id) const {
 }
 
 glm::vec3 PowerupSubsystem::get_next_powerup_position() const {
-
     int i = rand() % charcoal_locations.size();
     std::cout << i << std::endl;
 
