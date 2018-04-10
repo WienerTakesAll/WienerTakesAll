@@ -25,6 +25,7 @@ private:
     ShaderAsset* ui_shader_;
 
     UIObject scoreboard_;
+    UIObject locked_scoreboard_;
     std::array<UIObject, 4> scores_;
     int current_it_;
 
