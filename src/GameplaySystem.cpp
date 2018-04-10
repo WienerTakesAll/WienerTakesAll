@@ -361,7 +361,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
                 }
 
                 for (int i = 0; i < 4; ++i) {
-                    if (value == SDL_KEYDOWN && powerup_subsystem_.can_use_powerup(i)) {
+                    if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(i)) {
                         new_events.emplace_back(EventType::USE_POWERUP,
                                                 "type", powerup_subsystem_.get_player_powerup_type(i),
                                                 "target", PowerupTarget::SELF,
@@ -369,7 +369,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
                     }
                 }
             } else {
-                if (value == SDL_KEYDOWN && powerup_subsystem_.can_use_powerup(player_id)) {
+                if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(player_id)) {
                     new_events.emplace_back(EventType::USE_POWERUP,
                                             "type", powerup_subsystem_.get_player_powerup_type(player_id),
                                             "target", PowerupTarget::SELF,
@@ -391,7 +391,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
                 }
 
                 for (int i = 0; i < 4; ++i) {
-                    if (value == SDL_KEYDOWN && powerup_subsystem_.can_use_powerup(i)) {
+                    if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(i)) {
                         new_events.emplace_back(EventType::USE_POWERUP,
                                                 "type", powerup_subsystem_.get_player_powerup_type(i),
                                                 "target", PowerupTarget::OTHERS,
@@ -399,7 +399,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
                     }
                 }
             } else {
-                if (value == SDL_KEYDOWN && powerup_subsystem_.can_use_powerup(player_id)) {
+                if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(player_id)) {
                     new_events.emplace_back(EventType::USE_POWERUP,
                                             "type", powerup_subsystem_.get_player_powerup_type(player_id),
                                             "target", PowerupTarget::OTHERS,
