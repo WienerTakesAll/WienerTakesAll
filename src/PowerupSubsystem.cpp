@@ -34,7 +34,7 @@ void PowerupSubsystem::update() {
 
 void PowerupSubsystem::add_mound_location(const int x, int y, const int z) {
     int i = charcoal_locations.size() - 1;
-    charcoal_locations[i] = glm::vec3(x, y + 2.7, z);
+    charcoal_locations[i] = glm::vec3(x, y + 3, z);
 }
 
 void PowerupSubsystem::set_new_game_state(const GameState new_game_state) {
