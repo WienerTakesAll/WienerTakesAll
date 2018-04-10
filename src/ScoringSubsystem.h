@@ -15,9 +15,11 @@ public:
     void set_new_it_id(const int new_it_id);
     int get_current_it_score();
     int get_player_score(int player);
+    int get_current_score_lock_frames();
 
 private:
     int current_it_id_;
     GameState game_state_;
     std::map<int, int> scores_;
+    int score_lock_frames_;
 };

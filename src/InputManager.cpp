@@ -1,17 +1,21 @@
 #include <cassert>
 #include <iostream>
-#include <vector>
 
 #include "EventSystem.h"
+#include "GameState.h"
 #include "InputManager.h"
 #include "InputSettings.h"
 #include "SDL.h"
 
 InputManager::InputManager(const InputSettings& settings)
-    : settings_(settings) {
+    : settings_(settings)
+    , controllers_(std::array<SDL_GameController *, 4>())
+    , haptics_(std::array<SDL_Haptic *, 4>())
+    , num_players_(4) {
     EventSystem::add_event_handler(EventType::LOAD_EVENT, &InputManager::handle_load_event, this);
     EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &InputManager::handle_reload_settings_event, this);
     EventSystem::add_event_handler(EventType::VEHICLE_COLLISION, &InputManager::handle_vehicle_collision, this);
+    EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &InputManager::handle_new_game_state, this);
 }
 
 void InputManager::process_input(SDL_Event* event) {
@@ -74,29 +78,36 @@ void InputManager::process_input(SDL_Event* event) {
 
     }
 
-    if (should_queue_event) {
-        EventSystem::queue_event(
-            Event(
-                EventType::KEYPRESS_EVENT,
-                "player_id", player_id,
-                "key", key,
-                "value", value
-            )
-        );
+    should_queue_event =    should_queue_event  &&
+                            player_id != -1;
+
+    if (!should_queue_event) {
+        return;
     }
+
+    EventSystem::queue_event(
+        Event(
+            EventType::KEYPRESS_EVENT,
+            "player_id", player_id,
+            "key", key,
+            "value", value
+        )
+    );
 }
 
 void InputManager::quit() {
     for (SDL_GameController* game_controller : controllers_) {
-        SDL_GameControllerClose(game_controller);
+        if (game_controller != nullptr) {
+            SDL_GameControllerClose(game_controller);
+        }
     }
 
     for (SDL_Haptic* haptic : haptics_) {
-        SDL_HapticClose(haptic);
+        if (haptic != nullptr) {
+            SDL_HapticClose(haptic);
+        }
     }
 
-    controllers_.clear();
-    haptics_.clear();
     std::cout << "All controllers_ closed" << std::endl;
 }
 
@@ -112,44 +123,62 @@ void InputManager::handle_vehicle_collision(const Event& e) {
     rumble_controller(b_id);
 }
 
+void InputManager::handle_new_game_state(const Event& e) {
+    GameState state = static_cast<GameState>(e.get_value<int>("state", true).first);
+
+    switch (state) {
+        case GameState::START_MENU:
+            break;
+
+        case GameState::IN_GAME:
+            num_players_ = e.get_value<int>("num_players", true).first;
+            break;
+
+        default:
+            break;
+    }
+}
+
 void InputManager::handle_load_event(const Event& e) {
-    int num_controllers_player = SDL_NumJoysticks();
+    int num_controllers = SDL_NumJoysticks();
 
     // Link player controllers_
     SDL_GameControllerEventState(SDL_ENABLE);
     SDL_GameController* controller = nullptr;
 
-    for (int player_id = 0; player_id < num_controllers_player; ++player_id) {
-        if (SDL_IsGameController(player_id)) {
+    for (int controller_id = 0; controller_id < num_controllers; ++controller_id) {
+        if (SDL_IsGameController(controller_id)) {
             // Link controller
-            controller = SDL_GameControllerOpen(player_id);
+            controller = SDL_GameControllerOpen(controller_id);
 
             if (!controller) {
-                std::cerr << "Could not open GameController " << player_id << ": " << SDL_GetError() << std::endl;
+                std::cerr << "Could not open GameController " << controller_id << ": " << SDL_GetError() << std::endl;
                 continue;
             }
 
-            controllers_.push_back(controller);
+            int player_id = get_player_id_from_joystick_index(controller_id);
+            controllers_[player_id] = controller;
             std::cout << "Controller for player " << player_id << " linked" << std::endl;
 
             // Open haptic
             SDL_Joystick* joystick = SDL_GameControllerGetJoystick(controller);
             SDL_Haptic* haptic = SDL_HapticOpenFromJoystick(joystick);
+            player_id = controller_id;
 
             if (!haptic) {
                 std::cerr << "Could not open haptic for player " << player_id << "'s controller" << std::endl;
-                haptics_.push_back(nullptr);
+                haptics_[player_id] = nullptr;
                 continue;
             }
 
             // Initialize haptic rumble
             if (SDL_HapticRumbleInit(haptic) != 0) {
                 std::cerr << "Could not initialize haptic rumble for player " << player_id << "'s controller" << std::endl;
-                haptics_.push_back(nullptr);
+                haptics_[player_id] = nullptr;
                 continue;
             }
 
-            haptics_.push_back(haptic);
+            haptics_[player_id] = haptic;
             std::cout << "Haptic rumble for player " << player_id << " also initialized" << std::endl;
         }
     }
@@ -257,12 +286,15 @@ bool InputManager::process_keyboard(const int& key, int& player_id) {
             break;
 
         case SDLK_F5:
+            player_id = 0;
             break;
 
         case SDLK_F11:
+            player_id = 0;
             break;
 
         case SDLK_ESCAPE:
+            player_id = 0;
             break;
 
         default:
@@ -395,7 +427,8 @@ bool InputManager::process_controller_axis(const int& axis, const int& value) {
 }
 
 void InputManager::rumble_controller(const int id) const {
-    if (    id >= haptics_.size() ||
+    if (    id >= haptics_.size()   ||
+            id >= num_players_      ||
             haptics_[id] == nullptr ) {
         return;
     }
@@ -405,6 +438,11 @@ void InputManager::rumble_controller(const int id) const {
 
 const int InputManager::get_player_id_from_joystick_index(const int joystick_index) const {
     int player_id = SDL_NumJoysticks() - joystick_index - 1;
+
+    if (player_id >= num_players_) {
+        return -1;
+    }
+
     assert(player_id >= 0 && player_id < SDL_NumJoysticks());
     return player_id;
 }

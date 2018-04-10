@@ -114,11 +114,34 @@ void PhysicsSystem::update() {
             // Build vehicle input data
             physx::PxVehicleDrive4WRawInputData g_vehicle_input_data;
             g_vehicle_input_data.setDigitalAccel(true);
-            g_vehicle_input_data.setAnalogAccel(std::max(vehicle_controls_[i].forward_drive, 0.f));
-            g_vehicle_input_data.setAnalogBrake(vehicle_controls_[i].braking_force);
+
+            float accelForce = std::max(vehicle_controls_[i].forward_drive, vehicle_controls_[i].braking_force * 0.85f);
+            g_vehicle_input_data.setAnalogAccel(std::max(accelForce, 0.f));
+
             g_vehicle_input_data.setAnalogHandbrake(vehicle_controls_[i].hand_break * 1.0f);
             vehicle_controls_[i].hand_break = false;
             g_vehicle_input_data.setAnalogSteer(vehicle_controls_[i].horizontal_drive);
+
+            if (vehicle_controls_[i].braking_force * 0.65f < vehicle_controls_[i].forward_drive) {
+                g_vehicle_input_data.setGearUp(1);
+                vehicle_controls_[i].startedReversing = false;
+            } else {
+                g_vehicle_input_data.setGearDown(1);
+                auto vel = vehicles_[i]->getRigidDynamicActor()->getLinearVelocity();
+
+                if (vel.magnitude() < 1.f) {
+                    vehicle_controls_[i].startedReversing = true;
+                }
+            }
+
+            if (vehicle_controls_[i].startedReversing) {
+                g_vehicle_input_data.setGearDown(1);
+            } else {
+                g_vehicle_input_data.setAnalogBrake(vehicle_controls_[i].braking_force);
+            }
+
+
+
 
             // smooth input data
             PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(
@@ -222,6 +245,13 @@ void PhysicsSystem::handle_add_vehicle(const Event& e) {
     transform.p.x = e.get_value<int>("pos_x", true).first;
     transform.p.y = e.get_value<int>("pos_y", true).first;
     transform.p.z = e.get_value<int>("pos_z", true).first;
+    float rotation = e.get_value<float>("rotation", true).first;
+    glm::quat rotation_quat = glm::rotate(glm::quat(), glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+    transform.q.w = rotation_quat.w;
+    transform.q.x = rotation_quat.x;
+    transform.q.y = rotation_quat.y;
+    transform.q.z = rotation_quat.z;
+
     MeshAsset* mesh = asset_manager_.get_mesh_asset(settings_.vehicle_mesh_asset_path);
 
     // Construct new PhysicsComponent and add to list
