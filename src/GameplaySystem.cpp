@@ -46,7 +46,7 @@ GameplaySystem::GameplaySystem()
     add_event_handler(EventType::CHANGE_POWERUP, &GameplaySystem::handle_change_powerup, this);
     add_event_handler(EventType::PLAYER_FELL_OFF_ARENA, &GameplaySystem::handle_player_fell_off_arena, this);
     add_event_handler(EventType::ADD_CHARCOAL, &GameplaySystem::handle_add_charcoal, this);
-    
+
     EventSystem::queue_event(
         Event(
             EventType::NEW_GAME_STATE,

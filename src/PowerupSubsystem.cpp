@@ -12,9 +12,7 @@ namespace {
     const float POWERUP_DISTANCE_THRESHOLD = 2.5f;
     const int POWERUP_LOCK_FRAMES = 30;
     const glm::vec3 POWERUP_LOCATION_LIMITS = glm::vec3(10.0f, 1.5f, 10.0f);
-    glm::vec3 charcoal_locations[20];
-    int mound_index = 0;
-    int power_loc = 1;
+
     // Subtract 1 from POWERUP_COUNT to prevent PowerupType::INVINCIBILITY from dropping
     const int POWERUP_INDEX_RANGE = ((int) PowerupType::POWERUP_COUNT) - 1;
 }
@@ -34,13 +32,8 @@ void PowerupSubsystem::update() {
 }
 
 void PowerupSubsystem::add_mound_location(const int x, int y, const int z) {
-    charcoal_locations[mound_index] = glm::vec3(x, y + 2.7, z);
-
-    mound_index++;
-
-    if (mound_index >= 20) {
-        mound_index = 0;
-    }
+    int i = charcoal_locations.size() - 1;
+    charcoal_locations[i] = glm::vec3(x, y + 2.7, z);
 }
 
 void PowerupSubsystem::set_new_game_state(const GameState new_game_state) {
@@ -49,8 +42,6 @@ void PowerupSubsystem::set_new_game_state(const GameState new_game_state) {
     }
 
     game_state_ = new_game_state;
-    mound_index = 0;
-    power_loc = 1;
 }
 
 void PowerupSubsystem::create_powerup(const int object_id, const PowerupType type, glm::vec3 pos) {
@@ -102,16 +93,10 @@ const bool PowerupSubsystem::is_powerup(const int object_id) const {
 
 glm::vec3 PowerupSubsystem::get_next_powerup_position() const {
 
-    if (power_loc >= 20) {
-        power_loc = 0;
-    }
+    int i = rand() % charcoal_locations.size();
+    std::cout << i << std::endl;
 
-    glm::vec3 location = charcoal_locations[power_loc];
-    power_loc++;
-
-    if (location[1] == 0) {
-        location[1] = 2;
-    }
+    glm::vec3 location = charcoal_locations.at(i);
 
     return location;
 }
