@@ -116,6 +116,6 @@ const bool PowerupSubsystem::should_pickup_powerup(const int object_id, glm::vec
         glm::distance(powerup_pos_, object_pos) <= POWERUP_DISTANCE_THRESHOLD;
 }
 
-const bool PowerupSubsystem::should_update_powerup_position(const int object_id) const {
-    return frame_counter_ >= POWERUP_LOCK_FRAMES;
+const bool PowerupSubsystem::should_update_powerup_position(const int object_id, const glm::vec3& position) const {
+    return frame_counter_ >= POWERUP_LOCK_FRAMES && powerup_pos_ != position;
 }

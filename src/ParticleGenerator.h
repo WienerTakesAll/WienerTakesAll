@@ -12,6 +12,7 @@ public:
     void clear();
     void set_active(const bool& active);
     void set_position(glm::vec3 position);
+    glm::vec3 get_position() const;
     void set_probability(const float& probability);
     void set_particle_lifetime(const unsigned int& lifetime);
     void set_spawn_amount(int min, int max);

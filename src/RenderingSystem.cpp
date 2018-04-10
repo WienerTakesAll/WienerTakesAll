@@ -55,6 +55,7 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_keypress, this);
     EventSystem::add_event_handler(EventType::USE_POWERUP, &RenderingSystem::handle_use_powerup, this);
     EventSystem::add_event_handler(EventType::FINISH_POWERUP, &RenderingSystem::handle_finish_powerup, this);
+    EventSystem::add_event_handler(EventType::PICKUP_POWERUP, &RenderingSystem::handle_pickup_powerup, this);
     EventSystem::add_event_handler(EventType::DOMINATE_CONTROLS, &RenderingSystem::handle_dominate_controls, this);
     EventSystem::add_event_handler(EventType::RESTORE_CONTROLS, &RenderingSystem::handle_restore_controls, this);
 
@@ -63,6 +64,10 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
 
 void RenderingSystem::update() {
     particle_subsystem_.update();
+
+    for (auto animation : animation_callbacks_) {
+        animation();
+    }
 }
 
 void RenderingSystem::load(const Event& e) {
@@ -199,6 +204,7 @@ void RenderingSystem::handle_new_game_state(const Event& e) {
     if (new_game_state == GameState::START_MENU) {
         example_objects_.clear();
         car_indices_.clear();
+        animation_callbacks_.clear();
     }
 }
 
@@ -252,6 +258,12 @@ void RenderingSystem::handle_add_powerup(const Event& e) {
     example_objects_[object_id].set_texture(texture);
     example_objects_[object_id].apply_transform(glm::translate(glm::mat4x4(), glm::vec3(x, y, z)));
     example_objects_[object_id].set_has_shadows(true);
+    animation_callbacks_.push_back([this, object_id]() {
+        static int frames = 0;
+        example_objects_[object_id].apply_transform(glm::rotate(glm::mat4(), glm::radians(2.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+        example_objects_[object_id].apply_transform(glm::translate(glm::mat4(), glm::vec3(0.0f, sin(glm::radians(static_cast<float>(frames) * 3.0f)) * 0.003f, 0.0f)));
+        frames = (frames + 1) % 360;
+    });
 }
 
 void RenderingSystem::handle_change_powerup(const Event& e) {
@@ -300,7 +312,7 @@ void RenderingSystem::handle_use_powerup(const Event& e) {
     int player_id = e.get_value<int>("index", true).first;
     glm::vec4 overlay = glm::vec4(0.0f);
 
-    if(type == PowerupType::RELISH && target == PowerupTarget::OTHERS) {
+    if (type == PowerupType::RELISH && target == PowerupTarget::OTHERS) {
         // special case handled by handle_dominate_controls
         return;
     }
@@ -357,6 +369,10 @@ void RenderingSystem::handle_finish_powerup(const Event& e) {
 
     int object_id = e.get_value<int>("object_id", true).first;
     example_objects_[object_id].set_colour_overlay(glm::vec4());
+}
+
+void RenderingSystem::handle_pickup_powerup(const Event& e) {
+    particle_subsystem_.handle_pickup_powerup(e);
 }
 
 void RenderingSystem::render() {
