@@ -40,9 +40,9 @@ void GameplayHud::load() {
     TextureAsset* background_tex =
         asset_manager_.get_texture_asset("assets/textures/score_bg.png", true);
     scoreboard_ = UIObject(
-                      glm::vec2(-0.25f, -0.33f),
+                      glm::vec2(-0.26f, -0.3432f),
                       glm::vec3(1.0f),
-                      glm::vec2(0.5f, 0.66f),
+                      glm::vec2(0.52f, 0.6864f),
                       square_mesh_,
                       background_tex,
                       ui_shader_
@@ -51,9 +51,9 @@ void GameplayHud::load() {
     TextureAsset* locked_background_tex =
         asset_manager_.get_texture_asset("assets/textures/score_bg_locked.png", true);
     locked_scoreboard_ = UIObject(
-                             glm::vec2(-0.25f, -0.33f),
+                             glm::vec2(-0.26f, -0.3432f),
                              glm::vec3(1.0f),
-                             glm::vec2(0.5f, 0.66f),
+                             glm::vec2(0.52f, 0.6864f),
                              square_mesh_,
                              locked_background_tex,
                              ui_shader_
