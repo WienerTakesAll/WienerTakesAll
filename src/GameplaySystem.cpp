@@ -94,6 +94,7 @@ void GameplaySystem::update() {
         // Move powerup here
         if (object_positions_.find(powerup_subsystem_.get_powerup_id()) != object_positions_.end()) {
             glm::vec3 powerup_cur_loc = object_positions_[powerup_subsystem_.get_powerup_id()];
+
             if (powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id(), powerup_cur_loc)) {
                 EventSystem::queue_event(
                     Event(
