@@ -35,6 +35,8 @@ private:
     void handle_keypress(const Event& e);
     void handle_use_powerup(const Event& e);
     void handle_finish_powerup(const Event& e);
+    void handle_dominate_controls(const Event& e);
+    void handle_restore_controls(const Event& e);
 
     void start_render() const;
     void setup_cameras();

@@ -115,6 +115,11 @@ void ParticleSubsystem::handle_use_powerup(const Event& e) {
     TextureAsset* powerup_texture;
     float particle_probability = 0.0f;
 
+    if(type == PowerupType::RELISH && target == PowerupTarget::OTHERS) {
+        // special case handled by handle_dominate_controls
+        return;
+    }
+
     switch (type) {
         case PowerupType::KETCHUP:
             powerup_texture = asset_manager_.get_texture_asset(POWERUP_PARTICLE_TEXTURE_PATH);
