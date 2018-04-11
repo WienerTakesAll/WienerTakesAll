@@ -233,11 +233,12 @@ void GameplayHud::render() const {
 
     for (auto& holder : powerup_holders_) {
         auto transform = glm::mat4();
-        if (num_ai_ == 3)
-        {
+
+        if (num_ai_ == 3) {
             transform = glm::scale(glm::mat4(1.f), glm::vec3(2.f, 2.f, 1.f));
             transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.f));
         }
+
         holder.render(transform);
 
         //If singleplayer, only render the first holder
