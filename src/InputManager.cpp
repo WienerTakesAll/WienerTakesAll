@@ -16,6 +16,56 @@ InputManager::InputManager(const InputSettings& settings)
     EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &InputManager::handle_reload_settings_event, this);
     EventSystem::add_event_handler(EventType::VEHICLE_COLLISION, &InputManager::handle_vehicle_collision, this);
     EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &InputManager::handle_new_game_state, this);
+    EventSystem::add_event_handler(EventType::DOMINATE_CONTROLS, &InputManager::handle_dominate_controls, this);
+    EventSystem::add_event_handler(EventType::REVERSE_CONTROLS, &InputManager::handle_reverse_controls, this);
+    EventSystem::add_event_handler(EventType::RESTORE_CONTROLS, &InputManager::handle_restore_controls, this);
+
+    buttons_ = {
+        SDL_CONTROLLER_BUTTON_A,
+        SDL_CONTROLLER_BUTTON_B,
+        SDL_CONTROLLER_BUTTON_X,
+        SDL_CONTROLLER_BUTTON_Y,
+        SDL_CONTROLLER_BUTTON_BACK,
+        SDL_CONTROLLER_BUTTON_GUIDE,
+        SDL_CONTROLLER_BUTTON_START,
+        SDL_CONTROLLER_BUTTON_LEFTSTICK,
+        SDL_CONTROLLER_BUTTON_RIGHTSTICK,
+        SDL_CONTROLLER_BUTTON_LEFTSHOULDER,
+        SDL_CONTROLLER_BUTTON_RIGHTSHOULDER
+    };
+
+    axes_ = {
+        SDL_CONTROLLER_AXIS_LEFTX,
+        SDL_CONTROLLER_AXIS_RIGHTX,
+        SDL_CONTROLLER_AXIS_TRIGGERLEFT,
+        SDL_CONTROLLER_AXIS_TRIGGERRIGHT
+    };
+
+    keys_ = {
+        SDLK_q,
+        SDLK_e,
+        SDLK_w,
+        SDLK_s,
+        SDLK_a,
+        SDLK_d,
+        SDLK_r,
+        SDLK_y,
+        SDLK_t,
+        SDLK_f,
+        SDLK_g,
+        SDLK_h,
+        SDLK_u,
+        SDLK_o,
+        SDLK_i,
+        SDLK_j,
+        SDLK_k,
+        SDLK_l,
+        SDLK_RSHIFT,
+        SDLK_LEFT,
+        SDLK_UP,
+        SDLK_DOWN,
+        SDLK_RIGHT
+    };
 }
 
 void InputManager::process_input(SDL_Event* event) {
@@ -137,6 +187,57 @@ void InputManager::handle_new_game_state(const Event& e) {
         default:
             break;
     }
+}
+
+void InputManager::handle_dominate_controls(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    if (object_id < 0 || object_id >= controllers_.size()) {
+        return;
+    }
+
+    // Queue all held controller buttons as key press
+    process_held_controller_buttons(object_id, RelishType::DOMINATE);
+
+    // Queue all tilted controller axes as key press
+    process_held_controller_axes(object_id, RelishType::DOMINATE);
+
+    // Queue all held keyboard buttons as key press
+    process_held_keyboard_keys(object_id, RelishType::DOMINATE);
+}
+
+void InputManager::handle_reverse_controls(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    if (object_id < 0 || object_id >= controllers_.size()) {
+        return;
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        if (i == object_id) {
+            continue;
+        }
+
+        process_held_controller_buttons(i, RelishType::REVERSE);
+
+        process_held_controller_axes(i, RelishType::REVERSE);
+
+        process_held_keyboard_keys(i, RelishType::REVERSE);
+    }
+}
+
+void InputManager::handle_restore_controls(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    if (object_id < 0 || object_id >= controllers_.size()) {
+        return;
+    }
+
+    process_held_controller_buttons(object_id, RelishType::RESTORE);
+
+    process_held_controller_axes(object_id, RelishType::RESTORE);
+
+    process_held_keyboard_keys(object_id, RelishType::RESTORE);
 }
 
 void InputManager::handle_load_event(const Event& e) {
@@ -445,4 +546,119 @@ const int InputManager::get_player_id_from_joystick_index(const int joystick_ind
 
     assert(player_id >= 0 && player_id < SDL_NumJoysticks());
     return player_id;
+}
+
+void InputManager::process_held_controller_buttons(int object_id, RelishType type) {
+    SDL_GameController* controller = controllers_[object_id];
+
+    for (auto button : buttons_) {
+        int value = SDL_CONTROLLERBUTTONDOWN;
+        Uint8 state = SDL_GameControllerGetButton(controller, button);
+
+        // state == 1 if pressed
+        if (state != 1 || !process_controller_button(button)) {
+            continue;
+        }
+
+        if (type == RelishType::DOMINATE) {
+            for (int i = 0; i < 4; ++i) {
+                EventSystem::queue_event(
+                    Event(
+                        EventType::KEYPRESS_EVENT,
+                        "player_id", i,
+                        "key", button,
+                        "value", value
+                    )
+                );
+            }
+        } else {
+            EventSystem::queue_event(
+                Event(
+                    EventType::KEYPRESS_EVENT,
+                    "player_id", object_id,
+                    "key", button,
+                    "value", value
+                )
+            );
+        }
+    }
+}
+
+void InputManager::process_held_controller_axes(int object_id, RelishType type) {
+    SDL_GameController* controller = controllers_[object_id];
+
+    for (auto axis : axes_) {
+        int value = SDL_GameControllerGetAxis(controller, axis);
+
+        // value == 0 if not tilted
+        if (value == 0 || !process_controller_axis(axis, value)) {
+            continue;
+        }
+
+        if (type == RelishType::DOMINATE) {
+            for (int i = 0; i < 4; ++i) {
+                EventSystem::queue_event(
+                    Event(
+                        EventType::KEYPRESS_EVENT,
+                        "player_id", i,
+                        "key", axis,
+                        "value", value
+                    )
+                );
+            }
+        } else {
+            EventSystem::queue_event(
+                Event(
+                    EventType::KEYPRESS_EVENT,
+                    "player_id", object_id,
+                    "key", axis,
+                    "value", value
+                )
+            );
+        }
+    }
+}
+
+void InputManager::process_held_keyboard_keys(int object_id, RelishType type) {
+    const Uint8* key_states = SDL_GetKeyboardState(nullptr);
+
+    for (auto key : keys_) {
+        int value = SDL_KEYDOWN;
+        int scan_code = SDL_GetScancodeFromKey(key);
+
+        // key_states[scan_code] == 1 if pressed
+        if (key_states[scan_code] != 1) {
+            continue;
+        }
+
+        // Queue only the keyboard buttons for the dominant player
+        int player_id = -1;
+        bool should_queue_event = process_keyboard(key, player_id);
+
+        if (!should_queue_event || object_id != player_id) {
+            continue;
+        }
+
+        if (type == RelishType::DOMINATE) {
+            for (int i = 0; i < 4; ++i) {
+                EventSystem::queue_event(
+                    Event(
+                        EventType::KEYPRESS_EVENT,
+                        "player_id", i,
+                        "key", key,
+                        "value", value
+                    )
+                );
+            }
+        } else {
+            EventSystem::queue_event(
+                Event(
+                    EventType::KEYPRESS_EVENT,
+                    "player_id", object_id,
+                    "key", key,
+                    "value", value
+                )
+            );
+        }
+    }
 }

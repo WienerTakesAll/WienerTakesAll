@@ -36,6 +36,7 @@ private:
     void handle_new_it(const Event& e);
     void handle_pickup_powerup(const Event& e);
     void handle_use_powerup(const Event& e);
+    void handle_activate_ai(const Event& e);
 
     AssetManager& asset_manager_;
     int loading_frames_counter_;
@@ -48,4 +49,6 @@ private:
 
     //Checks whether joystick has already been pressed up/down
     bool controller_buffer_;
+
+    int num_ai_;
 };

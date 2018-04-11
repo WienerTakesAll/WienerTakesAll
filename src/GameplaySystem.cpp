@@ -296,14 +296,35 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
 
         // Powerup
         // glm::vec3 powerup_loc = powerup_subsystem_.get_next_powerup_position();
+
+        int powerup_id = powerup_subsystem_.get_powerup_id();
+
+        if (powerup_id == -1) {
+            powerup_id = gameobject_counter_->assign_id();
+        }
+
         EventSystem::queue_event(
             Event(
                 EventType::ADD_POWERUP,
-                "object_id", gameobject_counter_->assign_id(),
+                "object_id", powerup_id,
                 "type", static_cast<int>(powerup_subsystem_.get_next_powerup_type()),
                 "pos_x", 0.f,
                 "pos_y", 2.7f,
                 "pos_z", 0.f
+            )
+        );
+
+        EventSystem::queue_event(
+            Event(
+                EventType::OBJECT_TRANSFORM_EVENT,
+                "object_id", powerup_id,
+                "pos_x", 0.f,
+                "pos_y", 2.7f,
+                "pos_z", 0.f,
+                "qua_x", 0.f,
+                "qua_y", 0.0f,
+                "qua_z", 0.f,
+                "qua_w", 1.0f
             )
         );
 
