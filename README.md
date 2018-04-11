@@ -28,7 +28,9 @@ Alternatively, they can also be controlled by keyboard controls as well.
  - Player 4 Arrow keys; RSHIFT to powerup self, RETURN to use powerups on others
 
 Menu selection on the keyboard is down with the enter key.
+
 Escape will end the game early.
+
 To toggle full-screen mode, press F11.
 
 ## Powerups
