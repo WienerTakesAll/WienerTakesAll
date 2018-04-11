@@ -14,20 +14,18 @@ namespace {
     const int MAX_TRIGGER_VALUE = 32768;
     const float DRIVE_SPEED = 0.6f;
     const float BRAKE_SPEED = 0.8f;
-    const float KETCHUP_BOOST = 1000.0f;
-    const float NORMAL_STEER_DAMPENING = 0.6f;
-    const float RELISH_MASS = 2000.f;
-    const float RELISH_STEER_DAMPENING = 6.0f;
-    const glm::vec3 HOT_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
-    const float NORMAL_KEYBOARD_STEER_AMOUNT = 0.4f;
-    const float RELISH_KEYBOARD_STEER_AMOUNT = 4.0f;
+    const float STEER_DAMPENING = 0.6f;
+    const float KEYBOARD_STEER_AMOUNT = 0.4f;
     const glm::vec3 COLLISION_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
+    const int NUM_MOUNDS = 20;
+    const int SPAWN_DISTANCE_FROM_CENTER = 20;
+
+    const float POWERUP_TICK = 0.01f;
+    const float KETCHUP_BOOST = 1000.0f;
+    const glm::vec3 MUSTARD_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const float RELISH_DURATION = 2.5f;
     const float MUSTARD_DURATION = 0.2f;
     const float INVINCIBILITY_DURATION = 1.0f;
-    const float POWERUP_TICK = 0.01f;
-    const int NUM_MOUNDS = 20;
-    const int SPAWN_DISTANCE_FROM_CENTER = 20;
 }
 
 GameplaySystem::GameplaySystem()
@@ -502,7 +500,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_f:
         case SDLK_j:
         case SDLK_LEFT: {
-            float steer_amount = NORMAL_KEYBOARD_STEER_AMOUNT;
+            float steer_amount = KEYBOARD_STEER_AMOUNT;
             float steer_value = value != SDL_KEYUP ? steer_amount : 0.f;
             steer_value = std::max(-1.0f, std::min(1.0f, steer_value));
 
@@ -532,7 +530,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_h:
         case SDLK_l:
         case SDLK_RIGHT: {
-            float steer_amount = -NORMAL_KEYBOARD_STEER_AMOUNT;
+            float steer_amount = -KEYBOARD_STEER_AMOUNT;
 
             float steer_value = value != SDL_KEYUP ? steer_amount : 0.f;
             steer_value = std::max(-1.0f, std::min(1.0f, steer_value));
@@ -610,7 +608,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
                 value -= 5000;
             }
 
-            float steer_dampening = NORMAL_STEER_DAMPENING;
+            float steer_dampening = STEER_DAMPENING;
 
             float steer_value = (float)(value * steer_dampening) / -MAX_TRIGGER_VALUE;
             steer_value = std::max(-1.0f, std::min(1.0f, steer_value));
@@ -837,7 +835,7 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                         "object_id", object_id,
                         // TODO: Pass glm::vec3 in events
                         "x", 0.0f,
-                        "y", HOT_KNOCK_BACK_FORCE.y,
+                        "y", MUSTARD_KNOCK_BACK_FORCE.y,
                         "z", 0.f
                     )
                 );
@@ -853,9 +851,9 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                             EventType::OBJECT_APPLY_FORCE,
                             "object_id", i,
                             // TODO: Pass glm::vec3 in events
-                            "x", HOT_KNOCK_BACK_FORCE.x,
-                            "y", HOT_KNOCK_BACK_FORCE.y,
-                            "z", HOT_KNOCK_BACK_FORCE.z
+                            "x", MUSTARD_KNOCK_BACK_FORCE.x,
+                            "y", MUSTARD_KNOCK_BACK_FORCE.y,
+                            "z", MUSTARD_KNOCK_BACK_FORCE.z
                         )
                     );
                 }
