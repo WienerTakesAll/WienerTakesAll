@@ -219,7 +219,8 @@ void InputManager::handle_dominate_controls(const Event& e) {
     for (auto axis : axes_) {
         int value = SDL_GameControllerGetAxis(controller, axis);
 
-        if (!process_controller_axis(axis, value)) {
+        // value == 0 if not tilted
+        if (value == 0 || !process_controller_axis(axis, value)) {
             continue;
         }
 
@@ -301,7 +302,8 @@ void InputManager::handle_reverse_controls(const Event& e) {
         for (auto axis : axes_) {
             int value = SDL_GameControllerGetAxis(controller, axis);
 
-            if (!process_controller_axis(axis, value)) {
+            // value == 0 if not tilted
+            if (value == 0 || !process_controller_axis(axis, value)) {
                 continue;
             }
 
