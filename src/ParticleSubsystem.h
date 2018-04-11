@@ -17,11 +17,13 @@ public:
     void handle_use_powerup(const Event& e);
     void handle_finish_powerup(const Event& e);
     void handle_new_game_state(const Event& e);
+    void handle_pickup_powerup(const Event& e);
 
 private:
     AssetManager& asset_manager_;
     ParticleGenerator hotdog_indicator_gen_;
     std::array<ParticleGenerator, 4> powerup_gens_;
+    ParticleGenerator powerup_pickup_gen_;
 
     int whos_it;
 };

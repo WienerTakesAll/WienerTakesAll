@@ -1,6 +1,4 @@
-#define _USE_MATH_DEFINES
 #include <cmath>
-#undef _USE_MATH_DEFINES
 
 #include "ParticleGenerator.h"
 #include "RenderingComponent.h"
@@ -14,10 +12,6 @@
 #include <iostream>
 #include <cstdlib> // for rand
 #include <ctime>
-
-namespace {
-    const float DEG_TO_RAD = M_PI / 180.0f;
-}
 
 ParticleGenerator::ParticleGenerator()
     : active_(true)
@@ -209,6 +203,10 @@ void ParticleGenerator::set_position(glm::vec3 position) {
     position_ = position;
 }
 
+glm::vec3 ParticleGenerator::get_position() const {
+    return position_;
+}
+
 void ParticleGenerator::set_probability(const float& probability) {
     spawn_probability_ = probability;
 }
@@ -237,9 +235,9 @@ void ParticleGenerator::set_particle_rotation_rads(float delta, float min, float
 }
 
 void ParticleGenerator::set_particle_rotation_degrees(float delta, float min, float max) {
-    rotation_delta_ = delta * DEG_TO_RAD;
-    rotation_max_ = max * DEG_TO_RAD;
-    rotation_min_ = min * DEG_TO_RAD;
+    rotation_delta_ = glm::radians(delta);
+    rotation_max_ = glm::radians(max);
+    rotation_min_ = glm::radians(min);
 }
 
 void ParticleGenerator::set_particle_scale(float delta, float min, float max) {

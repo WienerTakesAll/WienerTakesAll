@@ -46,6 +46,7 @@ GameplaySystem::GameplaySystem()
     add_event_handler(EventType::PICKUP_POWERUP, &GameplaySystem::handle_pickup_powerup, this);
     add_event_handler(EventType::CHANGE_POWERUP, &GameplaySystem::handle_change_powerup, this);
     add_event_handler(EventType::PLAYER_FELL_OFF_ARENA, &GameplaySystem::handle_player_fell_off_arena, this);
+    add_event_handler(EventType::ADD_CHARCOAL, &GameplaySystem::handle_add_charcoal, this);
     add_event_handler(EventType::DOMINATE_CONTROLS, &GameplaySystem::handle_dominate_controls, this);
     add_event_handler(EventType::RESTORE_CONTROLS, &GameplaySystem::handle_restore_controls, this);
     add_event_handler(EventType::REVERSE_CONTROLS, &GameplaySystem::handle_reverse_controls, this);
@@ -92,22 +93,24 @@ void GameplaySystem::update() {
         powerup_subsystem_.update();
 
         // Move powerup here
-        if (object_positions_.find(powerup_subsystem_.get_powerup_id()) != object_positions_.end() &&
-                powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id())) {
+        if (object_positions_.find(powerup_subsystem_.get_powerup_id()) != object_positions_.end()) {
             glm::vec3 powerup_cur_loc = object_positions_[powerup_subsystem_.get_powerup_id()];
-            EventSystem::queue_event(
-                Event(
-                    EventType::OBJECT_TRANSFORM_EVENT,
-                    "object_id", powerup_subsystem_.get_powerup_id(),
-                    "pos_x", powerup_cur_loc.x,
-                    "pos_y", powerup_cur_loc.y,
-                    "pos_z", powerup_cur_loc.z,
-                    "qua_w", 1.0f,
-                    "qua_x", 0.0f,
-                    "qua_y", 0.0f,
-                    "qua_z", 0.0f
-                )
-            );
+
+            if (powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id(), powerup_cur_loc)) {
+                EventSystem::queue_event(
+                    Event(
+                        EventType::OBJECT_TRANSFORM_EVENT,
+                        "object_id", powerup_subsystem_.get_powerup_id(),
+                        "pos_x", powerup_cur_loc.x,
+                        "pos_y", powerup_cur_loc.y,
+                        "pos_z", powerup_cur_loc.z,
+                        "qua_w", 1.0f,
+                        "qua_x", 0.0f,
+                        "qua_y", 0.0f,
+                        "qua_z", 0.0f
+                    )
+                );
+            }
         }
 
         for (auto& powerup_data : powerup_datas_) {
@@ -191,7 +194,6 @@ void GameplaySystem::handle_load(const Event& e) {
 
 void GameplaySystem::handle_new_game_state(const Event& e) {
     GameState new_game_state = (GameState)e.get_value<int>("state", true).first;
-
     powerup_subsystem_.set_new_game_state(new_game_state);
     scoring_subsystem_.set_new_game_state(new_game_state);
 
@@ -271,7 +273,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
             )
         );
 
-        //CHARCOAL_TEST
+        // mounds
         for (size_t i = 0; i < NUM_MOUNDS; i++) {
             EventSystem::queue_event(
                 Event(
@@ -294,15 +296,15 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
         );
 
         // Powerup
-        glm::vec3 powerup_loc = powerup_subsystem_.get_next_powerup_position();
+        // glm::vec3 powerup_loc = powerup_subsystem_.get_next_powerup_position();
         EventSystem::queue_event(
             Event(
                 EventType::ADD_POWERUP,
                 "object_id", gameobject_counter_->assign_id(),
                 "type", static_cast<int>(powerup_subsystem_.get_next_powerup_type()),
-                "pos_x", powerup_loc.x,
-                "pos_y", powerup_loc.y,
-                "pos_z", powerup_loc.z
+                "pos_x", 0.f,
+                "pos_y", 2.7f,
+                "pos_z", 0.f
             )
         );
 
@@ -311,7 +313,6 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
         dom_ = -1;
         controllers_reversed_.fill(false);
     }
-
 
     else if (new_game_state == GameState::END_GAME) {
 
@@ -361,7 +362,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
                 }
 
                 for (int i = 0; i < 4; ++i) {
-                    if (value == SDL_KEYDOWN && powerup_subsystem_.can_use_powerup(i)) {
+                    if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(i)) {
                         new_events.emplace_back(EventType::USE_POWERUP,
                                                 "type", powerup_subsystem_.get_player_powerup_type(i),
                                                 "target", PowerupTarget::SELF,
@@ -369,7 +370,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
                     }
                 }
             } else {
-                if (value == SDL_KEYDOWN && powerup_subsystem_.can_use_powerup(player_id)) {
+                if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(player_id)) {
                     new_events.emplace_back(EventType::USE_POWERUP,
                                             "type", powerup_subsystem_.get_player_powerup_type(player_id),
                                             "target", PowerupTarget::SELF,
@@ -391,7 +392,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
                 }
 
                 for (int i = 0; i < 4; ++i) {
-                    if (value == SDL_KEYDOWN && powerup_subsystem_.can_use_powerup(i)) {
+                    if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(i)) {
                         new_events.emplace_back(EventType::USE_POWERUP,
                                                 "type", powerup_subsystem_.get_player_powerup_type(i),
                                                 "target", PowerupTarget::OTHERS,
@@ -399,7 +400,7 @@ void GameplaySystem::handle_key_press(const Event& e) {
                     }
                 }
             } else {
-                if (value == SDL_KEYDOWN && powerup_subsystem_.can_use_powerup(player_id)) {
+                if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(player_id)) {
                     new_events.emplace_back(EventType::USE_POWERUP,
                                             "type", powerup_subsystem_.get_player_powerup_type(player_id),
                                             "target", PowerupTarget::OTHERS,
@@ -738,6 +739,16 @@ void GameplaySystem::handle_new_it(const Event& e) {
             "index", new_it_id
         )
     );
+}
+
+void GameplaySystem::handle_add_charcoal(const Event& e) {
+    int object_id = e.get_value<int>("object_id", true).first;
+
+    std::pair<int, bool> x = e.get_value<int>("pos_x", true);
+    std::pair<int, bool> y = e.get_value<int>("pos_y", true);
+    std::pair<int, bool> z = e.get_value<int>("pos_z", true);
+
+    powerup_subsystem_.add_mound_location(x.first, y.first, z.first);
 }
 
 void GameplaySystem::handle_add_powerup(const Event& e) {
