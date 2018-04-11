@@ -20,6 +20,7 @@ UISystem::UISystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::NEW_IT, &UISystem::handle_new_it, this);
     EventSystem::add_event_handler(EventType::PICKUP_POWERUP, &UISystem::handle_pickup_powerup, this);
     EventSystem::add_event_handler(EventType::USE_POWERUP, &UISystem::handle_use_powerup, this);
+    EventSystem::add_event_handler(EventType::ACTIVATE_AI, &UISystem::handle_activate_ai, this);
 
     window_ = asset_manager.get_window();
 }
@@ -179,7 +180,14 @@ void UISystem::handle_new_game_state(const Event& e) {
         case GameState::END_GAME:
             if (e.get_value<int>("winner", false).second) {
                 int winner_id = e.get_value<int>("winner", false).first;
-                end_game_screen_.set_winner(winner_id);
+
+                if (num_ai_ == 3 && winner_id != 0) {
+                    //A special case was added where -2 makes the crown invisible.
+                    end_game_screen_.set_winner(-2);
+                } else {
+                    end_game_screen_.set_winner(winner_id);
+                }
+
             } else {
                 end_game_screen_.set_winner(-1);
             }
@@ -230,4 +238,9 @@ void UISystem::handle_use_powerup(const Event& e) {
     int object_id = e.get_value<int>("index", true).first;
 
     gameplay_hud_.use_powerup(object_id);
+}
+
+void UISystem::handle_activate_ai(const Event& e) {
+    num_ai_ = e.get_value<int>("num_ai", true).first;
+    gameplay_hud_.set_num_ai(num_ai_);
 }

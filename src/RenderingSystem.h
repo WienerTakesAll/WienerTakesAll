@@ -36,6 +36,7 @@ private:
     void handle_keypress(const Event& e);
     void handle_use_powerup(const Event& e);
     void handle_finish_powerup(const Event& e);
+    void handle_activate_ai(const Event& e);
     void handle_pickup_powerup(const Event& e);
     void handle_dominate_controls(const Event& e);
     void handle_restore_controls(const Event& e);
@@ -43,6 +44,7 @@ private:
     void start_render() const;
     void setup_cameras();
     void end_render() const;
+    void render_single_player();
 
     bool init_window();
 
@@ -62,6 +64,7 @@ private:
     ShaderAsset* shadow_shader_;
     ParticleSubsystem particle_subsystem_;
     unsigned int whos_it;
+    int num_ai_;
     std::vector<std::function<void()>> animation_callbacks_;
 };
 

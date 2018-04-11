@@ -19,6 +19,8 @@ public:
     void reset_powerups();
     void set_num_humans(int num_humans);
 
+    void set_num_ai(int num_ai);
+
 private:
     AssetManager& asset_manager_;
     MeshAsset* square_mesh_;
@@ -37,4 +39,6 @@ private:
 
     UIObject countdown_;
     int countdown_value_;
+
+    int num_ai_;
 };
