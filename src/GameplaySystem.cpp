@@ -8,6 +8,7 @@
 #include "GameObjectCounter.h"
 #include "GameplaySystem.h"
 #include "VehicleControls.h"
+#include "StatusEffect.h"
 
 namespace {
     const int MAX_SCORE = 2500;
@@ -736,9 +737,6 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
         glm::vec3 velocity(vx, vy, vz);
         object_velocities_[object_id] = velocity;
     }
-
-
-
 }
 
 void GameplaySystem::handle_new_it(const Event& e) {
@@ -753,10 +751,9 @@ void GameplaySystem::handle_new_it(const Event& e) {
 
     EventSystem::queue_event(
         Event(
-            EventType::USE_POWERUP,
-            "type", PowerupType::INVINCIBILITY,
-            "target", PowerupTarget::SELF,
-            "index", new_it_id
+            EventType::NEW_STATUS_EFFECT,
+            "type", StatusEffect::INVINCIBILITY,
+            "object_id", new_it_id
         )
     );
 }
@@ -910,11 +907,11 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
 
             break;
 
-        case PowerupType::INVINCIBILITY:
-            assert(target == PowerupTarget::SELF);
-            std::cout << "INVINCIBILITY used by player " << object_id << std::endl;
-            powerup_datas_[object_id].invincibility = INVINCIBILITY_DURATION;
-            break;
+        // case PowerupType::INVINCIBILITY:
+        //     assert(target == PowerupTarget::SELF);
+        //     std::cout << "INVINCIBILITY used by player " << object_id << std::endl;
+        //     powerup_datas_[object_id].invincibility = INVINCIBILITY_DURATION;
+        //     break;
 
         default:
             break;

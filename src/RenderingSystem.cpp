@@ -8,6 +8,7 @@
 
 #include "GameState.h"
 #include "Powerup.h"
+#include "StatusEffect.h"
 
 namespace {
     const std::string STANDARD_SHADER_PATH = "assets/shaders/SimpleShader";
@@ -53,12 +54,9 @@ RenderingSystem::RenderingSystem(AssetManager& asset_manager)
     EventSystem::add_event_handler(EventType::ADD_POWERUP, &RenderingSystem::handle_add_powerup, this);
     EventSystem::add_event_handler(EventType::CHANGE_POWERUP, &RenderingSystem::handle_change_powerup, this);
     EventSystem::add_event_handler(EventType::KEYPRESS_EVENT, &RenderingSystem::handle_keypress, this);
-    EventSystem::add_event_handler(EventType::USE_POWERUP, &RenderingSystem::handle_use_powerup, this);
-    EventSystem::add_event_handler(EventType::FINISH_POWERUP, &RenderingSystem::handle_finish_powerup, this);
+    EventSystem::add_event_handler(EventType::NEW_STATUS_EFFECT, &RenderingSystem::handle_new_status_effect, this);
     EventSystem::add_event_handler(EventType::ACTIVATE_AI, &RenderingSystem::handle_activate_ai, this);
     EventSystem::add_event_handler(EventType::PICKUP_POWERUP, &RenderingSystem::handle_pickup_powerup, this);
-    EventSystem::add_event_handler(EventType::DOMINATE_CONTROLS, &RenderingSystem::handle_dominate_controls, this);
-    EventSystem::add_event_handler(EventType::RESTORE_CONTROLS, &RenderingSystem::handle_restore_controls, this);
 
     init_window();
 }
@@ -305,71 +303,59 @@ void RenderingSystem::handle_keypress(const Event& e) {
     }
 }
 
-void RenderingSystem::handle_use_powerup(const Event& e) {
-    particle_subsystem_.handle_use_powerup(e);
+void RenderingSystem::handle_new_status_effect(const Event& e) {
+    particle_subsystem_.handle_new_status_effect(e);
 
-    PowerupType type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
-    PowerupTarget target = static_cast<PowerupTarget>(e.get_value<int>("target", true).first);
-    int player_id = e.get_value<int>("index", true).first;
+    StatusEffect type = static_cast<StatusEffect>(e.get_value<int>("type", true).first);
+    int player_id = e.get_value<int>("object_id", true).first;
+
+
     glm::vec4 overlay = glm::vec4(0.0f);
 
-    if (type == PowerupType::RELISH && target == PowerupTarget::OTHERS) {
-        // special case handled by handle_dominate_controls
-        return;
-    }
-
     switch (type) {
-        case PowerupType::KETCHUP:
+        case StatusEffect::NONE:
+            overlay = glm::vec4(0.0f); // no overlay
+            break;
+
+        case StatusEffect::BAD_KETCHUP:
             overlay[0] = OVERLAY_INTENSITY; // red
             break;
 
-        case PowerupType::RELISH:
-            overlay[1] = OVERLAY_INTENSITY; // green
+        case StatusEffect::GOOD_KETCHUP:
+            overlay[0] = OVERLAY_INTENSITY; // red
             break;
 
-        case PowerupType::MUSTARD:
+        case StatusEffect::MUSTARD_EFFECT:
             // red + green = yellow
             overlay[0] = OVERLAY_INTENSITY;
             overlay[1] = OVERLAY_INTENSITY;
             break;
 
-        case PowerupType::INVINCIBILITY:
+        case StatusEffect::INVINCIBILITY:
             // red + green + blue = white
             overlay[0] = OVERLAY_INTENSITY;
             overlay[1] = OVERLAY_INTENSITY;
             overlay[2] = OVERLAY_INTENSITY;
             break;
 
-        default:
-            assert(false);
-            break;
-    }
-
-    switch (target) {
-        case PowerupTarget::SELF:
-            example_objects_[player_id].set_colour_overlay(overlay);
+        case StatusEffect::DOMINATED:
+            // black
+            overlay[0] = -OVERLAY_INTENSITY * 1.5f;
+            overlay[1] = -OVERLAY_INTENSITY * 1.5f;
+            overlay[2] = -OVERLAY_INTENSITY * 1.5f;
+            overlay[3] = OVERLAY_INTENSITY * 1.5f;
             break;
 
-        case PowerupTarget::OTHERS:
-            for (int i = 0; i < 4; ++i) {
-                if (i != player_id) {
-                    example_objects_[i].set_colour_overlay(overlay);
-                }
-            }
-
+        case StatusEffect::CONTROLS_REVERSED:
+            overlay[1] = OVERLAY_INTENSITY; // green
             break;
 
         default:
             assert(false);
             break;
     }
-}
 
-void RenderingSystem::handle_finish_powerup(const Event& e) {
-    particle_subsystem_.handle_finish_powerup(e);
-
-    int object_id = e.get_value<int>("object_id", true).first;
-    example_objects_[object_id].set_colour_overlay(glm::vec4());
+    example_objects_[player_id].set_colour_overlay(overlay);
 }
 
 void RenderingSystem::handle_activate_ai(const Event& e) {
@@ -626,29 +612,4 @@ void RenderingSystem::preload_assets() const {
     // Obstacles
     asset_manager_.get_mesh_asset(CHARCOAL_MESH_PATH);
     asset_manager_.get_texture_asset(CHARCOAL_TEXTURE_PATH);
-}
-
-void RenderingSystem::handle_dominate_controls(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
-    glm::vec4 overlay = glm::vec4(0.0f);
-
-    for (int i = 0; i < 4; ++i) {
-        if (i != object_id) {
-            overlay[0] = -OVERLAY_INTENSITY * 2.f;
-            overlay[1] = -OVERLAY_INTENSITY * 2.f;
-            overlay[2] = -OVERLAY_INTENSITY * 2.f;
-            overlay[3] = OVERLAY_INTENSITY * 2.f;
-            example_objects_[i].set_colour_overlay(overlay);
-        }
-    }
-}
-
-void RenderingSystem::handle_restore_controls(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
-
-    for (int i = 0; i < 4; ++i) {
-        if (i != object_id) {
-            example_objects_[i].set_colour_overlay(glm::vec4());
-        }
-    }
 }

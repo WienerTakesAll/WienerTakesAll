@@ -231,10 +231,6 @@ void UISystem::handle_pickup_powerup(const Event& e) {
 void UISystem::handle_use_powerup(const Event& e) {
     int type = e.get_value<int>("type", true).first;
 
-    if (type == PowerupType::INVINCIBILITY) {
-        return;
-    }
-
     int object_id = e.get_value<int>("index", true).first;
 
     gameplay_hud_.use_powerup(object_id);

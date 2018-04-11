@@ -8,6 +8,7 @@
 #include "AudioSettings.h"
 #include "GameState.h"
 #include "Powerup.h"
+#include "StatusEffect.h"
 
 AudioSystem::AudioSystem(const AudioSettings& settings)
     : init_successful_(false)
@@ -32,7 +33,7 @@ bool AudioSystem::init() {
     add_event_handler(EventType::NEW_GAME_STATE, &AudioSystem::handle_new_game_state, this);
     add_event_handler(EventType::NEW_IT, &AudioSystem::handle_new_it, this);
     add_event_handler(EventType::PICKUP_POWERUP, &AudioSystem::handle_pickup_powerup, this);
-    add_event_handler(EventType::USE_POWERUP, &AudioSystem::handle_use_powerup, this);
+    add_event_handler(EventType::NEW_STATUS_EFFECT, &AudioSystem::handle_new_status_effect, this);
     init_successful_ = true;
     return init_successful_;
 }
@@ -205,24 +206,35 @@ void AudioSystem::handle_pickup_powerup(const Event& e) {
     play_sound(SoundAsset::SQUISH);
 }
 
-void AudioSystem::handle_use_powerup(const Event& e) {
+void AudioSystem::handle_new_status_effect(const Event& e) {
     int type = e.get_value<int>("type", true).first;
 
     switch (type) {
-        case PowerupType::KETCHUP:
+        case StatusEffect::NONE:
+            break;
+
+        case StatusEffect::BAD_KETCHUP:
             play_sound(SoundAsset::DRILL);
             break;
 
-        case PowerupType::MUSTARD:
+        case StatusEffect::GOOD_KETCHUP:
+            play_sound(SoundAsset::DRILL);
+            break;
+
+        case StatusEffect::MUSTARD_EFFECT:
             play_sound(SoundAsset::BOING);
             break;
 
-        case PowerupType::RELISH:
+        case StatusEffect::INVINCIBILITY:
+            play_sound(SoundAsset::BRIGHT);
+            break;
+
+        case StatusEffect::DOMINATED:
             play_sound(SoundAsset::DOG_LAPPING_WATER);
             break;
 
-        case PowerupType::INVINCIBILITY:
-            play_sound(SoundAsset::BRIGHT);
+        case StatusEffect::CONTROLS_REVERSED:
+            play_sound(SoundAsset::DOG_LAPPING_WATER);
             break;
 
         default:

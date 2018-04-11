@@ -33,6 +33,7 @@ enum class EventType {
     DOMINATE_CONTROLS,
     RESTORE_CONTROLS,
     REVERSE_CONTROLS,
+    NEW_STATUS_EFFECT,
 
     // Keep at end of list
     EVENT_COUNT

@@ -1,10 +1,12 @@
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "ParticleSubsystem.h"
 #include "RenderingComponent.h"
 #include "AssetManager.h"
-#include <glm/gtx/quaternion.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include "Powerup.h"
 #include "GameState.h"
+#include "StatusEffect.h"
 
 namespace {
     const std::string PARTICLE_SHADER_PATH = "assets/shaders/ParticleShader";
@@ -127,80 +129,71 @@ void ParticleSubsystem::handle_object_transform(const Event& e) {
     }
 }
 
-void ParticleSubsystem::handle_use_powerup(const Event& e) {
+void ParticleSubsystem::handle_new_status_effect(const Event& e) {
     PowerupType type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
-    PowerupTarget target = static_cast<PowerupTarget>(e.get_value<int>("target", true).first);
-    int player_id = e.get_value<int>("index", true).first;
-    glm::vec4 delta = glm::vec4(0.0f, 0.0f, 0.0f, -0.01f);
-    glm::vec4 min = glm::vec4();
-    glm::vec4 max = glm::vec4();
+    int player_id = e.get_value<int>("object_id", true).first;
 
     TextureAsset* powerup_texture;
     float particle_probability = 0.0f;
-
-    if (type == PowerupType::RELISH && target == PowerupTarget::OTHERS) {
-        // special case handled by handle_dominate_controls
-        return;
-    }
+    glm::vec4 delta = glm::vec4(0.0f, 0.0f, 0.0f, -0.01f);
+    glm::vec4 min = glm::vec4();
+    glm::vec4 max = glm::vec4();
+    bool new_active = true;
 
     switch (type) {
-        case PowerupType::KETCHUP:
+        case StatusEffect::BAD_KETCHUP:
+            new_active = true;
             powerup_texture = asset_manager_.get_texture_asset(POWERUP_PARTICLE_TEXTURE_PATH);
             particle_probability = 0.15f;
             min = glm::vec4(0.4f, 0.0f, 0.0f, -0.1f);
             max = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
             break;
 
-        case PowerupType::MUSTARD:
+        case StatusEffect::GOOD_KETCHUP:
+            new_active = true;
+            powerup_texture = asset_manager_.get_texture_asset(POWERUP_PARTICLE_TEXTURE_PATH);
+            particle_probability = 0.15f;
+            min = glm::vec4(0.4f, 0.0f, 0.0f, -0.1f);
+            max = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+            break;
+
+        case StatusEffect::MUSTARD_EFFECT:
+            new_active = true;
             powerup_texture = asset_manager_.get_texture_asset(POWERUP_PARTICLE_TEXTURE_PATH);
             particle_probability = 0.15f;
             min = glm::vec4(0.4f, 0.4f, 0.0f, -0.1f);
             max = glm::vec4(1.0f, 1.0f, 0.0f, 0.0f);
             break;
 
-        case PowerupType::RELISH:
+        case StatusEffect::INVINCIBILITY:
+            new_active = true;
+            powerup_texture = asset_manager_.get_texture_asset(INVINCIBILITY_PARTICLE_TEXTURE_PATH);
+            particle_probability = 1.0f;
+            break;
+
+        case StatusEffect::CONTROLS_REVERSED:
+            new_active = true;
             powerup_texture = asset_manager_.get_texture_asset(POWERUP_PARTICLE_TEXTURE_PATH);
             particle_probability = 0.15f;
             min = glm::vec4(0.0f, 0.4f, 0.0f, -0.1f);
             max = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
             break;
 
-        case PowerupType::INVINCIBILITY:
-            powerup_texture = asset_manager_.get_texture_asset(INVINCIBILITY_PARTICLE_TEXTURE_PATH);
-            particle_probability = 1.0f;
+        case StatusEffect::DOMINATED:
+        case StatusEffect::NONE:
+            new_active = false;
+            return;
             break;
 
         default:
-            return;
+            assert(false);
             break;
     }
 
-    switch (target) {
-        case PowerupTarget::SELF:
-            powerup_gens_[player_id].set_active(true);
-            powerup_gens_[player_id].set_colour(delta, min, max);
-            powerup_gens_[player_id].set_texture(powerup_texture);
-            powerup_gens_[player_id].set_probability(particle_probability);
-            break;
-
-        case PowerupTarget::OTHERS:
-            for (int i = 0; i < 4; ++i) {
-                if (i != player_id) {
-                    powerup_gens_[i].set_active(true);
-                    powerup_gens_[i].set_colour(delta, min, max);
-                    powerup_gens_[i].set_texture(powerup_texture);
-                    powerup_gens_[i].set_probability(particle_probability);
-                }
-            }
-
-            break;
-    }
-}
-
-void ParticleSubsystem::handle_finish_powerup(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
-
-    powerup_gens_[object_id].set_active(false);
+    powerup_gens_[player_id].set_active(new_active);
+    powerup_gens_[player_id].set_colour(delta, min, max);
+    powerup_gens_[player_id].set_texture(powerup_texture);
+    powerup_gens_[player_id].set_probability(particle_probability);
 }
 
 void ParticleSubsystem::handle_new_game_state(const Event& e) {
