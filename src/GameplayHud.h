@@ -17,6 +17,7 @@ public:
     void pickup_powerup(int player, int type);
     void use_powerup(int player);
     void reset_powerups();
+    void set_num_humans(int num_humans);
 
     void set_num_ai(int num_ai);
 
@@ -26,6 +27,7 @@ private:
     ShaderAsset* ui_shader_;
 
     UIObject scoreboard_;
+    UIObject locked_scoreboard_;
     std::array<UIObject, 4> scores_;
     int current_it_;
 
@@ -33,6 +35,7 @@ private:
     std::array<glm::mat4, 4> it_pointer_transforms_;
 
     std::array<UIObject, 4> powerup_holders_;
+    std::array<UIObject, 4> player_numbers_;
 
     UIObject countdown_;
     int countdown_value_;

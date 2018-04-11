@@ -5,8 +5,8 @@
 namespace {
     const float MENU_ITEM_SCALE = 0.7f;
     const float MENU_TEXT_X_POS = -0.35f;
-    const float MENU_TEXT_Y_BASE = -0.42f;
-    const float MENU_TEXT_SPACING = -0.195f;
+    const float MENU_TEXT_Y_BASE = -0.41f;
+    const float MENU_TEXT_SPACING = -0.2f;
 }
 
 StartMenu::StartMenu(AssetManager& asset_manager)
@@ -46,7 +46,8 @@ void StartMenu::load() {
     }
 
     TextureAsset* one_players_tex =
-        asset_manager_.get_texture_asset("assets/textures/one_players.png");
+        asset_manager_.get_texture_asset("assets/textures/one_players_selected.png"); // default selection
+    asset_manager_.get_texture_asset("assets/textures/one_players.png"); // preload
     one_players_ = UIObject( // top middle
                        glm::vec2(MENU_TEXT_X_POS, menu_y[0]),
                        glm::vec3(1.0f),
@@ -58,6 +59,7 @@ void StartMenu::load() {
 
     TextureAsset* two_players_tex =
         asset_manager_.get_texture_asset("assets/textures/two_players.png");
+    asset_manager_.get_texture_asset("assets/textures/two_players_selected.png"); // preload
     two_players_ = UIObject( // top middle
                        glm::vec2(MENU_TEXT_X_POS, menu_y[1]),
                        glm::vec3(1.0f),
@@ -69,6 +71,7 @@ void StartMenu::load() {
 
     TextureAsset* three_players_tex =
         asset_manager_.get_texture_asset("assets/textures/three_players.png");
+    asset_manager_.get_texture_asset("assets/textures/three_players_selected.png"); // preload
     three_players_ = UIObject( // top middle
                          glm::vec2(MENU_TEXT_X_POS, menu_y[2]),
                          glm::vec3(1.0f),
@@ -80,6 +83,7 @@ void StartMenu::load() {
 
     TextureAsset* four_players_tex =
         asset_manager_.get_texture_asset("assets/textures/four_players.png");
+    asset_manager_.get_texture_asset("assets/textures/four_players_selected.png"); // preload
     four_players_ = UIObject( // top middle
                         glm::vec2(MENU_TEXT_X_POS, menu_y[3]),
                         glm::vec3(1.0f),
@@ -91,6 +95,7 @@ void StartMenu::load() {
 
     TextureAsset* exit_game_tex =
         asset_manager_.get_texture_asset("assets/textures/exit_game.png");
+    asset_manager_.get_texture_asset("assets/textures/exit_game_selected.png"); // preload
     exit_game_ = UIObject( // top middle
                      glm::vec2(MENU_TEXT_X_POS, menu_y[4]),
                      glm::vec3(1.0f),
@@ -108,7 +113,7 @@ void StartMenu::load() {
         selection_indicators_.emplace_back(
             glm::vec2(), // garbage
             glm::vec3(1.0f),
-            glm::vec2(0.9f),
+            glm::vec2(0.85f),
             square_mesh_,
             unselected_tex,
             ui_shader_
@@ -120,11 +125,11 @@ void StartMenu::load() {
         asset_manager_.get_texture_asset("assets/textures/grilled_sausage.png");
     selection_indicators_[active_selection].set_texture(selected_tex);
 
-    selection_indicators_[0].set_origin(glm::vec2(-.5f, -0.5f));
-    selection_indicators_[1].set_origin(glm::vec2(-.5f, -.72f));
-    selection_indicators_[2].set_origin(glm::vec2(-.5f, -.94f));
-    selection_indicators_[3].set_origin(glm::vec2(-.5f, -1.16f));
-    selection_indicators_[4].set_origin(glm::vec2(-.5f, -1.38f));
+    selection_indicators_[0].set_origin(glm::vec2(-.5f, -0.55f));
+    selection_indicators_[1].set_origin(glm::vec2(-.5f, -.79f));
+    selection_indicators_[2].set_origin(glm::vec2(-.5f, -1.03f));
+    selection_indicators_[3].set_origin(glm::vec2(-.5f, -1.27f));
+    selection_indicators_[4].set_origin(glm::vec2(-.5f, -1.50f));
 }
 
 void StartMenu::move_selection_up() {
@@ -136,11 +141,55 @@ void StartMenu::move_selection_up() {
         asset_manager_.get_texture_asset("assets/textures/raw_sausage.png");
     selection_indicators_[active_selection].set_texture(unselected_tex);
 
+    switch (active_selection) {
+        case 0:
+            one_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/one_players.png"));
+            break;
+
+        case 1:
+            two_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/two_players.png"));
+            break;
+
+        case 2:
+            three_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/three_players.png"));
+            break;
+
+        case 3:
+            four_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/four_players.png"));
+            break;
+
+        case 4:
+            exit_game_.set_texture(asset_manager_.get_texture_asset("assets/textures/exit_game.png"));
+            break;
+    }
+
     active_selection--;
 
     TextureAsset* selected_tex =
         asset_manager_.get_texture_asset("assets/textures/grilled_sausage.png");
     selection_indicators_[active_selection].set_texture(selected_tex);
+
+    switch (active_selection) {
+        case 0:
+            one_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/one_players_selected.png"));
+            break;
+
+        case 1:
+            two_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/two_players_selected.png"));
+            break;
+
+        case 2:
+            three_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/three_players_selected.png"));
+            break;
+
+        case 3:
+            four_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/four_players_selected.png"));
+            break;
+
+        case 4:
+            exit_game_.set_texture(asset_manager_.get_texture_asset("assets/textures/exit_game_selected.png"));
+            break;
+    }
 }
 
 void StartMenu::move_selection_down() {
@@ -152,11 +201,55 @@ void StartMenu::move_selection_down() {
         asset_manager_.get_texture_asset("assets/textures/raw_sausage.png");
     selection_indicators_[active_selection].set_texture(unselected_tex);
 
+    switch (active_selection) {
+        case 0:
+            one_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/one_players.png"));
+            break;
+
+        case 1:
+            two_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/two_players.png"));
+            break;
+
+        case 2:
+            three_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/three_players.png"));
+            break;
+
+        case 3:
+            four_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/four_players.png"));
+            break;
+
+        case 4:
+            exit_game_.set_texture(asset_manager_.get_texture_asset("assets/textures/exit_game.png"));
+            break;
+    }
+
     active_selection++;
 
     TextureAsset* selected_tex =
         asset_manager_.get_texture_asset("assets/textures/grilled_sausage.png");
     selection_indicators_[active_selection].set_texture(selected_tex);
+
+    switch (active_selection) {
+        case 0:
+            one_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/one_players_selected.png"));
+            break;
+
+        case 1:
+            two_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/two_players_selected.png"));
+            break;
+
+        case 2:
+            three_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/three_players_selected.png"));
+            break;
+
+        case 3:
+            four_players_.set_texture(asset_manager_.get_texture_asset("assets/textures/four_players_selected.png"));
+            break;
+
+        case 4:
+            exit_game_.set_texture(asset_manager_.get_texture_asset("assets/textures/exit_game_selected.png"));
+            break;
+    }
 }
 
 int StartMenu::selected_num_of_players() {

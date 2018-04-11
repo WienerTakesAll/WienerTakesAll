@@ -1,3 +1,4 @@
+#include <iostream>
 #include <stdlib.h> /* srand, rand */
 #include <time.h> /* time */
 #include <algorithm>
@@ -22,7 +23,6 @@ PowerupSubsystem::PowerupSubsystem()
     , frame_counter_(0)
     , powerup_type_(PowerupType::POWERUP_COUNT) {
 }
-
 void PowerupSubsystem::load() {
     // Initialize random seed
     srand(time(NULL));
@@ -30,6 +30,11 @@ void PowerupSubsystem::load() {
 
 void PowerupSubsystem::update() {
     frame_counter_ = std::min(POWERUP_LOCK_FRAMES, frame_counter_ + 1);
+}
+
+void PowerupSubsystem::add_mound_location(const int x, int y, const int z) {
+    int i = charcoal_locations.size() - 1;
+    charcoal_locations[i] = glm::vec3(x, y + 3, z);
 }
 
 void PowerupSubsystem::set_new_game_state(const GameState new_game_state) {
@@ -88,10 +93,12 @@ const bool PowerupSubsystem::is_powerup(const int object_id) const {
 }
 
 glm::vec3 PowerupSubsystem::get_next_powerup_position() const {
-    float x = (rand() % (2 * (int) POWERUP_LOCATION_LIMITS.x)) - (int) POWERUP_LOCATION_LIMITS.x;
-    float y = 1.5f;
-    float z = (rand() % (2 * (int) POWERUP_LOCATION_LIMITS.z)) - (int) POWERUP_LOCATION_LIMITS.z;
-    return glm::vec3(x, y, z);
+    int i = rand() % charcoal_locations.size();
+    std::cout << i << std::endl;
+
+    glm::vec3 location = charcoal_locations.at(i);
+
+    return location;
 }
 
 PowerupType PowerupSubsystem::get_next_powerup_type() const {
@@ -116,6 +123,6 @@ const bool PowerupSubsystem::should_pickup_powerup(const int object_id, glm::vec
         glm::distance(powerup_pos_, object_pos) <= POWERUP_DISTANCE_THRESHOLD;
 }
 
-const bool PowerupSubsystem::should_update_powerup_position(const int object_id) const {
-    return frame_counter_ >= POWERUP_LOCK_FRAMES;
+const bool PowerupSubsystem::should_update_powerup_position(const int object_id, const glm::vec3& position) const {
+    return frame_counter_ >= POWERUP_LOCK_FRAMES && powerup_pos_ != position;
 }

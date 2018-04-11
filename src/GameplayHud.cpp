@@ -14,12 +14,19 @@ namespace {
     const std::string MUSTARD_TEXTURE_PATH = "assets/textures/mustard_powerup_ui.png";
     const std::string RELISH_TEXTURE_PATH = "assets/textures/relish_powerup_ui.png";
     const std::string COUNTDOWN_TEXTURE_PATHS[5] = {
-        "assets/textures/countdown1.png"
-        , "assets/textures/countdown2.png"
-        , "assets/textures/countdown3.png"
-        , "assets/textures/countdown4.png"
-        , "assets/textures/countdown5.png"
+        "assets/textures/countdown1.png",
+        "assets/textures/countdown2.png",
+        "assets/textures/countdown3.png",
+        "assets/textures/countdown4.png",
+        "assets/textures/countdown5.png"
     };
+    const std::string PLAYER_TEXTURE_PATHS[4] = {
+        "assets/textures/p1.png",
+        "assets/textures/p2.png",
+        "assets/textures/p3.png",
+        "assets/textures/p4.png"
+    };
+    const std::string AI_TEXTURE_PATH = "assets/textures/ai.png";
 }
 
 GameplayHud::GameplayHud(AssetManager& asset_manager)
@@ -29,16 +36,28 @@ GameplayHud::GameplayHud(AssetManager& asset_manager)
 void GameplayHud::load() {
     square_mesh_ = asset_manager_.get_mesh_asset("assets/models/UIRect.obj");
     ui_shader_ = asset_manager_.get_shader_asset("assets/shaders/UIShader");
+
     TextureAsset* background_tex =
         asset_manager_.get_texture_asset("assets/textures/score_bg.png", true);
     scoreboard_ = UIObject(
-                      glm::vec2(-0.25f, -0.33f),
+                      glm::vec2(-0.26f, -0.3432f),
                       glm::vec3(1.0f),
-                      glm::vec2(0.5f, 0.66f),
+                      glm::vec2(0.52f, 0.6864f),
                       square_mesh_,
                       background_tex,
                       ui_shader_
                   );
+
+    TextureAsset* locked_background_tex =
+        asset_manager_.get_texture_asset("assets/textures/score_bg_locked.png", true);
+    locked_scoreboard_ = UIObject(
+                             glm::vec2(-0.26f, -0.3432f),
+                             glm::vec3(1.0f),
+                             glm::vec2(0.52f, 0.6864f),
+                             square_mesh_,
+                             locked_background_tex,
+                             ui_shader_
+                         );
 
     TextureAsset* p1_tex = asset_manager_.get_texture_asset("assets/textures/score_1.png", true);
     UIObject score_p1 = UIObject(
@@ -155,15 +174,36 @@ void GameplayHud::load() {
                      ui_shader_
                  );
     countdown_value_ = 5;
+
+    asset_manager_.get_texture_asset(AI_TEXTURE_PATH);
+    float player_number_size_x = 0.1f;
+    float player_number_size_y = player_number_size_x * 16.0f / 9.0f;
+    std::array<glm::vec2, 4> player_numbers_position = {
+        glm::vec2(-1.0f + player_number_size_x / 3.0, 0.8f - player_number_size_y * 1.25f),
+        glm::vec2(1.0 - player_number_size_x * 1.25f, 0.8f - player_number_size_y * 1.25f),
+        glm::vec2(-1.0f + player_number_size_x / 3.0, -0.2f - player_number_size_y * 1.25f),
+        glm::vec2(1.0 - player_number_size_x * 1.25f, -0.2f - player_number_size_y * 1.25f)
+    };
+
+    for (unsigned int i = 0; i < player_numbers_.size(); i++) {
+        player_numbers_[i] = UIObject(
+                                 player_numbers_position[i],
+                                 glm::vec3(1.0),
+                                 glm::vec2(player_number_size_x, player_number_size_y),
+                                 square_mesh_,
+                                 asset_manager_.get_texture_asset(PLAYER_TEXTURE_PATHS[i]),
+                                 ui_shader_
+                             );
+    }
 }
 
 void GameplayHud::render() const {
 
-    if (num_ai_ == 3) {
-        auto transform = glm::translate(glm::mat4(1.f), glm::vec3(0.7f, -.6f, 0.f));
-        scoreboard_.render(transform);
+    if (countdown_value_ > 0) {
+        locked_scoreboard_.render(glm::mat4());
     } else {
-        scoreboard_.render(glm::mat4());
+        auto transform = (num_ai_ == 3) ? glm::translate(glm::mat4(1.f), glm::vec3(0.7f, -.6f, 0.f)) : glm::mat4();
+        scoreboard_.render(transform);
     }
 
     if (countdown_value_ > 0) {
@@ -195,6 +235,16 @@ void GameplayHud::render() const {
         //If singleplayer, only render the first holder
         if (num_ai_ == 3) {
             break;
+        }
+    }
+
+    if (countdown_value_ > 0) {
+        if (num_ai_ == 3) {
+            player_numbers_[0].render(glm::mat4());
+        } else {
+            for (auto& player_number : player_numbers_) {
+                player_number.render(glm::mat4());
+            }
         }
     }
 }
@@ -279,4 +329,16 @@ void GameplayHud::reset_powerups() {
 
 void GameplayHud::set_num_ai(int num_ai) {
     num_ai_ = num_ai;
+}
+
+void GameplayHud::set_num_humans(int num_humans) {
+    std::cout << " num_humans is " << num_humans << std::endl;
+
+    for (unsigned int i = 0; i < player_numbers_.size(); i++) {
+        player_numbers_[i].set_texture(asset_manager_.get_texture_asset(PLAYER_TEXTURE_PATHS[i]));
+    }
+
+    for (int i = 3; i > num_humans - 1; i--) {
+        player_numbers_[i].set_texture(asset_manager_.get_texture_asset(AI_TEXTURE_PATH));
+    }
 }
