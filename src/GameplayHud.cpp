@@ -200,14 +200,16 @@ void GameplayHud::load() {
 void GameplayHud::render() const {
 
     if (countdown_value_ > 0) {
-        locked_scoreboard_.render(glm::mat4());
+        auto transform = (num_ai_ == 3) ? glm::translate(glm::mat4(1.f), glm::vec3(0.7f, -.6f, 0.f)) : glm::mat4();
+        locked_scoreboard_.render(transform);
     } else {
         auto transform = (num_ai_ == 3) ? glm::translate(glm::mat4(1.f), glm::vec3(0.7f, -.6f, 0.f)) : glm::mat4();
         scoreboard_.render(transform);
     }
 
     if (countdown_value_ > 0) {
-        countdown_.render(glm::mat4());
+        auto transform = (num_ai_ == 3) ? glm::translate(glm::mat4(1.f), glm::vec3(0.7f, -.6f, 0.f)) : glm::mat4();
+        countdown_.render(transform);
     }
 
     for (auto& score : scores_) {
@@ -230,7 +232,13 @@ void GameplayHud::render() const {
     }
 
     for (auto& holder : powerup_holders_) {
-        holder.render(glm::mat4());
+        auto transform = glm::mat4();
+        if (num_ai_ == 3)
+        {
+            transform = glm::scale(glm::mat4(1.f), glm::vec3(2.f, 2.f, 1.f));
+            transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.f));
+        }
+        holder.render(transform);
 
         //If singleplayer, only render the first holder
         if (num_ai_ == 3) {
@@ -239,9 +247,7 @@ void GameplayHud::render() const {
     }
 
     if (countdown_value_ > 0) {
-        if (num_ai_ == 3) {
-            player_numbers_[0].render(glm::mat4());
-        } else {
+        if (num_ai_ != 3) {
             for (auto& player_number : player_numbers_) {
                 player_number.render(glm::mat4());
             }
