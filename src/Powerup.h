@@ -12,3 +12,9 @@ enum PowerupTarget {
     SELF,
     OTHERS
 };
+
+enum RelishType {
+    DOMINATE,
+    REVERSE,
+    RESTORE
+};
