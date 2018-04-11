@@ -270,6 +270,81 @@ void InputManager::handle_dominate_controls(const Event& e) {
 
 void InputManager::handle_reverse_controls(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
+
+    for (int i = 0; i < 4; ++i) {
+        if (i == object_id) {
+            continue;
+        }
+
+        SDL_GameController* controller = controllers_[i];
+
+        for (auto button : buttons_) {
+            int value = SDL_CONTROLLERBUTTONDOWN;
+            Uint8 state = SDL_GameControllerGetButton(controller, button);
+
+            // state == 1 if pressed
+            if (state != 1 || !process_controller_button(button)) {
+                continue;
+            }
+
+            EventSystem::queue_event(
+                Event(
+                    EventType::KEYPRESS_EVENT,
+                    "player_id", i,
+                    "key", button,
+                    "value", value
+                )
+            );
+        }
+
+        // Queue all tilted controller axes as key press
+        for (auto axis : axes_) {
+            int value = SDL_GameControllerGetAxis(controller, axis);
+
+            if (!process_controller_axis(axis, value)) {
+                continue;
+            }
+
+            EventSystem::queue_event(
+                Event(
+                    EventType::KEYPRESS_EVENT,
+                    "player_id", i,
+                    "key", axis,
+                    "value", value
+                )
+            );
+        }
+
+        // Queue all held keyboard buttons as key press
+        const Uint8* key_states = SDL_GetKeyboardState(nullptr);
+
+        for (auto key : keys_) {
+            int value = SDL_KEYDOWN;
+            int scan_code = SDL_GetScancodeFromKey(key);
+
+            // key_states[scan_code] == 1 if pressed
+            if (key_states[scan_code] != 1) {
+                continue;
+            }
+
+            // Queue only the keyboard buttons for the dominant player
+            int player_id = -1;
+            bool should_queue_event = process_keyboard(key, player_id);
+
+            if (!should_queue_event || i != player_id) {
+                continue;
+            }
+
+            EventSystem::queue_event(
+                Event(
+                    EventType::KEYPRESS_EVENT,
+                    "player_id", i,
+                    "key", key,
+                    "value", value
+                )
+            );
+        }
+    }
 }
 
 void InputManager::handle_load_event(const Event& e) {
