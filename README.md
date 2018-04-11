@@ -1,5 +1,15 @@
 # WienerTakesAll
 
+In a spherical barbecue pit lie the land of hotdog buns. For the residents of this land, there is nothing less pleasurable than the majestic Wiener. The time approaches for the annual Wiener grabbing competition. Locked in battle, hot-dog buns compete for the chance to behold the esteemed Wiener.
+
+In this exhilarating sport of reverse-tag, If you hit the bun with the wiener, you get the wiener inside your bun! Classic family fun!
+
+May the Wiener Take All!
+
+## Gameplay
+
+Wiener Takes All is an arena-based driving game of reverse-tag. In this game, players aim to hold onto the Wiener for as long as possible. The hotdog bun currently in possession of the Wiener accumulates points over time. Every-bun else then aims to collide with the Wiener-holder in order to take the Wiener into their own buns and collect points in turn. Regardless, every-bun may make use of comical power-ups to their own benefit or to the detriment of their opponents.
+
 ## Controls
 
 All controls can be controlled by an Xbox controller.
@@ -13,9 +23,9 @@ All controls can be controlled by an Xbox controller.
 Alternatively, they can also be controlled by keyboard controls as well.
 
  - Player 1 WASD; Q to powerup self, E to use powerups on others
- - Player 2 TFGH; R self, Y others
- - Player 3 IJKL; U self, O others
- - Player 4 Arrow keys; RSHIFT self, RETURN others
+ - Player 2 TFGH; R to powerup self, Y to use powerups on others
+ - Player 3 IJKL; U to powerup self, O to use powerups on others
+ - Player 4 Arrow keys; RSHIFT to powerup self, RETURN to use powerups on others
 
 Menu selection on the keyboard is down with the enter key.
 Escape will end the game early.
@@ -23,11 +33,17 @@ To toggle full-screen mode, press F11.
 
 ## Powerups
 
-There are currently three powerups implemented:
+Pickup the condiment packets and use them to boost yourself or to the detriment of everybun else!
+
+There are currently three different powerups to be picked up:
 
 - Ketchup: Give yourself a handy boost, or cause others to go speeding out of control!
 - Mustard: Hop over other players, or make them hop over you!
-- Relish: Mess around with your enemies' steering, but take care not to mess yourself up!
+- Relish: Take control of everybun else, or reverse everybun's controls!
+
+As an added bonus, the buns who bump into the Wiener-holder gains temporary invincibility:
+
+- Invincibility: Keeps yourself safe from tags and knockbacks!
 
 ## Known issues
 
@@ -36,7 +52,8 @@ There are a number of issues that we are aware of and are making efforts to addr
 - On a Windows machine, the physics may take some time to load after starting the game from the menu.
 - The physics simulation lags sometimes when certain conditions are met
 - Resolution differences between windowed and fullscreen may stretch some textures
-- For Xbox controllers, the controller number shown may not match the player number in-game
+- Unplugging controllers while game is running may result in a crash
+- Controllers plugged in while game is running will not be recognized  until the game is restarted
 
 ## Compiling
 
