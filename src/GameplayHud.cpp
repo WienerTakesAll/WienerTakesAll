@@ -36,16 +36,28 @@ GameplayHud::GameplayHud(AssetManager& asset_manager)
 void GameplayHud::load() {
     square_mesh_ = asset_manager_.get_mesh_asset("assets/models/UIRect.obj");
     ui_shader_ = asset_manager_.get_shader_asset("assets/shaders/UIShader");
+
     TextureAsset* background_tex =
         asset_manager_.get_texture_asset("assets/textures/score_bg.png", true);
     scoreboard_ = UIObject(
-                      glm::vec2(-0.25f, -0.33f),
+                      glm::vec2(-0.26f, -0.3432f),
                       glm::vec3(1.0f),
-                      glm::vec2(0.5f, 0.66f),
+                      glm::vec2(0.52f, 0.6864f),
                       square_mesh_,
                       background_tex,
                       ui_shader_
                   );
+
+    TextureAsset* locked_background_tex =
+        asset_manager_.get_texture_asset("assets/textures/score_bg_locked.png", true);
+    locked_scoreboard_ = UIObject(
+                             glm::vec2(-0.26f, -0.3432f),
+                             glm::vec3(1.0f),
+                             glm::vec2(0.52f, 0.6864f),
+                             square_mesh_,
+                             locked_background_tex,
+                             ui_shader_
+                         );
 
     TextureAsset* p1_tex = asset_manager_.get_texture_asset("assets/textures/score_1.png", true);
     UIObject score_p1 = UIObject(
@@ -186,7 +198,11 @@ void GameplayHud::load() {
 }
 
 void GameplayHud::render() const {
-    scoreboard_.render(glm::mat4());
+    if (countdown_value_ > 0) {
+        locked_scoreboard_.render(glm::mat4());
+    } else {
+        scoreboard_.render(glm::mat4());
+    }
 
     if (countdown_value_ > 0) {
         countdown_.render(glm::mat4());
