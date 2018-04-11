@@ -297,16 +297,40 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
 
         // Powerup
         // glm::vec3 powerup_loc = powerup_subsystem_.get_next_powerup_position();
+
+        int powerupID = powerup_subsystem_.get_powerup_id();
+        if (powerupID == -1)
+            powerupID = gameobject_counter_->assign_id();
+
+            EventSystem::queue_event(
+                Event(
+                    EventType::ADD_POWERUP,
+                    "object_id", powerupID,
+                    "type", static_cast<int>(powerup_subsystem_.get_next_powerup_type()),
+                    "pos_x", 0.f,
+                    "pos_y", 2.7f,
+                    "pos_z", 0.f
+                )
+            );
+
         EventSystem::queue_event(
             Event(
-                EventType::ADD_POWERUP,
-                "object_id", gameobject_counter_->assign_id(),
-                "type", static_cast<int>(powerup_subsystem_.get_next_powerup_type()),
+                EventType::OBJECT_TRANSFORM_EVENT,
+                "object_id", powerupID,
                 "pos_x", 0.f,
                 "pos_y", 2.7f,
-                "pos_z", 0.f
+                "pos_z", 0.f,
+                "qua_x", 0.f,
+                "qua_y", 0.0f,
+                "qua_z", 0.f,
+                "qua_w", 1.0f
             )
         );
+
+
+
+
+        
 
     } else if (new_game_state == GameState::START_MENU) {
         gameobject_counter_->reset_counter();

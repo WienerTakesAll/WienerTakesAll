@@ -33,13 +33,14 @@ void PowerupSubsystem::update() {
 }
 
 void PowerupSubsystem::add_mound_location(const int x, int y, const int z) {
-    int i = charcoal_locations.size() - 1;
-    charcoal_locations[i] = glm::vec3(x, y + 3, z);
+    int i = charcoal_locations.size();
+    charcoal_locations.emplace_back(glm::vec3(x, y + 3, z));
 }
 
 void PowerupSubsystem::set_new_game_state(const GameState new_game_state) {
     if (new_game_state == GameState::IN_GAME) {
         object_powerups_.clear();
+        charcoal_locations.clear();
     }
 
     game_state_ = new_game_state;
@@ -94,7 +95,6 @@ const bool PowerupSubsystem::is_powerup(const int object_id) const {
 
 glm::vec3 PowerupSubsystem::get_next_powerup_position() const {
     int i = rand() % charcoal_locations.size();
-    std::cout << i << std::endl;
 
     glm::vec3 location = charcoal_locations.at(i);
 
