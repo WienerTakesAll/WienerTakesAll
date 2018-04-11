@@ -27,6 +27,7 @@ namespace {
     const float INVINCIBILITY_DURATION = 1.0f;
     const float POWERUP_TICK = 0.01f;
     const int NUM_MOUNDS = 20;
+    const int SPAWN_DISTANCE_FROM_CENTER = 20;
 }
 
 GameplaySystem::GameplaySystem()
@@ -208,7 +209,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 // TODO: Pass glm::vec3 in events
                 "pos_x", 0,
                 "pos_y", 10,
-                "pos_z", -40,
+                "pos_z", -SPAWN_DISTANCE_FROM_CENTER,
                 "rotation", 0.0f
             )
         );
@@ -218,7 +219,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 EventType::ADD_VEHICLE,
                 "object_id", gameobject_counter_->assign_id(),
                 // TODO: Pass glm::vec3 in events
-                "pos_x", -40,
+                "pos_x", -SPAWN_DISTANCE_FROM_CENTER,
                 "pos_y", 10,
                 "pos_z", 0,
                 "rotation", 90.0f
@@ -232,7 +233,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 // TODO: Pass glm::vec3 in events
                 "pos_x", 0,
                 "pos_y", 10,
-                "pos_z", 40,
+                "pos_z", SPAWN_DISTANCE_FROM_CENTER,
                 "rotation", 180.0f
             )
         );
@@ -243,7 +244,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 EventType::ADD_VEHICLE,
                 "object_id", last_player_id,
                 // TODO: Pass glm::vec3 in events
-                "pos_x", 40,
+                "pos_x", SPAWN_DISTANCE_FROM_CENTER,
                 "pos_y", 10,
                 "pos_z", 0,
                 "rotation", 270.0f
