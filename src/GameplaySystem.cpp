@@ -759,8 +759,6 @@ void GameplaySystem::handle_new_it(const Event& e) {
 }
 
 void GameplaySystem::handle_add_charcoal(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
-
     std::pair<int, bool> x = e.get_value<int>("pos_x", true);
     std::pair<int, bool> y = e.get_value<int>("pos_y", true);
     std::pair<int, bool> z = e.get_value<int>("pos_z", true);

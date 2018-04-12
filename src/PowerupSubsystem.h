@@ -39,6 +39,5 @@ private:
     glm::vec3 powerup_pos_;
     PowerupType powerup_type_;
     std::map<int, PowerupType> object_powerups_;
-    int charcoal_counter = 0;
     std::vector<glm::vec3> charcoal_locations;
 };

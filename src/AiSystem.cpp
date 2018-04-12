@@ -8,7 +8,6 @@
 
 namespace {
     const float AVOID_DISTANCE = 5.f;
-    const float CUTOFF_MAX_RADIUS = 30.f;
     const float CUTOFF_TIGHTNESS = 0.875f;
     const unsigned int MAX_COUNTER = 120;
     const int CUTOFF_COOLDOWN = 300;

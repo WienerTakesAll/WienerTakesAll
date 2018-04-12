@@ -130,7 +130,7 @@ void ParticleSubsystem::handle_object_transform(const Event& e) {
 }
 
 void ParticleSubsystem::handle_new_status_effect(const Event& e) {
-    PowerupType type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
+    StatusEffect type = static_cast<StatusEffect>(e.get_value<int>("type", true).first);
     int player_id = e.get_value<int>("object_id", true).first;
 
     TextureAsset* powerup_texture;
