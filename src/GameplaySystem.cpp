@@ -36,7 +36,7 @@ GameplaySystem::GameplaySystem()
     : gameobject_counter_(GameObjectCounter::get_instance())
     , current_game_state_(GameState::START_MENU)
     , current_it_id_(-1)
-    , dom_(-1) {
+    , dominator_(-1) {
     add_event_handler(EventType::LOAD_EVENT, &GameplaySystem::handle_load, this);
     add_event_handler(EventType::KEYPRESS_EVENT, &GameplaySystem::handle_key_press, this);
     add_event_handler(EventType::NEW_GAME_STATE, &GameplaySystem::handle_new_game_state, this);
@@ -46,11 +46,11 @@ GameplaySystem::GameplaySystem()
     add_event_handler(EventType::NEW_IT, &GameplaySystem::handle_new_it, this);
     add_event_handler(EventType::ADD_POWERUP, &GameplaySystem::handle_add_powerup, this);
     add_event_handler(EventType::USE_POWERUP, &GameplaySystem::handle_use_powerup, this);
+    add_event_handler(EventType::NEW_STATUS_EFFECT, &GameplaySystem::handle_new_status_effect, this);
     add_event_handler(EventType::PICKUP_POWERUP, &GameplaySystem::handle_pickup_powerup, this);
     add_event_handler(EventType::CHANGE_POWERUP, &GameplaySystem::handle_change_powerup, this);
     add_event_handler(EventType::PLAYER_FELL_OFF_ARENA, &GameplaySystem::handle_player_fell_off_arena, this);
     add_event_handler(EventType::ADD_CHARCOAL, &GameplaySystem::handle_add_charcoal, this);
-    add_event_handler(EventType::DOMINATE_CONTROLS, &GameplaySystem::handle_dominate_controls, this);
     add_event_handler(EventType::RESTORE_CONTROLS, &GameplaySystem::handle_restore_controls, this);
     add_event_handler(EventType::REVERSE_CONTROLS, &GameplaySystem::handle_reverse_controls, this);
 
@@ -311,7 +311,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
 
     } else if (new_game_state == GameState::START_MENU) {
         gameobject_counter_->reset_counter();
-        dom_ = -1;
+        dominator_ = -1;
         controllers_reversed_.fill(false);
     }
 
@@ -357,8 +357,8 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_u:
         case SDLK_RSHIFT:
         case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-            if (dom_ != -1) {
-                if (player_id != dom_) {
+            if (dominator_ != -1) {
+                if (player_id != dominator_) {
                     break;
                 }
 
@@ -387,8 +387,8 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_o:
         case SDLK_RETURN:
         case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-            if (dom_ != -1) {
-                if (player_id != dom_) {
+            if (dominator_ != -1) {
+                if (player_id != dominator_) {
                     break;
                 }
 
@@ -416,8 +416,8 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_t:
         case SDLK_i:
         case SDLK_UP:
-            if (dom_ != -1) {
-                if (player_id != dom_) {
+            if (dominator_ != -1) {
+                if (player_id != dominator_) {
                     break;
                 }
 
@@ -463,8 +463,8 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_g:
         case SDLK_k:
         case SDLK_DOWN:
-            if (dom_ != -1) {
-                if (player_id != dom_) {
+            if (dominator_ != -1) {
+                if (player_id != dominator_) {
                     break;
                 }
 
@@ -506,8 +506,8 @@ void GameplaySystem::handle_key_press(const Event& e) {
             float steer_value = value != SDL_KEYUP ? steer_amount : 0.f;
             steer_value = std::max(-1.0f, std::min(1.0f, steer_value));
 
-            if (dom_ != -1) {
-                if (player_id != dom_) {
+            if (dominator_ != -1) {
+                if (player_id != dominator_) {
                     break;
                 }
 
@@ -537,8 +537,8 @@ void GameplaySystem::handle_key_press(const Event& e) {
             float steer_value = value != SDL_KEYUP ? steer_amount : 0.f;
             steer_value = std::max(-1.0f, std::min(1.0f, steer_value));
 
-            if (dom_ != -1) {
-                if (player_id != dom_) {
+            if (dominator_ != -1) {
+                if (player_id != dominator_) {
                     break;
                 }
 
@@ -559,8 +559,8 @@ void GameplaySystem::handle_key_press(const Event& e) {
         }
 
         case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-            if (dom_ != -1) {
-                if (player_id != dom_) {
+            if (dominator_ != -1) {
+                if (player_id != dominator_) {
                     break;
                 }
 
@@ -580,8 +580,8 @@ void GameplaySystem::handle_key_press(const Event& e) {
             break;
 
         case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
-            if (dom_ != -1) {
-                if (player_id != dom_) {
+            if (dominator_ != -1) {
+                if (player_id != dominator_) {
                     break;
                 }
 
@@ -615,8 +615,8 @@ void GameplaySystem::handle_key_press(const Event& e) {
             float steer_value = (float)(value * steer_dampening) / -MAX_TRIGGER_VALUE;
             steer_value = std::max(-1.0f, std::min(1.0f, steer_value));
 
-            if (dom_ != -1) {
-                if (player_id != dom_) {
+            if (dominator_ != -1) {
+                if (player_id != dominator_) {
                     break;
                 }
 
@@ -792,6 +792,59 @@ void GameplaySystem::handle_change_powerup(const Event& e) {
     powerup_subsystem_.change_powerup_type(new_type);
 }
 
+void handle_new_status_effect(const Event& e) {
+    StatusEffect new_effect = static_cast<StatusEffect>(e.get_value<int>("type", true).first);
+    int player_id = e.get_value<int>("object_id", true).first;
+
+    if(player_status_effects_ == StatusEffect::INVINCIBILITY) {
+        if(new_effect != StatusEffect::INVINCIBILITY) {
+            return;
+        }
+    }
+
+    switch (new_effect) {
+        case StatusEffect::NONE:
+            player_status_effects_[player_id].effect_ = StatusEffect::NONE;
+            player_status_effects_[player_id].duration_ = 0;
+            break;
+
+        case StatusEffect::BAD_KETCHUP:
+            player_status_effects_[player_id].effect_ = StatusEffect::BAD_KETCHUP;
+            player_status_effects_[player_id].duration_ = BAD_KETCHUP_DURATION;
+            break;
+
+        case StatusEffect::GOOD_KETCHUP:
+            player_status_effects_[player_id].effect_ = StatusEffect::GOOD_KETCHUP;
+            player_status_effects_[player_id].duration_ = GOOD_KETCHUP_DURATION;
+            break;
+
+        case StatusEffect::MUSTARD_EFFECT:
+            player_status_effects_[player_id].effect_ = StatusEffect::MUSTARD_EFFECT;
+            player_status_effects_[player_id].duration_ = MUSTARD_EFFECT_DURATION;
+            break;
+
+        case StatusEffect::INVINCIBILITY:
+            player_status_effects_[player_id].effect_ = StatusEffect::INVINCIBILITY;
+            player_status_effects_[player_id].duration_ = INVINCIBILITY_DURATION;
+            break;
+
+        case StatusEffect::DOMINATED:
+            player_status_effects_[player_id].effect_ = StatusEffect::DOMINATED;
+            player_status_effects_[player_id].duration_ = DOMINATED_DURATION;
+            break;
+
+        case StatusEffect::CONTROLS_REVERSED:
+            player_status_effects_[player_id].effect_ = StatusEffect::CONTROLS_REVERSED;
+            player_status_effects_[player_id].duration_ = CONTROLS_REVERSED_DURATION;
+            break;
+
+        default:
+            assert(false);
+            break;
+    }
+}
+
+
 void GameplaySystem::handle_use_powerup(const Event& e) {
     int object_id = e.get_value<int>("index", true).first;
     int type = e.get_value<int>("type", true).first;
@@ -810,8 +863,6 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                         "object_id", object_id
                     )
                 );
-                player_status_effects_[object_id].effect_ = StatusEffect::GOOD_KETCHUP;
-                player_status_effects_[object_id].duration_ = GOOD_KETCHUP_DURATION;
             } else {
                 for (auto& player_effect : player_status_effects_) {
                     if (player_effect.first == object_id) {
@@ -825,8 +876,6 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                             "object_id", player_effect.first
                         )
                     );
-                    player_status_effects_[player_effect.first].effect_ = StatusEffect::BAD_KETCHUP;
-                    player_status_effects_[player_effect.first].duration_ = BAD_KETCHUP_DURATION;
                 }
             }
 
@@ -854,8 +903,6 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                         "object_id", object_id
                     )
                 );
-                player_status_effects_[object_id].effect_ = StatusEffect::MUSTARD_EFFECT;
-                player_status_effects_[object_id].duration_ = MUSTARD_EFFECT_DURATION;
             } else {
                 for (auto& player_effect : player_status_effects_) {
                     if (player_effect.first == object_id) {
@@ -878,8 +925,6 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                             "object_id", player_effect.first
                         )
                     );
-                    player_status_effects_[player_effect.first].effect_ = StatusEffect::MUSTARD_EFFECT;
-                    player_status_effects_[player_effect.first].duration_ = MUSTARD_EFFECT_DURATION;
                 }
             }
         }
@@ -888,15 +933,13 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
         case PowerupType::RELISH: {
             std::cout << "RELISH used by player " << object_id << std::endl;
             powerup_subsystem_.spend_powerup(object_id);
-            StatusEffect effect = StatusEffect::NONE;
-            int duration = 0;
+            StatusEffect new_effect = StatusEffect::NONE;
 
             if (target == PowerupTarget::SELF) {
-                effect = StatusEffect::DOMINATED;
-                duration = DOMINATED_DURATION;
+                dominator_ = object_id;
+                new_effect = StatusEffect::DOMINATED;
             } else {
-                effect = StatusEffect::CONTROLS_REVERSED;
-                duration = REVERSED_CONTROLS_DURATION;
+                new_effect = StatusEffect::CONTROLS_REVERSED;
             }
 
             for (auto& player_effect : player_status_effects_) {
@@ -907,12 +950,10 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                 EventSystem::queue_event(
                     Event(
                         EventType::NEW_STATUS_EFFECT,
-                        "type", effect,
+                        "type", new_effect,
                         "object_id", object_id
                     )
                 );
-                player_status_effects_[object_id].effect_ = effect;
-                player_status_effects_[object_id].duration_ = duration;
             }
         }
 
@@ -1027,23 +1068,6 @@ void GameplaySystem::handle_player_fell_off_arena(const Event& e) {
             "object_id", losing_player
         )
     );
-}
-
-void GameplaySystem::handle_dominate_controls(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
-    dom_ = object_id;
-}
-
-void GameplaySystem::handle_restore_controls(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
-
-    // Case 1: Restore controls after domination
-    if (object_id == dom_) {
-        dom_ = -1;
-    }
-
-    // Case 2: Restore controls after reversal
-    controllers_reversed_[object_id] = false;
 }
 
 void GameplaySystem::handle_reverse_controls(const Event& e) {

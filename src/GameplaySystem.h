@@ -30,10 +30,9 @@ private:
     void handle_pickup_powerup(const Event& e);
     void handle_change_powerup(const Event& e);
     void handle_use_powerup(const Event& e);
+    void handle_new_status_effect(const Event& e);
     void handle_player_fell_off_arena(const Event& e);
-    void handle_dominate_controls(const Event& e);
     void handle_restore_controls(const Event& e);
-    void handle_reverse_controls(const Event& e);
 
     // Returns appropriate "opposite" key
     const int get_reverse_key(const int key) const;
@@ -57,7 +56,7 @@ private:
 
     std::map<int, PlayerStatusEffect> player_status_effects_;
     std::array<bool, 4> controllers_reversed_;
-    int dom_;
+    int dominator_;
 
     PowerupSubsystem powerup_subsystem_;
     ScoringSubsystem scoring_subsystem_;

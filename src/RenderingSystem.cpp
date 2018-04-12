@@ -309,7 +309,6 @@ void RenderingSystem::handle_new_status_effect(const Event& e) {
     StatusEffect type = static_cast<StatusEffect>(e.get_value<int>("type", true).first);
     int player_id = e.get_value<int>("object_id", true).first;
 
-
     glm::vec4 overlay = glm::vec4(0.0f);
 
     switch (type) {
