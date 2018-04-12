@@ -196,18 +196,19 @@ void PhysicsSystem::update() {
         }
 
         physx::PxTransform transform = object.get_actor()->getGlobalPose();
-        physx::PxVec3 speed = object.get_actor()->getLinearVelocity();
 
         //If the player is out of the arena, put them back in
-        if (transform.p.y < -5) {
+        if (transform.p.y < -30) {
             transform.p.x = 0;
-            transform.p.y = 10;
+            transform.p.y = 20;
             transform.p.z = 0;
             transform.q.w = 1;
             transform.q.x = 0;
             transform.q.y = 0;
             transform.q.z = 0;
             object.get_actor()->setGlobalPose(transform);
+            object.get_actor()->setLinearVelocity(PxVec3(0.f, 1.f, 0.f));
+            object.get_actor()->setAngularVelocity(PxVec3(0.f, 0.f, 0.f));
 
             EventSystem::queue_event(
                 Event(
@@ -216,6 +217,8 @@ void PhysicsSystem::update() {
                 )
             );
         }
+
+        physx::PxVec3 speed = object.get_actor()->getLinearVelocity();
 
         EventSystem::queue_event(
             Event(
@@ -404,6 +407,17 @@ void PhysicsSystem::handle_new_game_state(const Event& e) {
         vehicles_.clear();
     }
 
+
+    if (new_game_state == IN_GAME) {
+        for (auto& object : dynamic_objects_) {
+            object.get_actor()->setLinearVelocity(PxVec3(0.f, 0.f, 0.f));
+            object.get_actor()->setAngularVelocity(PxVec3(0.f, 0.f, 0.f));
+        }
+
+        for (auto& control : vehicle_controls_) {
+            control = VehicleControls();
+        }
+    }
 
     if (new_game_state == GameState::END_GAME) {
         for (auto& control : vehicle_controls_) {
