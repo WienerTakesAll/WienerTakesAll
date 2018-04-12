@@ -90,16 +90,19 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>lib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>lib\release_x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>PsFastXml_x86.lib;PxFoundation_x86.lib;PxPvdSDK_x86.lib;PxTask_x86.lib;LowLevelAABB.lib;LowLevelParticles.lib;PhysX3_x86.lib;SimulationController.lib;LowLevelCloth.lib;PhysX3CharacterKinematic_x86.lib;PhysX3Extensions.lib;LowLevel.lib;PhysX3Common_x86.lib;PhysX3Vehicle.lib;LowLevelDynamics.lib;PhysX3Cooking_x86.lib;SceneQuery.lib;assimp-vc140-mt.lib;glew32.lib;opengl32.lib;SDL2.lib;SDL2_mixer.lib;SDL2_image.lib;SDL2main.lib;SDL2test.lib;libyaml-cppmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
