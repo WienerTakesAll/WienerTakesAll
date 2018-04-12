@@ -13,8 +13,7 @@ namespace {
     const float POWERUP_DISTANCE_THRESHOLD = 2.5f;
     const int POWERUP_LOCK_FRAMES = 30;
 
-    // Subtract 1 from POWERUP_COUNT to prevent PowerupType::INVINCIBILITY from dropping
-    const int POWERUP_INDEX_RANGE = ((int) PowerupType::POWERUP_COUNT) - 1;
+    const int POWERUP_INDEX_RANGE = PowerupType::POWERUP_COUNT;
 }
 
 PowerupSubsystem::PowerupSubsystem()
@@ -102,6 +101,7 @@ glm::vec3 PowerupSubsystem::get_next_powerup_position() const {
 PowerupType PowerupSubsystem::get_next_powerup_type() const {
     // Random powerup type
     PowerupType new_type = static_cast<PowerupType>(rand() % POWERUP_INDEX_RANGE);
+    new_type = PowerupType::MUSTARD;
     return new_type;
 }
 

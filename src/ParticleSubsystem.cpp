@@ -182,7 +182,6 @@ void ParticleSubsystem::handle_new_status_effect(const Event& e) {
         case StatusEffect::DOMINATED:
         case StatusEffect::NONE:
             new_active = false;
-            return;
             break;
 
         default:

@@ -21,12 +21,15 @@ namespace {
     const int NUM_MOUNDS = 20;
     const int SPAWN_DISTANCE_FROM_CENTER = 20;
 
-    const float POWERUP_TICK = 0.01f;
-    const float KETCHUP_BOOST = 1000.0f;
+    const int GOOD_KETCHUP_DURATION = 180;
+    const int BAD_KETCHUP_DURATION = 180;
+    const float GOOD_KETCHUP_BOOST = 1500.0f;
+    const float BAD_KETCHUP_BOOST = 5000.0f;
+    const int MUSTARD_EFFECT_DURATION = 60;
     const glm::vec3 MUSTARD_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
-    const float RELISH_DURATION = 2.5f;
-    const float MUSTARD_DURATION = 0.2f;
-    const float INVINCIBILITY_DURATION = 1.0f;
+    const int DOMINATED_DURATION = 180;;
+    const int REVERSED_CONTROLS_DURATION = 180;;
+    const int INVINCIBILITY_DURATION = 60;
 }
 
 GameplaySystem::GameplaySystem()
@@ -62,128 +65,105 @@ GameplaySystem::GameplaySystem()
 }
 
 void GameplaySystem::update() {
-    // Update game state here
-    if (should_update_score()) {
-        scoring_subsystem_.update();
+    if (current_game_state_ != GameState::IN_GAME) {
+        // No gameplay updates if not in game!
+        return;
+    }
 
-        int score_value = scoring_subsystem_.get_current_it_score();
-        int score_lock = scoring_subsystem_.get_current_score_lock_frames();
+    if (current_it_id_ == -1) {
+        // Game not done initializing
+        return;
+    }
 
-        if (score_value < MAX_SCORE) {
+
+    // update scoring subsystem
+    scoring_subsystem_.update();
+    int score_value = scoring_subsystem_.get_current_it_score();
+    int score_lock = scoring_subsystem_.get_current_score_lock_frames();
+    EventSystem::queue_event(
+        Event(
+            EventType::UPDATE_SCORE,
+            "object_id", current_it_id_,
+            "score", score_value,
+            "lock_frames", score_lock
+        )
+    );
+
+    if (score_value >= MAX_SCORE) {
+        EventSystem::queue_event(
+            Event(
+                EventType::NEW_GAME_STATE,
+                "state", GameState::END_GAME,
+                "winner", current_it_id_
+            )
+        );
+        // Game is over
+        return;
+    }
+
+    // update powerup subsystem
+    powerup_subsystem_.update();
+
+    if (object_positions_.find(powerup_subsystem_.get_powerup_id()) != object_positions_.end()) {
+        glm::vec3 powerup_cur_loc = object_positions_[powerup_subsystem_.get_powerup_id()];
+
+        if (powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id(), powerup_cur_loc)) {
             EventSystem::queue_event(
                 Event(
-                    EventType::UPDATE_SCORE,
-                    "object_id", current_it_id_,
-                    "score", score_value,
-                    "lock_frames", score_lock
-                )
-            );
-        } else {
-            EventSystem::queue_event(
-                Event(
-                    EventType::NEW_GAME_STATE,
-                    "state", GameState::END_GAME,
-                    "winner", current_it_id_
+                    EventType::OBJECT_TRANSFORM_EVENT,
+                    "object_id", powerup_subsystem_.get_powerup_id(),
+                    "pos_x", powerup_cur_loc.x,
+                    "pos_y", powerup_cur_loc.y,
+                    "pos_z", powerup_cur_loc.z,
+                    "qua_w", 1.0f,
+                    "qua_x", 0.0f,
+                    "qua_y", 0.0f,
+                    "qua_z", 0.0f
                 )
             );
         }
     }
 
-    if (current_game_state_ == GameState::IN_GAME) {
-        powerup_subsystem_.update();
-
-        // Move powerup here
-        if (object_positions_.find(powerup_subsystem_.get_powerup_id()) != object_positions_.end()) {
-            glm::vec3 powerup_cur_loc = object_positions_[powerup_subsystem_.get_powerup_id()];
-
-            if (powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id(), powerup_cur_loc)) {
-                EventSystem::queue_event(
-                    Event(
-                        EventType::OBJECT_TRANSFORM_EVENT,
-                        "object_id", powerup_subsystem_.get_powerup_id(),
-                        "pos_x", powerup_cur_loc.x,
-                        "pos_y", powerup_cur_loc.y,
-                        "pos_z", powerup_cur_loc.z,
-                        "qua_w", 1.0f,
-                        "qua_x", 0.0f,
-                        "qua_y", 0.0f,
-                        "qua_z", 0.0f
-                    )
-                );
-            }
+    // update status effects
+    for (auto& player_status : player_status_effects_) {
+        if (player_status.second.duration_ <= 0 ||
+                player_status.second.effect_ == StatusEffect::NONE) {
+            continue;
         }
 
-        for (auto& powerup_data : powerup_datas_) {
-            if (powerup_data.second.ketchup > 0.f) {
-                glm::vec3 boost_direction
-                    = object_rotations_[powerup_data.first] * glm::vec3(0.0f, 0.0f, powerup_data.second.ketchup * KETCHUP_BOOST);
-                EventSystem::queue_event(
-                    Event(
-                        EventType::OBJECT_APPLY_FORCE,
-                        "object_id", powerup_data.first,
-                        "x", boost_direction.x,
-                        "y", boost_direction.y,
-                        "z", boost_direction.z
-                    ));
+        // Apply effects for continuous status effects
+        // Ketchup effect
+        if (player_status.second.effect_ == StatusEffect::GOOD_KETCHUP ||
+                player_status.second.effect_ == StatusEffect::BAD_KETCHUP) {
 
-                powerup_data.second.ketchup -= POWERUP_TICK;
+            float boost = GOOD_KETCHUP_BOOST;
 
-                if (powerup_data.second.ketchup <= 0.0f) {
-                    EventSystem::queue_event(
-                        Event(
-                            EventType::FINISH_POWERUP,
-                            "object_id", powerup_data.first
-                        )
-                    );
-                }
+            if (player_status.second.effect_ == StatusEffect::BAD_KETCHUP) {
+                boost = BAD_KETCHUP_BOOST;
             }
 
-            if (powerup_data.second.mustard > 0.f) {
+            glm::vec3 boost_direction = object_rotations_[player_status.first] * glm::vec3(0.0f, 0.0f, boost);
+            EventSystem::queue_event(
+                Event(
+                    EventType::OBJECT_APPLY_FORCE,
+                    "object_id", player_status.first,
+                    "x", boost_direction.x,
+                    "y", boost_direction.y,
+                    "z", boost_direction.z
+                )
+            );
+        }
 
-                powerup_data.second.mustard -= POWERUP_TICK;
-
-                if (powerup_data.second.mustard <= 0.0f) {
-                    EventSystem::queue_event(
-                        Event(
-                            EventType::FINISH_POWERUP,
-                            "object_id", powerup_data.first
-                        )
-                    );
-                }
-            }
-
-            if (powerup_data.second.relish > 0.f) {
-                powerup_data.second.relish -= POWERUP_TICK;
-
-                if (powerup_data.second.relish <= 0.0f) {
-                    EventSystem::queue_event(
-                        Event(
-                            EventType::RESTORE_CONTROLS,
-                            "object_id", powerup_data.first
-                        )
-                    );
-
-                    EventSystem::queue_event(
-                        Event(
-                            EventType::FINISH_POWERUP,
-                            "object_id", powerup_data.first
-                        )
-                    );
-                }
-            }
-
-            if (powerup_data.second.invincibility > 0.f) {
-                powerup_data.second.invincibility -= POWERUP_TICK;
-
-                if (powerup_data.second.invincibility <= 0.0f) {
-                    EventSystem::queue_event(
-                        Event(
-                            EventType::FINISH_POWERUP,
-                            "object_id", powerup_data.first
-                        )
-                    );
-                }
-            }
+        // update status effects
+        if (--player_status.second.duration_ <= 0) {
+            player_status.second.effect_ = StatusEffect::NONE;
+            EventSystem::queue_event(
+                Event(
+                    EventType::NEW_STATUS_EFFECT,
+                    "type", StatusEffect::NONE,
+                    "object_id", player_status.first
+                )
+            );
         }
     }
 }
@@ -674,12 +654,10 @@ void GameplaySystem::handle_add_vehicle(const Event& e) {
     std::pair<int, bool> object_id = e.get_value<int>("object_id", true);
     scoring_subsystem_.add_vehicle(object_id.first);
 
-    player_powerup_data data;
-    data.ketchup = 0.f;
-    data.relish = 0.f;
-    data.invincibility = 0.0f;
-    data.mustard = 0.0f;
-    powerup_datas_.emplace(object_id.first, data);
+    PlayerStatusEffect effect_data;
+    effect_data.effect_ = StatusEffect::NONE;
+    effect_data.duration_ = 0;
+    player_status_effects_.emplace(object_id.first, effect_data);
 }
 void GameplaySystem::handle_object_transform_event(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
@@ -742,7 +720,8 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
 void GameplaySystem::handle_new_it(const Event& e) {
     // Ensure to turn off invincibility of former it
     if (current_it_id_ != -1) {
-        powerup_datas_[current_it_id_].invincibility = 0.f;
+        player_status_effects_[current_it_id_].effect_ = StatusEffect::INVINCIBILITY;
+        player_status_effects_[current_it_id_].duration_ = INVINCIBILITY_DURATION;
     }
 
     int new_it_id = e.get_value<int>("object_id", true).first;
@@ -827,89 +806,120 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
             powerup_subsystem_.spend_powerup(object_id);
 
             if (target == PowerupTarget::SELF) {
-                powerup_datas_[object_id].ketchup = 1.0f;
+                EventSystem::queue_event(
+                    Event(
+                        EventType::NEW_STATUS_EFFECT,
+                        "type", StatusEffect::GOOD_KETCHUP,
+                        "object_id", object_id
+                    )
+                );
+                player_status_effects_[object_id].effect_ = StatusEffect::GOOD_KETCHUP;
+                player_status_effects_[object_id].duration_ = GOOD_KETCHUP_DURATION;
             } else {
-                for (auto& powerup_data : powerup_datas_) {
-                    if (powerup_data.first != object_id) {
-                        powerup_data.second.ketchup = 2.5f;
+                for (auto& player_effect : player_status_effects_) {
+                    if (player_effect.first == object_id) {
+                        continue;
                     }
+
+                    EventSystem::queue_event(
+                        Event(
+                            EventType::NEW_STATUS_EFFECT,
+                            "type", StatusEffect::BAD_KETCHUP,
+                            "object_id", object_id
+                        )
+                    );
+                    player_status_effects_[player_effect.first].effect_ = StatusEffect::BAD_KETCHUP;
+                    player_status_effects_[player_effect.first].duration_ = BAD_KETCHUP_DURATION;
                 }
             }
 
             break;
         }
 
-        case PowerupType::MUSTARD:
+        case PowerupType::MUSTARD: {
             std::cout << "MUSTARD used by player " << object_id << std::endl;
             powerup_subsystem_.spend_powerup(object_id);
 
             if (target == PowerupTarget::SELF) {
-                powerup_datas_[object_id].mustard = MUSTARD_DURATION;
                 EventSystem::queue_event(
                     Event(
                         EventType::OBJECT_APPLY_FORCE,
                         "object_id", object_id,
-                        // TODO: Pass glm::vec3 in events
                         "x", 0.0f,
                         "y", MUSTARD_KNOCK_BACK_FORCE.y,
                         "z", 0.f
                     )
                 );
+                EventSystem::queue_event(
+                    Event(
+                        EventType::NEW_STATUS_EFFECT,
+                        "type", StatusEffect::MUSTARD_EFFECT,
+                        "object_id", object_id
+                    )
+                );
+                player_status_effects_[object_id].effect_ = StatusEffect::MUSTARD_EFFECT;
+                player_status_effects_[object_id].duration_ = MUSTARD_EFFECT_DURATION;
             } else {
-                for (int i = 0; i < 4; ++i) {
-                    if (i == object_id) {
+                for (auto& player_effect : player_status_effects_) {
+                    if (player_effect.first == object_id) {
                         continue;
                     }
 
-                    powerup_datas_[i].mustard = MUSTARD_DURATION;
                     EventSystem::queue_event(
                         Event(
                             EventType::OBJECT_APPLY_FORCE,
-                            "object_id", i,
-                            // TODO: Pass glm::vec3 in events
+                            "object_id", player_effect.first,
                             "x", MUSTARD_KNOCK_BACK_FORCE.x,
                             "y", MUSTARD_KNOCK_BACK_FORCE.y,
                             "z", MUSTARD_KNOCK_BACK_FORCE.z
                         )
                     );
+                    EventSystem::queue_event(
+                        Event(
+                            EventType::NEW_STATUS_EFFECT,
+                            "type", StatusEffect::MUSTARD_EFFECT,
+                            "object_id", player_effect.first
+                        )
+                    );
+                    player_status_effects_[player_effect.first].effect_ = StatusEffect::MUSTARD_EFFECT;
+                    player_status_effects_[player_effect.first].duration_ = MUSTARD_EFFECT_DURATION;
                 }
             }
+        }
+        break;
 
-            break;
-
-        case PowerupType::RELISH:
+        case PowerupType::RELISH: {
             std::cout << "RELISH used by player " << object_id << std::endl;
             powerup_subsystem_.spend_powerup(object_id);
+            StatusEffect effect = StatusEffect::NONE;
+            int duration = 0;
 
             if (target == PowerupTarget::SELF) {
-                powerup_datas_[object_id].relish = RELISH_DURATION;
+                effect = StatusEffect::DOMINATED;
+                duration = DOMINATED_DURATION;
+            } else {
+                effect = StatusEffect::CONTROLS_REVERSED;
+                duration = REVERSED_CONTROLS_DURATION;
+            }
+
+            for (auto& player_effect : player_status_effects_) {
+                if (player_effect.first == object_id) {
+                    continue;
+                }
+
                 EventSystem::queue_event(
                     Event(
-                        EventType::DOMINATE_CONTROLS,
+                        EventType::NEW_STATUS_EFFECT,
+                        "type", effect,
                         "object_id", object_id
                     )
                 );
-            } else {
-                for (auto& powerup_data : powerup_datas_) {
-                    if (powerup_data.first != object_id) {
-                        powerup_data.second.relish = RELISH_DURATION;
-                        EventSystem::queue_event(
-                            Event(
-                                EventType::REVERSE_CONTROLS,
-                                "object_id", powerup_data.first
-                            )
-                        );
-                    }
-                }
+                player_status_effects_[object_id].effect_ = effect;
+                player_status_effects_[object_id].duration_ = duration;
             }
+        }
 
-            break;
-
-        // case PowerupType::INVINCIBILITY:
-        //     assert(target == PowerupTarget::SELF);
-        //     std::cout << "INVINCIBILITY used by player " << object_id << std::endl;
-        //     powerup_datas_[object_id].invincibility = INVINCIBILITY_DURATION;
-        //     break;
+        break;
 
         default:
             break;
@@ -921,8 +931,8 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
     int b_id = e.get_value<int>("b_id", true).first;
     std::cout << a_id << " collided with " << b_id << std::endl;
 
-    bool a_invincible = powerup_datas_[a_id].invincibility > 0.f;
-    bool b_invincible = powerup_datas_[b_id].invincibility > 0.f;
+    bool a_invincible = player_status_effects_[a_id].effect_ == StatusEffect::INVINCIBILITY;
+    bool b_invincible = player_status_effects_[b_id].effect_ == StatusEffect::INVINCIBILITY;
 
     glm::vec3 a_pos = object_positions_[a_id];
     glm::vec3 b_pos = object_positions_[b_id];
@@ -998,9 +1008,9 @@ float GameplaySystem::calculate_player_speed(int player) {
 
 void GameplaySystem::handle_player_fell_off_arena(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
-    bool invincible = powerup_datas_[object_id].invincibility > 0.f;
 
-    if (object_id != current_it_id_ || invincible) {
+    if (object_id != current_it_id_ ||
+            player_status_effects_[object_id].effect_ == StatusEffect::INVINCIBILITY) {
         return;
     }
 
