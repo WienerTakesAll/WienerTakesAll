@@ -23,7 +23,7 @@ namespace {
 
     const int GOOD_KETCHUP_DURATION = 180;
     const int BAD_KETCHUP_DURATION = 180;
-    const float GOOD_KETCHUP_BOOST = 1500.0f;
+    const float GOOD_KETCHUP_BOOST = 1200.0f;
     const float BAD_KETCHUP_BOOST = 5000.0f;
     const int MUSTARD_EFFECT_DURATION = 60;
     const glm::vec3 MUSTARD_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
@@ -822,7 +822,7 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                         Event(
                             EventType::NEW_STATUS_EFFECT,
                             "type", StatusEffect::BAD_KETCHUP,
-                            "object_id", object_id
+                            "object_id", player_effect.first
                         )
                     );
                     player_status_effects_[player_effect.first].effect_ = StatusEffect::BAD_KETCHUP;
