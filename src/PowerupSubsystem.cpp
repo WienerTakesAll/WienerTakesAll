@@ -12,10 +12,8 @@
 namespace {
     const float POWERUP_DISTANCE_THRESHOLD = 2.5f;
     const int POWERUP_LOCK_FRAMES = 30;
-    const glm::vec3 POWERUP_LOCATION_LIMITS = glm::vec3(10.0f, 1.5f, 10.0f);
 
-    // Subtract 1 from POWERUP_COUNT to prevent PowerupType::INVINCIBILITY from dropping
-    const int POWERUP_INDEX_RANGE = ((int) PowerupType::POWERUP_COUNT) - 1;
+    const int POWERUP_INDEX_RANGE = PowerupType::POWERUP_COUNT;
 }
 
 PowerupSubsystem::PowerupSubsystem()
@@ -33,7 +31,6 @@ void PowerupSubsystem::update() {
 }
 
 void PowerupSubsystem::add_mound_location(const int x, int y, const int z) {
-    int i = charcoal_locations.size();
     charcoal_locations.emplace_back(glm::vec3(x, y + 3, z));
 }
 
@@ -104,7 +101,6 @@ glm::vec3 PowerupSubsystem::get_next_powerup_position() const {
 PowerupType PowerupSubsystem::get_next_powerup_type() const {
     // Random powerup type
     PowerupType new_type = static_cast<PowerupType>(rand() % POWERUP_INDEX_RANGE);
-    assert(new_type != PowerupType::INVINCIBILITY);
     return new_type;
 }
 

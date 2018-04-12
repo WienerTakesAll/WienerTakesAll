@@ -10,5 +10,6 @@ enum class SoundAsset {
     SQUISH,
     DRILL,
     DOG_LAPPING_WATER,
-    BRIGHT
+    BRIGHT,
+    MALFUNCTIONING_STATIC
 };

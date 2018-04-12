@@ -8,6 +8,7 @@
 #include "GameState.h"
 #include "PowerupSubsystem.h"
 #include "ScoringSubsystem.h"
+#include "StatusEffect.h"
 
 class GameObjectCounter;
 
@@ -29,10 +30,9 @@ private:
     void handle_pickup_powerup(const Event& e);
     void handle_change_powerup(const Event& e);
     void handle_use_powerup(const Event& e);
+    void handle_new_status_effect(const Event& e);
     void handle_player_fell_off_arena(const Event& e);
-    void handle_dominate_controls(const Event& e);
     void handle_restore_controls(const Event& e);
-    void handle_reverse_controls(const Event& e);
 
     // Returns appropriate "opposite" key
     const int get_reverse_key(const int key) const;
@@ -49,16 +49,14 @@ private:
     std::map<int, glm::quat> object_rotations_;
     std::map<int, glm::vec3> object_velocities_;
 
-    struct player_powerup_data {
-        float ketchup;
-        float mustard;
-        float relish;
-        float invincibility;
+    struct PlayerStatusEffect {
+        StatusEffect effect_;
+        int duration_;
     };
 
-    std::map<int, player_powerup_data> powerup_datas_;
+    std::map<int, PlayerStatusEffect> player_status_effects_;
     std::array<bool, 4> controllers_reversed_;
-    int dom_;
+    int dominator_;
 
     PowerupSubsystem powerup_subsystem_;
     ScoringSubsystem scoring_subsystem_;
