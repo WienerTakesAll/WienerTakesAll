@@ -230,7 +230,7 @@ void AudioSystem::handle_new_status_effect(const Event& e) {
             break;
 
         case StatusEffect::DOMINATED:
-            play_sound(SoundAsset::DOG_LAPPING_WATER);
+            play_sound(SoundAsset::MALFUNCTIONING_STATIC);
             break;
 
         case StatusEffect::CONTROLS_REVERSED:
