@@ -142,6 +142,7 @@
     <ClCompile Include="src\WheelMeshGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="src\AiSystem.h" />
     <ClInclude Include="src\AssetManager.h" />
     <ClInclude Include="src\AudioSettings.h" />
@@ -194,6 +195,12 @@
     <ClInclude Include="src\VehicleWheelQueryResults.h" />
     <ClInclude Include="src\WheelMeshGenerator.h" />
     <ClInclude Include="src\World.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="WienerTakesAll.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="logo.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
