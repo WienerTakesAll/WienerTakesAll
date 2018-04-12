@@ -1,11 +1,13 @@
 #include <cassert>
 #include <iostream>
 
+#include "SDL.h"
+
 #include "EventSystem.h"
 #include "GameState.h"
 #include "InputManager.h"
 #include "InputSettings.h"
-#include "SDL.h"
+#include "StatusEffect.h"
 
 InputManager::InputManager(const InputSettings& settings)
     : settings_(settings)
@@ -16,9 +18,8 @@ InputManager::InputManager(const InputSettings& settings)
     EventSystem::add_event_handler(EventType::RELOAD_SETTINGS_EVENT, &InputManager::handle_reload_settings_event, this);
     EventSystem::add_event_handler(EventType::VEHICLE_COLLISION, &InputManager::handle_vehicle_collision, this);
     EventSystem::add_event_handler(EventType::NEW_GAME_STATE, &InputManager::handle_new_game_state, this);
-    EventSystem::add_event_handler(EventType::DOMINATE_CONTROLS, &InputManager::handle_dominate_controls, this);
-    EventSystem::add_event_handler(EventType::REVERSE_CONTROLS, &InputManager::handle_reverse_controls, this);
-    EventSystem::add_event_handler(EventType::RESTORE_CONTROLS, &InputManager::handle_restore_controls, this);
+    EventSystem::add_event_handler(EventType::USE_POWERUP, &InputManager::handle_use_powerup, this);
+    EventSystem::add_event_handler(EventType::NEW_STATUS_EFFECT, &InputManager::handle_new_status_effect, this);
 
     buttons_ = {
         SDL_CONTROLLER_BUTTON_A,
@@ -189,55 +190,35 @@ void InputManager::handle_new_game_state(const Event& e) {
     }
 }
 
-void InputManager::handle_dominate_controls(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
+void InputManager::handle_use_powerup(const Event& e) {
+    int player_id = e.get_value<int>("index", true).first;
+    int type = e.get_value<int>("type", true).first;
+    int target = e.get_value<int>("target", true).first;
 
-    if (object_id < 0 || object_id >= controllers_.size()) {
-        return;
+    if (type == PowerupType::RELISH && target == PowerupTarget::SELF) {
+        // special case for domination effect
+        // Queue all held controller buttons as key press
+        process_held_controller_buttons(player_id);
+        // Queue all tilted controller axes as key press
+        process_held_controller_axes(player_id);
+        // Queue all held keyboard buttons as key press
+        process_held_keyboard_keys(player_id);
     }
+}
+
+void InputManager::handle_new_status_effect(const Event& e) {
+    StatusEffect new_effect = static_cast<StatusEffect>(e.get_value<int>("type", true).first);
+    int player_id = e.get_value<int>("object_id", true).first;
+
+    assert(player_id >= 0);
+    assert(player_id < controllers_.size());
 
     // Queue all held controller buttons as key press
-    process_held_controller_buttons(object_id, RelishType::DOMINATE);
-
+    process_held_controller_buttons(player_id);
     // Queue all tilted controller axes as key press
-    process_held_controller_axes(object_id, RelishType::DOMINATE);
-
+    process_held_controller_axes(player_id);
     // Queue all held keyboard buttons as key press
-    process_held_keyboard_keys(object_id, RelishType::DOMINATE);
-}
-
-void InputManager::handle_reverse_controls(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
-
-    if (object_id < 0 || object_id >= controllers_.size()) {
-        return;
-    }
-
-    for (int i = 0; i < 4; ++i) {
-        if (i == object_id) {
-            continue;
-        }
-
-        process_held_controller_buttons(i, RelishType::REVERSE);
-
-        process_held_controller_axes(i, RelishType::REVERSE);
-
-        process_held_keyboard_keys(i, RelishType::REVERSE);
-    }
-}
-
-void InputManager::handle_restore_controls(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
-
-    if (object_id < 0 || object_id >= controllers_.size()) {
-        return;
-    }
-
-    process_held_controller_buttons(object_id, RelishType::RESTORE);
-
-    process_held_controller_axes(object_id, RelishType::RESTORE);
-
-    process_held_keyboard_keys(object_id, RelishType::RESTORE);
+    process_held_keyboard_keys(player_id);
 }
 
 void InputManager::handle_load_event(const Event& e) {
@@ -548,7 +529,7 @@ const int InputManager::get_player_id_from_joystick_index(const int joystick_ind
     return player_id;
 }
 
-void InputManager::process_held_controller_buttons(int object_id, RelishType type) {
+void InputManager::process_held_controller_buttons(int object_id) {
     SDL_GameController* controller = controllers_[object_id];
 
     for (auto button : buttons_) {
@@ -560,31 +541,19 @@ void InputManager::process_held_controller_buttons(int object_id, RelishType typ
             continue;
         }
 
-        if (type == RelishType::DOMINATE) {
-            for (int i = 0; i < 4; ++i) {
-                EventSystem::queue_event(
-                    Event(
-                        EventType::KEYPRESS_EVENT,
-                        "player_id", i,
-                        "key", button,
-                        "value", value
-                    )
-                );
-            }
-        } else {
-            EventSystem::queue_event(
-                Event(
-                    EventType::KEYPRESS_EVENT,
-                    "player_id", object_id,
-                    "key", button,
-                    "value", value
-                )
-            );
-        }
+
+        EventSystem::queue_event(
+            Event(
+                EventType::KEYPRESS_EVENT,
+                "player_id", object_id,
+                "key", button,
+                "value", value
+            )
+        );
     }
 }
 
-void InputManager::process_held_controller_axes(int object_id, RelishType type) {
+void InputManager::process_held_controller_axes(int object_id) {
     SDL_GameController* controller = controllers_[object_id];
 
     for (auto axis : axes_) {
@@ -595,31 +564,19 @@ void InputManager::process_held_controller_axes(int object_id, RelishType type) 
             continue;
         }
 
-        if (type == RelishType::DOMINATE) {
-            for (int i = 0; i < 4; ++i) {
-                EventSystem::queue_event(
-                    Event(
-                        EventType::KEYPRESS_EVENT,
-                        "player_id", i,
-                        "key", axis,
-                        "value", value
-                    )
-                );
-            }
-        } else {
-            EventSystem::queue_event(
-                Event(
-                    EventType::KEYPRESS_EVENT,
-                    "player_id", object_id,
-                    "key", axis,
-                    "value", value
-                )
-            );
-        }
+
+        EventSystem::queue_event(
+            Event(
+                EventType::KEYPRESS_EVENT,
+                "player_id", object_id,
+                "key", axis,
+                "value", value
+            )
+        );
     }
 }
 
-void InputManager::process_held_keyboard_keys(int object_id, RelishType type) {
+void InputManager::process_held_keyboard_keys(int object_id) {
     const Uint8* key_states = SDL_GetKeyboardState(nullptr);
 
     for (auto key : keys_) {
@@ -639,26 +596,14 @@ void InputManager::process_held_keyboard_keys(int object_id, RelishType type) {
             continue;
         }
 
-        if (type == RelishType::DOMINATE) {
-            for (int i = 0; i < 4; ++i) {
-                EventSystem::queue_event(
-                    Event(
-                        EventType::KEYPRESS_EVENT,
-                        "player_id", i,
-                        "key", key,
-                        "value", value
-                    )
-                );
-            }
-        } else {
-            EventSystem::queue_event(
-                Event(
-                    EventType::KEYPRESS_EVENT,
-                    "player_id", object_id,
-                    "key", key,
-                    "value", value
-                )
-            );
-        }
+
+        EventSystem::queue_event(
+            Event(
+                EventType::KEYPRESS_EVENT,
+                "player_id", object_id,
+                "key", key,
+                "value", value
+            )
+        );
     }
 }

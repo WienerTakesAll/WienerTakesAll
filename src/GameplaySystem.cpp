@@ -28,7 +28,7 @@ namespace {
     const int MUSTARD_EFFECT_DURATION = 60;
     const glm::vec3 MUSTARD_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const int DOMINATED_DURATION = 180;;
-    const int REVERSED_CONTROLS_DURATION = 180;;
+    const int CONTROLS_REVERSED_DURATION = 180;;
     const int INVINCIBILITY_DURATION = 180;
 }
 
@@ -51,8 +51,6 @@ GameplaySystem::GameplaySystem()
     add_event_handler(EventType::CHANGE_POWERUP, &GameplaySystem::handle_change_powerup, this);
     add_event_handler(EventType::PLAYER_FELL_OFF_ARENA, &GameplaySystem::handle_player_fell_off_arena, this);
     add_event_handler(EventType::ADD_CHARCOAL, &GameplaySystem::handle_add_charcoal, this);
-    add_event_handler(EventType::RESTORE_CONTROLS, &GameplaySystem::handle_restore_controls, this);
-    add_event_handler(EventType::REVERSE_CONTROLS, &GameplaySystem::handle_reverse_controls, this);
 
     controllers_reversed_.fill(false);
 
@@ -350,6 +348,10 @@ void GameplaySystem::handle_key_press(const Event& e) {
 
     std::vector<Event> new_events;
 
+    if (player_status_effects_[player_id].effect_ == StatusEffect::DOMINATED) {
+        return;
+    }
+
     switch (key) {
         // self powerup
         case SDLK_q: // fall through
@@ -357,26 +359,11 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_u:
         case SDLK_RSHIFT:
         case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-            if (dominator_ != -1) {
-                if (player_id != dominator_) {
-                    break;
-                }
-
-                for (int i = 0; i < 4; ++i) {
-                    if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(i)) {
-                        new_events.emplace_back(EventType::USE_POWERUP,
-                                                "type", powerup_subsystem_.get_player_powerup_type(i),
-                                                "target", PowerupTarget::SELF,
-                                                "index", i);
-                    }
-                }
-            } else {
-                if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(player_id)) {
-                    new_events.emplace_back(EventType::USE_POWERUP,
-                                            "type", powerup_subsystem_.get_player_powerup_type(player_id),
-                                            "target", PowerupTarget::SELF,
-                                            "index", player_id);
-                }
+            if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(player_id)) {
+                new_events.emplace_back(EventType::USE_POWERUP,
+                                        "type", powerup_subsystem_.get_player_powerup_type(player_id),
+                                        "target", PowerupTarget::SELF,
+                                        "index", player_id);
             }
 
             break;
@@ -387,26 +374,11 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_o:
         case SDLK_RETURN:
         case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-            if (dominator_ != -1) {
-                if (player_id != dominator_) {
-                    break;
-                }
-
-                for (int i = 0; i < 4; ++i) {
-                    if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(i)) {
-                        new_events.emplace_back(EventType::USE_POWERUP,
-                                                "type", powerup_subsystem_.get_player_powerup_type(i),
-                                                "target", PowerupTarget::OTHERS,
-                                                "index", i);
-                    }
-                }
-            } else {
-                if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(player_id)) {
-                    new_events.emplace_back(EventType::USE_POWERUP,
-                                            "type", powerup_subsystem_.get_player_powerup_type(player_id),
-                                            "target", PowerupTarget::OTHERS,
-                                            "index", player_id);
-                }
+            if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(player_id)) {
+                new_events.emplace_back(EventType::USE_POWERUP,
+                                        "type", powerup_subsystem_.get_player_powerup_type(player_id),
+                                        "target", PowerupTarget::OTHERS,
+                                        "index", player_id);
             }
 
             break;
@@ -416,44 +388,20 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_t:
         case SDLK_i:
         case SDLK_UP:
-            if (dominator_ != -1) {
-                if (player_id != dominator_) {
-                    break;
-                }
-
-                for (int i = 0; i < 4; ++i) {
-                    if (value == SDL_KEYDOWN) {
-                        new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                                "index", i,
-                                                "type", VehicleControlType::FORWARD_DRIVE,
-                                                "value", calculate_player_speed(i));
-                        new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                                "index", i,
-                                                "type", VehicleControlType::BRAKE,
-                                                "value", 0.0f);
-                    } else if (value == SDL_KEYUP) {
-                        new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                                "index", i,
-                                                "type", VehicleControlType::FORWARD_DRIVE,
-                                                "value", 0.0f);
-                    }
-                }
-            } else {
-                if (value == SDL_KEYDOWN) {
-                    new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                            "index", player_id,
-                                            "type", VehicleControlType::FORWARD_DRIVE,
-                                            "value", calculate_player_speed(player_id));
-                    new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                            "index", player_id,
-                                            "type", VehicleControlType::BRAKE,
-                                            "value", 0.0f);
-                } else if (value == SDL_KEYUP) {
-                    new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                            "index", player_id,
-                                            "type", VehicleControlType::FORWARD_DRIVE,
-                                            "value", 0.0f);
-                }
+            if (value == SDL_KEYDOWN) {
+                new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                        "index", player_id,
+                                        "type", VehicleControlType::FORWARD_DRIVE,
+                                        "value", calculate_player_speed(player_id));
+                new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                        "index", player_id,
+                                        "type", VehicleControlType::BRAKE,
+                                        "value", 0.0f);
+            } else if (value == SDL_KEYUP) {
+                new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                        "index", player_id,
+                                        "type", VehicleControlType::FORWARD_DRIVE,
+                                        "value", 0.0f);
             }
 
             break;
@@ -463,36 +411,16 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_g:
         case SDLK_k:
         case SDLK_DOWN:
-            if (dominator_ != -1) {
-                if (player_id != dominator_) {
-                    break;
-                }
-
-                for (int i = 0; i < 4; ++i) {
-                    if (value == SDL_KEYDOWN) {
-                        new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                                "index", i,
-                                                "type", VehicleControlType::BRAKE,
-                                                "value", BRAKE_SPEED);
-                    } else if (value == SDL_KEYUP) {
-                        new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                                "index", i,
-                                                "type", VehicleControlType::BRAKE,
-                                                "value", 0.f);
-                    }
-                }
-            } else {
-                if (value == SDL_KEYDOWN) {
-                    new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                            "index", player_id,
-                                            "type", VehicleControlType::BRAKE,
-                                            "value", BRAKE_SPEED);
-                } else if (value == SDL_KEYUP) {
-                    new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                            "index", player_id,
-                                            "type", VehicleControlType::BRAKE,
-                                            "value", 0.f);
-                }
+            if (value == SDL_KEYDOWN) {
+                new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                        "index", player_id,
+                                        "type", VehicleControlType::BRAKE,
+                                        "value", BRAKE_SPEED);
+            } else if (value == SDL_KEYUP) {
+                new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                        "index", player_id,
+                                        "type", VehicleControlType::BRAKE,
+                                        "value", 0.f);
             }
 
             break;
@@ -506,24 +434,10 @@ void GameplaySystem::handle_key_press(const Event& e) {
             float steer_value = value != SDL_KEYUP ? steer_amount : 0.f;
             steer_value = std::max(-1.0f, std::min(1.0f, steer_value));
 
-            if (dominator_ != -1) {
-                if (player_id != dominator_) {
-                    break;
-                }
-
-                for (int i = 0; i < 4; ++i) {
-                    new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                            "index", i,
-                                            "type", VehicleControlType::STEER,
-                                            "value", steer_value);
-                }
-            } else {
-                new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                        "index", player_id,
-                                        "type", VehicleControlType::STEER,
-                                        "value", steer_value);
-            }
-
+            new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                    "index", player_id,
+                                    "type", VehicleControlType::STEER,
+                                    "value", steer_value);
             break;
         }
 
@@ -537,66 +451,27 @@ void GameplaySystem::handle_key_press(const Event& e) {
             float steer_value = value != SDL_KEYUP ? steer_amount : 0.f;
             steer_value = std::max(-1.0f, std::min(1.0f, steer_value));
 
-            if (dominator_ != -1) {
-                if (player_id != dominator_) {
-                    break;
-                }
-
-                for (int i = 0; i < 4; ++i) {
-                    new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                            "index", i,
-                                            "type", VehicleControlType::STEER,
-                                            "value", steer_value);
-                }
-            } else {
-                new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                        "index", player_id,
-                                        "type", VehicleControlType::STEER,
-                                        "value", steer_value);
-            }
+            new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                    "index", player_id,
+                                    "type", VehicleControlType::STEER,
+                                    "value", steer_value);
 
             break;
         }
 
         case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-            if (dominator_ != -1) {
-                if (player_id != dominator_) {
-                    break;
-                }
-
-                for (int i = 0; i < 4; ++i) {
-                    new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                            "index", i,
-                                            "type", VehicleControlType::FORWARD_DRIVE,
-                                            "value", (float)(value) / MAX_TRIGGER_VALUE * calculate_player_speed(i));
-                }
-            } else {
-                new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                        "index", player_id,
-                                        "type", VehicleControlType::FORWARD_DRIVE,
-                                        "value", (float)(value) / MAX_TRIGGER_VALUE * calculate_player_speed(player_id));
-            }
+            new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                    "index", player_id,
+                                    "type", VehicleControlType::FORWARD_DRIVE,
+                                    "value", (float)(value) / MAX_TRIGGER_VALUE * calculate_player_speed(player_id));
 
             break;
 
         case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
-            if (dominator_ != -1) {
-                if (player_id != dominator_) {
-                    break;
-                }
-
-                for (int i = 0; i < 4; ++i) {
-                    new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                            "index", i,
-                                            "type", VehicleControlType::BRAKE,
-                                            "value", (float)(value) / MAX_TRIGGER_VALUE);
-                }
-            } else {
-                new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                        "index", player_id,
-                                        "type", VehicleControlType::BRAKE,
-                                        "value", (float)(value) / MAX_TRIGGER_VALUE);
-            }
+            new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                    "index", player_id,
+                                    "type", VehicleControlType::BRAKE,
+                                    "value", (float)(value) / MAX_TRIGGER_VALUE);
 
             break;
 
@@ -615,24 +490,10 @@ void GameplaySystem::handle_key_press(const Event& e) {
             float steer_value = (float)(value * steer_dampening) / -MAX_TRIGGER_VALUE;
             steer_value = std::max(-1.0f, std::min(1.0f, steer_value));
 
-            if (dominator_ != -1) {
-                if (player_id != dominator_) {
-                    break;
-                }
-
-                for (int i = 0; i < 4; i++) {
-                    new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                            "index", i,
-                                            "type", VehicleControlType::STEER,
-                                            "value", steer_value);
-                }
-            } else {
-                new_events.emplace_back(EventType::VEHICLE_CONTROL,
-                                        "index", player_id,
-                                        "type", VehicleControlType::STEER,
-                                        "value", steer_value);
-            }
-
+            new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                    "index", player_id,
+                                    "type", VehicleControlType::STEER,
+                                    "value", steer_value);
             break;
         }
 
@@ -643,6 +504,31 @@ void GameplaySystem::handle_key_press(const Event& e) {
 
         default:
             return;
+    }
+
+    // if this input is the current dominator's input
+    if (player_id == dominator_) {
+        for (int other_player = 0; other_player < 4; other_player++) {
+            // forward this input to all dominated players
+            if (other_player == player_id ||
+                    player_status_effects_[other_player].effect_ != DOMINATED) {
+                continue;
+            }
+
+            auto new_events_copy = new_events;
+
+            for (const auto& event : new_events_copy) {
+                if (event.event_type != EventType::VEHICLE_CONTROL) {
+                    continue;
+                }
+
+                std::cout << "DOMINATING" << std::endl;
+                new_events.emplace_back(EventType::VEHICLE_CONTROL,
+                                        "index", other_player,
+                                        "type", event.get_value<int>("type", true).first,
+                                        "value", event.get_value<float>("value", true).first);
+            }
+        }
     }
 
     for (const auto& event : new_events) {
@@ -729,9 +615,6 @@ void GameplaySystem::handle_new_it(const Event& e) {
             "object_id", new_it_id
         )
     );
-
-    player_status_effects_[new_it_id].effect_ = StatusEffect::INVINCIBILITY;
-    player_status_effects_[new_it_id].duration_ = INVINCIBILITY_DURATION;
 }
 
 void GameplaySystem::handle_add_charcoal(const Event& e) {
@@ -792,15 +675,17 @@ void GameplaySystem::handle_change_powerup(const Event& e) {
     powerup_subsystem_.change_powerup_type(new_type);
 }
 
-void handle_new_status_effect(const Event& e) {
+void GameplaySystem::handle_new_status_effect(const Event& e) {
     StatusEffect new_effect = static_cast<StatusEffect>(e.get_value<int>("type", true).first);
     int player_id = e.get_value<int>("object_id", true).first;
 
-    if(player_status_effects_ == StatusEffect::INVINCIBILITY) {
-        if(new_effect != StatusEffect::INVINCIBILITY) {
+    if (player_status_effects_[player_id].effect_ == StatusEffect::INVINCIBILITY) {
+        if (new_effect != StatusEffect::INVINCIBILITY) {
             return;
         }
     }
+
+    controllers_reversed_[player_id] = false;
 
     switch (new_effect) {
         case StatusEffect::NONE:
@@ -836,6 +721,7 @@ void handle_new_status_effect(const Event& e) {
         case StatusEffect::CONTROLS_REVERSED:
             player_status_effects_[player_id].effect_ = StatusEffect::CONTROLS_REVERSED;
             player_status_effects_[player_id].duration_ = CONTROLS_REVERSED_DURATION;
+            controllers_reversed_[player_id] = true;
             break;
 
         default:
@@ -856,6 +742,7 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
             powerup_subsystem_.spend_powerup(object_id);
 
             if (target == PowerupTarget::SELF) {
+
                 EventSystem::queue_event(
                     Event(
                         EventType::NEW_STATUS_EFFECT,
@@ -868,6 +755,7 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                     if (player_effect.first == object_id) {
                         continue;
                     }
+
 
                     EventSystem::queue_event(
                         Event(
@@ -887,6 +775,7 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
             powerup_subsystem_.spend_powerup(object_id);
 
             if (target == PowerupTarget::SELF) {
+
                 EventSystem::queue_event(
                     Event(
                         EventType::OBJECT_APPLY_FORCE,
@@ -896,6 +785,7 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                         "z", 0.f
                     )
                 );
+
                 EventSystem::queue_event(
                     Event(
                         EventType::NEW_STATUS_EFFECT,
@@ -909,6 +799,7 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                         continue;
                     }
 
+
                     EventSystem::queue_event(
                         Event(
                             EventType::OBJECT_APPLY_FORCE,
@@ -918,6 +809,7 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                             "z", MUSTARD_KNOCK_BACK_FORCE.z
                         )
                     );
+
                     EventSystem::queue_event(
                         Event(
                             EventType::NEW_STATUS_EFFECT,
@@ -947,11 +839,12 @@ void GameplaySystem::handle_use_powerup(const Event& e) {
                     continue;
                 }
 
+
                 EventSystem::queue_event(
                     Event(
                         EventType::NEW_STATUS_EFFECT,
                         "type", new_effect,
-                        "object_id", object_id
+                        "object_id", player_effect.first
                     )
                 );
             }
@@ -1068,11 +961,6 @@ void GameplaySystem::handle_player_fell_off_arena(const Event& e) {
             "object_id", losing_player
         )
     );
-}
-
-void GameplaySystem::handle_reverse_controls(const Event& e) {
-    int object_id = e.get_value<int>("object_id", true).first;
-    controllers_reversed_[object_id] = true;
 }
 
 const int GameplaySystem::get_reverse_key(const int key) const {
