@@ -29,7 +29,7 @@ namespace {
     const glm::vec3 MUSTARD_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const int DOMINATED_DURATION = 180;;
     const int REVERSED_CONTROLS_DURATION = 180;;
-    const int INVINCIBILITY_DURATION = 60;
+    const int INVINCIBILITY_DURATION = 180;
 }
 
 GameplaySystem::GameplaySystem()
@@ -718,12 +718,6 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
 }
 
 void GameplaySystem::handle_new_it(const Event& e) {
-    // Ensure to turn off invincibility of former it
-    if (current_it_id_ != -1) {
-        player_status_effects_[current_it_id_].effect_ = StatusEffect::INVINCIBILITY;
-        player_status_effects_[current_it_id_].duration_ = INVINCIBILITY_DURATION;
-    }
-
     int new_it_id = e.get_value<int>("object_id", true).first;
     scoring_subsystem_.set_new_it_id(new_it_id);
     current_it_id_ = new_it_id;
@@ -735,6 +729,9 @@ void GameplaySystem::handle_new_it(const Event& e) {
             "object_id", new_it_id
         )
     );
+
+    player_status_effects_[new_it_id].effect_ = StatusEffect::INVINCIBILITY;
+    player_status_effects_[new_it_id].duration_ = INVINCIBILITY_DURATION;
 }
 
 void GameplaySystem::handle_add_charcoal(const Event& e) {
@@ -944,7 +941,6 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
             Event(
                 EventType::OBJECT_APPLY_FORCE,
                 "object_id", a_id,
-                // TODO: Pass glm::vec3 in events
                 "x", v_dir[0] * COLLISION_KNOCK_BACK_FORCE.x,
                 "y", COLLISION_KNOCK_BACK_FORCE.y,
                 "z", v_dir[2] * COLLISION_KNOCK_BACK_FORCE.z
@@ -957,7 +953,6 @@ void GameplaySystem::handle_vehicle_collision(const Event& e) {
             Event(
                 EventType::OBJECT_APPLY_FORCE,
                 "object_id", b_id,
-                // TODO: Pass glm::vec3 in events
                 "x", -v_dir[0] * COLLISION_KNOCK_BACK_FORCE.x,
                 "y", COLLISION_KNOCK_BACK_FORCE.y,
                 "z", -v_dir[2] * COLLISION_KNOCK_BACK_FORCE.z
