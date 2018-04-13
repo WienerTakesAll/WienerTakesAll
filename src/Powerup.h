@@ -4,7 +4,7 @@ enum PowerupType {
     KETCHUP,
     RELISH,
     MUSTARD,
-    POWERUP_COUNT
+    NO_POWERUP
 };
 
 enum PowerupTarget {

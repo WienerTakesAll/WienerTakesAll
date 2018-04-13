@@ -223,7 +223,7 @@ void RenderingSystem::handle_add_skybox(const Event& e) {
 void RenderingSystem::handle_add_powerup(const Event& e) {
     PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
 
-    assert(powerup_type != PowerupType::POWERUP_COUNT);
+    assert(powerup_type != PowerupType::NO_POWERUP);
 
     int object_id = e.get_value<int>("object_id", true).first;
     float x = e.get_value<float>("pos_x", true).first;
@@ -268,7 +268,7 @@ void RenderingSystem::handle_add_powerup(const Event& e) {
 void RenderingSystem::handle_change_powerup(const Event& e) {
     PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
 
-    assert(powerup_type != PowerupType::POWERUP_COUNT);
+    assert(powerup_type != PowerupType::NO_POWERUP);
 
     int object_id = e.get_value<int>("object_id", true).first;
     TextureAsset* texture;

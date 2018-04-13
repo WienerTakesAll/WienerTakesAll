@@ -13,11 +13,15 @@ namespace {
     const float POWERUP_DISTANCE_THRESHOLD = 2.5f;
     const int POWERUP_LOCK_FRAMES = 30;
 
-    const int POWERUP_INDEX_RANGE = PowerupType::POWERUP_COUNT;
+    const int POWERUP_INDEX_RANGE = PowerupType::NO_POWERUP;
+    const int NUM_PLAYERS = 4;
 }
 
 PowerupSubsystem::PowerupSubsystem()
     : frame_counter_(0) {
+    for (int i = 0; i < NUM_PLAYERS; i++) {
+        player_powerups_[i] = PowerupType::NO_POWERUP;
+    }
 }
 void PowerupSubsystem::load() {
     // Initialize random seed
@@ -34,7 +38,10 @@ void PowerupSubsystem::add_mound_location(const int x, int y, const int z) {
 
 void PowerupSubsystem::set_new_game_state(const GameState new_game_state) {
     if (new_game_state == GameState::IN_GAME) {
-        player_powerups_.clear();
+        for (auto& player : player_powerups_) {
+            player.second = PowerupType::NO_POWERUP;
+        }
+
         charcoal_locations.clear();
     }
 
@@ -72,13 +79,11 @@ void PowerupSubsystem::pickup_powerup(const int object_id) {
 
 void PowerupSubsystem::spend_powerup(const int object_id) {
     // Clear powerup entry.
-    player_powerups_[object_id] = PowerupType::POWERUP_COUNT;
+    player_powerups_[object_id] = PowerupType::NO_POWERUP;
 }
 
 const bool PowerupSubsystem::can_use_powerup(const int object_id) const {
-    return
-        player_powerups_.find(object_id) != player_powerups_.end() &&
-        player_powerups_.at(object_id) != PowerupType::POWERUP_COUNT;
+    return player_powerups_.at(object_id) != PowerupType::NO_POWERUP;
 }
 
 const PowerupType PowerupSubsystem::get_player_powerup_type(const int object_id) const {
