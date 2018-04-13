@@ -40,7 +40,7 @@ void AiSystem::update() {
                 Event(
                     EventType::KEYPRESS_EVENT,
                     "player_id", i,
-                    "key", random % 2 ? SDL_CONTROLLER_BUTTON_LEFTSHOULDER : SDL_CONTROLLER_BUTTON_RIGHTSHOULDER,
+                    "key", rand() % 2 ? SDL_CONTROLLER_BUTTON_LEFTSHOULDER : SDL_CONTROLLER_BUTTON_RIGHTSHOULDER,
                     "value", SDL_CONTROLLERBUTTONDOWN
                 )
             );
