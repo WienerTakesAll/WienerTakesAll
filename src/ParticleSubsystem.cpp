@@ -31,6 +31,7 @@ void ParticleSubsystem::update() {
 
     for (auto& powerup_pickup_gen : powerup_pickup_gens_) {
         powerup_pickup_gen.second.update();
+        powerup_pickup_gen.second.set_active(false);
     }
 }
 
