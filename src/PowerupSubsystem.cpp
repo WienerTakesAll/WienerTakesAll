@@ -82,6 +82,7 @@ glm::vec3 PowerupSubsystem::pickup_powerup(const int powerup_id, const int playe
 
     powerup_objs_[powerup_id].pos_ = occupied_charcoal_locations_[new_charcoal_index].first;
     powerup_objs_[powerup_id].frame_lock_counter_ = 0;
+    powerup_objs_[powerup_id].charcoal_index_ = new_charcoal_index;
     return powerup_objs_[powerup_id].pos_;
 }
 
