@@ -100,7 +100,6 @@ int PowerupSubsystem::get_next_powerup_position() const {
 
         if (occupied_charcoal_locations_[new_index].second) {
             new_index = -1;
-            break;
         }
     }
 
