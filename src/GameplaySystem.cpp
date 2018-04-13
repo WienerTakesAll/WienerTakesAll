@@ -568,10 +568,6 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
     object_rotations_[object_id] = glm::quat(qw, qx, qy, qz);
     object_positions_[object_id] = glm::vec3(x, y, z);
 
-    if (powerup_subsystem_.is_powerup(object_id)) {
-        powerup_subsystem_.change_powerup_position(object_id, glm::vec3(x, y, z));
-    }
-
     // If obj is a vehicle and is close enough to powerup
     // should pick it up
     if (object_id < NUM_PLAYERS && object_id >= 0) {
@@ -654,7 +650,8 @@ void GameplaySystem::handle_pickup_powerup(const Event& e) {
     // Pick up powerup
     int player_id = e.get_value<int>("object_id", true).first;
     int powerup_id = e.get_value<int>("powerup_id", true).first;
-    powerup_subsystem_.pickup_powerup(powerup_id, player_id);
+    glm::vec3 new_powerup_pos = powerup_subsystem_.pickup_powerup(powerup_id, player_id);
+
 
     // Change powerup type
     PowerupType new_type = powerup_subsystem_.get_next_powerup_type();
@@ -667,14 +664,13 @@ void GameplaySystem::handle_pickup_powerup(const Event& e) {
     );
 
     // Move powerup to new location
-    glm::vec3 new_location = powerup_subsystem_.get_next_powerup_position();
     EventSystem::queue_event(
         Event(
             EventType::OBJECT_TRANSFORM_EVENT,
             "object_id", powerup_id,
-            "pos_x", new_location.x,
-            "pos_y", new_location.y,
-            "pos_z", new_location.z,
+            "pos_x", new_powerup_pos.x,
+            "pos_y", new_powerup_pos.y,
+            "pos_z", new_powerup_pos.z,
             "qua_w", 1.0f,
             "qua_x", 0.0f,
             "qua_y", 0.0f,

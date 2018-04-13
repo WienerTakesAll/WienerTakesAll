@@ -16,9 +16,8 @@ public:
     void add_mound_location(const int x, int y, const int z);
     void create_powerup(const int object_id, const PowerupType type, glm::vec3 pos);
     // Modifiers
-    void change_powerup_position(const int object_id, glm::vec3 pos);
     void change_powerup_type(int object_id, const PowerupType new_type);
-    void pickup_powerup(const int powerup_id, const int player_id);
+    glm::vec3 pickup_powerup(const int powerup_id, const int player_id);
     PowerupType spend_powerup(const int object_id);
 
     // Utility functions

@@ -58,25 +58,18 @@ void PowerupSubsystem::create_powerup(const int object_id, const PowerupType typ
     powerup_objs_[object_id] = new_powerup;
 }
 
-void PowerupSubsystem::change_powerup_position(const int object_id, glm::vec3 pos) {
-    powerup_objs_[object_id].pos_ = pos;
-}
-
 void PowerupSubsystem::change_powerup_type(int object_id, const PowerupType new_type) {
     powerup_objs_[object_id].type_ = new_type;
 }
 
-void PowerupSubsystem::pickup_powerup(const int powerup_id, const int player_id) {
-    // Prevent pickup if powerup was just picked up
-    if (powerup_objs_[powerup_id].frame_lock_counter_ < POWERUP_LOCK_FRAMES) {
-        return;
-    }
-
+glm::vec3 PowerupSubsystem::pickup_powerup(const int powerup_id, const int player_id) {
     // Add current powerup to object
     player_powerups_[player_id] = powerup_objs_[powerup_id].type_;
 
-    // Lock powerup until new powerup comes
+    glm::vec3 new_powerup_pos = get_next_powerup_position();
+    powerup_objs_[powerup_id].pos_ = new_powerup_pos;
     powerup_objs_[powerup_id].frame_lock_counter_ = 0;
+    return new_powerup_pos;
 }
 
 PowerupType PowerupSubsystem::spend_powerup(const int object_id) {
