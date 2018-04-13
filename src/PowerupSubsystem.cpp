@@ -10,15 +10,14 @@
 #include "PowerupSubsystem.h"
 
 namespace {
-    const float POWERUP_DISTANCE_THRESHOLD = 3.5f;
+    const float POWERUP_DISTANCE_THRESHOLD = 2.5f;
     const int POWERUP_LOCK_FRAMES = 30;
 
     const int POWERUP_INDEX_RANGE = PowerupType::NO_POWERUP;
     const int NUM_PLAYERS = 4;
 }
 
-PowerupSubsystem::PowerupSubsystem()
-    : frame_counter_(0) {
+PowerupSubsystem::PowerupSubsystem() {
     for (int i = 0; i < NUM_PLAYERS; i++) {
         player_powerups_[i] = PowerupType::NO_POWERUP;
     }
@@ -29,7 +28,10 @@ void PowerupSubsystem::load() {
 }
 
 void PowerupSubsystem::update() {
-    frame_counter_ = std::min(POWERUP_LOCK_FRAMES, frame_counter_ + 1);
+    for(auto& powerup_obj : powerup_objs_) {
+        powerup_obj.second.frame_lock_counter_ =
+            std::min(POWERUP_LOCK_FRAMES, powerup_obj.second.frame_lock_counter_ + 1);
+    }
 }
 
 void PowerupSubsystem::add_mound_location(const int x, int y, const int z) {
@@ -50,31 +52,31 @@ void PowerupSubsystem::set_new_game_state(const GameState new_game_state) {
 
 void PowerupSubsystem::create_powerup(const int object_id, const PowerupType type, glm::vec3 pos) {
     PowerupObject new_powerup;
-    new_powerup.id_ = object_id;
     new_powerup.pos_ = pos;
     new_powerup.type_ = type;
-    powerup_objs_.push_back(new_powerup);
+    new_powerup.frame_lock_counter_ = 0;
+    powerup_objs_[object_id] = new_powerup;
 }
 
 void PowerupSubsystem::change_powerup_position(const int object_id, glm::vec3 pos) {
-    powerup_objs_[0].pos_ = pos;
+    powerup_objs_[object_id].pos_ = pos;
 }
 
-void PowerupSubsystem::change_powerup_type(int powerup_id, const PowerupType new_type) {
-    powerup_objs_[0].type_ = new_type;
+void PowerupSubsystem::change_powerup_type(int object_id, const PowerupType new_type) {
+    powerup_objs_[object_id].type_ = new_type;
 }
 
-void PowerupSubsystem::pickup_powerup(const int object_id) {
+void PowerupSubsystem::pickup_powerup(const int powerup_id, const int player_id) {
     // Prevent pickup if powerup was just picked up
-    if (frame_counter_ < POWERUP_LOCK_FRAMES) {
+    if (powerup_objs_[powerup_id].frame_lock_counter_ < POWERUP_LOCK_FRAMES) {
         return;
     }
 
     // Add current powerup to object
-    player_powerups_[object_id] = powerup_objs_[0].type_;
+    player_powerups_[player_id] = powerup_objs_[powerup_id].type_;
 
     // Lock powerup until new powerup comes
-    frame_counter_ = 0;
+    powerup_objs_[powerup_id].frame_lock_counter_ = 0;
 }
 
 PowerupType PowerupSubsystem::spend_powerup(const int object_id) {
@@ -85,7 +87,7 @@ PowerupType PowerupSubsystem::spend_powerup(const int object_id) {
 
 const bool PowerupSubsystem::is_powerup(const int object_id) const {
     for (const auto& powerup_obj : powerup_objs_) {
-        if (powerup_obj.id_ == object_id) {
+        if (powerup_obj.first == object_id) {
             return true;
         }
     }
@@ -107,8 +109,8 @@ PowerupType PowerupSubsystem::get_next_powerup_type() const {
     return new_type;
 }
 
-PowerupType PowerupSubsystem::get_powerup_type() const {
-    return powerup_objs_[0].type_;
+PowerupType PowerupSubsystem::get_powerup_type(int powerup_id) const {
+    return powerup_objs_.at(powerup_id).type_;
 }
 
 const int PowerupSubsystem::get_powerup_id() const {
@@ -116,16 +118,27 @@ const int PowerupSubsystem::get_powerup_id() const {
         return -1;
     }
 
-    return powerup_objs_[0].id_;
+    for (const auto& powerup_obj : powerup_objs_) {
+        return powerup_obj.first;
+    }
+    assert(false);
+    return -1;
 }
 
-const bool PowerupSubsystem::should_pickup_powerup(const int object_id, glm::vec3 object_pos) const {
-    return
-        !is_powerup(object_id) &&
-        frame_counter_ >= POWERUP_LOCK_FRAMES &&
-        glm::distance(powerup_objs_[0].pos_, object_pos) <= POWERUP_DISTANCE_THRESHOLD;
+const bool PowerupSubsystem::within_powerup(glm::vec3 object_pos) const {
+    for (const auto& powerup_obj : powerup_objs_) {
+        return
+            powerup_obj.second.frame_lock_counter_ >= POWERUP_LOCK_FRAMES &&
+            glm::distance(powerup_obj.second.pos_, object_pos) <= POWERUP_DISTANCE_THRESHOLD;
+    }
+    assert(false);
+    return false;
 }
 
-const bool PowerupSubsystem::should_update_powerup_position(const int object_id, const glm::vec3& position) const {
-    return frame_counter_ >= POWERUP_LOCK_FRAMES && powerup_objs_[0].pos_ != position;
+const bool PowerupSubsystem::should_update_powerup_position(const glm::vec3& position) const {
+    for (const auto& powerup_obj : powerup_objs_) {
+        return powerup_obj.second.frame_lock_counter_ >= POWERUP_LOCK_FRAMES && powerup_obj.second.pos_ != position;
+    }
+    assert(false);
+    return false;
 }
