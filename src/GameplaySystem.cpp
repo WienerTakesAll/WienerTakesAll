@@ -241,8 +241,6 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
             rand_x = rand() % 2 ? rand_x : -rand_x;
             int rand_z = (rand() % (50 - PLAYER_SPAWN_DIST_FROM_CENTER)) + PLAYER_SPAWN_DIST_FROM_CENTER;
             rand_z = rand() % 2 ? rand_z : -rand_z;
-            std::cout << "rand_x: " << rand_x << std::endl;
-            std::cout << "rand_z: " << rand_z << std::endl;
             EventSystem::queue_event(
                 Event(
                     EventType::ADD_CHARCOAL,
