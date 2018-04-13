@@ -76,6 +76,7 @@ void EndGameScreen::set_winner(int winner_id) {
         case -2:
             crown_location_ = // not visible, but we still want to display the end screen
                 glm::translate(glm::mat4(), glm::vec3(1000, 1000, 1000));
+            congratulations_.visible_ = false;
             break;
 
         default:
