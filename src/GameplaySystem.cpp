@@ -25,15 +25,15 @@ namespace {
     const int PLAYER_SPAWN_DIST_FROM_CENTER = 20;
     const float POWERUP_SPAWN_DIST_FROM_CENTER = PLAYER_SPAWN_DIST_FROM_CENTER - 5;
 
-    const int GOOD_KETCHUP_DURATION = 180;
-    const int BAD_KETCHUP_DURATION = 180;
+    const int GOOD_KETCHUP_DURATION = 240;
+    const int BAD_KETCHUP_DURATION = 240;
     const float GOOD_KETCHUP_BOOST = 1200.0f;
-    const float BAD_KETCHUP_BOOST = 5000.0f;
+    const float BAD_KETCHUP_BOOST = 3000.0f;
     const int MUSTARD_EFFECT_DURATION = 60;
-    const glm::vec3 MUSTARD_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
-    const int DOMINATED_DURATION = 180;;
-    const int CONTROLS_REVERSED_DURATION = 180;;
-    const int INVINCIBILITY_DURATION = 180;
+    const glm::vec3 MUSTARD_KNOCK_BACK_FORCE(30000.f, 80000.f, 30000.f);
+    const int DOMINATED_DURATION = 180;
+    const int CONTROLS_REVERSED_DURATION = 180;
+    const int INVINCIBILITY_DURATION = 150;
 }
 
 GameplaySystem::GameplaySystem()
