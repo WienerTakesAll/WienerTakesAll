@@ -79,10 +79,13 @@ There are a number of issues that we are aware of and are making efforts to addr
     - `WienerTakesAll\lib\include\`
     - `WienerTakesAll\lib\x86\`
     - `WienerTakesAll\lib\dlls\`
+    - `WienerTakesAll\lib\release-x86\`
+    - `WienerTakesAll\lib\release-dlls\`
 3. Optionally you can delete the `lib.zip` folder now.
 3. Copy all the DLL files in  `WienerTakesAll\lib\dlls\` into `WienerTakesAll\Debug\`.
-4. Copy the `WienerTakesAll\assets` folder into `WienerTakesAll\Debug\`.
-4. Open the `WienerTakesAll.sln` solution and build for _Debug x86_.
+3. Copy all the DLL files in  `WienerTakesAll\lib\release-dlls\` into `WienerTakesAll\Release\`.
+4. Copy the `WienerTakesAll\assets` folder into `WienerTakesAll\Debug\` and `WienerTakesAll\Release\`.
+4. Open the `WienerTakesAll.sln` solution and build for _Debug x86_ or _Release x86_.
 
 NOTE: On VS2017 the Windows 8.1 SDK and the UCRT SD must be installed since this is a VS2015 project.
 Also the target must be retargeted for the newest platform tools.
@@ -116,6 +119,27 @@ WienerTakesAll
 │   ├── SDL2_mixer.dll
 │   └── zlib1.dll
 ├── README.md
+├── Release
+│   ├── assimp-vc140-mt.dll
+│   ├── glew32.dll
+│   ├── glut32.dll
+│   ├── libjpeg-9.dll
+│   ├── libpng16-16.dll
+│   ├── libtiff-5.dll
+│   ├── libwebp-7.dll
+│   ├── nvToolsExt32_1.dll
+│   ├── PhysX3CharacterKinematic_x86.dll
+│   ├── PhysX3Common_x86.dll
+│   ├── PhysX3Cooking_x86.dll
+│   ├── PhysX3_x86.dll
+│   ├── PhysX3Gpu_x86.dll
+│   ├── PhysXDevice.dll
+│   ├── PxFoundation_x86.dll
+│   ├── PxPvdSDK_x86.dll
+│   ├── SDL2.dll
+│   ├── SDL2_image.dll
+│   ├── SDL2_mixer.dll
+│   └── zlib1.dll
 ├── WienerTakesAll.sln
 ├── WienerTakesAll.vcxproj
 ├── WienerTakesAll.vcxproj.filters
@@ -131,6 +155,33 @@ WienerTakesAll
 │   │   │   └── <glm-headers>
 │   │   └── assimp
 │   │       └── <assimp-headers>
+│   ├── release-x86
+|   │   ├── assimp-vc140-mt.lib
+|   │   ├── glew32.lib
+|   │   ├── glew32s.lib
+|   │   ├── libyaml-cppmt.lib
+|   │   ├── LowLevelAABB.lib
+|   │   ├── LowLevelCloth.lib
+|   │   ├── LowLevel.lib
+|   │   ├── LowLevelDynamics.lib
+|   │   ├── LowLevelParticles.lib
+|   │   ├── PhysX3CharacterKinematic_x86.lib
+|   │   ├── PhysX3Common_x86.lib
+|   │   ├── PhysX3Cooking_x86.lib
+|   │   ├── PhysX3_x86.lib
+|   │   ├── PhysX3Extensions.lib
+|   │   ├── PhysX3Vehicle.lib
+|   │   ├── PsFastXml_x86.lib
+|   │   ├── PxFoundation_x86.lib
+|   │   ├── PxPvdSDK_x86.lib
+|   │   ├── PxTask_x86.lib
+|   │   ├── SceneQuery.lib
+|   │   ├── SDL2.lib
+|   │   ├── SDL2_image.lib
+|   │   ├── SDL2_mixer.lib
+|   │   ├── SDL2main.lib
+|   │   ├── SDL2test.lib
+|   │   └── SimulationController.lib
 │   └── x86
 |       ├── assimp-vc140-mt.lib
 |       ├── glew32.lib
