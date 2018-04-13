@@ -212,8 +212,8 @@ void ParticleSubsystem::handle_add_powerup(const Event& e) {
     powerup_pickup_gens_[powerup_id].set_position(glm::vec3(100.0f, 100.0f, 100.0f));
     powerup_pickup_gens_[powerup_id].set_particle_scale(-0.05f, 0.15f, 1.5f);
     powerup_pickup_gens_[powerup_id].set_particle_acceleration(glm::vec3(0.0f, -0.005f, 0.0f));
-    powerup_pickup_gens_[powerup_id].set_spawn_amount(10, 40);
-    powerup_pickup_gens_[powerup_id].set_spawn_range(2.0f, 1.0f, 2.0f);
+    powerup_pickup_gens_[powerup_id].set_spawn_amount(100, 200);
+    powerup_pickup_gens_[powerup_id].set_spawn_range(3.0f, 3.0f, 3.0f);
     powerup_pickup_gens_[powerup_id].set_particle_fixed_size(false);
 }
 
