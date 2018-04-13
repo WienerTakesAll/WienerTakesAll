@@ -104,26 +104,6 @@ void GameplaySystem::update() {
     // update powerup subsystem
     powerup_subsystem_.update();
 
-    if (object_positions_.find(powerup_subsystem_.get_powerup_id()) != object_positions_.end()) {
-        glm::vec3 powerup_cur_loc = object_positions_[powerup_subsystem_.get_powerup_id()];
-
-        if (powerup_subsystem_.should_update_powerup_position(powerup_cur_loc)) {
-            EventSystem::queue_event(
-                Event(
-                    EventType::OBJECT_TRANSFORM_EVENT,
-                    "object_id", powerup_subsystem_.get_powerup_id(),
-                    "pos_x", powerup_cur_loc.x,
-                    "pos_y", powerup_cur_loc.y,
-                    "pos_z", powerup_cur_loc.z,
-                    "qua_w", 1.0f,
-                    "qua_x", 0.0f,
-                    "qua_y", 0.0f,
-                    "qua_z", 0.0f
-                )
-            );
-        }
-    }
-
     // update status effects
     for (auto& player_status : player_status_effects_) {
         if (player_status.second.duration_ <= 0 ||
@@ -276,7 +256,6 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
         );
 
         // Powerup
-        // glm::vec3 powerup_loc = powerup_subsystem_.get_next_powerup_position();
 
         int powerup_id = powerup_subsystem_.get_powerup_id();
 
@@ -570,13 +549,15 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
     // If obj is a vehicle and is close enough to powerup
     // should pick it up
     if (object_id < NUM_PLAYERS && object_id >= 0) {
-        if (powerup_subsystem_.within_powerup(glm::vec3(x, y, z))) {
+        std::vector<int> in_range_powerups = powerup_subsystem_.within_powerup(glm::vec3(x, y, z));
+
+        for (int powerup_id : in_range_powerups) {
             EventSystem::queue_event(
                 Event(
                     EventType::PICKUP_POWERUP,
                     "object_id", object_id,
-                    "powerup_id", powerup_subsystem_.get_powerup_id(),
-                    "powerup_type", powerup_subsystem_.get_powerup_type(powerup_subsystem_.get_powerup_id())
+                    "powerup_id", powerup_id,
+                    "powerup_type", powerup_subsystem_.get_powerup_type(powerup_id)
                 )
             );
         }
