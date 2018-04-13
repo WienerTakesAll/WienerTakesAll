@@ -109,7 +109,7 @@ glm::vec4 ParticleGenerator::generate_colour() const {
 }
 
 void ParticleGenerator::render(const glm::mat4& camera) const {
-    if (particles_.empty()) {
+    if (particles_.empty() || !active_) {
         return;
     }
 

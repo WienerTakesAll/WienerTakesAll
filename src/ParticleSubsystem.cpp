@@ -133,7 +133,7 @@ void ParticleSubsystem::handle_new_status_effect(const Event& e) {
     StatusEffect type = static_cast<StatusEffect>(e.get_value<int>("type", true).first);
     int player_id = e.get_value<int>("object_id", true).first;
 
-    TextureAsset* powerup_texture;
+    TextureAsset* powerup_texture = asset_manager_.get_texture_asset(POWERUP_PARTICLE_TEXTURE_PATH);
     float particle_probability = 0.0f;
     glm::vec4 delta = glm::vec4(0.0f, 0.0f, 0.0f, -0.01f);
     glm::vec4 min = glm::vec4();
