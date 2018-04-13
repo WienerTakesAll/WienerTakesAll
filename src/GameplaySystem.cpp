@@ -11,6 +11,8 @@
 #include "StatusEffect.h"
 
 namespace {
+    const int NUM_PLAYERS = 4;
+
     const int MAX_SCORE = 2500;
     const int MAX_TRIGGER_VALUE = 32768;
     const float DRIVE_SPEED = 0.6f;
@@ -105,7 +107,7 @@ void GameplaySystem::update() {
     if (object_positions_.find(powerup_subsystem_.get_powerup_id()) != object_positions_.end()) {
         glm::vec3 powerup_cur_loc = object_positions_[powerup_subsystem_.get_powerup_id()];
 
-        if (powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id(), powerup_cur_loc)) {
+        if (powerup_subsystem_.should_update_powerup_position(powerup_cur_loc)) {
             EventSystem::queue_event(
                 Event(
                     EventType::OBJECT_TRANSFORM_EVENT,
@@ -570,16 +572,19 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
         powerup_subsystem_.change_powerup_position(object_id, glm::vec3(x, y, z));
     }
 
-    // A vehicle close enough to powerup should pick it up
-    if (powerup_subsystem_.should_pickup_powerup(object_id, glm::vec3(x, y, z))) {
-        EventSystem::queue_event(
-            Event(
-                EventType::PICKUP_POWERUP,
-                "object_id", object_id,
-                "powerup_id", powerup_subsystem_.get_powerup_id(),
-                "powerup_type", powerup_subsystem_.get_powerup_type()
-            )
-        );
+    // If obj is a vehicle and is close enough to powerup
+    // should pick it up
+    if (object_id < NUM_PLAYERS && object_id >= 0) {
+        if (powerup_subsystem_.within_powerup(glm::vec3(x, y, z))) {
+            EventSystem::queue_event(
+                Event(
+                    EventType::PICKUP_POWERUP,
+                    "object_id", object_id,
+                    "powerup_id", powerup_subsystem_.get_powerup_id(),
+                    "powerup_type", powerup_subsystem_.get_powerup_type(powerup_subsystem_.get_powerup_id())
+                )
+            );
+        }
     }
 
     if (object_id < 4 && object_id != current_it_id_) {

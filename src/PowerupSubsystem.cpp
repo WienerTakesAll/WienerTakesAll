@@ -28,7 +28,7 @@ void PowerupSubsystem::load() {
 }
 
 void PowerupSubsystem::update() {
-    for(auto& powerup_obj : powerup_objs_) {
+    for (auto& powerup_obj : powerup_objs_) {
         powerup_obj.second.frame_lock_counter_ =
             std::min(POWERUP_LOCK_FRAMES, powerup_obj.second.frame_lock_counter_ + 1);
     }
@@ -121,6 +121,7 @@ const int PowerupSubsystem::get_powerup_id() const {
     for (const auto& powerup_obj : powerup_objs_) {
         return powerup_obj.first;
     }
+
     assert(false);
     return -1;
 }
@@ -131,6 +132,7 @@ const bool PowerupSubsystem::within_powerup(glm::vec3 object_pos) const {
             powerup_obj.second.frame_lock_counter_ >= POWERUP_LOCK_FRAMES &&
             glm::distance(powerup_obj.second.pos_, object_pos) <= POWERUP_DISTANCE_THRESHOLD;
     }
+
     assert(false);
     return false;
 }
@@ -139,6 +141,7 @@ const bool PowerupSubsystem::should_update_powerup_position(const glm::vec3& pos
     for (const auto& powerup_obj : powerup_objs_) {
         return powerup_obj.second.frame_lock_counter_ >= POWERUP_LOCK_FRAMES && powerup_obj.second.pos_ != position;
     }
+
     assert(false);
     return false;
 }
