@@ -263,6 +263,9 @@ void RenderingSystem::handle_add_powerup(const Event& e) {
         static int frames = 0;
         example_objects_[object_id].apply_transform(glm::rotate(glm::mat4(), glm::radians(2.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
         example_objects_[object_id].apply_transform(glm::translate(glm::mat4(), glm::vec3(0.0f, sin(glm::radians(static_cast<float>(frames) * 3.0f)) * 0.003f, 0.0f)));
+        glm::vec4 overlay((sin(glm::radians(static_cast<float>(frames)) * 2.0f) + 1) * 0.05f);
+        overlay[3] = 0.0f;
+        example_objects_[object_id].set_colour_overlay(overlay);
         frames = (frames + 1) % 360;
     });
 }
