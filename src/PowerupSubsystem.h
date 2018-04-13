@@ -24,7 +24,6 @@ public:
     const bool is_powerup(const int object_id) const;
     PowerupType get_next_powerup_type() const;
     PowerupType get_powerup_type(int powerup_id) const;
-    const int get_powerup_id() const;
     std::vector<int> within_powerup(glm::vec3 object_pos) const;
 
 private:
