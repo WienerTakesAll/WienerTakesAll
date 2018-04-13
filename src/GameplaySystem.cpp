@@ -532,7 +532,6 @@ void GameplaySystem::handle_key_press(const Event& e) {
                     continue;
                 }
 
-                std::cout << "DOMINATING" << std::endl;
                 new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                         "index", other_player,
                                         "type", event.get_value<int>("type", true).first,
