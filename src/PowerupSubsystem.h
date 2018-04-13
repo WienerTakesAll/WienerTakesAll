@@ -27,15 +27,16 @@ public:
     std::vector<int> within_powerup(glm::vec3 object_pos) const;
 
 private:
-    glm::vec3 get_next_powerup_position() const;
+    int get_next_powerup_position() const;
 
     GameState game_state_;
     struct PowerupObject {
         glm::vec3 pos_;
+        int charcoal_index_;
         PowerupType type_;
         int frame_lock_counter_;
     };
     std::map<int, PowerupObject> powerup_objs_;
     std::map<int, PowerupType> player_powerups_;
-    std::vector<glm::vec3> charcoal_locations;
+    std::vector<std::pair<glm::vec3, bool>> occupied_charcoal_locations_;
 };

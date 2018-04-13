@@ -35,7 +35,7 @@ void PowerupSubsystem::update() {
 }
 
 void PowerupSubsystem::add_mound_location(const int x, int y, const int z) {
-    charcoal_locations.emplace_back(glm::vec3(x, y + 3, z));
+    occupied_charcoal_locations_.emplace_back(glm::vec3(x, y + 3, z), false);
 }
 
 void PowerupSubsystem::set_new_game_state(const GameState new_game_state) {
@@ -44,7 +44,7 @@ void PowerupSubsystem::set_new_game_state(const GameState new_game_state) {
             player.second = PowerupType::NO_POWERUP;
         }
 
-        charcoal_locations.clear();
+        occupied_charcoal_locations_.clear();
     }
 
     game_state_ = new_game_state;
@@ -53,6 +53,7 @@ void PowerupSubsystem::set_new_game_state(const GameState new_game_state) {
 void PowerupSubsystem::create_powerup(const int object_id, const PowerupType type, glm::vec3 pos) {
     PowerupObject new_powerup;
     new_powerup.pos_ = pos;
+    new_powerup.charcoal_index_ = -1;
     new_powerup.type_ = type;
     new_powerup.frame_lock_counter_ = 0;
     powerup_objs_[object_id] = new_powerup;
@@ -70,10 +71,18 @@ glm::vec3 PowerupSubsystem::pickup_powerup(const int powerup_id, const int playe
     // Add current powerup to object
     player_powerups_[player_id] = powerup_objs_[powerup_id].type_;
 
-    glm::vec3 new_powerup_pos = get_next_powerup_position();
-    powerup_objs_[powerup_id].pos_ = new_powerup_pos;
+    int new_charcoal_index = get_next_powerup_position();
+    occupied_charcoal_locations_[new_charcoal_index].second = true;
+
+    int old_charcoal_index = powerup_objs_[powerup_id].charcoal_index_;
+
+    if (old_charcoal_index >= 0) {
+        occupied_charcoal_locations_[old_charcoal_index].second = false;
+    }
+
+    powerup_objs_[powerup_id].pos_ = occupied_charcoal_locations_[new_charcoal_index].first;
     powerup_objs_[powerup_id].frame_lock_counter_ = 0;
-    return new_powerup_pos;
+    return powerup_objs_[powerup_id].pos_;
 }
 
 PowerupType PowerupSubsystem::spend_powerup(const int object_id) {
@@ -82,22 +91,20 @@ PowerupType PowerupSubsystem::spend_powerup(const int object_id) {
     return spent_powerup;
 }
 
-const bool PowerupSubsystem::is_powerup(const int object_id) const {
-    for (const auto& powerup_obj : powerup_objs_) {
-        if (powerup_obj.first == object_id) {
-            return true;
+// returns a charcoal index
+int PowerupSubsystem::get_next_powerup_position() const {
+    int new_index = -1;
+
+    while (new_index == -1) {
+        new_index = rand() % occupied_charcoal_locations_.size();
+
+        if (occupied_charcoal_locations_[new_index].second) {
+            new_index = -1;
+            break;
         }
     }
 
-    return false;
-}
-
-glm::vec3 PowerupSubsystem::get_next_powerup_position() const {
-    int i = rand() % charcoal_locations.size();
-
-    glm::vec3 location = charcoal_locations.at(i);
-
-    return location;
+    return new_index;
 }
 
 PowerupType PowerupSubsystem::get_next_powerup_type() const {
