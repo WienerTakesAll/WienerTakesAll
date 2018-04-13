@@ -19,9 +19,6 @@ namespace {
 
 ParticleSubsystem::ParticleSubsystem(AssetManager& asset_manager)
     : asset_manager_(asset_manager)
-    , hotdog_indicator_gen_()
-    , powerup_gens_()
-    , powerup_pickup_gen_()
     , whos_it(0) {
 }
 
@@ -32,8 +29,10 @@ void ParticleSubsystem::update() {
         powerup_gen.update();
     }
 
-    powerup_pickup_gen_.update();
-    powerup_pickup_gen_.set_active(false);
+    for (auto& powerup_pickup_gen : powerup_pickup_gens_) {
+        powerup_pickup_gen.second.update();
+        powerup_pickup_gen.second.set_active(false);
+    }
 }
 
 void ParticleSubsystem::render(const glm::mat4& camera, int camera_number) {
@@ -45,7 +44,9 @@ void ParticleSubsystem::render(const glm::mat4& camera, int camera_number) {
         powerup_gen.render(camera);
     }
 
-    powerup_pickup_gen_.render(camera);
+    for (auto& powerup_pickup_gen : powerup_pickup_gens_) {
+        powerup_pickup_gen.second.render(camera);
+    }
 }
 
 void ParticleSubsystem::handle_load(const Event& e) {
@@ -81,22 +82,6 @@ void ParticleSubsystem::handle_load(const Event& e) {
         powerup_gen.set_spawn_amount(0, 1);
         powerup_gen.set_spawn_range(2.0f, 1.0f, 2.0f);
     }
-
-    RenderingComponent pickup_component;
-    pickup_component.set_mesh(mesh);
-    pickup_component.set_shader(asset_manager_.get_shader_asset(PARTICLE_SHADER_PATH));
-    pickup_component.set_texture(asset_manager_.get_texture_asset(POWERUP_PICKUP_PARTICLE_TEXTURE_PATH));
-    powerup_pickup_gen_.init(pickup_component);
-    powerup_pickup_gen_.set_active(false);
-    powerup_pickup_gen_.set_probability(0.5f);
-    powerup_pickup_gen_.set_particle_lifetime(120);
-    powerup_pickup_gen_.set_particle_rotation_degrees(10.0f, 0.0f, 359.0f);
-    powerup_pickup_gen_.set_position(glm::vec3(100.0f, 100.0f, 100.0f));
-    powerup_pickup_gen_.set_particle_scale(-0.05f, 0.15f, 1.5f);
-    powerup_pickup_gen_.set_particle_acceleration(glm::vec3(0.0f, -0.005f, 0.0f));
-    powerup_pickup_gen_.set_spawn_amount(10, 40);
-    powerup_pickup_gen_.set_spawn_range(2.0f, 1.0f, 2.0f);
-    powerup_pickup_gen_.set_particle_fixed_size(false);
 }
 
 void ParticleSubsystem::handle_new_it(const Event& e) {
@@ -211,12 +196,34 @@ void ParticleSubsystem::handle_new_game_state(const Event& e) {
     }
 }
 
+void ParticleSubsystem::handle_add_powerup(const Event& e) {
+    int powerup_id = e.get_value<int>("object_id", true).first;
+    powerup_pickup_gens_[powerup_id] = ParticleGenerator();
+
+    RenderingComponent pickup_component;
+    pickup_component.set_mesh(asset_manager_.get_mesh_asset(PARTICLE_MESH_PATH));
+    pickup_component.set_shader(asset_manager_.get_shader_asset(PARTICLE_SHADER_PATH));
+    pickup_component.set_texture(asset_manager_.get_texture_asset(POWERUP_PICKUP_PARTICLE_TEXTURE_PATH));
+    powerup_pickup_gens_[powerup_id].init(pickup_component);
+    powerup_pickup_gens_[powerup_id].set_active(false);
+    powerup_pickup_gens_[powerup_id].set_probability(0.5f);
+    powerup_pickup_gens_[powerup_id].set_particle_lifetime(120);
+    powerup_pickup_gens_[powerup_id].set_particle_rotation_degrees(10.0f, 0.0f, 359.0f);
+    powerup_pickup_gens_[powerup_id].set_position(glm::vec3(100.0f, 100.0f, 100.0f));
+    powerup_pickup_gens_[powerup_id].set_particle_scale(-0.05f, 0.15f, 1.5f);
+    powerup_pickup_gens_[powerup_id].set_particle_acceleration(glm::vec3(0.0f, -0.005f, 0.0f));
+    powerup_pickup_gens_[powerup_id].set_spawn_amount(100, 200);
+    powerup_pickup_gens_[powerup_id].set_spawn_range(3.0f, 3.0f, 3.0f);
+    powerup_pickup_gens_[powerup_id].set_particle_fixed_size(false);
+}
+
 void ParticleSubsystem::handle_pickup_powerup(const Event& e) {
     int object_id = e.get_value<int>("object_id", true).first;
+    int powerup_id = e.get_value<int>("powerup_id", true).first;
     PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("powerup_type", true).first);
 
-    powerup_pickup_gen_.set_position(powerup_gens_[object_id].get_position());
-    powerup_pickup_gen_.set_active(true);
+    powerup_pickup_gens_[powerup_id].set_position(powerup_gens_[object_id].get_position());
+    powerup_pickup_gens_[powerup_id].set_active(true);
 
     glm::vec4 delta(0.0f, 0.0f, 0.0f, -0.05f);
     glm::vec4 min(0.0f, 0.0f, 0.0f, 0.0f);
@@ -240,5 +247,5 @@ void ParticleSubsystem::handle_pickup_powerup(const Event& e) {
         min[1] = 0.6f;
     }
 
-    powerup_pickup_gen_.set_colour(delta, min, max);
+    powerup_pickup_gens_[powerup_id].set_colour(delta, min, max);
 }

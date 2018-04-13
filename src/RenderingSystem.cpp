@@ -221,6 +221,8 @@ void RenderingSystem::handle_add_skybox(const Event& e) {
 }
 
 void RenderingSystem::handle_add_powerup(const Event& e) {
+    particle_subsystem_.handle_add_powerup(e);
+
     PowerupType powerup_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
 
     assert(powerup_type != PowerupType::NO_POWERUP);
