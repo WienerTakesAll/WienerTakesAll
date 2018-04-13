@@ -110,19 +110,6 @@ PowerupType PowerupSubsystem::get_powerup_type(int powerup_id) const {
     return powerup_objs_.at(powerup_id).type_;
 }
 
-const int PowerupSubsystem::get_powerup_id() const {
-    if (powerup_objs_.size() == 0) {
-        return -1;
-    }
-
-    for (const auto& powerup_obj : powerup_objs_) {
-        return powerup_obj.first;
-    }
-
-    assert(false);
-    return -1;
-}
-
 // Returns a vector of all powerup ids within pickup range
 std::vector<int> PowerupSubsystem::within_powerup(glm::vec3 object_pos) const {
     std::vector<int> in_range_powerups;

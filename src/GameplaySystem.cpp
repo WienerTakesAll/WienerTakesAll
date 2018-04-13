@@ -12,6 +12,7 @@
 
 namespace {
     const int NUM_PLAYERS = 4;
+    const int NUM_POWERUPS = 3;
 
     const int MAX_SCORE = 2500;
     const int MAX_TRIGGER_VALUE = 32768;
@@ -256,17 +257,20 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
         );
 
         // Powerup
+        for (int i = 0; i < NUM_POWERUPS; i++) {
+            EventSystem::queue_event(
+                Event(
+                    EventType::ADD_POWERUP,
+                    "object_id", gameobject_counter_->assign_id(),
+                    "type", static_cast<int>(powerup_subsystem_.get_next_powerup_type()),
+                    "pos_x", 0.f,
+                    "pos_y", 2.7f,
+                    "pos_z", 0.f
+                )
+            );
+        }
 
-        EventSystem::queue_event(
-            Event(
-                EventType::ADD_POWERUP,
-                "object_id", gameobject_counter_->assign_id();,
-                "type", static_cast<int>(powerup_subsystem_.get_next_powerup_type()),
-                "pos_x", 0.f,
-                "pos_y", 2.7f,
-                "pos_z", 0.f
-            )
-        );
+
 
     } else if (new_game_state == GameState::START_MENU) {
         gameobject_counter_->reset_counter();
