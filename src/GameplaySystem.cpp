@@ -647,9 +647,9 @@ void GameplaySystem::handle_add_powerup(const Event& e) {
 
 void GameplaySystem::handle_pickup_powerup(const Event& e) {
     // Pick up powerup
-    int object_id = e.get_value<int>("object_id", true).first;
+    int player_id = e.get_value<int>("object_id", true).first;
     int powerup_id = e.get_value<int>("powerup_id", true).first;
-    powerup_subsystem_.pickup_powerup(object_id);
+    powerup_subsystem_.pickup_powerup(powerup_id, player_id);
 
     // Change powerup type
     PowerupType new_type = powerup_subsystem_.get_next_powerup_type();
