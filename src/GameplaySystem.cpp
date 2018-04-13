@@ -11,6 +11,9 @@
 #include "StatusEffect.h"
 
 namespace {
+    const int NUM_PLAYERS = 4;
+    const int NUM_POWERUPS = NUM_PLAYERS;
+
     const int MAX_SCORE = 2500;
     const int MAX_TRIGGER_VALUE = 32768;
     const float DRIVE_SPEED = 0.6f;
@@ -19,7 +22,8 @@ namespace {
     const float KEYBOARD_STEER_AMOUNT = 0.4f;
     const glm::vec3 COLLISION_KNOCK_BACK_FORCE(15000.f, 80000.f, 15000.f);
     const int NUM_MOUNDS = 20;
-    const int SPAWN_DISTANCE_FROM_CENTER = 20;
+    const int PLAYER_SPAWN_DIST_FROM_CENTER = 20;
+    const float POWERUP_SPAWN_DIST_FROM_CENTER = PLAYER_SPAWN_DIST_FROM_CENTER - 5;
 
     const int GOOD_KETCHUP_DURATION = 180;
     const int BAD_KETCHUP_DURATION = 180;
@@ -102,26 +106,6 @@ void GameplaySystem::update() {
     // update powerup subsystem
     powerup_subsystem_.update();
 
-    if (object_positions_.find(powerup_subsystem_.get_powerup_id()) != object_positions_.end()) {
-        glm::vec3 powerup_cur_loc = object_positions_[powerup_subsystem_.get_powerup_id()];
-
-        if (powerup_subsystem_.should_update_powerup_position(powerup_subsystem_.get_powerup_id(), powerup_cur_loc)) {
-            EventSystem::queue_event(
-                Event(
-                    EventType::OBJECT_TRANSFORM_EVENT,
-                    "object_id", powerup_subsystem_.get_powerup_id(),
-                    "pos_x", powerup_cur_loc.x,
-                    "pos_y", powerup_cur_loc.y,
-                    "pos_z", powerup_cur_loc.z,
-                    "qua_w", 1.0f,
-                    "qua_x", 0.0f,
-                    "qua_y", 0.0f,
-                    "qua_z", 0.0f
-                )
-            );
-        }
-    }
-
     // update status effects
     for (auto& player_status : player_status_effects_) {
         if (player_status.second.duration_ <= 0 ||
@@ -186,7 +170,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 // TODO: Pass glm::vec3 in events
                 "pos_x", 0,
                 "pos_y", 10,
-                "pos_z", -SPAWN_DISTANCE_FROM_CENTER,
+                "pos_z", -PLAYER_SPAWN_DIST_FROM_CENTER,
                 "rotation", 0.0f
             )
         );
@@ -196,7 +180,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 EventType::ADD_VEHICLE,
                 "object_id", gameobject_counter_->assign_id(),
                 // TODO: Pass glm::vec3 in events
-                "pos_x", -SPAWN_DISTANCE_FROM_CENTER,
+                "pos_x", -PLAYER_SPAWN_DIST_FROM_CENTER,
                 "pos_y", 10,
                 "pos_z", 0,
                 "rotation", 90.0f
@@ -210,7 +194,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 // TODO: Pass glm::vec3 in events
                 "pos_x", 0,
                 "pos_y", 10,
-                "pos_z", SPAWN_DISTANCE_FROM_CENTER,
+                "pos_z", PLAYER_SPAWN_DIST_FROM_CENTER,
                 "rotation", 180.0f
             )
         );
@@ -221,7 +205,7 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
                 EventType::ADD_VEHICLE,
                 "object_id", last_player_id,
                 // TODO: Pass glm::vec3 in events
-                "pos_x", SPAWN_DISTANCE_FROM_CENTER,
+                "pos_x", PLAYER_SPAWN_DIST_FROM_CENTER,
                 "pos_y", 10,
                 "pos_z", 0,
                 "rotation", 270.0f
@@ -253,14 +237,18 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
 
         // mounds
         for (size_t i = 0; i < NUM_MOUNDS; i++) {
+            int rand_x = (rand() % (70 - PLAYER_SPAWN_DIST_FROM_CENTER)) + PLAYER_SPAWN_DIST_FROM_CENTER;
+            rand_x = rand() % 2 ? rand_x : -rand_x;
+            int rand_z = (rand() % (50 - PLAYER_SPAWN_DIST_FROM_CENTER)) + PLAYER_SPAWN_DIST_FROM_CENTER;
+            rand_z = rand() % 2 ? rand_z : -rand_z;
             EventSystem::queue_event(
                 Event(
                     EventType::ADD_CHARCOAL,
                     "object_id", gameobject_counter_->assign_id(),
                     // TODO: Pass glm::vec3 in events
-                    "pos_x", (rand() % 140) - 70,
+                    "pos_x", rand_x,
                     "pos_y", (rand() % 3),
-                    "pos_z", (rand() % 140) - 70
+                    "pos_z", rand_z
                 )
             );
         }
@@ -273,21 +261,13 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
             )
         );
 
-        // Powerup
-        // glm::vec3 powerup_loc = powerup_subsystem_.get_next_powerup_position();
-
-        int powerup_id = powerup_subsystem_.get_powerup_id();
-
-        if (powerup_id == -1) {
-            powerup_id = gameobject_counter_->assign_id();
-        }
-
+        // Powerups
         EventSystem::queue_event(
             Event(
                 EventType::ADD_POWERUP,
-                "object_id", powerup_id,
+                "object_id", gameobject_counter_->assign_id(),
                 "type", static_cast<int>(powerup_subsystem_.get_next_powerup_type()),
-                "pos_x", 0.f,
+                "pos_x", POWERUP_SPAWN_DIST_FROM_CENTER,
                 "pos_y", 2.7f,
                 "pos_z", 0.f
             )
@@ -295,15 +275,34 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
 
         EventSystem::queue_event(
             Event(
-                EventType::OBJECT_TRANSFORM_EVENT,
-                "object_id", powerup_id,
+                EventType::ADD_POWERUP,
+                "object_id", gameobject_counter_->assign_id(),
+                "type", static_cast<int>(powerup_subsystem_.get_next_powerup_type()),
+                "pos_x", -POWERUP_SPAWN_DIST_FROM_CENTER,
+                "pos_y", 2.7f,
+                "pos_z", 0.f
+            )
+        );
+
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_POWERUP,
+                "object_id", gameobject_counter_->assign_id(),
+                "type", static_cast<int>(powerup_subsystem_.get_next_powerup_type()),
                 "pos_x", 0.f,
                 "pos_y", 2.7f,
-                "pos_z", 0.f,
-                "qua_x", 0.f,
-                "qua_y", 0.0f,
-                "qua_z", 0.f,
-                "qua_w", 1.0f
+                "pos_z", POWERUP_SPAWN_DIST_FROM_CENTER
+            )
+        );
+
+        EventSystem::queue_event(
+            Event(
+                EventType::ADD_POWERUP,
+                "object_id", gameobject_counter_->assign_id(),
+                "type", static_cast<int>(powerup_subsystem_.get_next_powerup_type()),
+                "pos_x", 0.f,
+                "pos_y", 2.7f,
+                "pos_z", -POWERUP_SPAWN_DIST_FROM_CENTER
             )
         );
 
@@ -359,11 +358,15 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_u:
         case SDLK_RSHIFT:
         case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-            if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(player_id)) {
-                new_events.emplace_back(EventType::USE_POWERUP,
-                                        "type", powerup_subsystem_.get_player_powerup_type(player_id),
-                                        "target", PowerupTarget::SELF,
-                                        "index", player_id);
+            if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN)) {
+                PowerupType spent_powerup = powerup_subsystem_.spend_powerup(player_id);
+
+                if (spent_powerup != PowerupType::NO_POWERUP) {
+                    new_events.emplace_back(EventType::USE_POWERUP,
+                                            "type", spent_powerup,
+                                            "target", PowerupTarget::SELF,
+                                            "index", player_id);
+                }
             }
 
             break;
@@ -374,11 +377,15 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_o:
         case SDLK_RETURN:
         case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-            if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(player_id)) {
-                new_events.emplace_back(EventType::USE_POWERUP,
-                                        "type", powerup_subsystem_.get_player_powerup_type(player_id),
-                                        "target", PowerupTarget::OTHERS,
-                                        "index", player_id);
+            if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN)) {
+                PowerupType spent_powerup = powerup_subsystem_.spend_powerup(player_id);
+
+                if (spent_powerup != PowerupType::NO_POWERUP) {
+                    new_events.emplace_back(EventType::USE_POWERUP,
+                                            "type", spent_powerup,
+                                            "target", PowerupTarget::OTHERS,
+                                            "index", player_id);
+                }
             }
 
             break;
@@ -522,7 +529,6 @@ void GameplaySystem::handle_key_press(const Event& e) {
                     continue;
                 }
 
-                std::cout << "DOMINATING" << std::endl;
                 new_events.emplace_back(EventType::VEHICLE_CONTROL,
                                         "index", other_player,
                                         "type", event.get_value<int>("type", true).first,
@@ -558,20 +564,21 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
     object_rotations_[object_id] = glm::quat(qw, qx, qy, qz);
     object_positions_[object_id] = glm::vec3(x, y, z);
 
-    if (powerup_subsystem_.is_powerup(object_id)) {
-        powerup_subsystem_.change_powerup_position(object_id, glm::vec3(x, y, z));
-    }
+    // If obj is a vehicle and is close enough to powerup
+    // should pick it up
+    if (object_id < NUM_PLAYERS && object_id >= 0) {
+        std::vector<int> in_range_powerups = powerup_subsystem_.within_powerup(glm::vec3(x, y, z));
 
-    // A vehicle close enough to powerup should pick it up
-    if (powerup_subsystem_.should_pickup_powerup(object_id, glm::vec3(x, y, z))) {
-        EventSystem::queue_event(
-            Event(
-                EventType::PICKUP_POWERUP,
-                "object_id", object_id,
-                "powerup_id", powerup_subsystem_.get_powerup_id(),
-                "powerup_type", powerup_subsystem_.get_powerup_type()
-            )
-        );
+        for (int powerup_id : in_range_powerups) {
+            EventSystem::queue_event(
+                Event(
+                    EventType::PICKUP_POWERUP,
+                    "object_id", object_id,
+                    "powerup_id", powerup_id,
+                    "powerup_type", powerup_subsystem_.get_powerup_type(powerup_id)
+                )
+            );
+        }
     }
 
     if (object_id < 4 && object_id != current_it_id_) {
@@ -639,9 +646,10 @@ void GameplaySystem::handle_add_powerup(const Event& e) {
 
 void GameplaySystem::handle_pickup_powerup(const Event& e) {
     // Pick up powerup
-    int object_id = e.get_value<int>("object_id", true).first;
+    int player_id = e.get_value<int>("object_id", true).first;
     int powerup_id = e.get_value<int>("powerup_id", true).first;
-    powerup_subsystem_.pickup_powerup(object_id);
+    glm::vec3 new_powerup_pos = powerup_subsystem_.pickup_powerup(powerup_id, player_id);
+
 
     // Change powerup type
     PowerupType new_type = powerup_subsystem_.get_next_powerup_type();
@@ -654,14 +662,13 @@ void GameplaySystem::handle_pickup_powerup(const Event& e) {
     );
 
     // Move powerup to new location
-    glm::vec3 new_location = powerup_subsystem_.get_next_powerup_position();
     EventSystem::queue_event(
         Event(
             EventType::OBJECT_TRANSFORM_EVENT,
             "object_id", powerup_id,
-            "pos_x", new_location.x,
-            "pos_y", new_location.y,
-            "pos_z", new_location.z,
+            "pos_x", new_powerup_pos.x,
+            "pos_y", new_powerup_pos.y,
+            "pos_z", new_powerup_pos.z,
             "qua_w", 1.0f,
             "qua_x", 0.0f,
             "qua_y", 0.0f,
@@ -671,8 +678,9 @@ void GameplaySystem::handle_pickup_powerup(const Event& e) {
 }
 
 void GameplaySystem::handle_change_powerup(const Event& e) {
+    int powerup_id = e.get_value<int>("object_id", true).first;
     PowerupType new_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
-    powerup_subsystem_.change_powerup_type(new_type);
+    powerup_subsystem_.change_powerup_type(powerup_id, new_type);
 }
 
 void GameplaySystem::handle_new_status_effect(const Event& e) {

@@ -16,28 +16,27 @@ public:
     void add_mound_location(const int x, int y, const int z);
     void create_powerup(const int object_id, const PowerupType type, glm::vec3 pos);
     // Modifiers
-    void change_powerup_position(const int player_id, glm::vec3 pos);
-    void change_powerup_type(const PowerupType new_type);
-    void pickup_powerup(const int player_id);
-    void spend_powerup(const int object_id);
+    void change_powerup_type(int object_id, const PowerupType new_type);
+    glm::vec3 pickup_powerup(const int powerup_id, const int player_id);
+    PowerupType spend_powerup(const int object_id);
 
     // Utility functions
-    const bool can_use_powerup(const int object_id) const;
-    const PowerupType get_player_powerup_type(const int object_id) const;
     const bool is_powerup(const int object_id) const;
-    glm::vec3 get_next_powerup_position() const;
     PowerupType get_next_powerup_type() const;
-    PowerupType get_powerup_type() const;
-    const int get_powerup_id() const;
-    const bool should_pickup_powerup(const int player_id, glm::vec3 object_pos) const;
-    const bool should_update_powerup_position(const int object_id, const glm::vec3& location) const;
+    PowerupType get_powerup_type(int powerup_id) const;
+    std::vector<int> within_powerup(glm::vec3 object_pos) const;
 
 private:
-    int powerup_id_;
-    int frame_counter_;
+    int get_next_powerup_position() const;
+
     GameState game_state_;
-    glm::vec3 powerup_pos_;
-    PowerupType powerup_type_;
-    std::map<int, PowerupType> object_powerups_;
-    std::vector<glm::vec3> charcoal_locations;
+    struct PowerupObject {
+        glm::vec3 pos_;
+        int charcoal_index_;
+        PowerupType type_;
+        int frame_lock_counter_;
+    };
+    std::map<int, PowerupObject> powerup_objs_;
+    std::map<int, PowerupType> player_powerups_;
+    std::vector<std::pair<glm::vec3, bool>> occupied_charcoal_locations_;
 };
