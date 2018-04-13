@@ -10,7 +10,7 @@
 #include "PowerupSubsystem.h"
 
 namespace {
-    const float POWERUP_DISTANCE_THRESHOLD = 2.5f;
+    const float POWERUP_DISTANCE_THRESHOLD = 3.5f;
     const int POWERUP_LOCK_FRAMES = 30;
 
     const int POWERUP_INDEX_RANGE = PowerupType::NO_POWERUP;
@@ -77,18 +77,10 @@ void PowerupSubsystem::pickup_powerup(const int object_id) {
     frame_counter_ = 0;
 }
 
-void PowerupSubsystem::spend_powerup(const int object_id) {
-    // Clear powerup entry.
+PowerupType PowerupSubsystem::spend_powerup(const int object_id) {
+    PowerupType spent_powerup = player_powerups_[object_id];
     player_powerups_[object_id] = PowerupType::NO_POWERUP;
-}
-
-const bool PowerupSubsystem::can_use_powerup(const int object_id) const {
-    return player_powerups_.at(object_id) != PowerupType::NO_POWERUP;
-}
-
-const PowerupType PowerupSubsystem::get_player_powerup_type(const int object_id) const {
-    assert(can_use_powerup(object_id));
-    return player_powerups_.at(object_id);
+    return spent_powerup;
 }
 
 const bool PowerupSubsystem::is_powerup(const int object_id) const {

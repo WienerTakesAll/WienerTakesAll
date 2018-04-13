@@ -19,11 +19,9 @@ public:
     void change_powerup_position(const int object_id, glm::vec3 pos);
     void change_powerup_type(int powerup_id, const PowerupType new_type);
     void pickup_powerup(const int player_id);
-    void spend_powerup(const int object_id);
+    PowerupType spend_powerup(const int object_id);
 
     // Utility functions
-    const bool can_use_powerup(const int object_id) const;
-    const PowerupType get_player_powerup_type(const int object_id) const;
     const bool is_powerup(const int object_id) const;
     glm::vec3 get_next_powerup_position() const;
     PowerupType get_next_powerup_type() const;

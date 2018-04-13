@@ -359,11 +359,15 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_u:
         case SDLK_RSHIFT:
         case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-            if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(player_id)) {
-                new_events.emplace_back(EventType::USE_POWERUP,
-                                        "type", powerup_subsystem_.get_player_powerup_type(player_id),
-                                        "target", PowerupTarget::SELF,
-                                        "index", player_id);
+            if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN)) {
+                PowerupType spent_powerup = powerup_subsystem_.spend_powerup(player_id);
+
+                if (spent_powerup != PowerupType::NO_POWERUP) {
+                    new_events.emplace_back(EventType::USE_POWERUP,
+                                            "type", spent_powerup,
+                                            "target", PowerupTarget::SELF,
+                                            "index", player_id);
+                }
             }
 
             break;
@@ -374,11 +378,15 @@ void GameplaySystem::handle_key_press(const Event& e) {
         case SDLK_o:
         case SDLK_RETURN:
         case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-            if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN) && powerup_subsystem_.can_use_powerup(player_id)) {
-                new_events.emplace_back(EventType::USE_POWERUP,
-                                        "type", powerup_subsystem_.get_player_powerup_type(player_id),
-                                        "target", PowerupTarget::OTHERS,
-                                        "index", player_id);
+            if ((value == SDL_KEYDOWN || value == SDL_CONTROLLERBUTTONDOWN)) {
+                PowerupType spent_powerup = powerup_subsystem_.spend_powerup(player_id);
+
+                if (spent_powerup != PowerupType::NO_POWERUP) {
+                    new_events.emplace_back(EventType::USE_POWERUP,
+                                            "type", spent_powerup,
+                                            "target", PowerupTarget::OTHERS,
+                                            "index", player_id);
+                }
             }
 
             break;
