@@ -671,8 +671,9 @@ void GameplaySystem::handle_pickup_powerup(const Event& e) {
 }
 
 void GameplaySystem::handle_change_powerup(const Event& e) {
+    int powerup_id = e.get_value<int>("object_id", true).first;
     PowerupType new_type = static_cast<PowerupType>(e.get_value<int>("type", true).first);
-    powerup_subsystem_.change_powerup_type(new_type);
+    powerup_subsystem_.change_powerup_type(powerup_id, new_type);
 }
 
 void GameplaySystem::handle_new_status_effect(const Event& e) {

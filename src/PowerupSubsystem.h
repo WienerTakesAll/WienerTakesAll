@@ -16,8 +16,8 @@ public:
     void add_mound_location(const int x, int y, const int z);
     void create_powerup(const int object_id, const PowerupType type, glm::vec3 pos);
     // Modifiers
-    void change_powerup_position(const int player_id, glm::vec3 pos);
-    void change_powerup_type(const PowerupType new_type);
+    void change_powerup_position(const int object_id, glm::vec3 pos);
+    void change_powerup_type(int powerup_id, const PowerupType new_type);
     void pickup_powerup(const int player_id);
     void spend_powerup(const int object_id);
 
@@ -33,11 +33,14 @@ public:
     const bool should_update_powerup_position(const int object_id, const glm::vec3& location) const;
 
 private:
-    int powerup_id_;
-    int frame_counter_;
     GameState game_state_;
-    glm::vec3 powerup_pos_;
-    PowerupType powerup_type_;
-    std::map<int, PowerupType> object_powerups_;
+    int frame_counter_;
+    struct PowerupObject {
+        int id_;
+        glm::vec3 pos_;
+        PowerupType type_;
+    };
+    std::vector<PowerupObject> powerup_objs_;
+    std::map<int, PowerupType> player_powerups_;
     std::vector<glm::vec3> charcoal_locations;
 };
