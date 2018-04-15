@@ -200,58 +200,30 @@ void GameplayHud::load() {
 void GameplayHud::render() const {
 
     if (countdown_value_ > 0) {
-        auto transform = (num_ai_ == 3) ? glm::translate(glm::mat4(1.f), glm::vec3(0.7f, -.6f, 0.f)) : glm::mat4();
-        locked_scoreboard_.render(transform);
+        locked_scoreboard_.render(glm::mat4());
     } else {
-        auto transform = (num_ai_ == 3) ? glm::translate(glm::mat4(1.f), glm::vec3(0.7f, -.6f, 0.f)) : glm::mat4();
-        scoreboard_.render(transform);
+        scoreboard_.render(glm::mat4());
     }
 
     if (countdown_value_ > 0) {
-        auto transform = (num_ai_ == 3) ? glm::translate(glm::mat4(1.f), glm::vec3(0.7f, -.6f, 0.f)) : glm::mat4();
-        countdown_.render(transform);
+        countdown_.render(glm::mat4());
     }
 
     for (auto& score : scores_) {
-
-        if (num_ai_ == 3) {
-            auto transform = glm::translate(glm::mat4(1.f), glm::vec3(0.7f, -.6f, 0.f));
-            score.render(transform);
-        } else {
-            score.render(glm::mat4());
-        }
+        score.render(glm::mat4());
     }
 
     for (unsigned int i = 0; i < it_pointers_.size(); i++) {
         it_pointers_[i].render(it_pointer_transforms_[i]);
-
-        //If singleplayer, only render the first pointer
-        if (num_ai_ == 3) {
-            break;
-        }
     }
 
     for (auto& holder : powerup_holders_) {
-        auto transform = glm::mat4();
-
-        if (num_ai_ == 3) {
-            transform = glm::scale(glm::mat4(1.f), glm::vec3(2.f, 2.f, 1.f));
-            transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.f));
-        }
-
-        holder.render(transform);
-
-        //If singleplayer, only render the first holder
-        if (num_ai_ == 3) {
-            break;
-        }
+        holder.render(glm::mat4());
     }
 
     if (countdown_value_ > 0) {
-        if (num_ai_ != 3) {
-            for (auto& player_number : player_numbers_) {
-                player_number.render(glm::mat4());
-            }
+        for (auto& player_number : player_numbers_) {
+            player_number.render(glm::mat4());
         }
     }
 }
@@ -285,15 +257,6 @@ void GameplayHud::update_it_pointer(int player_id, glm::vec3 vector_to_it) {
 
     it_pointer_transforms_[player_id] =
         glm::translate(glm::mat4(), glm::vec3(origin_translate[0] / -4.f, origin_translate[1] / 4.f, 0.f));
-
-    if (num_ai_ == 3 && player_id == 0) {
-        it_pointer_transforms_[player_id][3][0] *= 3.f;
-        it_pointer_transforms_[player_id][3][1] *= 3.f;
-
-        it_pointer_transforms_[player_id]
-            = glm::translate(it_pointer_transforms_[player_id], glm::vec3(.5f, -.5f, 0.f));
-    }
-
 
     float angle = glm::orientedAngle(origin_translate, glm::vec2(0, 1));
 
