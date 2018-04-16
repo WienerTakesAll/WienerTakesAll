@@ -215,7 +215,8 @@ void GameplaySystem::handle_new_game_state(const Event& e) {
         EventSystem::queue_event(
             Event(
                 EventType::NEW_IT,
-                "object_id", (rand() % (last_player_id - first_player_id + 1)) + first_player_id
+                "object_id", (rand() % (last_player_id - first_player_id + 1)) + first_player_id,
+                "start", true
             )
         );
 
@@ -612,16 +613,19 @@ void GameplaySystem::handle_object_transform_event(const Event& e) {
 
 void GameplaySystem::handle_new_it(const Event& e) {
     int new_it_id = e.get_value<int>("object_id", true).first;
+    bool start = e.get_value<bool>("start", false).second;
     scoring_subsystem_.set_new_it_id(new_it_id);
     current_it_id_ = new_it_id;
 
-    EventSystem::queue_event(
-        Event(
-            EventType::NEW_STATUS_EFFECT,
-            "type", StatusEffect::INVINCIBILITY,
-            "object_id", new_it_id
-        )
-    );
+    if (!start) {
+        EventSystem::queue_event(
+            Event(
+                EventType::NEW_STATUS_EFFECT,
+                "type", StatusEffect::INVINCIBILITY,
+                "object_id", new_it_id
+            )
+        );
+    }
 }
 
 void GameplaySystem::handle_add_charcoal(const Event& e) {
