@@ -26,7 +26,7 @@ struct AudioSettings {
     };
     // Information for loading music assets. First value is the key, second is the path.
     std::vector<std::pair<const MusicAsset, const std::string>> music_assets_info = {
-        {MusicAsset::START_MENU, "assets/audio/economical-shoppers.wav"},
-        {MusicAsset::IN_GAME, "assets/audio/twister.wav"}
+        {MusicAsset::START_MENU, "assets/audio/guiton-sketch.wav"},
+        {MusicAsset::IN_GAME, "assets/audio/pump.wav"}
     };
 };
