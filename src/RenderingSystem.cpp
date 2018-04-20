@@ -15,6 +15,7 @@ namespace {
     const std::string TEXTURE_SHADER_PATH = "assets/shaders/TextureShader";
     const std::string SKYBOX_SHADER_PATH = "assets/shaders/SkyboxShader";
     const std::string SHADOW_SHADER_PATH = "assets/shaders/ShadowShader";
+    const std::string OUTLINE_SHADER_PATH = "assets/shaders/OutlineShader";
     const std::string CAR_MESH_PATH = "assets/models/NoWienerCarModel.obj";
     const std::string CAR_SHADOW_MESH_PATH = "assets/models/CarShadowModel.obj";
     const std::string WEINER_MESH_PATH = "assets/models/WienerCarModel.obj";
@@ -73,6 +74,7 @@ void RenderingSystem::load(const Event& e) {
     setup_cameras();
     preload_assets();
     shadow_shader_ = asset_manager_.get_shader_asset(SHADOW_SHADER_PATH);
+    outline_shader_ = asset_manager_.get_shader_asset(OUTLINE_SHADER_PATH);
     particle_subsystem_.handle_load(e);
     asset_manager_.toggle_fullscreen();
 }
@@ -387,6 +389,10 @@ void RenderingSystem::render() {
 
         glViewport(vx, vy, (window_w / 2), (window_h / 2));
 
+        for (auto& object : example_objects_) {
+            object.render_outline(cameras[i], outline_shader_);
+        }
+
         glEnable(GL_FRAMEBUFFER_SRGB);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_MULTISAMPLE);
@@ -588,6 +594,7 @@ void RenderingSystem::preload_assets() const {
     asset_manager_.get_shader_asset(TEXTURE_SHADER_PATH);
     asset_manager_.get_shader_asset(SKYBOX_SHADER_PATH);
     asset_manager_.get_shader_asset(SHADOW_SHADER_PATH);
+    asset_manager_.get_shader_asset(OUTLINE_SHADER_PATH);
 
     // Wiener
     asset_manager_.get_mesh_asset(CAR_MESH_PATH);

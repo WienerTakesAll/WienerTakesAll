@@ -17,6 +17,7 @@ public:
     //Renders the object from the camera perspective.
     void render(glm::mat4x4 camera, float ambient = 0.f) const;
     void render_lighting(glm::mat4x4 camera, glm::vec3 light_direction, ShaderAsset* shadow_shader) const;
+    void render_outline(glm::mat4x4 camera, ShaderAsset* outline_shader) const;
     // Multiplies current transform with new transform
     void apply_transform(glm::mat4x4 transform);
     // Sets current transform to new transform

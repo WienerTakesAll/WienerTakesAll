@@ -150,6 +150,70 @@ void RenderingComponent::render_lighting(glm::mat4x4 camera, glm::vec3 light_dir
 
 }
 
+void RenderingComponent::render_outline(glm::mat4x4 camera, ShaderAsset* outline_shader) const {
+    if (outline_shader == nullptr || !outline_shader->is_valid()) {
+        std::cerr << "Trying to render with invalid shader!" << std::endl;
+        return;
+    }
+
+    if (mesh_ == nullptr || !mesh_->valid_) {
+        std::cerr << "Trying to render with invalid mesh!" << std::endl;
+        return;
+    }
+
+    if (texture_ != nullptr && texture_->is_valid()) {
+        glBindTexture(GL_TEXTURE_2D, texture_->get_texture_id());
+        glEnable(GL_TEXTURE_2D);
+    } else {
+        glDisable(GL_TEXTURE_2D);
+    }
+
+    // https://www.codeproject.com/Articles/8499/Generating-Outlines-in-OpenGL
+    glUseProgram(outline_shader->get_program_id());
+
+    // Enable polygon offsets, and offset filled polygons forward by 2.5
+    glEnable( GL_POLYGON_OFFSET_FILL );
+    glPolygonOffset( -5.5f, -5.5f );
+
+    // Set the render mode to be line rendering with a thick line width
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    glLineWidth( 2.0f );
+
+    // Render the object
+
+    GLuint uniform_model = glGetUniformLocation(shader_->get_program_id(), "Model");
+    GLuint uniform_view = glGetUniformLocation(shader_->get_program_id(), "View");
+
+    for (size_t i = 0; i < mesh_->meshes_.size(); i++) {
+        glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffers_[i]);
+        glVertexAttribPointer
+        (0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
+         , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, position_)));
+        glVertexAttribPointer
+        (1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
+         , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, normal_)));
+        glVertexAttribPointer
+        (2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshAsset::MeshData::VertexData)
+         , reinterpret_cast<void*>(offsetof(MeshAsset::MeshData::VertexData, uv_)));
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffers_[i]);
+
+        glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(transform_matrix_));
+        glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(camera));
+
+        glDrawElements(GL_TRIANGLES, mesh_->meshes_[i].indices_.size(), GL_UNSIGNED_INT, 0);
+    }
+
+    // Set the polygon mode to be filled triangles
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+    // glDisable(GL_POLYGON_OFFSET_FILL);
+
+    // Pop the state changes off the attribute stack
+    // to set things back how they were
+    glPopAttrib();
+}
+
 void RenderingComponent::apply_transform(glm::mat4x4 transform) {
     transform_matrix_ *= transform;
 }

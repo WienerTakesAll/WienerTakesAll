@@ -59,6 +59,7 @@ private:
 
     AssetManager& asset_manager_;
     ShaderAsset* shadow_shader_;
+    ShaderAsset* outline_shader_;
     ParticleSubsystem particle_subsystem_;
     unsigned int whos_it;
     int num_ai_;
