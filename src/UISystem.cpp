@@ -98,16 +98,22 @@ void UISystem::handle_key_press(const Event& e) {
                     quit_event.type = SDL_QUIT;
                     SDL_PushEvent(&quit_event);
                 } else {
-                    EventSystem::queue_event(
-                        Event(
-                            EventType::NEW_GAME_STATE,
-                            "state", GameState::IN_GAME,
-                            "num_players", start_menu_.selected_num_of_players()
-                        )
-                    );
-                    loading_frames_counter_ = 0;
+                    if (!start_menu_.instructions_visible()) {
+                        EventSystem::queue_event(
+                            Event(
+                                EventType::NEW_GAME_STATE,
+                                "state", GameState::IN_GAME,
+                                "num_players", start_menu_.selected_num_of_players()
+                            )
+                        );
+                        loading_frames_counter_ = 0;
+                    }
                 }
 
+                break;
+
+            case SDLK_i:
+                start_menu_.toggle_instructions();
                 break;
 
             case SDLK_UP:
@@ -168,6 +174,7 @@ void UISystem::handle_new_game_state(const Event& e) {
 
     switch (new_game_state) {
         case GameState::START_MENU:
+            start_menu_.hide_instructions();
             gameplay_hud_.reset_scores();
             gameplay_hud_.reset_powerups();
             break;
