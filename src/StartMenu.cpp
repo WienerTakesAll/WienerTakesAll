@@ -11,7 +11,8 @@ namespace {
 
 StartMenu::StartMenu(AssetManager& asset_manager)
     : asset_manager_(asset_manager)
-    , active_selection(0) {
+    , active_selection(0)
+    , instructions_visible_(false) {
 }
 
 void StartMenu::load() {
@@ -130,10 +131,21 @@ void StartMenu::load() {
     selection_indicators_[2].set_origin(glm::vec2(-.5f, -1.03f));
     selection_indicators_[3].set_origin(glm::vec2(-.5f, -1.27f));
     selection_indicators_[4].set_origin(glm::vec2(-.5f, -1.50f));
+
+    TextureAsset* instructions_tex =
+        asset_manager_.get_texture_asset("assets/textures/instructions.png");
+    instructions_ = UIObject( // cover screen
+                        glm::vec2(-1.f),
+                        glm::vec3(1.0f),
+                        glm::vec2(2.0f),
+                        square_mesh_,
+                        instructions_tex,
+                        ui_shader_
+                    );
 }
 
 void StartMenu::move_selection_up() {
-    if (active_selection == 0) {
+    if (active_selection == 0 || instructions_visible_) {
         return;
     }
 
@@ -193,7 +205,7 @@ void StartMenu::move_selection_up() {
 }
 
 void StartMenu::move_selection_down() {
-    if (active_selection >= selection_indicators_.size() - 1) {
+    if (active_selection >= selection_indicators_.size() - 1 || instructions_visible_) {
         return;
     }
 
@@ -252,7 +264,23 @@ void StartMenu::move_selection_down() {
     }
 }
 
+void StartMenu::toggle_instructions() {
+    instructions_visible_ = !instructions_visible_;
+}
+
+void StartMenu::hide_instructions() {
+    instructions_visible_ = false;
+}
+
+bool StartMenu::instructions_visible() {
+    return instructions_visible_;
+}
+
 int StartMenu::selected_num_of_players() {
+    if (instructions_visible_) {
+        return -1;
+    }
+
     return active_selection + 1;
 }
 
@@ -261,6 +289,11 @@ bool StartMenu::selected_exit() {
 }
 
 void StartMenu::render() const {
+    if (instructions_visible_) {
+        instructions_.render(glm::mat4());
+        return;
+    }
+
     background_.render(glm::mat4());
     logo_.render(glm::mat4());
 
