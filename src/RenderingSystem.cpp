@@ -387,7 +387,7 @@ void RenderingSystem::render() {
 
         glViewport(vx, vy, (window_w / 2), (window_h / 2));
 
-
+        glEnable(GL_FRAMEBUFFER_SRGB);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_CULL_FACE);
@@ -424,6 +424,7 @@ void RenderingSystem::render() {
         glDepthMask(GL_TRUE);
         glDisable(GL_BLEND);
         glDisable(GL_STENCIL_TEST);
+        glDisable(GL_FRAMEBUFFER_SRGB);
     }
 
     end_render();
